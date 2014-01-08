@@ -1,0 +1,16 @@
+- biocViews
+- version number check
+- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
+- vignettes/ not inst/doc/
+- examples in man page
+- dontrun / eval=FALSE
+- unit tests
+- detect OS-specific code?
+- registration of .Call entry points
+- \seealso{} ?
+- print() cat() message() warning() error() (mis)use?
+- library() in man pages
+- code formatting stats / constats
+- if () '%' vs '%%'
+- NAMESPACE and DESCRIPTION file consistency
+- devtools? codetoolsBioC?

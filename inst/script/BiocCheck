@@ -1,0 +1,7 @@
+#!/usr/bin/env Rscript --vanilla
+
+
+suppressPackageStartupMessages(library(BiocCheck))
+
+
+message("Hello from BiocCheck")
