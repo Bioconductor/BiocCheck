@@ -14,3 +14,4 @@
 - if () '%' vs '%%'
 - NAMESPACE and DESCRIPTION file consistency
 - devtools? codetoolsBioC?
+- using T and F instead of TRUE/FALSE? (I think R CMD check only checks for this in default param values)
