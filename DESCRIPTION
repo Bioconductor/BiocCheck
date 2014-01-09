@@ -10,4 +10,4 @@ LazyData: true
 VignetteBuilder: knitr
 Depends: optparse
 Imports: biocViews
-Suggests: knitr
+Suggests: knitr, RUnit, BiocGenerics
