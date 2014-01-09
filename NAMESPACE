@@ -1,1 +1,2 @@
-export(installScript)
+import(optparse)
+export(BiocCheck)

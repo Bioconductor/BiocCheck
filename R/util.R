@@ -1,18 +1,24 @@
-installScript <- function()
+.printf <- function(...) cat(noquote(sprintf(...)), "\n")
+
+.BiocCheckFromCommandLine <- function()
 {
-    srcFile = system.file("script", "BiocCheck", package="BiocCheck")
-    destDir = file.path(Sys.getenv("R_HOME"), "bin")
-    ## FIXME put this in tryCatch, complain if we can't copy, suggest an alternative
-    res = file.copy(srcFile, destDir)
-    print(paste("Result was:", res))
-    destFile = file.path(destDir, "BiocCheck")
-    Sys.chmod(destFile, "0755")
+    option_list <- list(
+        make_option(c("-n", "--add_numbers"), action="store_true", default=FALSE,
+        help="Print line number at the beginning of each line [default]")
+        )
+    parser <- OptionParser(usage = "%prog [options] package", option_list=option_list)
+    arguments <- parse_args(parser, positional_arguments = 1)
+    opt <- arguments$options
+    file <- arguments$args
+
+    .printf("file is %s, class of opt is %s\n", file, class(opt))
+    BiocCheck(file, opt)
 }
 
-
-isScriptInstalled <- function()
+BiocCheck <- function(package, ...)
 {
-    # FIXME throw warning if no exec perms
-    file.exists(Sys.getenv("R_HOME"), "bin", "BiocCheck")
+    .printf("in BiocCheck()")
+    .printf("package is %s, args are:", package)
+    dots = list(...)
+    print(dots)
 }
-
