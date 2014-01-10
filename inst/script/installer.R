@@ -8,7 +8,6 @@ destFile <- file.path(destDir, "BiocCheck")
 alreadyExists <- file.exists(destFile)
 
 
-
 if ( (!alreadyExists) || (md5sum(srcFile) != md5sum(destFile)))
 {
     res <- FALSE
