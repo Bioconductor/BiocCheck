@@ -2,10 +2,15 @@
 
 library(tools)
 
-srcFile <- file.path("inst", "script", "BiocCheck")
+srcDir <- file.path("inst", "script")
+srcFile <- file.path(srcDir, "BiocCheck")
+if (onWindows)
+    srcDir <- c(srcDir, file.path(srcDir, "BiocCheck.bat"))
 destDir <- file.path(Sys.getenv("R_HOME"), "bin")
 destFile <- file.path(destDir, "BiocCheck")
 alreadyExists <- file.exists(destFile)
+onWindows <- (.Platform$OS.type == "windows")
+
 
 
 if ( (!alreadyExists) || (md5sum(srcFile) != md5sum(destFile)))
@@ -14,7 +19,8 @@ if ( (!alreadyExists) || (md5sum(srcFile) != md5sum(destFile)))
     suppressWarnings(
         tryCatch({
                 res <- file.copy(srcFile, destDir, overwrite<-TRUE)
-                res <- Sys.chmod(destFile, "0755")
+                if (!onWindows)
+                    res <- Sys.chmod(destFile, "0755")
                     },
             error=function(e) res=-1)
     )
@@ -26,6 +32,8 @@ if ( (!alreadyExists) || (md5sum(srcFile) != md5sum(destFile)))
             "If you want to be able to run 'R CMD BiocCheck' you'll\n",
             "need to copy it yourself to a directory on your PATH,\n",
             "making sure it is executable.", sep=""))
+        if (onWindows)
+            message("Windows users need to copy BiocCheck.bat as well.")
     }
 }
 
