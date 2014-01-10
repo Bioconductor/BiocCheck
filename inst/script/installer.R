@@ -1,6 +1,7 @@
 #!/usr/bin/env Rscript --vanilla
 
 library(tools)
+onWindows <- (.Platform$OS.type == "windows")
 
 srcDir <- file.path("inst", "script")
 srcFile <- file.path(srcDir, "BiocCheck")
@@ -9,7 +10,6 @@ if (onWindows)
 destDir <- file.path(Sys.getenv("R_HOME"), "bin")
 destFile <- file.path(destDir, "BiocCheck")
 alreadyExists <- file.exists(destFile)
-onWindows <- (.Platform$OS.type == "windows")
 
 
 
