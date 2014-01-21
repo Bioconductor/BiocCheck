@@ -1,0 +1,42 @@
+\name{with_debug}
+\alias{with_debug}
+\title{Temporarily set debugging compilation flags.}
+\usage{
+with_debug(code, PKG_CFLAGS = NULL, PKG_CXXFLAGS = NULL,
+  PKG_FFLAGS = NULL, PKG_FCFLAGS = NULL, debug = TRUE,
+  action = "replace")
+}
+\arguments{
+  \item{code}{to execute.}
+
+  \item{PKG_CFLAGS}{flags for compiling C code}
+
+  \item{PKG_CXXFLAGS}{flags for compiling C++ code}
+
+  \item{PKG_FFLAGS}{flags for compiling Fortran code.}
+
+  \item{PKG_FCFLAGS}{flags for Fortran 9x code.}
+
+  \item{action}{(for \code{with_envvar} only): should new
+  values \code{"replace"}, \code{"suffix"}, \code{"prefix"}
+  existing environmental variables with the same name.}
+
+  \item{debug}{If \code{TRUE} adds \code{-g -O0} to all
+  flags (Adding \env{PKG_FFLAGS} and \env{PKG_FCFLAGS}}
+}
+\description{
+Temporarily set debugging compilation flags.
+}
+\examples{
+flags <- names(compiler_flags(TRUE))
+with_debug(Sys.getenv(flags))
+
+\dontrun{
+install("mypkg")
+with_debug(install("mypkg"))
+}
+}
+\seealso{
+Other debugging flags: \code{\link{compiler_flags}}
+}
+

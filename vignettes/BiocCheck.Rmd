@@ -1,0 +1,87 @@
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{BiocCheck}
+-->
+
+# BiocCheck
+
+`BiocCheck` is *opinionated software*, encapsulating what the Bioconductor 
+core team feels are best practices for writing Bioconductor packages.
+We've divided our opinions into three categories:
+
+* **REQUIRED** (Equivalent to an `ERROR` in `R CMD check`). This means the package
+  is missing something critical and it cannot be accepted into Bioconductor
+  until the issue is fixed. (`BiocCheck` will continue past a `required`
+  error, thus it is possible to have more than one, but it will end
+  with an error code.) 
+* **RECOMMENDED** (Equivalent to a `WARNING` in `R CMD check`). We strongly
+  encourage that these issues be fixed. In the weeks leading up to a
+  Bioconductor release we will ask package authors to fix these issues.
+* **NOTE**: Not necessarily something bad, just something we wanted to point out.
+
+# Using `BiocCheck`
+
+Most commonly you will use BiocCheck from your operating system command line,
+as
+
+    R CMD BiocCheck package
+
+Where `package` is either a directory containing an R package, or a source
+tarball (.tar.gz file). R CMD BiocCheck takes options which can be seen by running
+
+    R CMD BiocCheck --help
+
+```{r echo=FALSE}
+suppressWarnings(
+    output <- system2(file.path(Sys.getenv("R_HOME"), "bin", "R"),
+        "CMD BiocCheck --help", stdout=TRUE, stderr=FALSE)
+)
+cat(paste(output, collapse="\n"))
+```
+
+# When should `BiocCheck` be run
+
+Run `BiocCheck` after running `R CMD check`. 
+
+# Installing `BiocCheck`
+
+`BiocCheck` should be installed as follows:
+
+```{r eval=FALSE}
+source("http://bioconductor.org/biocLite.R")
+biocLite("BiocCheck")
+```
+
+This installation process attempts to install a script called `BiocCheck` in the `bin`
+directory of your `R` installation. If it fails to do that (most likely due to insufficient
+permissions), it will tell you, saying something like:
+
+    Failed to copy the "inst/script/BiocCheck" script to
+    /Library/Frameworks/R.framework/Resources/bin
+    If you want to be able to run 'R CMD BiocCheck' you'll
+    need to copy it yourself to a directory on your PATH,
+    making sure it is executable.
+
+
+You can fix the problem by following these instructions (noting that `R` may
+live in a different directory on your system than what is shown above).
+
+Windows users will also see this:
+
+    Windows users need to copy BiocCheck.bat as well.
+
+If you don't have permission to copy these files to the `bin` directory
+of your `R` installation, you can, as noted, copy them to any directory
+that's in your PATH. For assistance modifying your PATH, see this link
+([Windows](http://www.computerhope.com/issues/ch000549.htm)) or 
+this one ([Mac/Unix](http://kb.iu.edu/data/acar.html)).
+
+If you manually copy these files to a directory in your PATH that is
+not your R bin directory, you'll continue to see the above message 
+when (re-)installing `BiocCheck` but you can safely ignore it.
+
+
+
+
+# Interpreting `BiocCheck` Messages
+
