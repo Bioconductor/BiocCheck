@@ -3,3 +3,6 @@
 .RData
 BiocCheck.Rproj
 .Rbuildignore
+vignettes/*.md
+vignettes/*.html
+*.so

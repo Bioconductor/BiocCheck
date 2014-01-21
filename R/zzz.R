@@ -1,29 +1,15 @@
 setRefClass("MsgClass",
     fields=list(
-        name="character"
-    )
-)
-
-setRefClass("NumClass",
-    fields=list(
-        num="integer"
+        msg="character"
     ),
     methods=list(
-        bump = function(){
-            if (length(.self$num) == 0)
-                .self$num <- 0
-            .self$num <- .self$num + 1
-            return(.self$num)
-            },
-        get = function() .self$num
+        get = function() .self$msg,
+        getNum = function() length(.self$msg),
+        zero = function() .self$msg <- character(0),
+        add = function(m) .self$msg <- append(.self$msg, m) 
         )
 )
 
-
-check_errors <- new("MsgClass", name=character(0))
-check_warnings <- new("MsgClass", name=character(0))
-check_notes <- new("MsgClass", name=character(0))
-
-num_errors <- new ("NumClass", num=integer(0))
-num_warnings <- new ("NumClass", num=integer(0))
-num_notes <- new ("NumClass", num=integer(0))
+.errors <- new("MsgClass", msg=character(0))
+.warnings <- new("MsgClass", msg=character(0))
+.notes <- new("MsgClass", msg=character(0))
