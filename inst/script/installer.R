@@ -6,21 +6,31 @@ onWindows <- (.Platform$OS.type == "windows")
 srcDir <- file.path("inst", "script")
 srcFile <- file.path(srcDir, "BiocCheck")
 if (onWindows)
-    srcFile <- c(srcFile, file.path(srcDir, "BiocCheck.bat"))
+    batFile <- c(srcFile, file.path(srcDir, "BiocCheck.bat"))
 destDir <- file.path(Sys.getenv("R_HOME"), "bin")
 destFile <- file.path(destDir, "BiocCheck")
+tmpFile <- file.path(tempdir(), "BiocCheck")
 alreadyExists <- file.exists(destFile)
 
+lines <- readLines(srcFile)
+lines <- gsub("RSCRIPT_PATH", file.path(Sys.getenv("R_HOME"),
+    "bin", "Rscript"), lines)
+cat(lines, file=tmpFile, sep="\n")
+Sys.chmod(tmpFile, "0755")
 
-
-if ( (!alreadyExists) || (md5sum(srcFile) != md5sum(destFile)))
+if ( (!alreadyExists) || (md5sum(tmpFile) != md5sum(destFile)))
 {
     res <- FALSE
     suppressWarnings(
         tryCatch({
-                res <- file.copy(srcFile, destDir, overwrite<-TRUE)
-                if (!onWindows)
+                res <- file.copy(tmpFile, destDir, overwrite<-TRUE)
+
+                if (onWindows)
+                {
+                    res <- file.copy(batFile, destDir, overwrite<-TRUE)
+                } else {
                     res <- Sys.chmod(destFile, "0755")
+                }
                     },
             error=function(e) res=-1)
     )

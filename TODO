@@ -1,3 +1,24 @@
+fix install bug if R is not in path
+X- check for <<-
+
+More suggestions are going in the wiki:
+https://github.com/Bioconductor/BiocCheck/wiki
+
+X-Detect problematic depends: see Martin's email
+
+Suggestions from Nate:
+- Valid license
+- Make sure every (non-trivial) class has a show() method.
+   or at least display the #/% of classes that don't.
+
+---
+more ideas from dan:
+
+X- search for browser() statements
+X- search for more than one (e.g.) examples section in man page?
+  (subsequent ones are not checked by R CMD check)
+  (I think R CMD check warns about this)
+
 X - biocViews
 X- version number check
 X- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
@@ -11,21 +32,21 @@ X- unit tests
 - deprecated packages
     multicore
 - detect OS-specific code?
-- registration of .Call entry points
+X- registration of .Call entry points
     getLoadedDLLs() - is there one?
     getDLLRegisteredRoutines() if it returns nothing
     warning
-- use of .C is a note
+X- use of .C is a note
 - \seealso{} ?
     NOTE: count # of times it's used
 - print() cat() message() warning() error() (mis)use?
-- library(pkg) in man pages
+X- library(pkg) in man pages
     warning
 - code formatting stats / constats
     indentation, line length NOTE
     formatR / tidy?
 - if () '%' vs '%%' # & vs &&, | vs || ?
-- NAMESPACE and DESCRIPTION file consistency
+X- NAMESPACE and DESCRIPTION file consistency
     warning getNamespaceImports
     loadedNamespaces()
     all 
@@ -36,11 +57,11 @@ X- unit tests
     well-formatted?
     warning
 
-- using T and F instead of TRUE/FALSE? (I think R CMD check only checks for this in default param values)
+X- using T and F instead of TRUE/FALSE? (I think R CMD check only checks for this in default param values)
     would be nice - 
     rapply(body)
     codetools
-    - Is version number ok for a new package? (0.99.z). We'd need to know if the package is intended to be a new package.
+X    - Is version number ok for a new package? (0.99.z). We'd need to know if the package is intended to be a new package.
 
 misc notes
 
@@ -52,7 +73,7 @@ Note - neutral
 
 Is error necessary?
 
-add new flag --new-package,
+X add new flag --new-package,
     then check that version is 0.99.z if that switch is on
 
 tools::Rdindex
@@ -92,32 +113,32 @@ new todos 1/15/14
    - [ ] runnable examples on pages with exported functions / methods
 - Cross-platform availability
 **** Recommended (warnings)
-- [ ] NAMESPACE and DESCRIPTION file inconsistency
+- [X] NAMESPACE and DESCRIPTION file inconsistency
        all(names(getNamespaceImports("Rsamtools")) %in% loadedNamespaces())
        all(unmangled(packageDescription("Rsamtools")$Imports) %in% 
 getNamespaceImports("Rsamtools"))
 - [0/1] vignette
-   - [ ] % eval=FALSE chunks
+   - [..] % eval=FALSE chunks (noted but it's not a warning...)
 - [0/1] inst/doc
-   - [ ] vignette sources (Rnw, Rmd, Rrst)
+   - [X] vignette sources (Rnw, Rmd, Rrst)
 - [0/1] man
    - [ ] % dontrun
 - [0/1] tests
    - [X] non-empty tests/ directory
 - [0/2] R/
-   - [ ] OS-specific packages / code ?
-   - [ ] Don't use T / F
+   - [X] OS-specific packages / code ?
+   - [X] Don't use T / F
 - [ ] NEWS
        - present in ./ or ./inst
        - well-formatted?
-- [ ] registration of .Call entry points
+- [X] registration of .Call entry points
    - pkg in getLoadedDLLS() but no getDLLRegistredRoutines()
-- [ ] library(MyPackage) / require() in man pages
-- print() cat() message() warning() error() (mis)use?
+- [X] library(MyPackage) / require() in man pages
+- print() cat() message() warning() stop() (mis)use?
 **** Other? (note)
-- [ ] use of .C
+- [X] use of .C
 - [ ] \seealso{} (times used; more is better)
 - [ ] Code formatting stats / consistency
 - [ ] warnings reported to user
-- [ ] codetoolsBioC::writeNamespaceExports()
+- [X] codetoolsBioC::writeNamespaceExports()
 - devtools? formatR?

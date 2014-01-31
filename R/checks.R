@@ -4,7 +4,7 @@ getVigSources <- function(dir)
 {
     dir(dir,
         pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$",
-        ignore.case=TRUE)
+        ignore.case=TRUE, full.names=TRUE)
 }
 
 checkVignetteDir <- function(pkgdir)
@@ -28,7 +28,23 @@ checkVignetteDir <- function(pkgdir)
         handleWarning("Vignette sources exist in inst/doc/; they belong in vignettes/.")
     }
 
+    chunks <- 0
+    efs <- 0
+    for (file in vigdircontents)
+    {
+        chunks <- chunks +
+            length(grep(">>=|```\\{r|.. \\{r", readLines(file,
+            warn=FALSE)))
+        efs <- efs + 
+            length(grep("eval\\s?=\\s?FALSE", readLines(file,
+            warn=FALSE)))
+    }
 
+    percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
+
+    handleNote(sprintf(
+        "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
+        chunks, efs,  as.integer(percent)))
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
@@ -232,18 +248,31 @@ checkImportSuggestions <- function(pkgname)
     suggestions <- NULL
     tryCatch({
         suppressMessages({
-            suggestions <- capture.output(writeNamespaceImports(pkgname))
+            suppressWarnings({
+                suggestions <- capture.output(writeNamespaceImports(pkgname))
+            })
         })
     },
         error=function(e){
+            suggestions <- "ERROR"
             handleMessage("Could not get namespace suggestions.")
-            })
-    if(!is.null(suggestions))
+    })
+
+
+    if(length(suggestions) && (!is.null(suggestions)) &&
+        (suggestions != "ERROR"))
     {
             handleMessage("Namespace import suggestions are:")
-            cat(paste(suggestions, collapse="\n"))
+            message(paste(suggestions, collapse="\n"))
             handleMessage("--END of namespace import suggestions.")
     }
+
+    if ((!is.null(suggestions)) && (!length(suggestions)))
+    {
+        message("  No suggestions.")
+    }
+
+    suggestions
 }
 
 checkDeprecatedPackages <- function(pkgdir)
@@ -256,61 +285,8 @@ checkDeprecatedPackages <- function(pkgdir)
 }
 
 
-checkTorF <- function(parsedCode)
-{
-    t <- list()
-    f <- c()
-    for (filename in names(parsedCode))
-    {
-        df <- parsedCode[[filename]]
-        trows <- df[which(df$token == "SYMBOL" & df$text =="T"),]
-        frows <- df[which(df$token == "SYMBOL" & df$text =="F"),]
-        if (nrow(trows) > 0) 
-        hasT <- dim(trows)[1] > 0
-        hasF <- dim(frows)[1] > 0 
-        if (hasT) t <- append(t, filename)
-        if (hasF) f <- append(f, filename)
-
-    }
-    #FIXME - print output
-    list(t=t, f=f) # for tests
-}
 
 
-mungeName <- function(name, pkgname)
-{
-    pos <- regexpr(pkgname, name)
-    substr(name, pos+1+nchar(pkgname), nchar(name))
-}
-
-
-checkForDotC <- function(parsedCode, pkgname)
-{
-    dotc <- list()
-    for (filename in names(parsedCode))
-    {
-        df <- parsedCode[[filename]]
-        dotcrows <- df[which(df$token == "SYMBOL_FUNCTION_CALL" & df$text ==".C"),]
-        if (nrow(dotcrows) > 0)
-        {
-            dotc[[filename]] <- dotcrows[, c(1,2)]
-        }
-    }
-    for (name in names(dotc))
-    {
-        x <- dotc[[name]]
-        for (i in nrow(x))
-        {
-            if (grepl("\\.R$", name, ignore.case=TRUE))
-                message(sprintf("Found .C in %s (line %s, column %s)",
-                    mungeName(name, pkgname), x[i,1], x[i,2]))
-            else
-                message(sprintf("Found .C in %s", name)) # FIXME test this
-
-        }
-    }
-    dotc # for tests
-}
 
 checkParsedFiles <- function(pkgdir)
 {
@@ -391,4 +367,311 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
             paste(badones, collapse=", ")))
 
     }
+}
+
+## Make sure this is run after pkg is installed.
+checkForBadDepends <- function(pkgdir)
+{
+    pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
+    output <- getBadDeps(pkgdir)
+
+    if (!is.null(output))
+    {
+        output <- strsplit(output, "\n")[[1]]
+        res <- regexpr("'[^']*'$", output)
+        fns <- regexpr("^[^:]*:", output)
+        fmatch.length <- attr(fns, "match.length")
+        if (any(res != -1))
+        {
+            res <- substr(output, res, nchar(output))
+            fns <- unique(substr(output, fns, fmatch.length-1))
+            res <- gsub("'", "", fixed=TRUE, res)
+            res <- unique(res)
+            badFunctions <- paste(fns, collapse=", ")
+            badObjects <- paste(res, collapse=", ")
+            msg <- sprintf(paste0(
+                "Packages that provide %s\n",
+                "  (used in %s)\n",
+                "  should be in Imports, not Depends (and imported in NAMESPACE),\n",
+                "  otherwise packages that import %s could fail."),
+                badObjects, badFunctions, pkgname)
+            handleError(msg)
+        }
+    }
+
+}
+
+
+
+
+getBadDeps <- function(pkgdir)
+{
+    cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
+    oldquotes <- getOption("useFancyQuotes")
+    on.exit(options(useFancyQuotes=oldquotes))
+    options(useFancyQuotes=FALSE)
+    args <- sprintf("-q --vanilla --slave -f %s --args %s",
+        system.file("script", "checkBadDeps.R", package="BiocCheck"),
+        dQuote(pkgdir))
+    system2(cmd, args, stdout=TRUE, stderr=FALSE)
+}
+
+
+## FIXME - turns out this is slow when run against
+getFunctionLengths <- function(df)
+{
+    df <- df[df$terminal & df$parent > -1,]
+    rownames(df) <- seq_along(1:nrow(df))
+    max <- nrow(df)
+    res <- list()
+    funcRows <- df[df$token == "FUNCTION",]
+    lst<-lapply(split(df, rownames(df)), as.list)
+    if (nrow(funcRows))
+    {
+        for (i in 1:nrow(funcRows))
+        {
+            funcRowId <- as.integer(rownames(funcRows)[i])
+            funcRow <- funcRows[as.character(funcRowId),]
+            funcStartLine <- funcRow$line1 # this might get updated later
+            funcLines <- NULL
+            funcName <- "_anonymous_"
+            # attempt to get function name
+            if (funcRowId >= 3) 
+            {
+                up1 <- lst[[as.character(funcRowId -1)]]
+                #up1 <- df[as.character(funcRowId - 1),]
+                #up2 <- df[as.character(funcRowId - 2),]
+                up2 <- lst[[as.character(funcRowId -2)]]
+                if (up1$token %in% c("EQ_ASSIGN", "LEFT_ASSIGN") &&
+                    up2$token == "SYMBOL")
+                {
+                    funcName <- up2$text
+                    funcStartLine <- up2$line1
+                }
+            }
+            j <- funcRowId + 1
+            saveme <- NULL
+            while (TRUE)
+            {
+                #thisRowId <- as.integer(rownames(df)[j])
+                thisRowId <- j
+                #thisRow <- df[thisRowId,]
+                thisRow <- lst[[as.character(thisRowId)]]
+                if (thisRowId == max || thisRow$parent > funcRow$parent)
+                {
+                    lineToExamine <- ifelse(thisRowId == max, max, saveme)
+                    #endLine <- df[rownames(df) == as.character(lineToExamine), "line2"]
+                    endLine <- lst[[as.character(lineToExamine)]]$line2
+                    funcLines <- endLine - (funcStartLine -1)
+                    if(funcName == "_anonymous_") funcName <- paste0(funcName, ".",
+                        funcStartLine)
+                    res[[funcName]] <- c(length=funcLines,
+                        startLine=funcStartLine, endLine=endLine)
+                    break
+                } else {
+                    if (thisRow$parent > 0) 
+                    {
+                        saveme <- thisRowId
+                    }
+                }
+                j <- j + 1
+            }
+
+        }
+    }
+    res
+}
+
+doesFileLoadPackage <- function(df, pkgname)
+{
+    df <- cbind(df, idx=seq_along(1:nrow(df)))
+    res <- c()
+    regex <- paste0("^['|\"]*", pkgname, "['|\"]*$")
+    max <- nrow(df)
+    reqs <- df[df$token == "SYMBOL_FUNCTION_CALL" &
+        df$text %in% c("library","require"),]
+    if (nrow(reqs))
+    {
+        for (i in 1:nrow(reqs))
+        {
+            reqRow <- reqs[i,]
+            currIdx <- reqs[i, "idx"]
+            if ((currIdx + 1) >= max) return(res)
+            i1 = df[df$idx == currIdx+1,]
+            p <- i1$parent
+            rowsWithThatParent <- df[df$parent == p,]
+            lastRowWithThatParent <-
+                rowsWithThatParent[nrow(rowsWithThatParent),]
+            rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
+            for (j in 1:nrow(rowsToCheck))
+            {
+                curRow <- rowsToCheck[j,]
+                if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
+                    grepl(regex, curRow$text))
+                {
+                    prevRow <- df[curRow$idx -1,]
+                    prevPrevRow <- df[curRow$idx -2,]
+                    if (!(prevRow$token == "EQ_SUB" && 
+                        prevRow$text == "=" &&
+                        prevPrevRow$token == "SYMBOL_SUB" &&
+                        prevPrevRow$text == "help"))
+                    {
+                        res <- append(res, reqRow$line1)
+                    }
+                }
+            }
+        }    
+    res
+    }
+}
+
+
+checkForLibraryMe <- function(pkgname, parsedCode)
+{
+    for (filename in names(parsedCode))
+    {
+        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
+            next
+        df <- parsedCode[[filename]]
+        if (nrow(df))
+        {
+            res <- doesFileLoadPackage(df, pkgname)
+            if (length(res))
+            {
+                msg <- sprintf("library or require called on %s in file %s",
+                    pkgname, mungeName(filename, pkgname))
+                if (grepl("\\.R$", filename, ignore.case=TRUE))
+                {
+                    msg <- sprintf("%s, line %s", msg, 
+                        paste(res, collapse=","))
+                }
+                msg <- sprintf("%s; this is not necessary.", msg)
+                handleMessage(msg)
+            }
+        }
+    }
+}
+
+checkFunctionLengths <- function(parsedCode, pkgname)
+{
+    df <- data.frame(stringsAsFactors=FALSE)
+    i <- 1
+    for (filename in names(parsedCode))
+    {
+        #.debug("filename is %s", filename)
+        message(".", appendLF=FALSE)
+        pc <- parsedCode[[filename]]
+        filename <- mungeName(filename, pkgname)
+        res <- getFunctionLengths(pc)
+        for (name in names(res)) {
+            x <- res[[name]]
+            if (length(x))
+            {
+                df[i,1] <- filename
+                df[i,2] <- name
+                df[i,3] <- x['length']
+                df[i,4] <- x['startLine']
+                df[i,5] <- x['endLine']
+            }
+            i <- i + 1
+        }
+    }
+    message("")
+    
+    colnames <- c("filename","functionName","length","startLine","endLine")
+    if (ncol(df) == length(colnames))
+    {
+        colnames(df) <- colnames
+        df <- df[with(df, order(-length)),]
+        h <- head(df, n=5)
+        if (nrow(h))
+        {
+            handleMessage(sprintf(
+                "  The longest function is %s lines long", max(h$length)))
+            handleMessage(sprintf("  The longest %s functions are:", nrow(h)))
+            for (i in 1:nrow(h))
+            {
+                row <- df[i,]
+                if (grepl("\\.R$", row$filename, ignore.case=TRUE))
+                {
+                    handleMessage(sprintf("    %s() (%s, line %s): %s lines",
+                        row$functionName, row$filename, row$startLine, row$length))
+                } else {
+                    handleMessage(sprintf("    %s() (%s): %s lines",
+                        row$functionName, row$filename, row$length))
+                }
+            }
+        }
+    }
+}
+
+## This needs work. Doesn't R CMD check do this anyway?
+old.checkExportsAreDocumented <- function(pkgdir, pkgname)
+{
+    namesAndAliases <- character(0)
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+    for (manpage in manpages)
+    {
+        rd <- parse_Rd(manpage)
+        name <- 
+            unlist(rd[unlist(lapply(rd, function(x) 
+                attr(x, "Rd_tag") == "\\name"))][[1]][1])
+        aliases <- unlist(lapply(rd[unlist(lapply(rd,
+            function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
+        namesAndAliases <- append(namesAndAliases, c(name, aliases))
+    }
+    exports <- getNamespaceExports(pkgname)
+    bad <- (!exports %in% unique(namesAndAliases))
+    exports[bad]
+}
+
+doesManPageHaveRunnableExample <- function(rd)
+{
+    hasExamples <- any(unlist(lapply(rd,
+        function(x) attr(x, "Rd_tag") == "\\examples")))
+    if (!hasExamples) return(FALSE)
+    ex <- capture.output(Rd2ex(rd))
+    ex <- grep("^\\s*$", ex, invert=TRUE, value=TRUE)
+    ex <- grep("^\\s*#", value=TRUE, ex, invert=TRUE)
+    ex <- ex[nchar(ex) > 0]
+    as.logical(length(ex))
+}
+
+# Which pages document things that are exported?
+checkExportsAreDocumented <- function(pkgdir, pkgname)
+{
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+    exports <- getNamespaceExports(pkgname)
+    msgs <- character(0)
+    for (manpage in manpages)
+    {
+        rd <- parse_Rd(manpage)
+        name <- 
+            unlist(rd[unlist(lapply(rd, function(x) 
+                attr(x, "Rd_tag") == "\\name"))][[1]][1])
+        aliases <- unlist(lapply(rd[unlist(lapply(rd,
+            function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
+        namesAndAliases <- c(name, aliases)
+        exportedTopics <- unique(namesAndAliases[namesAndAliases %in% exports])
+        if (length(exportedTopics) && 
+            !doesManPageHaveRunnableExample(rd)) 
+        {
+            msg <- sprintf(paste0("Man page %s documents exported\n", 
+                "  topic(s) %s\n  but has no runnable examples."),
+                basename(manpage), paste(exportedTopics, collapse=", "))
+            msgs <- append(msgs, msg)
+        }
+
+    }
+    if (length(msgs))
+    {
+        handleError("Man pages of exported objects had no running examples:")
+        for (msg in msgs)
+        {
+            handleMessage(msg)
+        }
+    }
+    msgs # for testing
 }

@@ -1,4 +1,5 @@
-#!/usr/bin/env Rscript --vanilla
+#!RSCRIPT_PATH --vanilla 
+# replace RSCRIPT_PATH above with full path to Rscript
 
 suppressPackageStartupMessages(library(methods))
 suppressPackageStartupMessages(library(BiocCheck))
