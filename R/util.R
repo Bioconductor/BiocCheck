@@ -1,12 +1,15 @@
 .printf <- function(...) cat(noquote(sprintf(...)), "\n")
 
-.msg <- function(...) message(noquote(sprintf(...)))
+.debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
+    .printf(...)
+.msg <- function(..., appendLF=TRUE)
+    message(noquote(sprintf(...)), appendLF=appendLF)
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
 
-handleMessage <- function(msg)
+handleMessage <- function(msg, appendLF=TRUE)
 {
-    .msg("* %s", msg)
+    .msg("* %s", msg, appendLF=appendLF)
 }
 
 handleError <- function(msg)
@@ -47,7 +50,8 @@ installAndLoad <- function(pkg)
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]
     args <- list(package=pkgname, lib.loc=libdir)
     if (paste0("package:",pkgname) %in% search())
-        unload(file.path(libdir, pkgname))
+        suppressWarnings(unload(file.path(libdir, pkgname)))
+
     suppressPackageStartupMessages(do.call(library, args))
 }
 
@@ -75,10 +79,13 @@ getAllDependencies <- function(pkgdir)
 
 parseFile <- function(infile, pkgdir)
 {
+    # FIXME - use purl to parse RMD and RRST
+    # regardless of VignetteBuilder value
     if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst", infile, TRUE))
     {
         dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-        if ("VignetteBuilder" %in% colnames(dcf))
+        if ("VignetteBuilder" %in% colnames(dcf) &&
+            dcf[, "VignetteBuilder"]=="knitr")
         {
             outfile <- file.path(tempdir(), "parseFile.tmp")
             suppressMessages(capture.output(
@@ -88,20 +95,20 @@ parseFile <- function(infile, pkgdir)
             oldwd <- getwd()
             on.exit(setwd(oldwd))
             setwd(tempdir())
-            outfile <- file.path(tempdir(), sub("\\.Rnw$", ".R", TRUE), basename(infile))
-            Stangle(infile)
+            outfile <- file.path(tempdir(),
+                sub("\\.Rnw$", ".R", basename(infile), ignore.case=TRUE))
+            capture.output(Stangle(infile))
         }
     } else if (grepl("\\.Rd", infile, TRUE)) 
     {
         rd <- parse_Rd(infile)
         outfile <- file.path(tempdir(), "parseFile.tmp")
-        capture.output(code <- Rd2ex(rd))
-        cat(code, file=outfile)
+        code <- capture.output(Rd2ex(rd))
+        cat(code, file=outfile, sep="\n")
     } else if (grepl("\\.R", infile, TRUE)) {
-        #message(sprintf("infile is %s", infile))
         outfile <- infile
     }
-    p <- parse(outfile)
+    p <- parse(outfile, keep.source=TRUE)
     getParseData(p)
 }
 
@@ -118,7 +125,56 @@ parseFiles <- function(pkgdir)
     for (file in files)
     {
         df <- parseFile(file, pkgdir)
-        parsedCode[[file]] <- df
+        if (nrow(df))
+            parsedCode[[file]] <- df
     }
     parsedCode
 }
+
+findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
+    token)
+{
+    matches <- list()
+    for (filename in names(parsedCode))
+    {
+        df <- parsedCode[[filename]]
+        matchedrows <- 
+            df[which(df$token == 
+                token & df$text == symbolName),]
+        if (nrow(matchedrows) > 0)
+        {
+            matches[[filename]] <- matchedrows[, c(1,2)]
+        }
+    }
+    if (token == "SYMBOL_FUNCTION_CALL")
+        parens="()"
+    else
+        parens=""
+    for (name in names(matches))
+    {
+        x <- matches[[name]]
+        for (i in nrow(x))
+        {
+            if (grepl("\\.R$", name, ignore.case=TRUE))
+                message(sprintf("  Found %s%s in %s (line %s, column %s)",
+                    symbolName, parens,
+                    mungeName(name, pkgname), x[i,1], x[i,2]))
+            else
+                message(sprintf("  Found %s%s in %s",
+                    symbolName, parens,
+                    mungeName(name, pkgname))) # FIXME test this
+
+        }
+    }
+    length(matches) # for tests
+}
+
+mungeName <- function(name, pkgname)
+{
+    twoseps <- paste0(rep.int(.Platform$file.sep, 2), collapse="")
+    name <- gsub(twoseps, .Platform$file.sep, name, fixed=TRUE)
+    pos <- regexpr(pkgname, name)
+    substr(name, pos+1+nchar(pkgname), nchar(name))
+}
+
+

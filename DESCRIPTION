@@ -10,6 +10,6 @@ License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
 Imports: biocViews, BiocInstaller, graph, devtools (>= 1.4.1),
-    knitr, tools, optparse
-Suggests: RUnit, BiocGenerics, Biobase
+    knitr, tools, optparse, codetools
+Suggests: RUnit, BiocGenerics, Biobase, RJSONIO
 Enhances: codetoolsBioC

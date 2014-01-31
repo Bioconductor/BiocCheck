@@ -6,9 +6,13 @@
         make_option("--no-check-vignettes", action="store_true",
             help="disable vignette checks"),
         make_option("--new-package", action="store_true",
-            help="enable checks specific to new packages")
+            help="enable checks specific to new packages"),
+        make_option("--no-check-bioc-views", action="store_true",
+            help="disable biocViews-specific checks (for non-BioC packages)")
+
         )
-    parser <- OptionParser(usage = "R CMD BiocCheck [options] package", option_list=option_list)
+    parser <- OptionParser(usage = "R CMD BiocCheck [options] package",
+        option_list=option_list)
     arguments <- parse_args(parser, positional_arguments = 1)
     opt <- arguments$options
     file <- arguments$args
@@ -19,6 +23,7 @@
 
 BiocCheck <- function(package, ...)
 {
+    package <- normalizePath(package)
     d <- list(...)
     if (length(d))
         dots <- list(...)[[1]]
@@ -33,8 +38,13 @@ BiocCheck <- function(package, ...)
 
     handleMessage(sprintf("This is BiocCheck, version %s.",
         packageVersion("BiocCheck")))
+
+
+
     handleMessage("Installing package...")
     installAndLoad(package)
+
+    checkForBadDepends(file.path(tempdir(), "lib", package_name))
 
 
     ## checks
@@ -50,8 +60,12 @@ BiocCheck <- function(package, ...)
         checkNewPackageVersionNumber(package_dir)
     }
     checkVersionNumber(package_dir, !is.null(dots[["new-package"]]))
-    handleMessage("Checking biocViews...")
-    checkBiocViews(package_dir)
+
+    if (is.null(dots[["no-check-bioc-views"]]))
+    {
+        handleMessage("Checking biocViews...")
+        checkBiocViews(package_dir)
+    }
     handleMessage("Checking build system compatibility...")
     checkBBScompatibility(package_dir)
     handleMessage("Checking unit tests...")
@@ -64,23 +78,63 @@ BiocCheck <- function(package, ...)
         checkImportSuggestions(package_name)
     }
 
-    handleMessage("Checking for deprecated package usage....")
+    handleMessage("Checking for deprecated package usage...")
     checkDeprecatedPackages(package_dir)
 
     handleMessage("Parsing R code in R directory, examples, vignettes...")
 
     parsedCode <- parseFiles(package_dir)
 
-    handleMessage("Checking for T and F symbols...")
-    checkTorF(parsedCode)
-    handleMessage("Checking for .C...")
-    checkForDotC(parsedCode, package_name)
+    ## FIXME - these should probably tell the user
+    ## which files (with line number?) the 'offending'
+    ## symbols were found in.
+
+    handleMessage("Checking for T...")
+    res <- findSymbolInParsedCode(parsedCode, package_name, "T",
+        "SYMBOL")
+    if (res > 0) handleWarning(sprintf("T was found in %s files",
+        res))
+    handleMessage("Checking for F...")
+    res <- findSymbolInParsedCode(parsedCode, package_name, "F",
+        "SYMBOL")
+    if (res > 0) handleWarning(sprintf("F was found in %s files",
+        res))
+
+    handleMessage("Checking for .C()...")
+    res <- findSymbolInParsedCode(parsedCode, package_name, ".C",
+        "SYMBOL_FUNCTION_CALL")
+    if (res > 0) handleNote(sprintf(".C() was found in %s files",
+        res))
+    handleMessage("Checking for browser()...")
+    res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
+        "SYMBOL_FUNCTION_CALL")
+    if (res > 0)
+        handleWarning(sprintf("browser() was found in %s files",
+            res))
+
+    handleMessage("Checking for <<-...")
+res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
+    "LEFT_ASSIGN")
+if (res > 0)
+    handleWarning(sprintf("<<- was found in %s files", res))
+
+    handleMessage(sprintf("Checking for library/require of %s...",
+        package_name))
+    checkForLibraryMe(package_name, parsedCode)
+
 
     handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
     checkDescriptionNamespaceConsistency(package_name)
 
+    handleMessage("Checking function lengths", appendLF=FALSE)
+    checkFunctionLengths(parsedCode, package_name)
+
+    handleMessage("Checking exported objects have runnable examples...")
+    checkExportsAreDocumented(package_dir, package_name)
+
+
     ## Summary
-    .msg("Summary:")
+    .msg("\nSummary:")
     .msg("REQUIRED count: %s", .errors$getNum())
     .msg("RECOMMENDED count: %s", .warnings$getNum())
     .msg("NOTE count: %s", .notes$getNum())

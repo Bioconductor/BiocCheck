@@ -5,6 +5,8 @@ message("You may see some warnings here -- they don't indicate unit test problem
 
 library(devtools)
 
+parsedCode <- NULL
+
 create_test_package <- function(pkgpath, description=list(),
     extraActions=function(path=NULL){})
 {
@@ -82,7 +84,8 @@ test_vignettes0 <- function()
 
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 0 
-        && BiocCheck:::.notes$getNum() == 0)
+        && BiocCheck:::.notes$getNum() == 1,
+        "expected no note/warning/error")
     zeroCounters()
     instdoc <- file.path(UNIT_TEST_TEMPDIR, "inst", "doc")
     dir.create(instdoc, recursive=TRUE)
@@ -91,7 +94,8 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 1 
-        && BiocCheck:::.notes$getNum() == 0)
+        && BiocCheck:::.notes$getNum() == 1,
+        "expected 1 warning, 1 note")
     zeroCounters()
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
@@ -99,6 +103,12 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
     checkTrue(BiocCheck:::.warnings$getNum() == 1, 
         "Rmd file not seen as valid vignette source")
+    zeroCounters()
+    BiocCheck:::checkVignetteDir(system.file("testpackages",
+        "testpkg0", package="BiocCheck"))
+    checkEquals(1, BiocCheck:::.notes$getNum())
+    checkEquals("# of chunks: 2, # of eval=FALSE: 1 (50%)",
+        BiocCheck:::.notes$get()[1])
 }
 
 test_checkVersionNumber <- function()
@@ -249,22 +259,42 @@ test_parseFile <- function()
 
 test_checkTorF <- function() 
 {
-    DEACTIVATED("not ready yet")
-    parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
-        "devtools0", package="BiocCheck"))
-    res <- BiocCheck:::checkTorF(parsedCode)
-    checkTrue(length(res$t) == 1)
-    checkTrue(length(res$f) == 1)
+    if (is.null(parsedCode))
+        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+            "testpkg0", package="BiocCheck"))
 
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "T",
+        "SYMBOL")
+    checkTrue(res == 1)
+
+
+    ## Even though F is found twice in a single file (morecode.R),
+    ## res is 1, because it keeps track of the number of files that matched,
+    ## not the overall number of matches. Maybe this should change,
+    ## maybe it doesn't matter.
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "F",
+        "SYMBOL")
+    checkTrue(res == 1)
 }
 
 test_checkForDotC <- function()
 {
-    parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
-        "devtools0", package="BiocCheck"))
-    res <- BiocCheck:::checkForDotC(parsedCode, "devtools0")
-    checkTrue(length(res) == 1)
-    res
+    if (is.null(parsedCode))
+        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+            "testpkg0", package="BiocCheck"))
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", ".C",
+        "SYMBOL_FUNCTION_CALL")
+    checkTrue(res == 2)
+}
+
+test_checkForBrowser <- function()
+{
+    if (is.null(parsedCode))
+        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+            "testpkg0", package="BiocCheck"))
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "browser",
+        "SYMBOL_FUNCTION_CALL")
+    checkTrue(res == 1)
 }
 
 test_checkDescriptionNamespaceConsistency <- function()
@@ -294,4 +324,79 @@ test_checkDescriptionNamespaceConsistency <- function()
     checkEquals("devtools imported in NAMESPACE but not in DESCRIPTION:Imports",
         BiocCheck:::.warnings$get()[1])
 
+}
+
+test_checkImportSuggestions <- function()
+{
+    if (suppressMessages(suppressWarnings(require(codetoolsBioC))))
+    {
+        suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
+        checkTrue(!is.null(suggestions)) # sometimes it works and sometimes it doesn't
+
+ 
+        BiocCheck:::installAndLoad(create_test_package('testpkg'))
+        suggestions <- BiocCheck:::checkImportSuggestions("testpkg")
+        checkTrue(length(suggestions) == 0)
+    }
+
+}
+
+test_checkForBadDepends <- function()
+{
+    BiocCheck:::installAndLoad(system.file("testpackages", "testpkg0",
+        package="BiocCheck"))
+    BiocCheck:::checkForBadDepends(file.path(tempdir(), "lib", "testpkg0"))
+    checkEquals(1, BiocCheck:::.errors$getNum())
+    checkTrue(grepl("baddep", BiocCheck:::.errors$get()[1]))
+}
+
+test_doesFileLoadPackage <- function()
+{
+    df <- getParseData(parse(system.file("testpackages", "testpkg0",
+        "R", "requireme.R", package="BiocCheck"), keep.source=TRUE))
+    res <- BiocCheck:::doesFileLoadPackage(df, "testpkg0")
+    checkEquals(c(3L, 4L, 5L, 6L, 7L, 8L, 9L, 10L, 12L, 13L, 14L), res)
+}
+
+test_checkForLibraryMe <- function()
+{
+    load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
+    BiocCheck:::checkForLibraryMe("IRanges", IRangesParsedCode)
+}
+
+test_getFunctionLengths <- function()
+{
+    file <- system.file("testpackages", "testpkg0", "R",
+        "parseme.R", package="BiocCheck")
+    df <- getParseData(parse(file, keep.source=TRUE))
+    res <- BiocCheck:::getFunctionLengths(df)
+    expected <-
+        structure(list(`_anonymous_.1` = structure(c(2, 1, 2), .Names = c("length", 
+        "startLine", "endLine")), fa = structure(c(1, 3, 3), .Names = c("length", 
+        "startLine", "endLine")), f2 = structure(c(1, 6, 6), .Names = c("length", 
+        "startLine", "endLine")), f3 = structure(c(5, 9, 13), .Names = c("length", 
+        "startLine", "endLine")), f4 = structure(c(4, 16, 19), .Names = c("length", 
+        "startLine", "endLine")), `_anonymous_.23` = structure(c(6, 23, 
+        28), .Names = c("length", "startLine", "endLine")), f5 = structure(c(1, 
+        31, 31), .Names = c("length", "startLine", "endLine")), f6 = structure(c(1, 
+        33, 33), .Names = c("length", "startLine", "endLine")), f7 = structure(c(6, 
+        35, 40), .Names = c("length", "startLine", "endLine"))), .Names = c("_anonymous_.1", 
+        "fa", "f2", "f3", "f4", "_anonymous_.23", "f5", "f6", "f7"))
+    checkTrue(all.equal(expected, res))
+}
+
+test_getFunctionLengths2 <- function()
+{
+    load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
+    BiocCheck:::checkFunctionLengths("IRanges", IRangesParsedCode)    
+}
+
+test_checkExportsAreDocumented <- function()
+{
+    pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    BiocCheck:::installAndLoad(pkgdir)
+    res <- BiocCheck:::checkExportsAreDocumented(pkgdir, "testpkg0")
+    checkEquals(res, 
+        "  Man page baddep.Rd documents exported\n  topic(s) baddep\n  but has no runnable examples.")
+    checkEquals(1, BiocCheck:::.errors$getNum())
 }
