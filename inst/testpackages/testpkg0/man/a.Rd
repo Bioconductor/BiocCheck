@@ -12,7 +12,7 @@ a(x)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{x}{
+    \item{x}{
 %%     ~~Describe \code{x} here~~
 }
 }
@@ -43,7 +43,7 @@ a(x)
 }
 \examples{
 #syntaks errir
-   ##---- Should be DIRECTLY executable !! ----
+    ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
 \dontrun{
@@ -57,7 +57,7 @@ function (x)
 
 
 
-  }
+    }
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the
