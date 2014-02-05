@@ -132,6 +132,12 @@ if (res > 0)
     handleMessage("Checking exported objects have runnable examples...")
     checkExportsAreDocumented(package_dir, package_name)
 
+    handleMessage("Checking package NEWS...")
+    checkNEWS(package_dir)
+
+    handleMessage(paste0("Checking formatting of DESCRIPTION, NAMESPACE,\n",
+        "  man pages, R source, and vignette source..."))
+    checkFormatting(package_dir)
 
     ## Summary
     .msg("\nSummary:")

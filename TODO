@@ -1,4 +1,8 @@
-fix install bug if R is not in path
+Should we check for windows line endings?
+If Title in DESCRIPTION is short (or one word...), emit NOTE...after all this
+will be tweeted....
+
+Xfix install bug if R is not in path
 X- check for <<-
 
 More suggestions are going in the wiki:
@@ -7,7 +11,7 @@ https://github.com/Bioconductor/BiocCheck/wiki
 X-Detect problematic depends: see Martin's email
 
 Suggestions from Nate:
-- Valid license
+X- Valid license ( R CMD check checks this)
 - Make sure every (non-trivial) class has a show() method.
    or at least display the #/% of classes that don't.
 
@@ -24,12 +28,12 @@ X- version number check
 X- DESCRIPTION file constraints from build system, e.g., email address in Maintainer
 X vignettes/ not inst/doc/
 - examples in man page 
-    every man page which documents an exported function
+   X every man page which documents an exported function
     must have an example (required)
 - dontrun / eval=FALSE
     warnings - note percent 
 X- unit tests
-- deprecated packages
+X- deprecated packages
     multicore
 - detect OS-specific code?
 X- registration of .Call entry points
@@ -51,8 +55,8 @@ X- NAMESPACE and DESCRIPTION file consistency
     loadedNamespaces()
     all 
 - devtools? codetoolsBioC?
-    NOTE: writeNamespaceExports try/catch
-- NEWS file
+   X NOTE: writeNamespaceExports try/catch
+X- NEWS file
     missing?
     well-formatted?
     warning
@@ -128,7 +132,7 @@ getNamespaceImports("Rsamtools"))
 - [0/2] R/
    - [X] OS-specific packages / code ?
    - [X] Don't use T / F
-- [ ] NEWS
+- [X] NEWS
        - present in ./ or ./inst
        - well-formatted?
 - [X] registration of .Call entry points

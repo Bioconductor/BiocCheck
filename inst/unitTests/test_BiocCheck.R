@@ -5,7 +5,25 @@ message("You may see some warnings here -- they don't indicate unit test problem
 
 library(devtools)
 
+.printf <- BiocCheck:::.printf 
+
 parsedCode <- NULL
+
+
+inspect <- function()
+{
+    .printf("errors: %s, warnings: %s, notes: %s",
+        BiocCheck:::.errors$getNum(),
+        BiocCheck:::.warnings$getNum(),
+        BiocCheck:::.notes$getNum())
+    print("errors:")
+    print(BiocCheck:::.errors$get())
+    print("warnings:")
+    print(BiocCheck:::.warnings$get())
+    print("notes:")
+    print(BiocCheck:::.notes$get())
+
+}
 
 create_test_package <- function(pkgpath, description=list(),
     extraActions=function(path=NULL){})
@@ -84,18 +102,20 @@ test_vignettes0 <- function()
 
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 0 
-        && BiocCheck:::.notes$getNum() == 1,
-        "expected no note/warning/error")
+        && BiocCheck:::.notes$getNum() == 0,
+        "expected no errors/warnings/notes")
     zeroCounters()
     instdoc <- file.path(UNIT_TEST_TEMPDIR, "inst", "doc")
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.rnw"))
     zeroCounters()
+
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
+
     checkTrue(BiocCheck:::.errors$getNum() == 0 
         && BiocCheck:::.warnings$getNum() == 1 
-        && BiocCheck:::.notes$getNum() == 1,
-        "expected 1 warning, 1 note")
+        && BiocCheck:::.notes$getNum() == 0,
+        "expected 1 warning, no notes or errors")
     zeroCounters()
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
@@ -106,9 +126,9 @@ test_vignettes0 <- function()
     zeroCounters()
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"))
-    checkEquals(1, BiocCheck:::.notes$getNum())
-    checkEquals("# of chunks: 2, # of eval=FALSE: 1 (50%)",
-        BiocCheck:::.notes$get()[1])
+    checkEquals(1, BiocCheck:::.warnings$getNum())
+    checkEquals("Too many vignette chunks are not evaluated!",
+        BiocCheck:::.warnings$get()[1])
 }
 
 test_checkVersionNumber <- function()
@@ -396,7 +416,28 @@ test_checkExportsAreDocumented <- function()
     pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
     BiocCheck:::installAndLoad(pkgdir)
     res <- BiocCheck:::checkExportsAreDocumented(pkgdir, "testpkg0")
-    checkEquals(res, 
-        "  Man page baddep.Rd documents exported\n  topic(s) baddep\n  but has no runnable examples.")
-    checkEquals(1, BiocCheck:::.errors$getNum())
+    checkEquals(1, BiocCheck:::.notes$getNum())
+}
+
+test_checkNEWS <- function()
+{
+    BiocCheck:::checkNEWS(system.file("testpackages", "testpkg0",
+        package="BiocCheck"))
+    checkEquals(1, BiocCheck:::.notes$getNum())
+    zeroCounters()
+    cat("lalala", file=file.path(UNIT_TEST_TEMPDIR, "NEWS"))
+    BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
+    stillZero()
+    unlink(file.path(UNIT_TEST_TEMPDIR, "NEWS"))
+    dir.create(file.path(UNIT_TEST_TEMPDIR, "inst"), FALSE)
+    cat("lalala", file=file.path(UNIT_TEST_TEMPDIR, "inst", "NEWS.Rd"))
+    BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
+    checkEquals(1, BiocCheck:::.warnings$getNum())
+}
+
+test_checkFormatting <- function()
+{
+    BiocCheck:::checkFormatting(system.file("testpackages", "testpkg0",
+        package="BiocCheck"))
+    checkEquals(3, BiocCheck:::.notes$getNum())
 }

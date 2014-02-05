@@ -42,9 +42,11 @@ checkVignetteDir <- function(pkgdir)
 
     percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
 
-    handleNote(sprintf(
+    handleMessage(sprintf(
         "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
         chunks, efs,  as.integer(percent)))
+    if (percent >= 50)
+        handleWarning("Too many vignette chunks are not evaluated!")
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
@@ -234,11 +236,12 @@ checkRegistrationOfEntryPoints <- function(pkgname)
     {
         r <- getDLLRegisteredRoutines(pkgname)
         # FIXME What's a better way to determine that there's nothing in r?
-        # This is stupid and may fail in other locales.
         x <- capture.output(r)
         if (length(x) == 1)
         {
-            handleWarning("Package has a DLL but no registered routines!")
+            handleWarning(
+                paste0("Package has a DLL but no registered routines!\n",
+                    "  see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
         }
     }
 }
@@ -667,11 +670,113 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     }
     if (length(msgs))
     {
-        handleError("Man pages of exported objects had no running examples:")
+        handleNote("Man pages of exported objects had no running examples:")
         for (msg in msgs)
         {
             handleMessage(msg)
         }
     }
     msgs # for testing
+}
+
+checkNEWS <- function(pkgdir)
+{
+    newsloc <- file.path(pkgdir, c("inst", "inst", "."), 
+            c("NEWS.Rd", "NEWS", "NEWS"))
+    news <- head(newsloc[file.exists(newsloc)], 1)
+    if (0L == length(news)) 
+    {
+        handleNote(paste0("No NEWS file. Package news will not be included\n",
+            "  in Bioconductor release announcements."))
+        return()
+    }
+    tryCatch({
+        suppressWarnings({
+            db <- if (grepl("Rd$", news)) 
+                tools:::.build_news_db_from_package_NEWS_Rd(news)
+            else tools:::.news_reader_default(news)
+        })
+    }, error=function(e){
+
+        handleWarning(sprintf(paste0("%s is malformed!\n",
+            "  Package news will not be included ",
+            "in Bioconductor release announcements."), basename(news)))
+    })
+}
+
+checkFormatting <- function(pkgdir)
+{
+    files <- c(file.path(pkgdir, c("DESCRIPTION",
+        "NAMESPACE")),
+        dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
+        full.names=TRUE),
+        dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
+            pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$", ignore.case=TRUE),
+        dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
+            full.names=TRUE)
+        )
+    longlines <- 0L
+    totallines <- 0L
+    tablines <- 0L
+    badindentlines <- 0L
+    ok <- TRUE
+
+    for (file in files)
+    {
+        if (file.exists(file))
+        {
+            lines <- readLines(file, warn=FALSE)
+            totallines <- totallines + length(lines)
+            n <- nchar(lines)
+            names(n) <- seq_along(1:length(n))
+            long <- n[n > 80]
+            if (length(long))
+            {
+                ## TODO/FIXME We could tell the user here which lines are long
+                ## in which files. 
+                longlines <- longlines + length(long)
+            }
+
+            tabs <- grepl("\t", lines)
+            if (any(tabs))
+            {
+                tablines <- tablines + length(which(tabs))
+            }
+
+            res <- regexpr("^([ ]+)", lines)
+            if (any(res > -1))
+            {
+                match.length <- attr(res, "match.length")
+                indents <- match.length[match.length > -1]
+                badindentlinesinthisfile <- length(which(indents %% 4 != 0))
+                badindentlines <- badindentlines + badindentlinesinthisfile
+            }
+
+        }
+    }
+    if (longlines > 0)
+    {
+        ok <- FALSE
+        handleNote(sprintf(" %s lines (%i%%) are > 80 characters long!",
+            longlines, as.integer((longlines/totallines) * (100/1) )))
+    }
+    if (tablines > 0)
+    {
+        ok <- FALSE
+        handleNote(sprintf(" %s lines (%i%%) contain tabs!",
+            tablines, as.integer((tablines/totallines) * (100/1) )))
+    }
+    if (badindentlines > 0)
+    {
+        ok <- FALSE
+        handleNote(sprintf(" %s lines (%i%%) are not indented by a multiple of 4 spaces!",
+            badindentlines,
+            as.integer((badindentlines/totallines) * (100/1) )))
+
+    }
+
+    if (!ok)
+    {
+        message("  See http://bioconductor.org/developers/how-to/coding-style/")
+    }
 }

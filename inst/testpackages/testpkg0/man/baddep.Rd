@@ -45,7 +45,7 @@ baddep()
 function () 
 {
     isValidJSON("{\"foo\": \"bar\"}")
-  }
+    }
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
