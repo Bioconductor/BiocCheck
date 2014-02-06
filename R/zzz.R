@@ -10,6 +10,6 @@ setRefClass("MsgClass",
         )
 )
 
-.errors <- new("MsgClass", msg=character(0))
-.warnings <- new("MsgClass", msg=character(0))
+.requirements <- new("MsgClass", msg=character(0))
+.recommendations <- new("MsgClass", msg=character(0))
 .notes <- new("MsgClass", msg=character(0))

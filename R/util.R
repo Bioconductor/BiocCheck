@@ -12,16 +12,16 @@ handleMessage <- function(msg, appendLF=TRUE)
     .msg("* %s", msg, appendLF=appendLF)
 }
 
-handleError <- function(msg)
+handleRequired <- function(msg)
 {
-    .errors$add(msg)
+    .requirements$add(msg)
     .msg("* REQUIRED: %s", msg)
     #.stop(msg)
 }
 
-handleWarning <- function(msg)
+handleRecommended <- function(msg)
 {
-    .warnings$add(msg)
+    .recommendations$add(msg)
     .msg("* RECOMMENDED: %s", msg)
 }
 
@@ -44,7 +44,7 @@ installAndLoad <- function(pkg)
     if (res != 0) 
     {
         cat(paste(readLines(stderr), collapse="\n"))
-        handleError(sprintf("Failed to install %s!", pkg))
+        handleRequired(sprintf("%s must be installable!", pkg))
 
     }
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]

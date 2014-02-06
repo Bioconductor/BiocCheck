@@ -92,12 +92,14 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",
         "SYMBOL")
-    if (res > 0) handleWarning(sprintf("T was found in %s files",
+    if (res > 0) handleRecommended(sprintf(
+        "Use TRUE instead of T (found in %s files)",
         res))
     handleMessage("Checking for F...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "F",
         "SYMBOL")
-    if (res > 0) handleWarning(sprintf("F was found in %s files",
+    if (res > 0) handleRecommended(sprintf(
+        "Use FALSE instead of F (found in %s files)",
         res))
 
     handleMessage("Checking for .C()...")
@@ -109,14 +111,16 @@ BiocCheck <- function(package, ...)
     res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
         "SYMBOL_FUNCTION_CALL")
     if (res > 0)
-        handleWarning(sprintf("browser() was found in %s files",
+        handleRecommended(sprintf(
+            "Remove browser() statements (found in %s files)",
             res))
 
     handleMessage("Checking for <<-...")
 res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
     "LEFT_ASSIGN")
 if (res > 0)
-    handleWarning(sprintf("<<- was found in %s files", res))
+    handleRecommended(sprintf("Avoid <<- if possible (found in %s files)",
+        res))
 
     handleMessage(sprintf("Checking for library/require of %s...",
         package_name))
@@ -141,19 +145,19 @@ if (res > 0)
 
     ## Summary
     .msg("\nSummary:")
-    .msg("REQUIRED count: %s", .errors$getNum())
-    .msg("RECOMMENDED count: %s", .warnings$getNum())
+    .msg("REQUIRED count: %s", .requirements$getNum())
+    .msg("RECOMMENDED count: %s", .recommendations$getNum())
     .msg("NOTE count: %s", .notes$getNum())
 
-    if (.errors$getNum() > 0)
+    if (.requirements$getNum() > 0)
         .msg("BiocCheck FAILED.")
 
     if ("Called_from_command_line" %in% names(dots))
     {
         q("no", 1)
     } else {
-        return (list(errors=.errors$get(),
-            warnings=.warnings$get(),
+        return (list(requirements=.requirements$get(),
+            recommendations=.recommendations$get(),
             notes=.notes$get()))
     }
 

@@ -46,8 +46,8 @@ X- use of .C is a note
 - print() cat() message() warning() error() (mis)use?
 X- library(pkg) in man pages
     warning
-- code formatting stats / constats
-    indentation, line length NOTE
+X- code formatting stats / constats
+    X indentation, line length NOTE
     formatR / tidy?
 - if () '%' vs '%%' # & vs &&, | vs || ?
 X- NAMESPACE and DESCRIPTION file consistency
@@ -142,7 +142,7 @@ getNamespaceImports("Rsamtools"))
 **** Other? (note)
 - [X] use of .C
 - [ ] \seealso{} (times used; more is better)
-- [ ] Code formatting stats / consistency
+- [?] Code formatting stats (X) / consistency (?)
 - [ ] warnings reported to user
 - [X] codetoolsBioC::writeNamespaceExports()
 - devtools? formatR?

@@ -13,19 +13,21 @@ checkVignetteDir <- function(pkgdir)
     instdocdir <- file.path(pkgdir, "inst", "doc")
     if (!file.exists(vigdir))
     {
-        handleError("No 'vignettes' directory!")
+        handleRequired("'vignettes' directory!")
         return()
     }
     vigdircontents <- getVigSources(vigdir)
     if (length(vigdircontents)==0)
     {
-        handleError("No vignette sources in vignettes/ directory.")
+        handleRequired("vignette sources in vignettes/ directory.")
         return()
     }
     instdocdircontents <- getVigSources(instdocdir)
     if (length(instdocdircontents) > 0)
     {
-        handleWarning("Vignette sources exist in inst/doc/; they belong in vignettes/.")
+        handleRecommended(paste0(
+            "Remove vignette sources from inst/doc/;",
+            " they belong in vignettes/."))
     }
 
     chunks <- 0
@@ -46,7 +48,7 @@ checkVignetteDir <- function(pkgdir)
         "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
         chunks, efs,  as.integer(percent)))
     if (percent >= 50)
-        handleWarning("Too many vignette chunks are not evaluated!")
+        handleRecommended("Evaluate more vignette chunks.")
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
@@ -54,8 +56,8 @@ checkNewPackageVersionNumber <- function(pkgdir)
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     version <- dcf[, "Version"]
         if(!grepl("^0[-.]99[-.][0-9]+$", version))
-            handleError(sprintf
-                ("Version %s is wrong for new package; should start with 0.99.",version))
+            handleRequired(sprintf
+                ("New package version starting with 0.99; got %s.",version))
 
 }
 
@@ -66,7 +68,8 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
     regex <- "^[0-9]+[-\\.]([0-9]+)[-\\.][0-9]+$"
     if(!grepl(regex, version))
     {
-        handleError("Invalid package Version")
+        handleRequired(paste0("Valid package Version, see\n",
+            "  http://www.bioconductor.org/developers/how-to/version-numbering/"))
         return()
     }
     tryCatch({
@@ -80,12 +83,12 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
         {
             shouldBe <- ifelse(isDevel, "odd", "even")
             vers <- ifelse(isDevel, "devel", "release")
-            handleWarning(sprintf("y of x.y.z version should be %s in %s",
+            handleRecommended(sprintf("y of x.y.z version should be %s in %s",
                     shouldBe, vers))
         }
 
         },
-        error=function(e) handleError("Invalid package version"))
+        error=function(e) handleRequired("Valid package version"))
 }
 
 checkBiocViews <- function(pkgdir)
@@ -93,7 +96,7 @@ checkBiocViews <- function(pkgdir)
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if (!"biocViews" %in% colnames(dcf))
     {
-        handleWarning("No biocViews found!")
+        handleRecommended("Add some biocViews!")
         return()
     } else {
         biocViews <- dcf[, "biocViews"]
@@ -104,7 +107,7 @@ checkBiocViews <- function(pkgdir)
         {
             badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
                 collapse=", ")
-            handleWarning(paste("Some biocViews are invalid:",
+            handleRecommended(paste("Use valid biocViews. Invalid ones:",
                 badViews))
         }
     }
@@ -124,8 +127,8 @@ checkBiocViews <- function(pkgdir)
     }
     if (length(unique(parents)) > 1)
     {
-        handleWarning(paste("Including biocViews from more than one category",
-            "(Software, ExperimentData, AnnotationData)"))
+        handleRecommended(paste0("Use biocViews from one category only\n",
+            "  (one of Software, ExperimentData, AnnotationData)"))
     }
 }
 
@@ -136,14 +139,14 @@ checkBBScompatibility <- function(pkgdir)
     pkgNameFromDir <- segs[length(segs)]
     if (dcf[, "Package"] != pkgNameFromDir)
     {
-        handleError(sprintf(
-            "Package dir %s does not match Package: field %s!",
+        handleRequired(sprintf(
+            "Package dir %s must match Package: field ( got %s)!",
             pkgNameFromDir, dcf[, "Package"]))
             return()
     }
     if (!"Version" %in% colnames(dcf))
     {
-        handleError("Version field not found in DESCRIPTION!")
+        handleRequired("Version field in DESCRIPTION!")
         return()
     }
     maintainer <- NULL
@@ -155,12 +158,12 @@ checkBBScompatibility <- function(pkgdir)
         pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE) 
         tryCatch(people <- eval(pp, env),
             error=function(e) {
-                handleError("Failed to evaluate Authors@R field!")
+                handleRequired("AuthorsR@ field must be valid R code!")
             })
         if (!exists("people")) return()
         if (!"person" %in% class(people))
         {
-            handleError("Authors@R does not evaluate to 'person' object!")
+            handleRequired("Authors@R must evaluate to 'person' object!")
             return()
         }
         for (person in people)
@@ -186,13 +189,13 @@ checkBBScompatibility <- function(pkgdir)
         }
         if (is.null(maintainer))
         {
-            handleError("No author with maintainer (cre) role.")
+            handleRequired("One author with maintainer (cre) role.")
             return()
         }
     } else if ("Maintainer" %in% colnames(dcf)) {
         maintainer <- dcf[,"Maintainer"]
     } else {
-        handleError("No Maintainer or Authors@R field in DESCRIPTION file!")
+        handleRequired("Maintainer or Authors@R field in DESCRIPTION file!")
         return()
     }
     # now need to make sure that regexes work, a la python/BBS 
@@ -202,7 +205,7 @@ checkBBScompatibility <- function(pkgdir)
     #if (!  (all(match)  > 0) && (all(match.length) > 0) )
     if (match == -1 && match.length == -1)
     {
-        handleError("Couldn't get email address from Maintainer field.")
+        handleRequired("Email address in Maintainer field.")
         return()
     }
 }
@@ -239,8 +242,8 @@ checkRegistrationOfEntryPoints <- function(pkgname)
         x <- capture.output(r)
         if (length(x) == 1)
         {
-            handleWarning(
-                paste0("Package has a DLL but no registered routines!\n",
+            handleRecommended(
+                paste0("Register native routines!\n",
                     "  see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
         }
     }
@@ -282,8 +285,8 @@ checkDeprecatedPackages <- function(pkgdir)
 {
     if ("multicore" %in% getAllDependencies(pkgdir))
     {
-        handleError(paste("'multicore' is deprecated and does not work on",
-            "Windows. Use 'parallel' instead."))
+        handleRequired(paste("Use 'parallel' instead of 'multicore'.\n",
+            "  'multicore' is deprecated and does not work on Windows."))
     }
 }
 
@@ -327,15 +330,15 @@ checkParsedFiles <- function(pkgdir)
     parseFiles(pkgdir, callbacks)
     if (length(t))
     {
-        handleWarning("Symbol T found (use TRUE instead) in files:")
+        handleRecommended("Use TRUE instead of T in files:")
         message("* ", appendLF=FALSE)
         handleLoop(t)
     }
     if (length(f))
     {
-        handleWarning("Symbol F found (use FALSE instead) in files:")
+        handleRecommended("Use FALSE instead of F in files:")
         message("* ", appendLF=FALSE)
-        handleLoop(t)
+        handleLoop(f)
     }
     if (length(dotc))
     {
@@ -347,11 +350,6 @@ checkParsedFiles <- function(pkgdir)
 
 checkDescriptionNamespaceConsistency <- function(pkgname)
 {
-#     if (!all(names(getNamespaceImports(pkgname)) %in% loadedNamespaces()))
-#    {
-#        handleWarning("Not all packages imported in NAMESPACE are in Description:Imports") #??
-#        # FIXME be specific
-#    }
     dImports <- cleanupDependency(packageDescription(pkgname)$Imports)
     nImports <- names(getNamespaceImports(pkgname))
     nImports <- nImports[which(nImports != "base")]
@@ -359,14 +357,15 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
     if(!(all(dImports %in% nImports)))
     {
         badones <- dImports[!dImports %in% nImports]
-        handleWarning(sprintf("%s imported in DESCRIPTION but not NAMESPACE",
+        handleRecommended(sprintf(
+            "Import %s in NAMESPACE as well as DESCRIPTION.",
             paste(badones, collapse=", ")))
     }
     if (!all (nImports %in% dImports))
     {
         badones <- nImports[!nImports %in% dImports]
-        handleWarning(sprintf(
-            "%s imported in NAMESPACE but not in DESCRIPTION:Imports",
+        handleRecommended(sprintf(
+            "Import %s in DESCRIPTION as well as NAMESPACE.",
             paste(badones, collapse=", ")))
 
     }
@@ -398,7 +397,7 @@ checkForBadDepends <- function(pkgdir)
                 "  should be in Imports, not Depends (and imported in NAMESPACE),\n",
                 "  otherwise packages that import %s could fail."),
                 badObjects, badFunctions, pkgname)
-            handleError(msg)
+            handleRequired(msg)
         }
     }
 
@@ -541,7 +540,7 @@ checkForLibraryMe <- function(pkgname, parsedCode)
             res <- doesFileLoadPackage(df, pkgname)
             if (length(res))
             {
-                msg <- sprintf("library or require called on %s in file %s",
+                msg <- sprintf("Don't call library or require on %s in file %s",
                     pkgname, mungeName(filename, pkgname))
                 if (grepl("\\.R$", filename, ignore.case=TRUE))
                 {
@@ -549,7 +548,7 @@ checkForLibraryMe <- function(pkgname, parsedCode)
                         paste(res, collapse=","))
                 }
                 msg <- sprintf("%s; this is not necessary.", msg)
-                handleMessage(msg)
+                handleRecommended(msg)
             }
         }
     }
@@ -697,9 +696,11 @@ checkNEWS <- function(pkgdir)
             else tools:::.news_reader_default(news)
         })
     }, error=function(e){
-
-        handleWarning(sprintf(paste0("%s is malformed!\n",
-            "  Package news will not be included ",
+        ## FIXME find a good reference to creating well-formed NEWS, and
+        ## reference it here.
+        ## Surprisingly, there does not seem to be one.
+        handleRecommended(sprintf(paste0("Fix formatting of %s!\n",
+            "  Malformed package NEWS will not be included ",
             "in Bioconductor release announcements."), basename(news)))
     })
 }
