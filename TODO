@@ -114,7 +114,7 @@ new todos 1/15/14
    - [X] vignette directory
    - [X] vignette sources (Rnw, Rmd, Rrst)
 - [/] man
-   - [ ] runnable examples on pages with exported functions / methods
+   - [X] runnable examples on pages with exported functions / methods
 - Cross-platform availability
 **** Recommended (warnings)
 - [X] NAMESPACE and DESCRIPTION file inconsistency
@@ -143,6 +143,6 @@ getNamespaceImports("Rsamtools"))
 - [X] use of .C
 - [ ] \seealso{} (times used; more is better)
 - [?] Code formatting stats (X) / consistency (?)
-- [ ] warnings reported to user
+- [X] warnings reported to user
 - [X] codetoolsBioC::writeNamespaceExports()
 - devtools? formatR?
