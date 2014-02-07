@@ -1,3 +1,13 @@
+- DESCRIPTION:Depends should say R ( >= X) where X is current version of R.
+- does package exist already (in CRAN?). Enabling this means we
+  should add an --offline option to disable any check that requires
+  net access.
+  
+- organize output into more coherent categories
+
+- detect if we are running on a binary/installed package and
+  not a source package?
+
 Should we check for windows line endings?
 If Title in DESCRIPTION is short (or one word...), emit NOTE...after all this
 will be tweeted....

@@ -1,5 +1,5 @@
 import(optparse)
-export(BiocCheck)
+import(methods)
 import(BiocInstaller)
 import(graph)
 import(biocViews)
@@ -7,3 +7,6 @@ importFrom(devtools, create, unload)
 importFrom(knitr, purl)
 importFrom(tools, parse_Rd, Rd2ex)
 importFrom(codetools, checkUsageEnv)
+
+export(BiocCheck)
+export(usage)
