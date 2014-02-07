@@ -101,8 +101,8 @@ checkBiocViews <- function(pkgdir)
     } else {
         biocViews <- dcf[, "biocViews"]
         views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
-        library(biocViews)
-        data(biocViewsVocab)
+        biocViewsVocab <- NULL ## to keep R CMD check happy
+        data("biocViewsVocab", package="biocViews", envir=environment())
         if (!all(views %in% nodes(biocViewsVocab)))
         {
             badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
@@ -112,7 +112,7 @@ checkBiocViews <- function(pkgdir)
         }
     }
 
-    getParent <- function(view)
+    getParent <- function(view, biocViewsVocab)
     {
         topLevel <- c("Software", "ExperimentData", "AnnotationData")
         for (level in topLevel) {
@@ -123,7 +123,7 @@ checkBiocViews <- function(pkgdir)
     parents <- c()
     for (view in views)
     {
-        parents <- c(parents, getParent(view))
+        parents <- c(parents, getParent(view, biocViewsVocab))
     }
     if (length(unique(parents)) > 1)
     {
@@ -255,7 +255,8 @@ checkImportSuggestions <- function(pkgname)
     tryCatch({
         suppressMessages({
             suppressWarnings({
-                suggestions <- capture.output(writeNamespaceImports(pkgname))
+                suggestions <- 
+                    capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
             })
         })
     },
@@ -294,59 +295,6 @@ checkDeprecatedPackages <- function(pkgdir)
 
 
 
-checkParsedFiles <- function(pkgdir)
-{
-    handleLoop <- function(loop)
-    {
-        for (item in loop)
-        {
-            message(item, appendLF=TRUE)
-            message(" ", appendLF=TRUE)
-        }
-        message("")
-    }
-
-    t <- c()
-    f <- c()
-    dotc <- c()
-    callbacks <- list(
-        # check for T or F
-        function(df, filename) {
-            trows <- df[which(df$token == "SYMBOL" & df$text =="T"),]
-            frows <- df[which(df$token == "SYMBOL" & df$text =="F"),]
-            hasT <- dim(trows)[1] > 0
-            hasF <- dim(frows)[1] > 0 
-            if (hasT) t <- append(t, filename)
-            if (hasF) f <- append(f, filename)
-        },
-        # check for .C
-        function(df, filename)
-        {
-            dotcrows <- df[which(df$token == "SYMBOL_FUNCTION_CALL" & df$text ==".C"),]
-            hasdotc <- dim(dotcrows)[1] > 0
-            if (hasdotc) dotc <- append(dotc, filename)
-        }
-    )
-    parseFiles(pkgdir, callbacks)
-    if (length(t))
-    {
-        handleRecommended("Use TRUE instead of T in files:")
-        message("* ", appendLF=FALSE)
-        handleLoop(t)
-    }
-    if (length(f))
-    {
-        handleRecommended("Use FALSE instead of F in files:")
-        message("* ", appendLF=FALSE)
-        handleLoop(f)
-    }
-    if (length(dotc))
-    {
-        handleMessage(".C found in files:")
-        message("* ", appendLF=FALSE)
-        handleLoop(dotc)
-    }
-}
 
 checkDescriptionNamespaceConsistency <- function(pkgname)
 {
@@ -689,11 +637,15 @@ checkNEWS <- function(pkgdir)
             "  in Bioconductor release announcements."))
         return()
     }
+    .build_news_db_from_package_NEWS_Rd <- 
+        get(".build_news_db_from_package_NEWS_Rd", getNamespace("tools"))
+    .news_reader_default <-
+        get(".news_reader_default", getNamespace("tools"))
     tryCatch({
         suppressWarnings({
             db <- if (grepl("Rd$", news)) 
-                tools:::.build_news_db_from_package_NEWS_Rd(news)
-            else tools:::.news_reader_default(news)
+                .build_news_db_from_package_NEWS_Rd(news)
+            else .news_reader_default(news)
         })
     }, error=function(e){
         ## FIXME find a good reference to creating well-formed NEWS, and

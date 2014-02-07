@@ -1,6 +1,7 @@
 .printf <- function(...) cat(noquote(sprintf(...)), "\n")
 
-.BiocCheckFromCommandLine <- function()
+
+getArgParser <- function()
 {
     option_list <- list(
         make_option("--no-check-vignettes", action="store_true",
@@ -11,8 +12,23 @@
             help="disable biocViews-specific checks (for non-BioC packages)")
 
         )
-    parser <- OptionParser(usage = "R CMD BiocCheck [options] package",
+    OptionParser(usage = "R CMD BiocCheck [options] package",
         option_list=option_list)
+}
+
+usage <- function()
+{
+    print_help(getArgParser())
+    if (interactive())
+    {
+        cat("When running interactively, options can be passed like so:\n")
+        cat("BiocCheck(package, `no-check-vignettes`=TRUE)\n")
+    }
+}
+
+.BiocCheckFromCommandLine <- function()
+{
+    parser <- getArgParser()
     arguments <- parse_args(parser, positional_arguments = 1)
     opt <- arguments$options
     file <- arguments$args
