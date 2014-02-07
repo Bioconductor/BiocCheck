@@ -5,9 +5,9 @@
 
 # BiocCheck
 
-`BiocCheck` is *opinionated software*, encapsulating what the Bioconductor 
-core team feels are best practices for writing Bioconductor packages.
-We've divided our opinions into three categories:
+`BiocCheck` encapsulates Bioconductor package guidelines
+and best practices, analyzing packages and reporting three
+categories of issues:
 
 * **REQUIRED** (Equivalent to an `ERROR` in `R CMD check`). This means the package
   is missing something critical and it cannot be accepted into Bioconductor
@@ -17,7 +17,8 @@ We've divided our opinions into three categories:
 * **RECOMMENDED** (Equivalent to a `WARNING` in `R CMD check`). We strongly
   encourage that these issues be fixed. In the weeks leading up to a
   Bioconductor release we will ask package authors to fix these issues.
-* **NOTE**: Not necessarily something bad, just something we wanted to point out.
+* **NOTE**: Not necessarily something bad, just something we wanted to point
+  out. package authors don't need to take action on these.
 
 # Using `BiocCheck`
 
@@ -79,9 +80,4 @@ this one ([Mac/Unix](http://kb.iu.edu/data/acar.html)).
 If you manually copy these files to a directory in your PATH that is
 not your R bin directory, you'll continue to see the above message 
 when (re-)installing `BiocCheck` but you can safely ignore it.
-
-
-
-
-# Interpreting `BiocCheck` Messages
 
