@@ -6,7 +6,7 @@ suppressMessages({
         if (.Platform$OS.type == "windows")
         {
             libdir <- file.path(tempdir(), "libdir")
-            install.packages(pkgname, repos=null, type="source",
+            install.packages(pkgname, repos=NULL, type="source",
                 INSTALL_opts=sprintf("--library=%s",
                     libdir))
         } else {
