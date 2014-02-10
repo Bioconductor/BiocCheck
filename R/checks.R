@@ -7,7 +7,7 @@ getVigSources <- function(dir)
         ignore.case=TRUE, full.names=TRUE)
 }
 
-checkVignetteDir <- function(pkgdir)
+checkVignetteDir <- function(pkgdir, checkingDir)
 {
     vigdir <- file.path(pkgdir, "vignettes")
     instdocdir <- file.path(pkgdir, "inst", "doc")
@@ -25,9 +25,17 @@ checkVignetteDir <- function(pkgdir)
     instdocdircontents <- getVigSources(instdocdir)
     if (length(instdocdircontents) > 0)
     {
-        handleRecommended(paste0(
-            "Remove vignette sources from inst/doc/;",
-            " they belong in vignettes/."))
+        if (checkingDir)
+        {
+            handleRecommended(paste0(
+                "Remove vignette sources from inst/doc;",
+                " they belong in vignettes/."))
+
+        } else {
+            handleNote(paste0(
+                "There are vignette sources in inst/doc;",
+                " probably put there by R CMD build."))
+        }
     }
 
     chunks <- 0

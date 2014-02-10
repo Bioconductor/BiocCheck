@@ -40,6 +40,10 @@ usage <- function()
 BiocCheck <- function(package, ...)
 {
     package <- normalizePath(package)
+    checkingDir <- FALSE
+    if (file.exists(package) && file.info(package)$isdir)
+        checkingDir <- TRUE
+
     d <- list(...)
     if (length(d))
         dots <- list(...)[[1]]
@@ -67,7 +71,7 @@ BiocCheck <- function(package, ...)
     if (is.null(dots[["no-check-vignettes"]]))
     {
         handleMessage("Checking vignette directories...")
-        checkVignetteDir(package_dir)
+        checkVignetteDir(package_dir, checkingDir)
     }
     handleMessage("Checking version number...")
     if (!is.null(dots[["new-package"]]))
