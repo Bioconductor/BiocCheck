@@ -92,13 +92,13 @@ setVersion <- function(version)
 
 test_vignettes0 <- function()
 {
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR) ## no vignettes dir
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE) ## no vignettes dir
     checkError("Missing vignettes dir doesn't cause error!")
     dir.create(file.path(UNIT_TEST_TEMPDIR, "vignettes"))
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR) ## empty vignettes dir
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE) ## empty vignettes dir
     checkError("Empty vignettes dir doesn't cause error!")
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "vignettes", "test.Rnw"))
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR) ## vig dir w/source file
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE) ## vig dir w/source file
 
     checkTrue(BiocCheck:::.requirements$getNum() == 0 
         && BiocCheck:::.recommendations$getNum() == 0 
@@ -110,7 +110,7 @@ test_vignettes0 <- function()
     cat("nothing", file=file.path(instdoc, "test.rnw"))
     zeroCounters()
 
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE)
 
     checkTrue(BiocCheck:::.requirements$getNum() == 0 
         && BiocCheck:::.recommendations$getNum() == 1 
@@ -120,12 +120,18 @@ test_vignettes0 <- function()
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.Rmd"))
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE)
     checkTrue(BiocCheck:::.recommendations$getNum() == 1, 
         "Rmd file not seen as valid vignette source")
     zeroCounters()
+    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, FALSE)
+    checkTrue(BiocCheck:::.notes$getNum() == 1, 
+        "Rmd file not seen as valid vignette source")
+    zeroCounters()
+
+
     BiocCheck:::checkVignetteDir(system.file("testpackages",
-        "testpkg0", package="BiocCheck"))
+        "testpkg0", package="BiocCheck"), TRUE)
     checkEquals(1, BiocCheck:::.recommendations$getNum())
     checkEquals("Evaluate more vignette chunks.",
         BiocCheck:::.recommendations$get()[1])

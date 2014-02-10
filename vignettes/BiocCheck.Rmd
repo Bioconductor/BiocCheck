@@ -28,7 +28,17 @@ as
     R CMD BiocCheck package
 
 Where `package` is either a directory containing an R package, or a source
-tarball (.tar.gz file). R CMD BiocCheck takes options which can be seen by running
+tarball (.tar.gz file). 
+
+`BiocCheck` can also be run interactively:
+
+```{r eval=FALSE}
+library(BiocCheck)
+BiocCheck("packageDirOrTarball")
+```
+
+
+R CMD BiocCheck takes options which can be seen by running
 
     R CMD BiocCheck --help
 
@@ -43,6 +53,10 @@ cat(paste(output, collapse="\n"))
 # When should `BiocCheck` be run
 
 Run `BiocCheck` after running `R CMD check`. 
+
+Note that `BiocCheck` is not a replacement for `R CMD check`;
+it is complementary. It should be run after `R CMD check` 
+completes successfully.
 
 # Installing `BiocCheck`
 
