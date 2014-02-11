@@ -32,6 +32,7 @@ tarball (.tar.gz file).
 
 `BiocCheck` can also be run interactively:
 
+
 ```{r eval=FALSE}
 library(BiocCheck)
 BiocCheck("packageDirOrTarball")
@@ -43,11 +44,8 @@ R CMD BiocCheck takes options which can be seen by running
     R CMD BiocCheck --help
 
 ```{r echo=FALSE}
-suppressWarnings(
-    output <- system2(file.path(Sys.getenv("R_HOME"), "bin", "R"),
-        "CMD BiocCheck --help", stdout=TRUE, stderr=FALSE)
-)
-cat(paste(output, collapse="\n"))
+library(BiocCheck)
+usage()
 ```
 
 # When should `BiocCheck` be run
