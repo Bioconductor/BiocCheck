@@ -246,9 +246,7 @@ checkRegistrationOfEntryPoints <- function(pkgname)
     if (pkgname %in% names(d))
     {
         r <- getDLLRegisteredRoutines(pkgname)
-        # FIXME What's a better way to determine that there's nothing in r?
-        x <- capture.output(r)
-        if (length(x) == 1)
+        if (sum(sapply(r, length)) == 0)
         {
             handleRecommended(
                 paste0("Register native routines!\n",
