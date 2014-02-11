@@ -170,11 +170,16 @@ if (res > 0)
     .msg("NOTE count: %s", .notes$getNum())
 
     if (.requirements$getNum() > 0)
+    {
+        errcode <- 1
         .msg("BiocCheck FAILED.")
+    } else {
+        errcode <- 0
+    }
 
     if ("Called_from_command_line" %in% names(dots))
     {
-        q("no", 1)
+        q("no", errcode)
     } else {
         return (list(requirements=.requirements$get(),
             recommendations=.recommendations$get(),
