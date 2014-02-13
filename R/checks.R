@@ -319,7 +319,7 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
     if (!all (nImports %in% dImports))
     {
         badones <- nImports[!nImports %in% dImports]
-        if (is.null(deps))
+        if (!is.null(deps))
         {
             badones <- badones[!badones %in% deps]
         }
