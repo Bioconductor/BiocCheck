@@ -305,6 +305,7 @@ checkDeprecatedPackages <- function(pkgdir)
 checkDescriptionNamespaceConsistency <- function(pkgname)
 {
     dImports <- cleanupDependency(packageDescription(pkgname)$Imports)
+    deps <- cleanupDependency(packageDescription(pkgname)$Depends)
     nImports <- names(getNamespaceImports(pkgname))
     nImports <- nImports[which(nImports != "base")]
 
@@ -318,10 +319,16 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
     if (!all (nImports %in% dImports))
     {
         badones <- nImports[!nImports %in% dImports]
-        handleRecommended(sprintf(
-            "Import %s in DESCRIPTION as well as NAMESPACE.",
-            paste(badones, collapse=", ")))
-
+        if (is.null(deps))
+        {
+            badones <- badones[!badones %in% deps]
+        }
+        if (length(badones))
+        {
+            handleRecommended(sprintf(
+                "Import %s in DESCRIPTION as well as NAMESPACE.",
+                paste(badones, collapse=", ")))
+        }
     }
 }
 
