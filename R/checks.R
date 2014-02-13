@@ -357,7 +357,7 @@ checkForBadDepends <- function(pkgdir)
                 "Packages that provide %s\n", 
                 "  (used in %s)\n",
                 "  should be imported in the NAMESPACE file,\n",
-                "  otherwise packages that import %s could fail.\n"
+                "  otherwise packages that import %s could fail.\n",
                 "  You can also move them to the Imports: field of DESCRIPTION\n",
                 "  if they are not needed by man page examples."),
                 badObjects, badFunctions, pkgname)
