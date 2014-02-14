@@ -76,8 +76,8 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
     regex <- "^[0-9]+[-\\.]([0-9]+)[-\\.][0-9]+$"
     if(!grepl(regex, version))
     {
-        handleRequired(paste0("Valid package Version, see\n",
-            "  http://www.bioconductor.org/developers/how-to/version-numbering/"))
+        handleRequired(paste0("Valid package Version, see",
+            " http://www.bioconductor.org/developers/how-to/version-numbering/"))
         return()
     }
     tryCatch({
@@ -135,8 +135,8 @@ checkBiocViews <- function(pkgdir)
     }
     if (length(unique(parents)) > 1)
     {
-        handleRecommended(paste0("Use biocViews from one category only\n",
-            "  (one of Software, ExperimentData, AnnotationData)"))
+        handleRecommended(paste0("Use biocViews from one category only",
+            " (one of Software, ExperimentData, AnnotationData)"))
     }
 }
 
@@ -249,8 +249,8 @@ checkRegistrationOfEntryPoints <- function(pkgname)
         if (sum(sapply(r, length)) == 0)
         {
             handleRecommended(
-                paste0("Register native routines!\n",
-                    "  see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
+                paste0("Register native routines!",
+                    " see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
         }
     }
 }
@@ -292,8 +292,8 @@ checkDeprecatedPackages <- function(pkgdir)
 {
     if ("multicore" %in% getAllDependencies(pkgdir))
     {
-        handleRequired(paste("Use 'parallel' instead of 'multicore'.\n",
-            "  'multicore' is deprecated and does not work on Windows."))
+        handleRequired(paste("Use 'parallel' instead of 'multicore'.",
+            " 'multicore' is deprecated and does not work on Windows."))
     }
 }
 
@@ -649,8 +649,8 @@ checkNEWS <- function(pkgdir)
     news <- head(newsloc[file.exists(newsloc)], 1)
     if (0L == length(news)) 
     {
-        handleNote(paste0("No NEWS file. Package news will not be included\n",
-            "  in Bioconductor release announcements."))
+        handleNote(paste0("No NEWS file. Package news will not be included",
+            " in Bioconductor release announcements."))
         return()
     }
     .build_news_db_from_package_NEWS_Rd <- 
@@ -667,8 +667,8 @@ checkNEWS <- function(pkgdir)
         ## FIXME find a good reference to creating well-formed NEWS, and
         ## reference it here.
         ## Surprisingly, there does not seem to be one.
-        handleRecommended(sprintf(paste0("Fix formatting of %s!\n",
-            "  Malformed package NEWS will not be included ",
+        handleRecommended(sprintf(paste0("Fix formatting of %s!",
+            " Malformed package NEWS will not be included ",
             "in Bioconductor release announcements."), basename(news)))
     })
 }

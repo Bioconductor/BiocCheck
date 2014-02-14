@@ -3,7 +3,10 @@
 .debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
     .printf(...)
 .msg <- function(..., appendLF=TRUE)
-    message(noquote(sprintf(...)), appendLF=appendLF)
+{
+    txt <- sprintf(...)
+    message(paste(strwrap(txt, indent=0, exdent=2), collapse="\n"))
+}
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
 
