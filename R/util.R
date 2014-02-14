@@ -5,7 +5,8 @@
 .msg <- function(..., appendLF=TRUE)
 {
     txt <- sprintf(...)
-    message(paste(strwrap(txt, indent=0, exdent=2), collapse="\n"))
+    message(paste(strwrap(txt, indent=0, exdent=2), collapse="\n"),
+        appendLF=appendLF)
 }
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
