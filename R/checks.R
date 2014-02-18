@@ -697,11 +697,19 @@ checkFormatting <- function(pkgdir)
 
     for (file in files)
     {
-        if (file.exists(file))
+
+        if (file.exists(file) && file.info(file)$size == 0)
+        {
+            pkgname <- getPkgNameFromPkgDir(pkgdir)
+            handleNote(sprintf("%s is empty.", mungeName(file, pkgname)))
+        }
+
+        if (file.exists(file) && file.info(file)$size > 0)
         {
             lines <- readLines(file, warn=FALSE)
             totallines <- totallines + length(lines)
             n <- nchar(lines)
+
             names(n) <- seq_along(1:length(n))
             long <- n[n > 80]
             if (length(long))
