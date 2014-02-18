@@ -142,7 +142,7 @@ checkBiocViews <- function(pkgdir)
 
 checkBBScompatibility <- function(pkgdir)
 {
-    lines <- readLines(file.path(pkgdir, "DESCRIPTION"))
+    lines <- readLines(file.path(pkgdir, "DESCRIPTION"), warn=FALSE)
     if (any(nchar(lines)==0))
     {
         handleRequired("Remove blank lines from DESCRIPTION!")
