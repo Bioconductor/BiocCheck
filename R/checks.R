@@ -142,6 +142,11 @@ checkBiocViews <- function(pkgdir)
 
 checkBBScompatibility <- function(pkgdir)
 {
+    lines <- readLines(file.path(pkgdir, "DESCRIPTION"))
+    if (any(nchar(lines)==0))
+    {
+        handleRequired("Remove blank lines from DESCRIPTION!")
+    }
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     segs <- strsplit(pkgdir, .Platform$file.sep)[[1]]
     pkgNameFromDir <- segs[length(segs)]
