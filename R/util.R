@@ -181,4 +181,11 @@ mungeName <- function(name, pkgname)
     substr(name, pos+1+nchar(pkgname), nchar(name))
 }
 
+getPkgNameFromPkgDir <- function(pkgdir)
+{
+    t <- tempdir()
+    ret <- sub(t, "", pkgdir)
+    ret <- gsub(.Platform$file.sep, "", ret)
+    ret
+}
 
