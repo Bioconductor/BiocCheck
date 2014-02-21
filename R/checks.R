@@ -341,11 +341,11 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
 checkForBadDepends <- function(pkgdir)
 {
     pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
+    depends <- cleanupDependency(packageDescription(pkgname)$Depends)
     output <- getBadDeps(pkgdir)
-
     if (!is.null(output))
     {
-        output <- strsplit(output, "\n")[[1]]
+        output <- unique(unlist(strsplit(output, "\n")))
         res <- regexpr("'[^']*'$", output)
         fns <- regexpr("^[^:]*:", output)
         fmatch.length <- attr(fns, "match.length")
@@ -354,19 +354,68 @@ checkForBadDepends <- function(pkgdir)
             res <- substr(output, res, nchar(output))
             fns <- unique(substr(output, fns, fmatch.length-1))
             res <- gsub("'", "", fixed=TRUE, res)
-            res <- unique(res)
             badFunctions <- paste(fns, collapse=", ")
             badObjects <- paste(res, collapse=", ")
-            msg <- sprintf(paste0(
-                ## FIXME show the actual package names?
-                "Packages that provide %s\n", 
-                "  (used in %s)\n",
-                "  should be imported in the NAMESPACE file,\n",
-                "  otherwise packages that import %s could fail.\n",
-                "  You can also move them to the Imports: field of DESCRIPTION\n",
-                "  if they are not needed by man page examples."),
-                badObjects, badFunctions, pkgname)
-            handleRequired(msg)
+
+            errObjects <- c()
+            errFunctions <- c()
+            errPkgs <- c()
+            noteObjects <- c()
+            noteFunctions <- c()
+
+            for (i in 1:length(fns))
+            {
+                found <- FALSE
+                sym <- res[i]
+                func <- fns[i]
+                for (j in 1:length(depends))
+                {
+                    dep <- depends[j]
+                    if (sym %in% getNamespaceExports(dep))
+                    {
+                        errObjects <- append(errObjects, sym)
+                        errFunctions <- append(errFunctions, func)
+                        errPkgs <- append(errPkgs, dep)
+                        found <- TRUE
+                    }
+                }
+                if (!found)
+                {
+                    noteObjects <- append(noteObjects, sym)
+                    noteFunctions <- append(noteFunctions, func)
+                }
+            }
+
+
+            if (length(errObjects) > 0)
+            {
+                msg <- sprintf(paste(
+                    ## FIXME show the actual package names?
+                    "Packages (%s) which provide %s", 
+                    "(used in %s)",
+                    "should be imported in the NAMESPACE file,",
+                    "otherwise packages that import %s could fail.",
+                    "You can also move them to the Imports: field of DESCRIPTION",
+                    "if they are not needed by man page examples."),
+                    paste(errPkgs, collapse="," ),
+                    paste(errObjects, collapse=", "), 
+                    paste(errFunctions, collapse=", "), pkgname)
+                handleRequired(msg)
+            }
+
+            if (length(noteObjects) > 0)
+            {
+                msg <- sprintf(paste(
+                    "Cannot determine how objects %s (used in %s)",
+                    "were initialized. It could be they are part of a",
+                    "data set loaded with data(), or perhaps part of",
+                    "an object referenced in with() or within()."),
+                    paste(noteObjects, collapse=", "),
+                    paste(noteFunctions, collapse=", "))
+
+                handleNote(msg)
+            }
+
         }
     }
 
