@@ -373,7 +373,9 @@ test_checkForBadDepends <- function()
         package="BiocCheck"))
     BiocCheck:::checkForBadDepends(file.path(tempdir(), "lib", "testpkg0"))
     checkEquals(1, BiocCheck:::.requirements$getNum())
+    checkEquals(1, BiocCheck:::.notes$getNum())
     checkTrue(grepl("baddep", BiocCheck:::.requirements$get()[1]))
+    checkTrue(grepl("colone", BiocCheck:::.notes$get()[1]))
 }
 
 test_doesFileLoadPackage <- function()
