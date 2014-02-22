@@ -192,6 +192,17 @@ test_checkBiocViews <- function()
 
 test_checkBBScompatibility <- function()
 {
+    cat("Package : foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Space in DESCRIPTION field name doesn't cause error")
+    zeroCounters()
+
+    cat("Package: foo\n\nImports: bar", file=file.path(UNIT_TEST_TEMPDIR,
+        "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkError("Blank line in DESCRIPTION doesn't cause error")
+    zeroCounters()
+    
     cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Package name which doesn't match dir name does not cause error!")
