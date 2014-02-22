@@ -811,3 +811,22 @@ checkFormatting <- function(pkgdir)
         message("  See http://bioconductor.org/developers/how-to/coding-style/")
     }
 }
+
+checkForPromptComments <- function(pkgdir)
+{
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+
+    bad <- c()
+    for (manpage in manpages)
+    {
+        lines <- readLines(manpage, warn=FALSE)
+        if (any(grepl("^%%  ~~", lines)))
+            bad <- append(bad, basename(manpage))
+    }
+    if (length(bad) > 0)
+    {
+        handleNote(sprintf(paste("Man pages %s contain generated comments,",
+            "which should be removed."), paste(bad, collapse=", ")))
+    }
+}

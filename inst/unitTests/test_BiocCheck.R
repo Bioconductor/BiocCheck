@@ -449,3 +449,11 @@ test_checkFormatting <- function()
         package="BiocCheck"))
     checkEquals(3, BiocCheck:::.notes$getNum())
 }
+
+test_checkForPromptComments <- function()
+{
+    BiocCheck:::checkForPromptComments(system.file("testpackages", "testpkg0",
+        package="BiocCheck"))
+    checkEquals(1, BiocCheck:::.notes$getNum())
+
+}
