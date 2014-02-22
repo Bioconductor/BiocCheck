@@ -146,8 +146,14 @@ checkBBScompatibility <- function(pkgdir)
     if (any(nchar(lines)==0))
     {
         handleRequired("Remove blank lines from DESCRIPTION!")
+        return()
     }
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if (any(grepl("\\s", colnames(dcf))))
+    {
+        handleRequired("Remove whitespace from DESCRIPTION field names.")
+        return()
+    }
     segs <- strsplit(pkgdir, .Platform$file.sep)[[1]]
     pkgNameFromDir <- segs[length(segs)]
     if (dcf[, "Package"] != pkgNameFromDir)
