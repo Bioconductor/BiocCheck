@@ -32,7 +32,7 @@ usage()
 \code{BiocCheck()} analyzes R packages for compliance with
 Bioconductor package guidelines and best practices. For
 the rationale behind these guidelines and best practices,
-the the vignette and pages in the \code{references} section.
+see the vignette and pages in the \code{references} section.
 \code{usage()} displays the options that can be passed
 to \code{BiocCheck()}.
 
