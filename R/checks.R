@@ -352,7 +352,8 @@ checkForBadDepends <- function(pkgdir)
     if (!is.null(output))
     {
         output <- unique(unlist(strsplit(output, "\n")))
-        output <- grep("no visible", output)
+        output <- output[grep("no visible", output)]
+        if (length(output) == 0) return()
         res <- regexpr("'[^']*'$", output)
         fns <- regexpr("^[^:]*:", output)
         fmatch.length <- attr(fns, "match.length")
