@@ -40,6 +40,9 @@ usage <- function()
 BiocCheck <- function(package, ...)
 {
     package <- normalizePath(package)
+    oldwarn <- getOption("warn")
+    on.exit(options(warn=oldwarn))
+    options(warn=1)
     checkingDir <- FALSE
     if (file.exists(package) && file.info(package)$isdir)
         checkingDir <- TRUE
@@ -65,10 +68,11 @@ BiocCheck <- function(package, ...)
     handleMessage("Installing package...")
     installAndLoad(package)
 
+    ## checks
+
     checkForBadDepends(file.path(tempdir(), "lib", package_name))
 
 
-    ## checks
     if (is.null(dots[["no-check-vignettes"]]))
     {
         handleMessage("Checking vignette directories...")
@@ -105,10 +109,6 @@ BiocCheck <- function(package, ...)
     handleMessage("Parsing R code in R directory, examples, vignettes...")
 
     parsedCode <- parseFiles(package_dir)
-
-    ## FIXME - these should probably tell the user
-    ## which files (with line number?) the 'offending'
-    ## symbols were found in.
 
     handleMessage("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",
