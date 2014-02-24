@@ -374,15 +374,18 @@ checkForBadDepends <- function(pkgdir)
                 found <- FALSE
                 sym <- res[i]
                 func <- fns[i]
-                for (j in 1:length(depends))
+                if (length(depends) >  0)
                 {
-                    dep <- depends[j]
-                    if (sym %in% getNamespaceExports(dep))
+                    for (j in 1:length(depends))
                     {
-                        errObjects <- append(errObjects, sym)
-                        errFunctions <- append(errFunctions, func)
-                        errPkgs <- append(errPkgs, dep)
-                        found <- TRUE
+                        dep <- depends[j]
+                        if (sym %in% getNamespaceExports(dep))
+                        {
+                            errObjects <- append(errObjects, sym)
+                            errFunctions <- append(errFunctions, func)
+                            errPkgs <- append(errPkgs, dep)
+                            found <- TRUE
+                        }
                     }
                 }
                 if (!found)
