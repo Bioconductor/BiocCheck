@@ -12,8 +12,8 @@ categories of issues:
 * **REQUIRED** (Equivalent to an `ERROR` in `R CMD check`). This means the package
   is missing something critical and it cannot be accepted into Bioconductor
   until the issue is fixed. (`BiocCheck` will continue past a `required`
-  error, thus it is possible to have more than one, but it will end
-  with an error code.) 
+  error, thus it is possible to have more than one, but it will exit
+  with an error code if run from the OS command line.) 
 * **RECOMMENDED** (Equivalent to a `WARNING` in `R CMD check`). We strongly
   encourage that these issues be fixed. In the weeks leading up to a
   Bioconductor release we will ask package authors to fix these issues.
