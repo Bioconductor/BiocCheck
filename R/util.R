@@ -61,7 +61,7 @@ installAndLoad <- function(pkg)
 
 cleanupDependency <- function(input)
 {
-    if (is.null(input)) return(NULL)
+    if (is.null(input)) return(character(0))
     output <- gsub("\\s", "", input)
     output <- gsub("\\([^)]*\\)", "", output)
     res <- strsplit(output, ",")[[1]]
