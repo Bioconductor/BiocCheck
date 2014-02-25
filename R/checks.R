@@ -348,6 +348,8 @@ checkForBadDepends <- function(pkgdir)
 {
     pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
     depends <- cleanupDependency(packageDescription(pkgname)$Depends)
+    depends <- append(depends,
+        cleanupDependency(packageDescription(pkgname)$Imports))
     output <- getBadDeps(pkgdir)
     if (!is.null(output))
     {
@@ -405,9 +407,7 @@ checkForBadDepends <- function(pkgdir)
                     "Packages (%s) which provide %s", 
                     "(used in %s)",
                     "should be imported in the NAMESPACE file,",
-                    "otherwise packages that import %s could fail.",
-                    "You can also move them to the Imports: field of DESCRIPTION",
-                    "if they are not needed by man page examples."),
+                    "otherwise packages that import %s could fail."),
                     paste(errPkgs, collapse="," ),
                     paste(errObjects, collapse=", "), 
                     paste(errFunctions, collapse=", "), pkgname)
