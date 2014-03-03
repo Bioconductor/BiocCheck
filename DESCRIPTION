@@ -13,4 +13,5 @@ Imports: biocViews, BiocInstaller, graph, devtools (>= 1.4.1),
     knitr, tools, optparse, codetools, methods
 Suggests: RUnit, BiocGenerics, Biobase, RJSONIO
 Enhances: codetoolsBioC
+biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck/issues
