@@ -32,9 +32,13 @@ checkVignetteDir <- function(pkgdir, checkingDir)
                 " they belong in vignettes/."))
 
         } else {
-            handleNote(paste0(
-                "There are vignette sources in inst/doc;",
-                " probably put there by R CMD build."))
+            # Do we really want to emit a NOTE
+            # for a situation that will almost always be true?
+            # I think not, commenting out for now.
+            # Commenting out associated unit test as well.
+#            handleNote(paste0(
+#                "There are vignette sources in inst/doc;",
+#                " probably put there by R CMD build."))
         }
     }
 

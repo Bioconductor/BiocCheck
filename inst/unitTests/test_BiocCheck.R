@@ -125,8 +125,9 @@ test_vignettes0 <- function()
         "Rmd file not seen as valid vignette source")
     zeroCounters()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, FALSE)
-    checkTrue(BiocCheck:::.notes$getNum() == 1, 
-        "Rmd file not seen as valid vignette source")
+#   I don't think we should even mention this. So commenting it out.
+#    checkTrue(BiocCheck:::.notes$getNum() == 1, 
+#        "no complaints about vignette sources in inst/doc of tarball")
     zeroCounters()
 
 
