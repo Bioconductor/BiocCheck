@@ -408,7 +408,7 @@ checkForBadDepends <- function(pkgdir)
                     "(used in %s)",
                     "should be imported in the NAMESPACE file,",
                     "otherwise packages that import %s could fail."),
-                    paste(errPkgs, collapse="," ),
+                    paste(errPkgs, collapse=", " ),
                     paste(errObjects, collapse=", "), 
                     paste(errFunctions, collapse=", "), pkgname)
                 handleRequired(msg)
@@ -675,7 +675,10 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
     exports <- getNamespaceExports(pkgname)
-    msgs <- character(0)
+    badManPages <- character(0)
+    exportingPagesCount <- 0L
+    noExamplesCount <- 0L
+
     for (manpage in manpages)
     {
         rd <- parse_Rd(manpage)
@@ -686,25 +689,32 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
             function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
         namesAndAliases <- c(name, aliases)
         exportedTopics <- unique(namesAndAliases[namesAndAliases %in% exports])
+        if (length(exportedTopics))
+        {
+            exportingPagesCount <- exportingPagesCount + 1
+        }
         if (length(exportedTopics) && 
             !doesManPageHaveRunnableExample(rd)) 
         {
-            msg <- sprintf(paste0("Man page %s documents exported\n", 
-                "  topic(s) %s\n  but has no runnable examples."),
-                basename(manpage), paste(exportedTopics, collapse=", "))
-            msgs <- append(msgs, msg)
+            noExamplesCount <- noExamplesCount + 1
+            badManPages <- append(badManPages, basename(manpage))
         }
+    }
 
-    }
-    if (length(msgs))
+    if (exportingPagesCount > 0 
+        && (noExamplesCount / exportingPagesCount) >= (0.8 / 1.0))
     {
-        handleNote("Man pages of exported objects had no running examples:")
-        for (msg in msgs)
-        {
-            handleMessage(msg)
-        }
+        handleRequired(paste0("At least 80% of man pages documenting ",
+            "exported objects must have runnable examples.",
+            "The following pages do not:"))
+    } else {
+        handleNote(paste0("The following man pages document exported ",
+            "objects but have no runnable examples:"))
     }
-    msgs # for testing
+    .msg(paste(badManPages, collapse=", "), indent=6)
+
+
+    badManPages # for testing
 }
 
 checkNEWS <- function(pkgdir)

@@ -2,10 +2,10 @@
 
 .debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
     .printf(...)
-.msg <- function(..., appendLF=TRUE)
+.msg <- function(..., appendLF=TRUE, indent=0, exdent=2)
 {
     txt <- sprintf(...)
-    message(paste(strwrap(txt, indent=0, exdent=2), collapse="\n"),
+    message(paste(strwrap(txt, indent=indent, exdent=exdent), collapse="\n"),
         appendLF=appendLF)
 }
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
@@ -160,11 +160,11 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
         for (i in nrow(x))
         {
             if (grepl("\\.R$", name, ignore.case=TRUE))
-                message(sprintf("  Found %s%s in %s (line %s, column %s)",
+                message(sprintf("      Found %s%s in %s (line %s, column %s)",
                     symbolName, parens,
                     mungeName(name, pkgname), x[i,1], x[i,2]))
             else
-                message(sprintf("  Found %s%s in %s",
+                message(sprintf("      Found %s%s in %s",
                     symbolName, parens,
                     mungeName(name, pkgname))) # FIXME test this
 

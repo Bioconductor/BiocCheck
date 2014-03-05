@@ -435,7 +435,7 @@ test_checkExportsAreDocumented <- function()
     pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
     BiocCheck:::installAndLoad(pkgdir)
     res <- BiocCheck:::checkExportsAreDocumented(pkgdir, "testpkg0")
-    checkEquals(1, BiocCheck:::.notes$getNum())
+    checkEquals(1, BiocCheck:::.requirements$getNum())
 }
 
 test_checkNEWS <- function()
