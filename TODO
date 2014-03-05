@@ -1,3 +1,5 @@
+- Import latest biocViews package to enforce use of new terms (but only 
+after it's available via biocLite())
 - DESCRIPTION:Depends should say R ( >= X) where X is current version of R.
 - does package exist already (in CRAN?). Enabling this means we
   should add an --offline option to disable any check that requires
