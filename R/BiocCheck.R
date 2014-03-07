@@ -63,7 +63,8 @@ BiocCheck <- function(package, ...)
         packageVersion("BiocCheck")))
 
     handleMessage(paste0("BiocCheck is a work in progress. Output",
-        "  and severity of issues may change."))
+        "  and severity of issues may change. ", 
+        "NOTEs will (probably) NOT evolve into more serious issues."))
 
     handleMessage("Installing package...")
     installAndLoad(package)
