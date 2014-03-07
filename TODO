@@ -1,11 +1,11 @@
 Latest round of feedback (3/7/2014):
 
   add file/line # for eval=FALSE hits
-  silence .C output
-  either change NOTE to something else or be 
-  explicit in pkg output that NOTEs will not turn into
-  something more severe.
-  remove ! from formatting NOTEs
+X  silence .C output
+X  either change NOTE to something else or be 
+    explicit in pkg output that NOTEs will not turn into
+    something more severe.
+X  remove ! from formatting NOTEs
   indent more -- maybe everything except
   * REQUIRED
   * RECOMMENDED
