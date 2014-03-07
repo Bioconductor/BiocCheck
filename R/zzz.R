@@ -6,10 +6,7 @@ setRefClass("MsgClass",
         get = function() .self$msg,
         getNum = function() length(.self$msg),
         zero = function() .self$msg <- character(0),
-        add = function(m) .self$msg <- append(.self$msg, m) 
+        add = function(m) .self$msg <- append(.self$msg, m)
         )
 )
 
-.requirements <- new("MsgClass", msg=character(0))
-.recommendations <- new("MsgClass", msg=character(0))
-.notes <- new("MsgClass", msg=character(0))
