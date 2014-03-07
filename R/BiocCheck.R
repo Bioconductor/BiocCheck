@@ -164,6 +164,10 @@ if (res > 0)
         "man pages, R source, and vignette source..."))
     checkFormatting(package_dir)
 
+    handleMessage("Checking for canned comments in man pages...")
+    checkForPromptComments(package_dir)
+
+
     ## Summary
     .msg("\nSummary:")
     .msg("REQUIRED count: %s", .requirements$getNum())
