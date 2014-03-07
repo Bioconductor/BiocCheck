@@ -9,7 +9,7 @@ Depends: R (>= 3.1.0)
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
-Imports: biocViews, BiocInstaller, graph, devtools (>= 1.4.1),
+Imports: biocViews (>= 1.31.9), BiocInstaller, graph, devtools (>= 1.4.1),
     knitr, tools, optparse, codetools, methods
 Suggests: RUnit, BiocGenerics, Biobase, RJSONIO
 Enhances: codetoolsBioC

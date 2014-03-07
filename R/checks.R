@@ -712,10 +712,12 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
             "exported objects must have runnable examples.",
             "The following pages do not:"))
     } else {
+        if (length(badManPages) > 0)
         handleNote(paste0("The following man pages document exported ",
             "objects but have no runnable examples:"))
     }
-    .msg(paste(badManPages, collapse=", "), indent=6)
+    if (length(badManPages) > 0)
+        .msg(paste(badManPages, collapse=", "), indent=6)
 
 
     badManPages # for testing
