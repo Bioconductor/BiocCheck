@@ -189,3 +189,12 @@ getPkgNameFromPkgDir <- function(pkgdir)
     ret
 }
 
+loadRefClasses <- function()
+{
+    assign(".requirements", new("MsgClass", msg=character(0)),
+        envir=.GlobalEnv)
+    assign(".recommendations", new("MsgClass", msg=character(0)),
+        envir=.GlobalEnv)
+    assign(".notes", new("MsgClass", msg=character(0)),
+        envir=.GlobalEnv)
+}

@@ -39,6 +39,7 @@ usage <- function()
 
 BiocCheck <- function(package, ...)
 {
+    loadRefClasses()
     package <- normalizePath(package)
     oldwarn <- getOption("warn")
     on.exit(options(warn=oldwarn))
