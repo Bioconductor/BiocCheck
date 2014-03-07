@@ -1,4 +1,25 @@
-- Import latest biocViews package to enforce use of new terms (but only 
+Latest round of feedback (3/7/2014):
+
+  add file/line # for eval=FALSE hits
+  silence .C output
+  either change NOTE to something else or be 
+  explicit in pkg output that NOTEs will not turn into
+  something more severe.
+  remove ! from formatting NOTEs
+  indent more -- maybe everything except
+  * REQUIRED
+  * RECOMMENDED
+  * NOTE
+  (and summary)
+
+  should be indented?
+
+  HTML report?
+
+  unit test coverage
+  BiocSubmit package (long range)
+
+X - Import latest biocViews package to enforce use of new terms (but only 
 after it's available via biocLite())
 - DESCRIPTION:Depends should say R ( >= X) where X is current version of R.
 - does package exist already (in CRAN?). Enabling this means we

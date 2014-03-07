@@ -123,11 +123,6 @@ BiocCheck <- function(package, ...)
         "Use FALSE instead of F (found in %s files)",
         res))
 
-    handleMessage("Checking for .C()...")
-    res <- findSymbolInParsedCode(parsedCode, package_name, ".C",
-        "SYMBOL_FUNCTION_CALL")
-    if (res > 0) handleNote(sprintf(".C() was found in %s files",
-        res))
     handleMessage("Checking for browser()...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
         "SYMBOL_FUNCTION_CALL")
