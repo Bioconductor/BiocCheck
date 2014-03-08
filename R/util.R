@@ -65,7 +65,7 @@ cleanupDependency <- function(input)
     output <- gsub("\\s", "", input)
     output <- gsub("\\([^)]*\\)", "", output)
     res <- strsplit(output, ",")[[1]]
-    res[which(res != "R")]
+    unique(res[which(res != "R")])
 }
 
 getAllDependencies <- function(pkgdir)
