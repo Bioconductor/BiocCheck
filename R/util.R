@@ -19,20 +19,20 @@ handleMessage <- function(msg, appendLF=TRUE)
 handleRequired <- function(msg)
 {
     .requirements$add(msg)
-    .msg("* REQUIRED: %s", msg)
+    .msg("* REQUIRED: %s", msg, indent=4)
     #.stop(msg)
 }
 
 handleRecommended <- function(msg)
 {
     .recommendations$add(msg)
-    .msg("* RECOMMENDED: %s", msg)
+    .msg("* RECOMMENDED: %s", msg, indent=4)
 }
 
 handleConsideration <- function(msg)
 {
     .considerations$add(msg)
-    .msg("* CONSIDER: %s", msg)
+    .msg("* CONSIDER: %s", msg, indent=4)
 }
 
 installAndLoad <- function(pkg)
