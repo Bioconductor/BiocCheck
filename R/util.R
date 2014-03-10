@@ -29,10 +29,10 @@ handleRecommended <- function(msg)
     .msg("* RECOMMENDED: %s", msg)
 }
 
-handleNote <- function(msg)
+handleConsideration <- function(msg)
 {
-    .notes$add(msg)
-    .msg("* NOTE: %s", msg)
+    .considerations$add(msg)
+    .msg("* CONSIDER: %s", msg)
 }
 
 installAndLoad <- function(pkg)
@@ -195,6 +195,6 @@ loadRefClasses <- function()
         envir=.GlobalEnv)
     assign(".recommendations", new("MsgClass", msg=character(0)),
         envir=.GlobalEnv)
-    assign(".notes", new("MsgClass", msg=character(0)),
+    assign(".considerations", new("MsgClass", msg=character(0)),
         envir=.GlobalEnv)
 }

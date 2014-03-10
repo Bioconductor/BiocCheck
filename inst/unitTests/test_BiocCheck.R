@@ -15,13 +15,13 @@ inspect <- function()
     .printf("requirements: %s, recommendations: %s, notes: %s",
         .requirements$getNum(),
         .recommendations$getNum(),
-        .notes$getNum())
+        .considerations$getNum())
     print("errors:")
     print(.requirements$get())
     print("warnings:")
     print(.recommendations$get())
     print("notes:")
-    print(.notes$get())
+    print(.considerations$get())
 
 }
 
@@ -48,9 +48,9 @@ checkError <- function(msg)
     # .printf("Errors: %s, Warnings: %s, Notes: %s", 
     #     .requirements$getNum(),
     #     .recommendations$getNum(),
-    #     .notes$getNum())
+    #     .considerations$getNum())
     checkTrue(
-        .notes$getNum() == 0 &&
+        .considerations$getNum() == 0 &&
         .recommendations$getNum() == 0 &&
         .requirements$getNum() == 1,
         msg
@@ -60,14 +60,14 @@ checkError <- function(msg)
 
 zeroCounters <- function()
 {
-    .notes$zero()
+    .considerations$zero()
     .recommendations$zero()
     .requirements$zero()
 }
 
 stillZero <- function()
 {
-    .notes$getNum() == 0 &&
+    .considerations$getNum() == 0 &&
     .recommendations$getNum() == 0 &&
     .requirements$getNum() == 0
 }
@@ -103,7 +103,7 @@ test_vignettes0 <- function()
 
     checkTrue(.requirements$getNum() == 0 
         && .recommendations$getNum() == 0 
-        && .notes$getNum() == 0,
+        && .considerations$getNum() == 0,
         "expected no errors/warnings/notes")
     zeroCounters()
     instdoc <- file.path(UNIT_TEST_TEMPDIR, "inst", "doc")
@@ -115,7 +115,7 @@ test_vignettes0 <- function()
 
     checkTrue(.requirements$getNum() == 0 
         && .recommendations$getNum() == 1 
-        && .notes$getNum() == 0,
+        && .considerations$getNum() == 0,
         "expected 1 warning, no notes or errors")
     zeroCounters()
     unlink(instdoc, TRUE)
@@ -127,7 +127,7 @@ test_vignettes0 <- function()
     zeroCounters()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, FALSE)
 #   I don't think we should even mention this. So commenting it out.
-#    checkTrue(.notes$getNum() == 1, 
+#    checkTrue(.considerations$getNum() == 1, 
 #        "no complaints about vignette sources in inst/doc of tarball")
     zeroCounters()
 
@@ -250,7 +250,7 @@ test_checkBBScompatibility <- function()
 test_checkUnitTests <- function()
 {
     BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
-    checkTrue(.notes$getNum() == 1)
+    checkTrue(.considerations$getNum() == 1)
     dir.create(file.path(UNIT_TEST_TEMPDIR, "tests"))
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "tests",
         "foo.R"))
@@ -377,9 +377,9 @@ test_checkForBadDepends <- function()
         package="BiocCheck"))
     BiocCheck:::checkForBadDepends(file.path(tempdir(), "lib", "testpkg0"))
     checkEquals(1, .requirements$getNum())
-    checkEquals(1, .notes$getNum())
+    checkEquals(1, .considerations$getNum())
     checkTrue(grepl("baddep", .requirements$get()[1]))
-    checkTrue(grepl("colone", .notes$get()[1]))
+    checkTrue(grepl("colone", .considerations$get()[1]))
 }
 
 test_doesFileLoadPackage <- function()
@@ -435,7 +435,7 @@ test_checkNEWS <- function()
 {
     BiocCheck:::checkNEWS(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
-    checkEquals(1, .notes$getNum())
+    checkEquals(1, .considerations$getNum())
     zeroCounters()
     cat("lalala", file=file.path(UNIT_TEST_TEMPDIR, "NEWS"))
     BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
@@ -451,13 +451,13 @@ test_checkFormatting <- function()
 {
     BiocCheck:::checkFormatting(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
-    checkEquals(3, .notes$getNum())
+    checkEquals(3, .considerations$getNum())
 }
 
 test_checkForPromptComments <- function()
 {
     BiocCheck:::checkForPromptComments(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
-    checkEquals(1, .notes$getNum())
+    checkEquals(1, .considerations$getNum())
 
 }

@@ -36,7 +36,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
             # for a situation that will almost always be true?
             # I think not, commenting out for now.
             # Commenting out associated unit test as well.
-#            handleNote(paste0(
+#            handleConsideration(paste0(
 #                "There are vignette sources in inst/doc;",
 #                " probably put there by R CMD build."))
         }
@@ -247,11 +247,11 @@ checkUnitTests <- function(pkgdir)
     if (!(dir.exists(tests_dir) && length(dir(tests_dir, pattern = "\\.(R|Rin)$"))))
     ## end stolen code
     {
-        msg <- paste0("Looks like this package contains no unit tests.\n",
+        msg <- paste0("Adding unit tests.\n",
             "  We strongly recommend them. See\n",
             "  http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/."
             )
-        handleNote(msg)
+        handleConsideration(msg)
     }
 }
 
@@ -421,14 +421,14 @@ checkForBadDepends <- function(pkgdir)
             if (length(noteObjects) > 0)
             {
                 msg <- sprintf(paste(
-                    "Cannot determine how objects %s (used in %s)",
+                    "Clarifying how objects %s (used in %s)",
                     "were initialized. It could be they are part of a",
                     "data set loaded with data(), or perhaps part of",
                     "an object referenced in with() or within()."),
                     paste(noteObjects, collapse=", "),
                     paste(noteFunctions, collapse=", "))
 
-                handleNote(msg)
+                handleConsideration(msg)
             }
 
         }
@@ -452,7 +452,6 @@ getBadDeps <- function(pkgdir)
 }
 
 
-## FIXME - turns out this is slow when run against
 getFunctionLengths <- function(df)
 {
     df <- df[df$terminal & df$parent > -1,]
@@ -713,8 +712,8 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
             "The following pages do not:"))
     } else {
         if (length(badManPages) > 0)
-        handleNote(paste0("The following man pages document exported ",
-            "objects but have no runnable examples:"))
+        handleConsideration(paste0("Adding runnable examples to the following ",
+            "man pages which document exported objects:"))
     }
     if (length(badManPages) > 0)
         .msg(paste(badManPages, collapse=", "), indent=6)
@@ -730,7 +729,8 @@ checkNEWS <- function(pkgdir)
     news <- head(newsloc[file.exists(newsloc)], 1)
     if (0L == length(news)) 
     {
-        handleNote(paste0("No NEWS file. Package news will not be included",
+        handleConsideration(paste0("Adding a NEWS file, so your ",
+            "package news will be included",
             " in Bioconductor release announcements."))
         return()
     }
@@ -777,7 +777,8 @@ checkFormatting <- function(pkgdir)
         if (file.exists(file) && file.info(file)$size == 0)
         {
             pkgname <- getPkgNameFromPkgDir(pkgdir)
-            handleNote(sprintf("%s is empty.", mungeName(file, pkgname)))
+            handleConsideration(sprintf("Adding content to the empty file %s.",
+                mungeName(file, pkgname)))
         }
 
         if (file.exists(file) && file.info(file)$size > 0)
@@ -815,19 +816,23 @@ checkFormatting <- function(pkgdir)
     if (longlines > 0)
     {
         ok <- FALSE
-        handleNote(sprintf(" %s lines (%i%%) are > 80 characters long.",
+        handleConsideration(sprintf(
+            "Shortening lines; %s lines (%i%%) are > 80 characters long.",
             longlines, as.integer((longlines/totallines) * (100/1) )))
     }
     if (tablines > 0)
     {
         ok <- FALSE
-        handleNote(sprintf(" %s lines (%i%%) contain tabs.",
+        handleConsideration(sprintf(
+            "Replacing tabs with 4 spaces; %s lines (%i%%) contain tabs.",
             tablines, as.integer((tablines/totallines) * (100/1) )))
     }
     if (badindentlines > 0)
     {
         ok <- FALSE
-        handleNote(sprintf(" %s lines (%i%%) are not indented by a multiple of 4 spaces.",
+        handleConsideration(sprintf(paste0(
+            "Indenting lines with a multiple of 4 spaces;",
+            " %s lines (%i%%) are not."),
             badindentlines,
             as.integer((badindentlines/totallines) * (100/1) )))
 
@@ -853,7 +858,8 @@ checkForPromptComments <- function(pkgdir)
     }
     if (length(bad) > 0)
     {
-        handleNote(sprintf(paste("Man pages %s contain generated comments,",
-            "which should be removed."), paste(bad, collapse=", ")))
+        handleConsideration(sprintf(
+            "Removing generated comments from man pages %s ",
+            paste(bad, collapse=", ")))
     }
 }

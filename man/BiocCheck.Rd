@@ -7,7 +7,7 @@ Check a package for compliance with Bioconductor package guidelines
 \description{
 Analyzes \code{R} packages for compliance with Bioconductor package guidelines
 and best practices. Divides output into three categories: 
-requirements, recommendations, and notes.
+requirements, recommendations, and considerations.
 This function is mostly meant to be called from the operating system's
 command line (via \code{R CMD BiocCheck}; see the vignette). Not meant
 to replace \code{R CMD check}, which should always be run first.
@@ -67,8 +67,9 @@ are possible.}
 \item{recommendations}{We strongly suggest fixing these items.
 Equivalent in severity to \code{WARNING}s in \code{R CMD check}.}
 
-\item{notes}{Fixing these items is not required. Equivalent
-in severity to \code{NOTE}s in `R CMD check`.}
+\item{considerations}{Fixing these items is not required. Equivalent
+in severity to \code{NOTE}s in `R CMD check`, though unlike \code{NOTE}s},
+there is no expectation that considerations will escalate in severity.
 }
 \references{
 \url{http://www.bioconductor.org/developers/how-to/coding-style/}
