@@ -17,8 +17,10 @@ categories of issues:
 * **RECOMMENDED** (Equivalent to a `WARNING` in `R CMD check`). We strongly
   encourage that these issues be fixed. In the weeks leading up to a
   Bioconductor release we will ask package authors to fix these issues.
-* **NOTE**: Not necessarily something bad, just something we wanted to point
-  out. package authors don't need to take action on these.
+* **CONSIDER**: Not necessarily something bad, just something we wanted to point
+  out. package authors don't need to take action on these. These are analagous
+  to `NOTE`s in `R CMD check`, though unlike `NOTE`s, there is no
+  expectation that they will increase in severity over time.
 
 # Using `BiocCheck`
 

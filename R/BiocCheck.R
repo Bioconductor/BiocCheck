@@ -64,8 +64,7 @@ BiocCheck <- function(package, ...)
         packageVersion("BiocCheck")))
 
     handleMessage(paste0("BiocCheck is a work in progress. Output",
-        "  and severity of issues may change. ", 
-        "NOTEs will (probably) NOT evolve into more serious issues."))
+        "  and severity of issues may change."))
 
     handleMessage("Installing package...")
     installAndLoad(package)
@@ -166,10 +165,10 @@ if (res > 0)
 
 
     ## Summary
-    .msg("\nSummary:")
+    .msg("\n\nSummary:")
     .msg("REQUIRED count: %s", .requirements$getNum())
     .msg("RECOMMENDED count: %s", .recommendations$getNum())
-    .msg("NOTE count: %s", .notes$getNum())
+    .msg("CONSIDERATION count: %s", .considerations$getNum())
 
     if (.requirements$getNum() > 0)
     {
@@ -185,7 +184,7 @@ if (res > 0)
     } else {
         return (list(requirements=.requirements$get(),
             recommendations=.recommendations$get(),
-            notes=.notes$get()))
+            considerations=.considerations$get()))
     }
 
 }
