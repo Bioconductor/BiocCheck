@@ -3,7 +3,7 @@
 %\VignetteIndexEntry{BiocCheck}
 -->
 
-# BiocCheck
+# `BiocCheck`
 
 `BiocCheck` encapsulates Bioconductor package guidelines
 and best practices, analyzing packages and reporting three
@@ -18,9 +18,10 @@ categories of issues:
   encourage that these issues be fixed. In the weeks leading up to a
   Bioconductor release we will ask package authors to fix these issues.
 * **CONSIDER**: Not necessarily something bad, just something we wanted to point
-  out. package authors don't need to take action on these. These are analagous
-  to `NOTE`s in `R CMD check`, though unlike `NOTE`s, there is no
-  expectation that they will increase in severity over time.
+  out. package authors don't need to take action on these, but they can.
+  These are analagous   to `NOTE`s in `R CMD check`, though unlike 
+  `NOTE`s, there is no   expectation that they will increase in severity
+  over time.
 
 # Using `BiocCheck`
 
@@ -72,11 +73,11 @@ directory of your `R` installation. If it fails to do that (most likely due to i
 permissions), it will tell you, saying something like:
 
     Failed to copy the "inst/script/BiocCheck" script to
-    /Library/Frameworks/R.framework/Resources/bin
-    If you want to be able to run 'R CMD BiocCheck' you'll
-    need to copy it yourself to a directory on your PATH,
-    making sure it is executable.
-
+    /Library/Frameworks/R.framework/Resources/bin. If you want to be able
+    to run 'R CMD BiocCheck' you'll need to copy it yourself to a directory
+    on your PATH, making sure it is executable. Edit the copied version,
+    replacing RSCRIPT_PATH with the full path to Rscript. See BiocCheck
+    vignette for more information.
 
 You can fix the problem by following these instructions (noting that `R` may
 live in a different directory on your system than what is shown above).
@@ -94,4 +95,222 @@ this one ([Mac/Unix](http://kb.iu.edu/data/acar.html)).
 If you manually copy these files to a directory in your PATH that is
 not your R bin directory, you'll continue to see the above message 
 when (re-)installing `BiocCheck` but you can safely ignore it.
+
+# Interpreting `BiocCheck` output
+
+## Dependency Checks
+
+* Checks to make sure that there will be no import problems
+  if another package imports your package. (`REQUIRED`)
+* Reports if it can't figure out how objects were
+  initialized (`CONSIDER`).
+
+
+## Vignette Checks
+
+Can be disabled with `--no-check-vignettes`.
+
+* Checks that `vignettes` directory exists. (`REQUIRED`)
+* Checks that it contains vignette sources (*.Rmd, *.Rnw, *.Rrst)
+  (`REQUIRED`)
+* If checking a directory (not a tarball), and vignette sources
+  exist in inst/doc, `RECOMMEND` they be removed.
+* Report the number of eval=FALSE chunks; if it's more than 50%
+  of the total, `RECOMMEND` that more chunks be evaluated.
+
+## Version Checks
+
+* Checks that the version number is valid for a new Bioconductor
+  package. This is only done if the `--new-package` option is supplied.
+  (`REQUIRED`).
+* Checks for a valid version, that format is correct and that 
+  version number is appropriate for this version of Bioconductor.
+  (`REQUIRED`).
+
+For more information on package versions, see the
+[Version Numbering HOWTO](http://www.bioconductor.org/developers/how-to/version-numbering/).
+
+## biocViews Checks
+
+These can be disabled with the `--no-check-bioc-views` option, 
+which might be useful when checking non-Bioconductor packages
+(since biocViews is a concept unique to Bioconductor).
+
+* Checks that a `biocViews` field is present in the DESCRIPTION file.
+  (`RECOMMENDED`).
+* Checks for valid views and displays invalid ones. (`RECOMMENDED`)
+* Checks that all views come from the same parent (one of Software,
+  AnnotationData, ExperimentData).
+
+More information about biocViews is available in the
+[Using biocViews HOWTO](http://www.bioconductor.org/developers/how-to/biocViews/).
+
+## Build System Compatibility Checks
+
+The Bioconductor Build System (BBS) is our nightly build system and it has
+certain requirements. Packages which don't meet these requirements can
+be silently skipped by BBS, so it's important to make sure
+that every package meets the requirements.
+
+* Checks to make sure there are no blank lines in the 
+  DESCRIPTION file (`REQUIRED`).
+* Checks to make sure there is no whitespace in DESCRIPTION
+  file field names (`REQUIRED`).
+* Checks to make sure that `Package` field of DESCRIPTION file
+  matches directory or tarball name (`REQUIRED`).
+* Checks to make sure a `Version` field is present in
+  the DESCRIPTION file. (`REQUIRED`).
+* Checks to make sure the DESCRIPTION file has either a `Maintainer`
+  field, or a valid `Authors@R` field which resolves to a valid
+  `Maintainer field`, which consists of (the following are all `REQUIRED`):
+    * A valid R object of class `person`.
+    * Only one person with the `cre` (creator) role.
+    * That person must have a syntactically valid email address.
+
+## Unit Test Checks
+
+We strongly believe in unit tests, though we do not at present
+require them. For more on what unit tests are, why they are helpful,
+and how to implement them, read our
+[Unit Testing HOWTO](http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/).
+
+At present we just check to see whether unit tests are present, and if not,
+urge you to `CONSIDER` adding them.
+
+## Native Routine Registration Checks
+
+Calls to native (C or Fortran) code entry points should be registered with
+R. This is documented in the
+[Writing R Extensions](http://cran.r-project.org/doc/manuals/r-release/R-exts.html#Registering-native-routines)
+manual. 
+
+If `BiocCheck` detects that your package has native code, but no
+entry points have been registered, it will `RECOMMEND` that you 
+register them.
+
+## Namespace Import Suggestion Checks
+
+If the package `codetoolsBioC` is installed, `BiocCheck` will run it
+to see if it has suggestions for the "Imports" section of your package
+NAMESPACE. 
+
+`codetoolsBioC` is an experimental package that is not presently
+available via `biocLite()`. It is available from 
+[our Subversion repository](https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/codetoolsBioC)
+ with the credentials readonly/readonly.
+
+ Output of codetoolsBioC is printed to the screen but `BiocCheck`
+ does not label it REQUIRED, RECOMMENDED, or CONSIDER.
+
+ ## Deprecated Package Checks
+
+ At present, this just looks to see whether your package has a
+ dependency on the `multicore` package, and if so, `REQUIRE`s you 
+ to remove it. `multicore` does not work on Windows, but the 
+ `parallel` package has all of the same functionality and works
+ on all operating systems. 
+
+ Note that `parallel` supports two types of parallelism: forking and socket clusters. Forking only works on Windows if the number of cores is set to 1, 
+ meaning there is no gain from parallelizing code. Socket clusters
+ work on all operating systems.
+
+ ## Code Parsing Checks
+
+ `BiocCheck` parses the code in your package's R directory, 
+ and in evaluated man page and vignette examples to look for various
+ symbols, which result in issues of varying severity:
+
+* It's `RECOMMENDED` to replace `T` and `F` with `TRUE` and `FALSE`.
+  This is because `T` and `F` are ordinary variables whose value 
+  can be altered, leading to unexpected results, whereas the value 
+  of `TRUE` and `FALSE` cannot be changed.
+* It's `RECOMMENDED` to remove `browser()` calls from code. This 
+  function causes the command-line R debugger to be invoked, and 
+  should not be used in production code (though it's OK to wrap 
+  such calls in a conditional that evaluates to TRUE if some debugging
+  option is set).
+* `CONSIDER` removing the symbol `<<-` from R code; it's generally
+  not a good idea to use it.
+* We `RECOMMEND` that you not call `library()` or `require()` on 
+  your own package within code in the R directory or in man page
+  examples, because it's not necessary. In these contexts, your 
+  package is already loaded.
+
+## DESCRIPTION/NAMESPACE consistency checks
+
+`BiocCheck` detects packages that are imported in
+NAMESPACE but not DESCRIPTION, or vice versa, and
+`RECOMMENDS` fixing them, with an explanation of
+how to do so.
+
+## Function length checking
+
+`BiocCheck` prints an informative message about the length
+(in lines) of your five longest functions (this includes functions
+in your R directory and in evaluated man page and vignette examples).
+
+`BiocCheck` does not assign severity to long functions, but
+you may want to consider breaking up long functions into smaller
+ones. This is a basic refactoring technique that results
+in code that's easier to read, debug, test, and maintain.
+
+## Runnable Examples Checking
+
+`BiocCheck` looks at all man pages which document exported objects
+and lists the ones that don't contain runnable examples (either because
+there is no `examples` section or because its examples are tagged
+with `dontrun`). It's `REQUIRED` that at least 80% of these man
+pages have runnable examples. If more than 80% of these pages 
+have runnable examples, but some are still missing, `BiocCheck`
+asks you to `CONSIDER` adding more runnable examples.
+
+Runnable examples are a key part of literate programming and
+help ensure that your code does what you say it does.
+
+## NEWS checks
+
+`BiocCheck` looks to see if there is a valid NEWS file
+(NEWS or NEWS.Rd) either in the 'inst' directory or in 
+the top-level directory of your package, and checks whether
+it is properly formatted. 
+
+NEWS files are a good way to keep users up-to-date on changes
+to your package. Excerpts from properly formatted NEWS
+files will be included in Bioconductor release announcements
+to tell users what has changed in your package in the last
+release.
+
+More information on NEWS files is available in the help topic
+`?news`.
+
+## Formatting checks
+
+There is no 100% correct way to format code. There are various
+style guides, and these checks adhere to 
+[Bioconductor's Style Guide](http://www.bioconductor.org/developers/how-to/coding-style/).
+
+We ask only that you `CONSIDER` adhering to this guide.
+
+In particular, we think it's important to avoid very long lines in code.
+Note that some text editors do not wrap lines automatically, requiring
+horizontal scrolling in order to read it. Also note that R syntax
+is very flexible and whitespace can be inserted almost anywhere in
+an expression.
+
+These checks are run against not just R code, but the DESCRIPTION 
+and NAMESPACE files as well as man pages and vignette source files. 
+All of these files allow long lines to be broken up.
+
+## Canned Comments check
+
+It can be handy to generate man page skeletons with `prompt()` and/or
+RStudio. These skeletons contain comments that look like this:
+
+    %%  ~~ A concise (1-5 lines) description of the dataset. ~~
+
+`BiocCheck` asks you to `CONSIDER` removing such comments.
+
+
+
+
 

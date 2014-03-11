@@ -37,11 +37,15 @@ if ( (!alreadyExists) || (md5sum(tmpFile) != md5sum(destFile)))
 
     if (is.null(res) || !res || res == -1)
     {
-        message(paste('Failed to copy the "inst/script/BiocCheck" script to\n',
-            file.path(Sys.getenv("R_HOME"), "bin"), "\n",
-            "If you want to be able to run 'R CMD BiocCheck' you'll\n",
-            "need to copy it yourself to a directory on your PATH,\n",
-            "making sure it is executable.", sep=""))
+        cat(strwrap(paste(
+            'Failed to copy the "inst/script/BiocCheck" script to',
+            paste0(file.path(Sys.getenv("R_HOME"), "bin"), "."),
+            "If you want to be able to run 'R CMD BiocCheck' you'll",
+            "need to copy it yourself to a directory on your PATH,",
+            "making sure it is executable. Edit the copied version,",
+            "replacing RSCRIPT_PATH with the full path to Rscript.",
+            "See BiocCheck vignette for more information.", sep=" ")),
+            sep="\n")
         if (onWindows)
             message("Windows users need to copy BiocCheck.bat as well.")
     }
