@@ -67,7 +67,7 @@ BiocCheck <- function(package, ...)
         "  and severity of issues may change."))
 
     handleMessage(paste0("For detailed information about these checks, ",
-        "see the BiocCheck vignette (temporarily available at ",
+        "see the BiocCheck vignette, temporarily available at ",
             "http://bioconductor.org/developers/BiocCheck.html#Interpreting_BiocCheck_output"))
 
     handleMessage("Installing package...")
