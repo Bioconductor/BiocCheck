@@ -47,7 +47,7 @@ R CMD BiocCheck takes options which can be seen by running
     R CMD BiocCheck --help
 
 ```{r echo=FALSE}
-library(BiocCheck)
+suppressPackageStartupMessages(library(BiocCheck))
 usage()
 ```
 
@@ -140,7 +140,7 @@ which might be useful when checking non-Bioconductor packages
   (`RECOMMENDED`).
 * Checks for valid views and displays invalid ones. (`RECOMMENDED`)
 * Checks that all views come from the same parent (one of Software,
-  AnnotationData, ExperimentData).
+  AnnotationData, ExperimentData) (`RECOMMENDED`).
 
 More information about biocViews is available in the
 [Using biocViews HOWTO](http://www.bioconductor.org/developers/how-to/biocViews/).
@@ -215,7 +215,7 @@ available via `biocLite()`. It is available from
  meaning there is no gain from parallelizing code. Socket clusters
  work on all operating systems.
 
- ## Code Parsing Checks
+## Code Parsing Checks
 
  `BiocCheck` parses the code in your package's R directory, 
  and in evaluated man page and vignette examples to look for various
