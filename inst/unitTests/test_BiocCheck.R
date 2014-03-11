@@ -216,8 +216,9 @@ test_checkBBScompatibility <- function()
     #    file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     #BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     #checkError("Syntax error in Authors@R doesn't cause error!")
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1 + 1", UNIT_TEST_PKG),
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    zeroCounters()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Wrong class in Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))", UNIT_TEST_PKG),

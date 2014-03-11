@@ -5,4 +5,5 @@ BiocCheck.Rproj
 .Rbuildignore
 vignettes/*.md
 vignettes/*.html
+vignettes/sync.sh
 *.so
