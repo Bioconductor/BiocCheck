@@ -52,6 +52,9 @@ Installing \code{BiocCheck} will attempt to install
 the \code{BiocCheck} script, which could fail; details
 in the vignette.
 
+See the vignette for detailed explanations of all
+the checks performed by \code{BiocCheck}.
+
 }
 \value{
 Mostly called for the side effect of the information displayed.
