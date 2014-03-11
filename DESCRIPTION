@@ -11,7 +11,7 @@ LazyData: true
 VignetteBuilder: knitr
 Imports: biocViews (>= 1.31.9), BiocInstaller, graph, devtools (>= 1.4.1),
     knitr, tools, optparse, codetools, methods
-Suggests: RUnit, BiocGenerics, Biobase, RJSONIO
+Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, knitrBootstrap
 Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck/issues
