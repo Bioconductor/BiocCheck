@@ -46,12 +46,12 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     efs <- 0
     for (file in vigdircontents)
     {
-        chunks <- chunks +
-            length(grep(">>=|```\\{r|.. \\{r", readLines(file,
-            warn=FALSE)))
+        lines <- readLines(file, warn=FALSE)
+        chunklines <- lines[grep(">>=|```\\{r|.. \\{r", lines)]
+        chunks <- chunks + length(chunklines)
+
         efs <- efs + 
-            length(grep("eval\\s?=\\s?FALSE", readLines(file,
-            warn=FALSE)))
+            length(grep("eval\\s?=\\s?FALSE", chunklines))
     }
 
     percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
