@@ -263,7 +263,7 @@ there is no `examples` section or because its examples are tagged
 with `dontrun`). It's `REQUIRED` that at least 80% of these man
 pages have runnable examples. If more than 80% of these pages 
 have runnable examples, but some are still missing, `BiocCheck`
-lists the missing ones and asks you to `CONSIDER` adding more runnable
+lists the missing ones and asks you to `CONSIDER` adding runnable
 examples to them.
 
 Runnable examples are a key part of literate programming and
