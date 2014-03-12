@@ -7,3 +7,4 @@ vignettes/*.md
 vignettes/*.html
 vignettes/sync.sh
 *.so
+*.o

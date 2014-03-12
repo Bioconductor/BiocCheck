@@ -136,7 +136,7 @@ parseFiles <- function(pkgdir)
 }
 
 findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
-    token)
+    token, silent=FALSE)
 {
     matches <- list()
     for (filename in names(parsedCode))
@@ -159,15 +159,17 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
         x <- matches[[name]]
         for (i in nrow(x))
         {
-            if (grepl("\\.R$", name, ignore.case=TRUE))
-                message(sprintf("      Found %s%s in %s (line %s, column %s)",
-                    symbolName, parens,
-                    mungeName(name, pkgname), x[i,1], x[i,2]))
-            else
-                message(sprintf("      Found %s%s in %s",
-                    symbolName, parens,
-                    mungeName(name, pkgname))) # FIXME test this
-
+            if (!silent)
+            {
+                if (grepl("\\.R$", name, ignore.case=TRUE))
+                    message(sprintf("      Found %s%s in %s (line %s, column %s)",
+                        symbolName, parens,
+                        mungeName(name, pkgname), x[i,1], x[i,2]))
+                else
+                    message(sprintf("      Found %s%s in %s",
+                        symbolName, parens,
+                        mungeName(name, pkgname))) # FIXME test this
+            }
         }
     }
     length(matches) # for tests

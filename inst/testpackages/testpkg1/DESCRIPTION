@@ -1,0 +1,10 @@
+Package: testpkg1
+Title: bla
+Description: blsa
+Version: 0.1
+Author: Joe Blow
+Maintainer: Joe Blow <joe@blow.com>
+Depends: R (>= 3.1.0), RJSONIO
+License: GPL-2
+LazyData: true
+VignetteBuilder: knitr
