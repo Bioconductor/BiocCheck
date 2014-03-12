@@ -255,17 +255,26 @@ checkUnitTests <- function(pkgdir)
     }
 }
 
-checkRegistrationOfEntryPoints <- function(pkgname)
+checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
 {
-    d <- getLoadedDLLs()
-    if (pkgname %in% names(d))
+    symbols <-  c(".C", ".Call", ".Fortran", ".External")
+    res <- lapply(symbols, function(x) {
+        findSymbolInParsedCode(parsedCode, pkgname, x, "SYMBOL_FUNCTION_CALL",
+            TRUE)
+    })
+
+    if (any(res > 0)) 
     {
-        r <- getDLLRegisteredRoutines(pkgname)
-        if (sum(sapply(r, length)) == 0)
+        d <- getLoadedDLLs()
+        if (pkgname %in% names(d))
         {
-            handleRecommended(
-                paste0("Register native routines!",
-                    " see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
+            r <- getDLLRegisteredRoutines(pkgname)
+            if (sum(sapply(r, length)) == 0)
+            {
+                handleRecommended(
+                    paste0("Register native routines!",
+                        " see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
+            }
         }
     }
 }

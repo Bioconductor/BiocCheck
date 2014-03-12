@@ -100,8 +100,10 @@ BiocCheck <- function(package, ...)
     checkBBScompatibility(package_dir)
     handleMessage("Checking unit tests...")
     checkUnitTests(package_dir)
+    parsedCode <- parseFiles(package_dir)
+
     handleMessage("Checking native routine registration...")
-    checkRegistrationOfEntryPoints(package_name)
+    checkRegistrationOfEntryPoints(package_name, parsedCode)
     if (suppressMessages(suppressWarnings(require(codetoolsBioC))))
     {
         handleMessage("Checking for namespace import suggestions...")
@@ -113,7 +115,6 @@ BiocCheck <- function(package, ...)
 
     handleMessage("Parsing R code in R directory, examples, vignettes...")
 
-    parsedCode <- parseFiles(package_dir)
 
     handleMessage("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",

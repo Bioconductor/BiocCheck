@@ -269,15 +269,14 @@ test_installAndLoad <- function()
 
 test_checkRegistrationOfEntryPoints <- function()
 {
-    if(!require(Biobase)) suppressPackageStartupMessages(require("Biobase"))
-    zeroCounters()
-    BiocCheck:::checkRegistrationOfEntryPoints("Biobase")
-    checkTrue(stillZero())
-    zeroCounters()
-    # This test could fail if devtools registers routines:
-    if(!require(devtools)) suppressPackageStartupMessages(require("devtools"))
-    BiocCheck:::checkRegistrationOfEntryPoints("devtools")
-    checkTrue(.recommendations$getNum() == 1)
+    parsedCode1 <- BiocCheck:::parseFiles(system.file("testpackages",
+        "testpkg1", package="BiocCheck"))
+    BiocCheck:::installAndLoad(system.file("testpackages", "testpkg1",
+        package="BiocCheck"))
+
+    BiocCheck:::checkRegistrationOfEntryPoints("testpkg1", parsedCode1)
+    checkTrue(.recommendations$getNum() == 1, 
+        "unregistered code not flagged!")
 }
 
 test_checkDeprecatedPackages <- function()
