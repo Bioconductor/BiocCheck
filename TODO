@@ -1,3 +1,6 @@
+- Check to see if submitter's email address (from maintainer field)
+  is subscribed to bioc-devel? This could only run if an option is
+  set containing a valid password to access the bioc-devel membership list.
 Latest round of feedback (3/7/2014):
 
   add file/line # for eval=FALSE hits
