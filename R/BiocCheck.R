@@ -80,8 +80,18 @@ BiocCheck <- function(package, ...)
 
     if (is.null(dots[["no-check-vignettes"]]))
     {
-        handleMessage("Checking vignette directories...")
-        checkVignetteDir(package_dir, checkingDir)
+        pkgType <- getPkgType(package_dir)
+        if ((is.na(pkgType)) || pkgType == "Software") 
+        {
+            if (is.na(pkgType))
+                msg <- "Unknown package type, checking vignette directories..."
+            else
+                msg <- "This is a software package, checking vignette directories..."
+            handleMessage(msg)
+            checkVignetteDir(package_dir, checkingDir)
+        } else {
+            handleMessage("This is not a software package, skipping vignette checks...")
+        }
     }
     handleMessage("Checking version number...")
     if (!is.null(dots[["new-package"]]))

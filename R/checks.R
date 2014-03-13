@@ -103,6 +103,43 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
         error=function(e) handleRequired("Valid package version"))
 }
 
+getPkgType <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if (!"biocViews" %in% colnames(dcf))
+    {
+        return(NA)
+    }
+    biocViews <- dcf[, "biocViews"]
+    views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
+    biocViewsVocab <- NULL ## to keep R CMD check happy
+    data("biocViewsVocab", package="biocViews", envir=environment())
+    if (!all(views %in% nodes(biocViewsVocab)))
+    {
+        badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
+            collapse=", ")
+        views <- views[!views %in% badViews]
+        if (length(views) == 0) return(NA)
+    }
+    parents <- c()
+    for (view in views)
+    {
+        parents <- c(parents, getParent(view, biocViewsVocab))
+    }
+    u <- unique(parents)
+    if (length(u)==1) return(u) else return(NA)
+}
+
+getParent <- function(view, biocViewsVocab)
+{
+    topLevel <- c("Software", "ExperimentData", "AnnotationData")
+    for (level in topLevel) {
+        if (view %in% names(acc(biocViewsVocab, level)[[level]]))
+            return(level)
+    }
+}
+
+
 checkBiocViews <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
@@ -124,14 +161,6 @@ checkBiocViews <- function(pkgdir)
         }
     }
 
-    getParent <- function(view, biocViewsVocab)
-    {
-        topLevel <- c("Software", "ExperimentData", "AnnotationData")
-        for (level in topLevel) {
-            if (view %in% names(acc(biocViewsVocab, level)[[level]]))
-                return(level)
-        }
-    }
     parents <- c()
     for (view in views)
     {
