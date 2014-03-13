@@ -461,3 +461,24 @@ test_checkForPromptComments <- function()
     checkEquals(1, .considerations$getNum())
 
 }
+
+test_getPkgType <- function()
+{
+   cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+
+   cat("biocViews: bad, Software", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+
+   cat("biocViews: DifferentialExpression, CellBiology", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   checkEquals("Software", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+
+   cat("biocViews: DifferentialExpression, ChipManufacturer", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+
+   cat("biocViews: GeneCardsCustomSchema, ChipManufacturer", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   checkEquals("AnnotationData", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+
+   cat("biocViews: Cancer, HapMap", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   checkEquals("ExperimentData", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+}
