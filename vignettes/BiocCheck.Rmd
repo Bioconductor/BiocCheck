@@ -110,6 +110,10 @@ when (re-)installing `BiocCheck` but you can safely ignore it.
 
 Can be disabled with `--no-check-vignettes`.
 
+Only run if your package is a software package (as
+determined by your [biocViews](#biocViews_Checks)), or if
+package type cannot be determined.
+
 * Checks that `vignettes` directory exists. (`REQUIRED`)
 * Checks that it contains vignette sources (*.Rmd, *.Rnw, *.Rrst)
   (`REQUIRED`)
