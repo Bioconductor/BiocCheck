@@ -66,9 +66,6 @@ BiocCheck <- function(package, ...)
     handleMessage(paste0("BiocCheck is a work in progress. Output",
         "  and severity of issues may change."))
 
-    handleMessage(paste0("For detailed information about these checks, ",
-        "see the BiocCheck vignette, temporarily available at ",
-            "http://bioconductor.org/developers/BiocCheck.html#Interpreting_BiocCheck_output"))
 
     handleMessage("Installing package...")
     installAndLoad(package)
@@ -184,6 +181,11 @@ if (res > 0)
     .msg("REQUIRED count: %s", .requirements$getNum())
     .msg("RECOMMENDED count: %s", .recommendations$getNum())
     .msg("CONSIDERATION count: %s", .considerations$getNum())
+    .msg(paste0("For detailed information about these checks, ",
+    "see the BiocCheck vignette, temporarily available at ",
+        "http://bioconductor.org/developers/BiocCheck.html#Interpreting_BiocCheck_output"),
+        exdent=0)
+
 
     if (.requirements$getNum() > 0)
     {
