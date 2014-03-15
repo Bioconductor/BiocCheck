@@ -458,13 +458,25 @@ checkForBadDepends <- function(pkgdir)
 
             if (length(noteObjects) > 0)
             {
+                if (length(noteObjects) == 1)
+                {
+                    grammar <- list(object_objects="object", was_were="was",
+                        itis_theyare="it is")
+                } else {
+                    grammar <- list(object_objects="objects", was_were="were",
+                        itis_theyare="they are")
+                }
+
                 msg <- sprintf(paste(
-                    "Clarifying how objects %s (used in %s)",
-                    "were initialized. It could be they are part of a",
+                    "Clarifying how %s %s (used in %s)",
+                    "%s initialized. Maybe %s part of a",
                     "data set loaded with data(), or perhaps part of",
                     "an object referenced in with() or within()."),
+                    grammar$object_objects,
                     paste(noteObjects, collapse=", "),
-                    paste(noteFunctions, collapse=", "))
+                    paste(noteFunctions, collapse=", "),
+                    grammar$was_were,
+                    grammar$itis_theyare)
 
                 handleConsideration(msg)
             }
