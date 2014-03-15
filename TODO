@@ -1,3 +1,4 @@
+- make sure i am using ifelse properly
 - Check to see if case-sensitivity is wrong in biocViews?
 - Check to see if submitter's email address (from maintainer field)
   is subscribed to bioc-devel? This could only run if an option is
