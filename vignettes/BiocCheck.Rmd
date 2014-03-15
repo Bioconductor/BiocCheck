@@ -142,7 +142,8 @@ which might be useful when checking non-Bioconductor packages
 
 * Checks that a `biocViews` field is present in the DESCRIPTION file.
   (`RECOMMENDED`).
-* Checks for valid views and displays invalid ones. (`RECOMMENDED`)
+* Checks for valid views and displays invalid ones. Note that biocViews
+  are case-sensitive. (`RECOMMENDED`)
 * Checks that all views come from the same parent (one of Software,
   AnnotationData, ExperimentData) (`RECOMMENDED`).
 
