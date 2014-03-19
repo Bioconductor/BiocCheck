@@ -951,7 +951,7 @@ checkForBiocDevelSubscription <- function(pkgdir)
         return()
     }
     y <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel",
-        body=list(adminpw=getOption("bioc.devel.password")))
+        body=list(adminpw=Sys.getenv("BIOC_DEVEL_PASSWORD")))
     l <- content(y, as="text")
     if(grepl("Authorization\\s+failed\\.", l))
     {

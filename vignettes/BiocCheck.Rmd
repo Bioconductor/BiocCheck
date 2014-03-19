@@ -317,7 +317,16 @@ RStudio. These skeletons contain comments that look like this:
 
 `BiocCheck` asks you to `CONSIDER` removing such comments.
 
+## bioc-devel Subscription Check
 
+This usually only applies if `BiocCheck` is run on the
+Bioconductor build machines, because this step requires
+special authorization.
 
-
-
+If this authorization is present, `BiocCheck` will 
+check to see if the email address in the Maintainer
+(or Authors@R) field is subscribed to the bioc-devel
+mailing list, and if not, `RECOMMEND`s that you
+subscribe. All maintainers should subscribe to this list.
+You can subscribe
+[here](https://stat.ethz.ch/mailman/listinfo/bioc-devel).
