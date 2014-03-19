@@ -175,6 +175,11 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for canned comments in man pages...")
     checkForPromptComments(package_dir)
 
+    if (!is.null(getOption("bioc.devel.password")))
+    {
+        handleMessage("Checking for bioc-devel mailing list subscription...")
+        checkForBiocDevelSubscription(package_dir)
+    }
 
     ## Summary
     .msg("\n\nSummary:")
