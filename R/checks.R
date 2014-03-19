@@ -206,7 +206,7 @@ checkBBScompatibility <- function(pkgdir)
     {
         env <- new.env(parent=emptyenv())
         env[["c"]] = c
-        env[["person"]] <- person
+        env[["person"]] <- utils::person
         pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE) 
         tryCatch(people <- eval(pp, env),
             error=function(e) {
@@ -911,5 +911,62 @@ checkForPromptComments <- function(pkgdir)
         handleConsideration(sprintf(
             "Removing generated comments from man pages %s ",
             paste(bad, collapse=", ")))
+    }
+}
+
+checkForBiocDevelSubscription <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if ("Maintainer" %in% colnames(dcf))
+    {
+        m <- dcf[, "Maintainer"]
+        ret <- regexec("<([^>]*)>", m)[[1]]
+        ml <- attr(ret, "match.length")
+        email <- substr(m, ret[2], ret[2]+ml[2]-1)
+    } else if ("Authors@R" %in% colnames(dcf)) {
+        ar <- dcf[, "Authors@R"]
+        env <- new.env(parent=emptyenv())
+        env[["c"]] = c
+        env[["person"]] <- utils::person
+        pp <- parse(text=ar, keep.source=TRUE) 
+        tryCatch(people <- eval(pp, env),
+            error=function(e) {
+                # could not parse Authors@R
+                return()
+            })
+        for (person in people)
+        {
+            if ("cre" %in% person$role) 
+            {
+                email <- person$email
+            }
+        }
+       
+    }
+    if (!exists("email"))
+        return()
+    if (tolower(email) == "maintainer@bioconductor.org")
+    {
+        handleMessage("Maintainer email is ok.")
+        return()
+    }
+    y <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel",
+        body=list(adminpw=getOption("bioc.devel.password")))
+    l <- content(y, as="text")
+    if(grepl("Authorization\\s+failed\\.", l))
+    {
+        # couldn't log in...
+        return()
+    }
+    z <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
+        body=list(findmember=email))
+    l <- content(z, as="text")
+    if(grepl(paste0(">", tolower(email), "<"), tolower(l), fixed=TRUE))
+    {
+        handleMessage("Maintainer is subscribed to bioc-devel!")
+    } else {
+        handleRecommended(paste0(
+            "Maintainer should be subscribed to bioc-devel mailing list. See ",
+            "https://stat.ethz.ch/mailman/listinfo/bioc-devel"))
     }
 }

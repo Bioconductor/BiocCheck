@@ -12,15 +12,15 @@ parsedCode <- NULL
 
 inspect <- function()
 {
-    .printf("requirements: %s, recommendations: %s, notes: %s",
+    .printf("requirements: %s, recommendations: %s, considerations: %s",
         .requirements$getNum(),
         .recommendations$getNum(),
         .considerations$getNum())
-    print("errors:")
+    print("requirements:")
     print(.requirements$get())
-    print("warnings:")
+    print("recommendations:")
     print(.recommendations$get())
-    print("notes:")
+    print("considerations:")
     print(.considerations$get())
 
 }
@@ -234,6 +234,7 @@ test_checkBBScompatibility <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Missing email in Maintainer doesn't cause error!")
+    zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
@@ -481,4 +482,45 @@ test_getPkgType <- function()
 
    cat("biocViews: Cancer, HapMap", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals("ExperimentData", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+}
+
+test_checkForBiocDevelSubscription <- function()
+{
+    if (!is.null(getOption("bioc.devel.password")))
+    {
+        cat("Maintainer: Joe Blow <foo@bar.com>",
+                file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
+        checkEquals(.recommendations$getNum(), 1)
+        zeroCounters()
+
+        cat("Maintainer: Dan Tenenbaum <dtenenba@fhcrc.org>",
+                file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
+        checkTrue(stillZero())
+        zeroCounters()
+
+        cat("Maintainer: Dan Tenenbaum <DTENENBA@fhcrc.ORG>",
+                file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
+        checkTrue(stillZero())
+        zeroCounters()
+
+        cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Joe', \n  'Blow', email='joe@blow.org', role=c('aut', 'cre')))",
+            UNIT_TEST_PKG),
+            file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
+        checkEquals(.recommendations$getNum(), 1)
+        zeroCounters()
+
+        cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Dan', \n  'Tenenbaum', email='dtenenba@fhcrc.org', role=c('aut', 'cre')))",
+            UNIT_TEST_PKG),
+            file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
+        checkTrue(stillZero())
+        zeroCounters()
+
+
+    }
+
 }
