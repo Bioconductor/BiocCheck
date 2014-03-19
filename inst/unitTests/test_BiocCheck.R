@@ -486,7 +486,7 @@ test_getPkgType <- function()
 
 test_checkForBiocDevelSubscription <- function()
 {
-    if (!is.null(getOption("bioc.devel.password")))
+    if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD")))
     {
         cat("Maintainer: Joe Blow <foo@bar.com>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
