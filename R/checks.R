@@ -966,7 +966,8 @@ checkForBiocDevelSubscription <- function(pkgdir)
         handleMessage("Maintainer is subscribed to bioc-devel!")
     } else {
         handleRecommended(paste0(
-            "Maintainer should be subscribed to bioc-devel mailing list. See ",
+            "Maintainer should be subscribed to bioc-devel mailing list.",
+            "Subscribe here: ",
             "https://stat.ethz.ch/mailman/listinfo/bioc-devel"))
     }
 }
