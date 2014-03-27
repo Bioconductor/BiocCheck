@@ -1,3 +1,9 @@
+- check that all packages in Depends/Suggests/Enhances/LinkingTo/Imports
+  are actually available? Here's why: suppose pkg being checked 
+  Depends on CRAN pkg foo which is installed on our builders
+  but is subsequently removed from CRAN. The next time we 
+  reinstall R on the builders we won't be able to install pkg
+  foo. I'm not sure BiocCheck is the best place for this check...
 - if --new-package is turned on, check that pkg name
   (modulo case changes) is not already in bioc
 - make sure i am using ifelse properly
