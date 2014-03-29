@@ -187,8 +187,9 @@ BiocCheck <- function(package, ...)
     .msg("RECOMMENDED count: %s", .recommendations$getNum())
     .msg("CONSIDERATION count: %s", .considerations$getNum())
     .msg(paste0("For detailed information about these checks, ",
-    "see the BiocCheck vignette, temporarily available at ",
-        "http://bioconductor.org/developers/BiocCheck.html#Interpreting_BiocCheck_output"),
+    "see the BiocCheck vignette, available at ",
+        sprintf("http://www.bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#Interpreting_BiocCheck_output",
+            BiocInstaller:::BIOC_VERSION)),
         exdent=0)
 
 
