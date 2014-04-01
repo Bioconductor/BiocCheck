@@ -85,7 +85,7 @@ parseFile <- function(infile, pkgdir)
 {
     # FIXME - use purl to parse RMD and RRST
     # regardless of VignetteBuilder value
-    if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst", infile, TRUE))
+    if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE))
     {
         dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
         if ("VignetteBuilder" %in% colnames(dcf) &&
@@ -124,7 +124,8 @@ parseFiles <- function(pkgdir)
     dir2 <- dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
         full.names=TRUE)
     dir3 <- dir(file.path(pkgdir, "vignettes"),
-        pattern="\\.Rnw$|\\.Rmd$|\\.Rrst", ignore.case=TRUE, full.names=TRUE)
+        pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
+        ignore.case=TRUE, full.names=TRUE)
     files <- c(dir1, dir2, dir3)
     for (file in files)
     {

@@ -115,7 +115,8 @@ determined by your [biocViews](#biocViews_Checks)), or if
 package type cannot be determined.
 
 * Checks that `vignettes` directory exists. (`REQUIRED`)
-* Checks that it contains vignette sources (*.Rmd, *.Rnw, *.Rrst)
+* Checks that it contains vignette sources 
+  (*.Rmd, *.Rnw, *.Rrst, *.Rhtml, *.Rtex)
   (`REQUIRED`)
 * If checking a directory (not a tarball), and vignette sources
   exist in inst/doc, `RECOMMEND` they be removed.
