@@ -3,7 +3,7 @@
 getVigSources <- function(dir)
 {
     dir(dir,
-        pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$",
+        pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
         ignore.case=TRUE, full.names=TRUE)
 }
 
@@ -811,7 +811,8 @@ checkFormatting <- function(pkgdir)
         dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
         full.names=TRUE),
         dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
-            pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$", ignore.case=TRUE),
+            pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
+            ignore.case=TRUE),
         dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
             full.names=TRUE)
         )
