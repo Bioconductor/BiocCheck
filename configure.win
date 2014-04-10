@@ -1,4 +1,0 @@
-
-$R_HOME/bin/Rscript --vanilla inst/script/installer.R
-
-
