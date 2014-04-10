@@ -1,28 +1,26 @@
 .installScript <- function()
 {
     onWindows <- (.Platform$OS.type == "windows")
+    files <- "BiocCheck"
+    if (onWindows)
+        files <- append(files, "BiocCheck.bat")
 
     srcDir <- file.path("inst", "script")
-    srcFile <- file.path(srcDir, "BiocCheck")
-    if (onWindows)
-        batFile <- c(srcFile, file.path(srcDir, "BiocCheck.bat"))
+    srcFile <- file.path(srcDir, files)
     destDir <- file.path(Sys.getenv("R_HOME"), "bin")
-    destFile <- file.path(destDir, "BiocCheck")
-    tmpFile <- file.path(tempdir(), "BiocCheck")
-    alreadyExists <- file.exists(destFile)
+    destFile <- file.path(destDir, files)
+    alreadyExists <- all(file.exists(destFile))
 
 
-    if ( (!alreadyExists) || (md5sum(srcFile) != md5sum(destFile)))
+    if ( (!alreadyExists) )
     {
         res <- FALSE
         suppressWarnings(
             tryCatch({
                     res <- file.copy(srcFile, destDir, overwrite<-TRUE)
 
-                    if (onWindows)
+                    if (!onWindows)
                     {
-                        res <- file.copy(batFile, destDir, overwrite<-TRUE)
-                    } else {
                         res <- Sys.chmod(destFile, "0755")
                     }
                         },
