@@ -10,3 +10,28 @@ setRefClass("MsgClass",
         )
 )
 
+
+.isScriptInstalled <- function()
+{
+    if (nchar(Sys.which("BiocCheck")))
+        return(TRUE)
+
+    onWindows <- (.Platform$OS.type == "windows")
+
+    if (onWindows)
+        file <- c("BiocCheck.bat", "BiocCheck")
+    else
+        file <- "BiocCheck"
+
+    path <- file.path(Sys.getenv("R_HOME"), "bin")
+
+    all(file.exists(file.path(path, file)))
+
+}
+
+.onLoad <- function(libname, pkgname)
+{
+    if (.isScriptInstalled())
+        return()
+    .installScript()
+}
