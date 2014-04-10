@@ -29,12 +29,14 @@
                 error=function(e) res=-1)
         )
 
+        if (interactive())
+            func <- packageStartupMessage
+        else
+            func <- message
+
+
         if (is.null(res) || !res || res == -1)
         {
-            if (interactive())
-                func <- packageStartupMessage
-            else
-                func <- message
             msg <- strwrap(paste(
                 'Failed to copy the "inst/script/BiocCheck" script to',
                 paste0(file.path(Sys.getenv("R_HOME"), "bin"), "."),
@@ -49,7 +51,7 @@
                 func(
                     "Windows users need to copy BiocCheck.bat as well.")
         } else {
-            message("BiocCheck script installed.")
+            func("BiocCheck script installed.")
         }
     }
 
