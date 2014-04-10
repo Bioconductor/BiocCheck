@@ -40,8 +40,7 @@
                 paste0(file.path(Sys.getenv("R_HOME"), "bin"), "."),
                 "If you want to be able to run 'R CMD BiocCheck' you'll",
                 "need to copy it yourself to a directory on your PATH,",
-                "making sure it is executable. Edit the copied version,",
-                "replacing RSCRIPT_PATH with the full path to Rscript.",
+                "making sure it is executable.",
                 "See BiocCheck vignette for more information."))
             for (i in 1:length(msg))
                 func(msg[i])
