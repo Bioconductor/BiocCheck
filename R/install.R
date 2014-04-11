@@ -14,24 +14,38 @@
 
     if ( (!alreadyExists) )
     {
+
+
+        tmpFile <- file.path(tempdir(), "BiocCheck")
+        lines <- readLines(file.path("inst", "script", "BiocCheck"))
+        lines <- sub("PATH_TO_RSCRIPT",
+            file.path(Sys.getenv("R_HOME"), "bin", "Rscript"),
+            lines)
+        cat(lines, sep="\n", file=tmpFile)
+        Sys.chmod(tmpFile, "0755")
+
+        filesToCopy <- c(tmpFile)
+        if (onWindows)
+            filesToCopy <- append(filesToCopy, file.path("inst", "script", "BiocCheck.bat"))
+
         res <- FALSE
         suppressWarnings(
             tryCatch({
-                    res <- file.copy(srcFile, destDir, overwrite<-TRUE)
+                    res <- 
+                        all(file.copy(filesToCopy, destDir, overwrite=TRUE))
 
-                    if (!onWindows)
-                    {
-                        res <- Sys.chmod(destFile, "0755")
-                    }
                         },
                 error=function(e) res=-1)
         )
+
+        destFiles <- file.path(destDir, basename(filesToCopy))
+
+        res <- all(file.exists(destFiles))
 
         if (interactive())
             func <- packageStartupMessage
         else
             func <- message
-
 
         if (is.null(res) || !res || res == -1)
         {
@@ -41,6 +55,8 @@
                 "If you want to be able to run 'R CMD BiocCheck' you'll",
                 "need to copy it yourself to a directory on your PATH,",
                 "making sure it is executable.",
+                "Edit the copied version,",
+                "replacing RSCRIPT_PATH with the full path to Rscript.",
                 "See BiocCheck vignette for more information."))
             for (i in 1:length(msg))
                 func(msg[i])

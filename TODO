@@ -1,3 +1,5 @@
+- check that knitr is in suggests if it is being used to build vignettes
+  (required)
 - check that all packages in Depends/Suggests/Enhances/LinkingTo/Imports
   are actually available? Here's why: suppose pkg being checked 
   Depends on CRAN pkg foo which is installed on our builders
