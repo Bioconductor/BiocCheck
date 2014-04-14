@@ -1,3 +1,6 @@
+
+- fix NEWS checking. it does not seem to detect incorrect formatting
+  of NEWS files (as detected by biocViews::getPackageNews/printNEWS)
 - check that knitr is in suggests if it is being used to build vignettes
   (required)
 - check that all packages in Depends/Suggests/Enhances/LinkingTo/Imports
