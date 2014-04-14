@@ -66,9 +66,11 @@ completes successfully.
 ```{r eval=FALSE}
 source("http://bioconductor.org/biocLite.R")
 biocLite("BiocCheck")
+library(BiocCheck)
 ```
 
-This installation process attempts to install a script called `BiocCheck` in the `bin`
+The package loading
+process attempts to install a script called `BiocCheck` in the `bin`
 directory of your `R` installation. If it fails to do that (most likely due to insufficient
 permissions), it will tell you, saying something like:
 
