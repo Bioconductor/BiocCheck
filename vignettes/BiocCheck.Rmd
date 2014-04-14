@@ -72,7 +72,7 @@ This installation process attempts to install a script called `BiocCheck` in the
 directory of your `R` installation. If it fails to do that (most likely due to insufficient
 permissions), it will tell you, saying something like:
 
-    Failed to copy the "inst/script/BiocCheck" script to
+    Failed to copy the "script/BiocCheck" script to
     /Library/Frameworks/R.framework/Resources/bin. If you want to be able
     to run 'R CMD BiocCheck' you'll need to copy it yourself to a directory
     on your PATH, making sure it is executable. Edit the copied version,
