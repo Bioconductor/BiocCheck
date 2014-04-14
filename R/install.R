@@ -5,7 +5,7 @@
     if (onWindows)
         files <- append(files, "BiocCheck.bat")
 
-    srcDir <- file.path("inst", "script")
+    srcDir <- system.file("script", package="BiocCheck")
     srcFile <- file.path(srcDir, files)
     destDir <- file.path(Sys.getenv("R_HOME"), "bin")
     destFile <- file.path(destDir, files)
@@ -17,7 +17,8 @@
 
 
         tmpFile <- file.path(tempdir(), "BiocCheck")
-        lines <- readLines(file.path("inst", "script", "BiocCheck"))
+        lines <- readLines(system.file("script", "BiocCheck",
+            package="BiocCheck"))
         lines <- sub("PATH_TO_RSCRIPT",
             file.path(Sys.getenv("R_HOME"), "bin", "Rscript"),
             lines)
@@ -26,7 +27,8 @@
 
         filesToCopy <- c(tmpFile)
         if (onWindows)
-            filesToCopy <- append(filesToCopy, file.path("inst", "script", "BiocCheck.bat"))
+            filesToCopy <- append(filesToCopy, system.file("script", "BiocCheck.bat",
+                package="BiocCheck"))
 
         res <- FALSE
         suppressWarnings(
@@ -50,7 +52,7 @@
         if (is.null(res) || !res || res == -1)
         {
             msg <- strwrap(paste(
-                'Failed to copy the "inst/script/BiocCheck" script to',
+                'Failed to copy the "script/BiocCheck" script to',
                 paste0(file.path(Sys.getenv("R_HOME"), "bin"), "."),
                 "If you want to be able to run 'R CMD BiocCheck' you'll",
                 "need to copy it yourself to a directory on your PATH,",
