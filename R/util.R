@@ -103,13 +103,13 @@ parseFile <- function(infile, pkgdir)
                 sub("\\.Rnw$", ".R", basename(infile), ignore.case=TRUE))
             capture.output(Stangle(infile))
         }
-    } else if (grepl("\\.Rd", infile, TRUE)) 
+    } else if (grepl("\\.Rd$", infile, TRUE)) 
     {
         rd <- parse_Rd(infile)
         outfile <- file.path(tempdir(), "parseFile.tmp")
         code <- capture.output(Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
-    } else if (grepl("\\.R", infile, TRUE)) {
+    } else if (grepl("\\.R$", infile, TRUE)) {
         outfile <- infile
     }
     p <- parse(outfile, keep.source=TRUE)
