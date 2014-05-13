@@ -149,7 +149,7 @@ checkBiocViews <- function(pkgdir)
         return()
     } else {
         biocViews <- dcf[, "biocViews"]
-        views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
+        views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
         biocViewsVocab <- NULL ## to keep R CMD check happy
         data("biocViewsVocab", package="biocViews", envir=environment())
         if (!all(views %in% nodes(biocViewsVocab)))
