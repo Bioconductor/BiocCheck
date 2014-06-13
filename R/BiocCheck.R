@@ -41,6 +41,9 @@ BiocCheck <- function(package, ...)
 {
     loadRefClasses()
     package <- normalizePath(package)
+    # be careful here:
+    if (.Platform$OS.type=="windows")
+        package=gsub("\\\\", "/", package)
     oldwarn <- getOption("warn")
     on.exit(options(warn=oldwarn))
     options(warn=1)

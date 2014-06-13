@@ -1,8 +1,8 @@
-#!PATH_TO_RSCRIPT --vanilla 
+#!/bin/sh
 
-suppressPackageStartupMessages(library(methods))
-suppressPackageStartupMessages(library(BiocCheck))
+R_SCRIPT="suppressPackageStartupMessages(library(methods))"
+R_SCRIPT="$R_SCRIPT; suppressPackageStartupMessages(library(BiocCheck))"
+R_SCRIPT="$R_SCRIPT; BiocCheck:::.BiocCheckFromCommandLine()"
 
-
-BiocCheck:::.BiocCheckFromCommandLine()
+echo "$R_SCRIPT" | $R_HOME/bin/R --vanilla --slave --args $*
 

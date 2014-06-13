@@ -76,25 +76,19 @@ permissions), it will tell you, saying something like:
 
     Failed to copy the "script/BiocCheck" script to
     /Library/Frameworks/R.framework/Resources/bin. If you want to be able
-    to run 'R CMD BiocCheck' you'll need to copy it yourself to a directory
-    on your PATH, making sure it is executable. Edit the copied version,
-    replacing RSCRIPT_PATH with the full path to Rscript. See BiocCheck
-    vignette for more information.
+    to run 'R CMD BiocCheck' you'll need to copy it yourself to a directory on your PATH, making sure it is executable. 
+    See the BiocCheck vignette for more information.
 
 You can fix the problem by following these instructions (noting that `R` may
 live in a different directory on your system than what is shown above).
 
-Windows users will also see this:
-
-    Windows users need to copy BiocCheck.bat as well.
-
-If you don't have permission to copy these files to the `bin` directory
-of your `R` installation, you can, as noted, copy them to any directory
+If you don't have permission to copy this file to the `bin` directory
+of your `R` installation, you can, as noted, copy it to any directory
 that's in your PATH. For assistance modifying your PATH, see this link
 ([Windows](http://www.computerhope.com/issues/ch000549.htm)) or 
 this one ([Mac/Unix](http://kb.iu.edu/data/acar.html)).
 
-If you manually copy these files to a directory in your PATH that is
+If you manually copy this files to a directory in your PATH that is
 not your R bin directory, you'll continue to see the above message 
 when (re-)installing `BiocCheck` but you can safely ignore it.
 
