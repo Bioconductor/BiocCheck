@@ -147,19 +147,10 @@ checkBiocViews <- function(pkgdir)
     {
         handleRecommended("Add some biocViews!")
         return()
-    } else {
-        biocViews <- dcf[, "biocViews"]
-        views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
-        biocViewsVocab <- NULL ## to keep R CMD check happy
-        data("biocViewsVocab", package="biocViews", envir=environment())
-        if (!all(views %in% nodes(biocViewsVocab)))
-        {
-            badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
-                collapse=", ")
-            handleRecommended(paste("Use valid biocViews. Invalid ones:",
-                badViews))
-        }
     }
+    biocViews <- dcf[, "biocViews"]
+    views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
+    data("biocViewsVocab", package="biocViews", envir=environment())
 
     parents <- c()
     for (view in views)
@@ -170,7 +161,87 @@ checkBiocViews <- function(pkgdir)
     {
         handleRecommended(paste0("Use biocViews from one category only",
             " (one of Software, ExperimentData, AnnotationData)"))
+        return()
     }
+    branch <- unique(parents)
+
+
+#    biocViewsVocab <- NULL ## to keep R CMD check happy
+    if (interactive()) 
+        env <- environment()
+    else
+        env <- .GlobalEnv
+
+    if (!all(views %in% nodes(biocViewsVocab)))
+    {
+        badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
+            collapse=", ")
+        handleRecommended(paste("Use valid biocViews. Invalid ones:",
+            badViews))
+    }
+
+
+    # this can maybe be removed soon:
+    if (branch == "Software") 
+    {
+        branch = "software"
+    } else if (branch == "AnnotationData")
+    {
+        branch = "annotation"
+    } else if (branch == "ExperimentData")
+    {
+        branch = "experiment"
+    }
+    # end of what can maybe be removed soon
+
+
+    rec <- NULL
+    tryCatch(suppressWarnings(rec <- recommendBiocViews(pkgdir, branch)),
+        error=function(e){
+        })
+
+    if (!is.null(rec))
+    {
+        if (rec$recommended != "")
+        {
+            handleConsideration(paste(
+                "Adding some of these automatically suggested biocViews: ",
+                rec$recommended))
+        }
+
+
+    }
+
+
+
+    # if (!"biocViews" %in% colnames(dcf))
+    # {
+    #     handleRecommended("Add some biocViews!")
+    #     return()
+    # } else {
+    #     biocViews <- dcf[, "biocViews"]
+    #     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
+    #     biocViewsVocab <- NULL ## to keep R CMD check happy
+    #     data("biocViewsVocab", package="biocViews", envir=environment())
+    #     if (!all(views %in% nodes(biocViewsVocab)))
+    #     {
+    #         badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
+    #             collapse=", ")
+    #         handleRecommended(paste("Use valid biocViews. Invalid ones:",
+    #             badViews))
+    #     }
+    # }
+
+    # parents <- c()
+    # for (view in views)
+    # {
+    #     parents <- c(parents, getParent(view, biocViewsVocab))
+    # }
+    # if (length(unique(parents)) > 1)
+    # {
+    #     handleRecommended(paste0("Use biocViews from one category only",
+    #         " (one of Software, ExperimentData, AnnotationData)"))
+    # }
 }
 
 checkBBScompatibility <- function(pkgdir)
