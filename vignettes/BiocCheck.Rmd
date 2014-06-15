@@ -143,6 +143,8 @@ which might be useful when checking non-Bioconductor packages
   are case-sensitive. (`RECOMMENDED`)
 * Checks that all views come from the same parent (one of Software,
   AnnotationData, ExperimentData) (`RECOMMENDED`).
+* Uses the `recommendBiocViews()` function from `biocViews` to
+  automatically suggest some biocViews for your package.
 
 More information about biocViews is available in the
 [Using biocViews HOWTO](http://www.bioconductor.org/developers/how-to/biocViews/).
