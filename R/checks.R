@@ -202,8 +202,9 @@ checkBiocViews <- function(pkgdir)
 
     if (!is.null(rec))
     {
-        if (rec$recommended != "")
+        if (length(rec$recommended) == 1 && rec$recommended == "")
         {
+        } else {
             handleConsideration(paste(
                 "Adding some of these automatically suggested biocViews: ",
                 rec$recommended))
