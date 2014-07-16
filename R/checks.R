@@ -180,19 +180,20 @@ checkBiocViews <- function(pkgdir)
             badViews))
     }
 
-
-    # this can maybe be removed soon:
-    if (branch == "Software") 
+    if (packageVersion("biocViews") < package_version("1.33.9"))
     {
-        branch = "software"
-    } else if (branch == "AnnotationData")
-    {
-        branch = "annotation"
-    } else if (branch == "ExperimentData")
-    {
-        branch = "experiment"
+        if (branch == "Software") 
+        {
+            branch = "software"
+        } else if (branch == "AnnotationData")
+        {
+            branch = "annotation"
+        } else if (branch == "ExperimentData")
+        {
+            branch = "experiment"
+        }
     }
-    # end of what can maybe be removed soon
+
 
 
     rec <- NULL
