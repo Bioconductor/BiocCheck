@@ -69,10 +69,10 @@ biocLite("BiocCheck")
 library(BiocCheck)
 ```
 
-The package loading
-process attempts to install a script called `BiocCheck` in the `bin`
-directory of your `R` installation. If it fails to do that (most likely due to insufficient
-permissions), it will tell you, saying something like:
+The package loading process attempts to install a script called
+`BiocCheck`  (`BiocCheck.bat` on Windows) into  the `bin` directory of
+your `R` installation. If it fails to do that (most likely due to
+insufficient permissions), it will tell you, saying something like:
 
     Failed to copy the "script/BiocCheck" script to
     /Library/Frameworks/R.framework/Resources/bin. If you want to be able
@@ -88,7 +88,7 @@ that's in your PATH. For assistance modifying your PATH, see this link
 ([Windows](http://www.computerhope.com/issues/ch000549.htm)) or 
 this one ([Mac/Unix](http://kb.iu.edu/data/acar.html)).
 
-If you manually copy this files to a directory in your PATH that is
+If you manually copy this file to a directory in your PATH that is
 not your R bin directory, you'll continue to see the above message 
 when (re-)installing `BiocCheck` but you can safely ignore it.
 
