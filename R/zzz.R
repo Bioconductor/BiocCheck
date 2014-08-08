@@ -19,7 +19,7 @@ setRefClass("MsgClass",
     onWindows <- (.Platform$OS.type == "windows")
 
     if (onWindows)
-        file <- c("BiocCheck.bat", "BiocCheck")
+        file <- "BiocCheck.bat"
     else
         file <- "BiocCheck"
 
