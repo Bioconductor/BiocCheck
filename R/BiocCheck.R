@@ -1,5 +1,3 @@
-.printf <- function(...) cat(noquote(sprintf(...)), "\n")
-
 
 getArgParser <- function()
 {
