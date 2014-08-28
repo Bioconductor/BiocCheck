@@ -150,6 +150,7 @@ checkBiocViews <- function(pkgdir)
     }
     biocViews <- dcf[, "biocViews"]
     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
+    views <- gsub("\\s", "", views)
     data("biocViewsVocab", package="biocViews", envir=environment())
 
     parents <- c()
