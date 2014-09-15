@@ -163,6 +163,9 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking function lengths", appendLF=FALSE)
     checkFunctionLengths(parsedCode, package_name)
 
+    handleMessage("Checking man pages...") # could add more man page checks...
+    checkForValueSection(package_dir)
+
     handleMessage("Checking exported objects have runnable examples...")
     checkExportsAreDocumented(package_dir, package_name)
 

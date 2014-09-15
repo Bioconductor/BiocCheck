@@ -796,6 +796,31 @@ doesManPageHaveRunnableExample <- function(rd)
     as.logical(length(ex))
 }
 
+checkForValueSection <- function(pkgdir)
+{
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+    badpages <- c()
+    for (manpage in manpages)
+    {
+        rd <- parse_Rd(manpage)
+        tags <- tools:::RdTags(rd)
+        value <- rd[grep("\\value", tags)]
+        if (!"\\value" %in% tags || 
+            (is.list(value[[1]]) && length(value[[1]]) == 0)  ||
+            nchar(gsub("^\\s+|\\s+$", "", rd[grep("\\value", tags)][[1]][1][[1]])) ==0)
+        {
+            badpages <- append(badpages, basename(manpage))
+        }
+    }
+    if (length(badpages)) {
+        handleRecommended(paste("Add non-empty \\value sections to the",
+            "following man pages:"))
+        .msg(paste(badpages, collapse=", "), indent=6, exdent=6)
+
+    }
+}
+
 # Which pages document things that are exported?
 checkExportsAreDocumented <- function(pkgdir, pkgname)
 {
