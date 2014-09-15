@@ -259,6 +259,11 @@ you may want to consider breaking up long functions into smaller
 ones. This is a basic refactoring technique that results
 in code that's easier to read, debug, test, and maintain.
 
+## Man Page checking
+
+`RECOMMENDS` that every man page has a non-empty
+`\value` section. Other man page checks may be added in the future.
+
 ## Runnable Examples Checking
 
 `BiocCheck` looks at all man pages which document exported objects
