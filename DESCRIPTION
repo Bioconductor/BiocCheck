@@ -1,7 +1,7 @@
 Package: BiocCheck
 Title: Bioconductor-specific package checks
 Description: Bioconductor-specific package checks
-Version: 1.1.9
+Version: 1.1.10
 Authors@R: c(person("Bioconductor", "Package Maintainer",
     email="maintainer@bioconductor.org",
     role=c("aut", "cre")))
@@ -16,3 +16,4 @@ Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, knitrBootstrap
 Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck/issues
+VignetteBuilder: knitr
