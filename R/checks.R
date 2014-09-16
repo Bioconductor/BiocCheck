@@ -820,7 +820,7 @@ checkForValueSection <- function(pkgdir)
         if ("\\usage" %in% tags && !is.null(value))
         {
             if ((is.list(value[[1]]) && length(value[[1]]) == 0) || 
-                nchar(gsub("^\\s+|\\s+$", "", value[[1]][1][[1]]))==0 )
+                nchar(gsub("^\\s+|\\s+$", "", paste(unlist(value), collapse='')))==0 )
             {
                 badpages <- append(badpages, basename(manpage))
             }
