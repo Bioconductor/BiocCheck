@@ -805,13 +805,27 @@ checkForValueSection <- function(pkgdir)
     {
         rd <- parse_Rd(manpage)
         tags <- tools:::RdTags(rd)
-        value <- rd[grep("\\value", tags)]
-        if (!"\\value" %in% tags || 
-            (is.list(value[[1]]) && length(value[[1]]) == 0)  ||
-            nchar(gsub("^\\s+|\\s+$", "", rd[grep("\\value", tags)][[1]][1][[1]])) ==0)
+
+        value <- NULL
+        if ("\\usage" %in% tags && (!"\\value" %in% tags))
         {
             badpages <- append(badpages, basename(manpage))
+            next
         }
+
+        if ("\\value" %in% tags)
+            value <- rd[grep("\\value", tags)]
+
+
+        if ("\\usage" %in% tags && !is.null(value))
+        {
+            if ((is.list(value[[1]]) && length(value[[1]]) == 0) || 
+                nchar(gsub("^\\s+|\\s+$", "", value[[1]][1][[1]]))==0 )
+            {
+                badpages <- append(badpages, basename(manpage))
+            }
+        }
+
     }
     if (length(badpages)) {
         handleRecommended(paste("Add non-empty \\value sections to the",
