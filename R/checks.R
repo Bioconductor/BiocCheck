@@ -686,6 +686,7 @@ doesFileLoadPackage <- function(df, pkgname)
 
 checkForLibraryMe <- function(pkgname, parsedCode)
 {
+    badfiles <- c()
     for (filename in names(parsedCode))
     {
         if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
@@ -696,18 +697,14 @@ checkForLibraryMe <- function(pkgname, parsedCode)
             res <- doesFileLoadPackage(df, pkgname)
             if (length(res))
             {
-                msg <- sprintf("Don't call library or require on %s in file %s",
-                    pkgname, mungeName(filename, pkgname))
-                if (grepl("\\.R$", filename, ignore.case=TRUE))
-                {
-                    msg <- sprintf("%s, line %s", msg, 
-                        paste(res, collapse=","))
-                }
-                msg <- sprintf("%s; this is not necessary.", msg)
-                handleRecommended(msg)
+                badfiles <- append(badfiles, mungeName(filename, pkgname))
             }
         }
     }
+    msg <- sprintf("The following files call library or require on %s.
+        This is not necessary.\n%s", pkgname,
+        paste(badfiles, collapse=", "))    
+    handleRecommended(msg)
 }
 
 checkFunctionLengths <- function(parsedCode, pkgname)
