@@ -701,10 +701,14 @@ checkForLibraryMe <- function(pkgname, parsedCode)
             }
         }
     }
-    msg <- sprintf("The following files call library or require on %s.
-        This is not necessary.\n%s", pkgname,
-        paste(badfiles, collapse=", "))    
-    handleRecommended(msg)
+    if (length(badfiles))
+    {
+        msg <- sprintf("The following files call library or require on %s.
+            This is not necessary.\n%s", pkgname,
+            paste(badfiles, collapse=", "))    
+        handleRecommended(msg)
+    }
+
 }
 
 checkFunctionLengths <- function(parsedCode, pkgname)
