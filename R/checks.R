@@ -145,7 +145,7 @@ checkBiocViews <- function(pkgdir)
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if (!"biocViews" %in% colnames(dcf))
     {
-        handleRecommended("Add some biocViews!")
+        handleRequired("Add some biocViews!")
         return()
     }
     biocViews <- dcf[, "biocViews"]
@@ -1080,7 +1080,7 @@ checkForBiocDevelSubscription <- function(pkgdir)
     {
         handleMessage("Maintainer is subscribed to bioc-devel!")
     } else {
-        handleRecommended(paste0(
+        handleRequired(paste0(
             "Maintainer should subscribe to the bioc-devel mailing list.",
             " Subscribe here: ",
             "https://stat.ethz.ch/mailman/listinfo/bioc-devel"))
