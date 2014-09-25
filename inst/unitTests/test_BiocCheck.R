@@ -173,8 +173,8 @@ test_checkBiocViews <- function()
 {
     cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(.recommendations$getNum() == 1,
-        "missing biocViews doesn't produce warning")
+    checkTrue(.requirements$getNum() == 1,
+        "missing biocViews doesn't produce error")
     zeroCounters()
     cat("biocViews: foo, Cancer, bar,\n    baz", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
@@ -491,7 +491,7 @@ test_checkForBiocDevelSubscription <- function()
         cat("Maintainer: Joe Blow <foo@bar.com>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
-        checkEquals(.recommendations$getNum(), 1)
+        checkEquals(.requirements$getNum(), 1)
         zeroCounters()
 
         cat("Maintainer: Dan Tenenbaum <dtenenba@fhcrc.org>",
@@ -510,7 +510,7 @@ test_checkForBiocDevelSubscription <- function()
             UNIT_TEST_PKG),
             file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
-        checkEquals(.recommendations$getNum(), 1)
+        checkEquals(.requirements$getNum(), 1)
         zeroCounters()
 
         cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Dan', \n  'Tenenbaum', email='dtenenba@fhcrc.org', role=c('aut', 'cre')))",
