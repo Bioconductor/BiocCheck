@@ -88,9 +88,9 @@ parseFile <- function(infile, pkgdir)
     if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE))
     {
         outfile <- file.path(tempdir(), "parseFile.tmp")
-        suppressMessages(capture.output(
+        suppressWarnings(suppressMessages(capture.output({
             purl(infile, outfile, documentation=0L)
-        ))
+        })))
     } else if (grepl("\\.Rd$", infile, TRUE)) 
     {
         rd <- parse_Rd(infile)
