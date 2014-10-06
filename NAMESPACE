@@ -5,7 +5,7 @@ import(graph)
 import(biocViews)
 import(httr)
 importFrom(devtools, create, unload)
-importFrom(knitr, purl)
+importFrom(knitr, purl, Sweave2knitr)
 importFrom(tools, parse_Rd, Rd2ex)
 importFrom(codetools, checkUsageEnv)
 
