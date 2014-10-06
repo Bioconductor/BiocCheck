@@ -269,7 +269,8 @@ in code that's easier to read, debug, test, and maintain.
 `BiocCheck` looks at all man pages which document exported objects
 and lists the ones that don't contain runnable examples (either because
 there is no `examples` section or because its examples are tagged
-with `dontrun`). It's `REQUIRED` that at least 80% of these man
+with `dontrun` or `donttest`).
+It's `REQUIRED` that at least 80% of these man
 pages have runnable examples. If more than 80% of these pages 
 have runnable examples, but some are still missing, `BiocCheck`
 lists the missing ones and asks you to `CONSIDER` adding runnable
