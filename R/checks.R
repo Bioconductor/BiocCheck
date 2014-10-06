@@ -717,7 +717,6 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     i <- 1
     for (filename in names(parsedCode))
     {
-        #.debug("filename is %s", filename)
         message(".", appendLF=FALSE)
         pc <- parsedCode[[filename]]
         filename <- mungeName(filename, pkgname)
@@ -791,6 +790,28 @@ doesManPageHaveRunnableExample <- function(rd)
         function(x) attr(x, "Rd_tag") == "\\examples")))
     if (!hasExamples) return(FALSE)
     ex <- capture.output(Rd2ex(rd))
+    removeDontTest <- function(lines)
+    {
+        idxs <- c()
+        insideDontTest <- FALSE
+        
+        for (i in 1:length(lines))
+        {
+            line = lines[i]
+            if (line == "## No test: "  || insideDontTest || line == "## End(No test)" )
+            {
+                idxs <- append(idxs, i)
+                insideDontTest <- TRUE
+                if (line == "## End(No test)" )
+                        insideDontTest <- FALSE
+            }
+        }
+        if (length(idxs))
+            lines[-idxs]
+        else
+            lines
+    }
+    ex <- removeDontTest(ex)
     ex <- grep("^\\s*$", ex, invert=TRUE, value=TRUE)
     ex <- grep("^\\s*#", value=TRUE, ex, invert=TRUE)
     ex <- ex[nchar(ex) > 0]
