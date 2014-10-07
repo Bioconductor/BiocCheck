@@ -1,1 +1,1 @@
-BiocGenerics:::testPackage("BiocCheck")
+BiocGenerics:::testPackage("BiocCheck") 
