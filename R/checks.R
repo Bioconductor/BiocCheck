@@ -1039,7 +1039,7 @@ checkForPromptComments <- function(pkgdir)
     for (manpage in manpages)
     {
         lines <- readLines(manpage, warn=FALSE)
-        if (any(grepl("^%%  ~~", lines)))
+        if (any(grepl("^%% ~", lines)))
             bad <- append(bad, basename(manpage))
     }
     if (length(bad) > 0)
