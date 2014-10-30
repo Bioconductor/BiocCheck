@@ -494,13 +494,13 @@ test_checkForBiocDevelSubscription <- function()
         checkEquals(.requirements$getNum(), 1)
         zeroCounters()
 
-        cat("Maintainer: Dan Tenenbaum <dtenenba@fhcrc.org>",
+        cat("Maintainer: Dan Tenenbaum <dtenenba@fredhutch.org>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkTrue(stillZero())
         zeroCounters()
 
-        cat("Maintainer: Dan Tenenbaum <DTENENBA@fhcrc.ORG>",
+        cat("Maintainer: Dan Tenenbaum <DTENENBA@fredhutch.ORG>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkTrue(stillZero())
@@ -513,7 +513,7 @@ test_checkForBiocDevelSubscription <- function()
         checkEquals(.requirements$getNum(), 1)
         zeroCounters()
 
-        cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Dan', \n  'Tenenbaum', email='dtenenba@fhcrc.org', role=c('aut', 'cre')))",
+        cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Dan', \n  'Tenenbaum', email='dtenenba@fredhutch.org', role=c('aut', 'cre')))",
             UNIT_TEST_PKG),
             file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
