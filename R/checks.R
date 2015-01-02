@@ -941,8 +941,7 @@ checkNEWS <- function(pkgdir)
 
 checkFormatting <- function(pkgdir)
 {
-    files <- c(file.path(pkgdir, c("DESCRIPTION",
-        "NAMESPACE")),
+    files <- c(file.path(pkgdir, "NAMESPACE"),
         dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
         full.names=TRUE),
         dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
