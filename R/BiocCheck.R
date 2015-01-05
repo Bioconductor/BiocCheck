@@ -149,7 +149,7 @@ BiocCheck <- function(package, ...)
     res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
         "LEFT_ASSIGN")
     if (res > 0)
-        handleConsideration(sprintf("Avoiding <<- if possible (found in %s files)",
+        handleConsideration(sprintf("Avoiding '<<-'' if possible (found in %s files)",
             res))
 
     handleMessage(sprintf("Checking for library/require of %s...",

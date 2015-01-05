@@ -547,7 +547,7 @@ checkForBadDepends <- function(pkgdir)
                     "data set loaded with data(), or perhaps part of",
                     "an object referenced in with() or within()."),
                     grammar$object_objects,
-                    paste(noteObjects, collapse=", "),
+                    sQuote(paste(noteObjects, collapse=", ")),
                     paste(noteFunctions, collapse=", "),
                     grammar$was_were,
                     grammar$itis_theyare)
