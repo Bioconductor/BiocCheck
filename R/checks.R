@@ -790,6 +790,8 @@ doesManPageHaveRunnableExample <- function(rd)
         function(x) attr(x, "Rd_tag") == "\\examples")))
     if (!hasExamples) return(FALSE)
     ex <- capture.output(Rd2ex(rd))
+    if(!length(ex))
+        return(FALSE)
     removeDontTest <- function(lines)
     {
         idxs <- c()
