@@ -87,10 +87,28 @@ parseFile <- function(infile, pkgdir)
     # regardless of VignetteBuilder value
     if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE))
     {
-        outfile <- file.path(tempdir(), "parseFile.tmp")
-        suppressWarnings(suppressMessages(capture.output({
-            purl(infile, outfile, documentation=0L)
-        })))
+        outfile <- NULL
+        desc <- file.path(pkgdir, "DESCRIPTION")
+        dcf <- read.dcf(desc)
+        if ("VignetteBuilder" %in% colnames(dcf) && dcf[,"VignetteBuilder"] == "knitr")
+        {
+            outfile <- file.path(tempdir(), "parseFile.tmp")
+            suppressWarnings(suppressMessages(capture.output({
+                purl(infile, outfile, documentation=0L)
+            })))
+            
+        } else {
+            oof <- file.path(tempdir(), basename(infile))
+            segs <- strsplit(oof, '.', TRUE)[[1]]
+            outfile <- paste0(paste(segs[1:length(segs)-1]), '.R')
+            suppressWarnings(suppressMessages(capture.output({
+                    oldwd <- getwd()
+                    on.exit(setwd(oldwd))
+                    setwd(tempdir())
+                    Stangle(infile)
+            })))
+        }
+
     } else if (grepl("\\.Rd$", infile, TRUE)) 
     {
         rd <- parse_Rd(infile)
