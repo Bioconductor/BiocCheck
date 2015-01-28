@@ -118,7 +118,8 @@ parseFile <- function(infile, pkgdir)
     } else if (grepl("\\.R$", infile, TRUE)) {
         outfile <- infile
     }
-    print(paste("FILE BEING PARSED IS", infile))
+    print(paste("INFILE IS", infile))
+    print(paste("FILE BEING PARSED IS", outfile))
     p <- parse(outfile, keep.source=TRUE)
     getParseData(p)
 }
