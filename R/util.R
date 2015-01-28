@@ -99,8 +99,9 @@ parseFile <- function(infile, pkgdir)
             
         } else {
             oof <- file.path(tempdir(), basename(infile))
-            segs <- strsplit(oof, '.', TRUE)[[1]]
-            outfile <- paste0(paste(segs[1:length(segs)-1]), '.R')
+            oof <- sapply(strsplit(basename(oof),"\\."),
+                function(x) paste(x[1:(length(x)-1)], collapse=".")) 
+            outfile <- paste0(oof, '.R')
             suppressWarnings(suppressMessages(capture.output({
                     oldwd <- getwd()
                     on.exit(setwd(oldwd))
