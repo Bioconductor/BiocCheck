@@ -111,7 +111,6 @@ parseFile <- function(infile, pkgdir)
 
     } else if (grepl("\\.Rd$", infile, TRUE)) 
     {
-        print(paste("MAN PAGE IS", infile))
         rd <- parse_Rd(infile)
         outfile <- file.path(tempdir(), "parseFile.tmp")
         code <- capture.output(Rd2ex(rd))
@@ -119,6 +118,7 @@ parseFile <- function(infile, pkgdir)
     } else if (grepl("\\.R$", infile, TRUE)) {
         outfile <- infile
     }
+    print(paste("FILE BEING PARSED IS", infile))
     p <- parse(outfile, keep.source=TRUE)
     getParseData(p)
 }
