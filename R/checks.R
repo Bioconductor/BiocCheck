@@ -351,7 +351,7 @@ checkUnitTests <- function(pkgdir)
     ## end stolen code
     {
         msg <- paste0("Adding unit tests.\n",
-            "  We strongly recommend them. See\n",
+            "  We strongly encourage them. See\n",
             "  http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/."
             )
         handleConsideration(msg)
