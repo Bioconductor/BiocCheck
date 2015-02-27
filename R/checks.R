@@ -1108,3 +1108,25 @@ checkForBiocDevelSubscription <- function(pkgdir)
             "https://stat.ethz.ch/mailman/listinfo/bioc-devel"))
     }
 }
+
+checkIsPackageAlreadyInRepo <- function(pkgName,
+    repo=c("CRAN", "Bioconductor"))
+{
+    if (repo=="CRAN")
+        repo.url <- "http://cran.fhcrc.org/src/contrib/PACKAGES"
+    else
+        repo.url <- sprintf("%s/src/contrib/PACKAGES",
+            biocinstallRepos()["BioCsoft"])
+    conn <- url(repo.url)
+    dcf <- read.dcf(conn)
+    close(conn)
+    if (pkgName %in% dcf[,"Package"])
+    {
+        if(repo=="CRAN")
+            msg <- "Package must be removed from CRAN."
+        else
+            msg <- sprintf("Rename your package (%s already exists in Bioconductor).",
+                pkgName)
+        handleRequired(msg)
+    }
+}
