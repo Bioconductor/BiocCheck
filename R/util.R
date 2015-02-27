@@ -211,6 +211,8 @@ loadRefClasses <- function()
 
 isInfrastructurePackage <- function(pkgDir)
 {
+    if (!file.exists(file.path(pkgDir, "DESCRIPTION")))
+        return(FALSE)
     dcf <- read.dcf(file.path(pkgDir, "DESCRIPTION"))
     if (!"biocViews" %in% colnames(dcf))
     {
