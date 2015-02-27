@@ -208,3 +208,15 @@ loadRefClasses <- function()
     assign(".considerations", new("MsgClass", msg=character(0)),
         envir=.GlobalEnv)
 }
+
+isInfrastructurePackage <- function(pkgDir)
+{
+    dcf <- read.dcf(file.path(pkgDir, "DESCRIPTION"))
+    if (!"biocViews" %in% colnames(dcf))
+    {
+        return(FALSE)
+    }
+    biocViews <- dcf[, "biocViews"]
+    views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
+    "Infrastructure" %in% views
+}
