@@ -13,6 +13,12 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     instdocdir <- file.path(pkgdir, "inst", "doc")
     if (!file.exists(vigdir))
     {
+        if (isInfrastructurePackage(pkgdir))
+        {
+            .msg("  Infrastructure package, vignette not required.",
+                indent=2)
+            return()
+        }
         handleRequired("'vignettes' directory!")
         return()
     }
@@ -198,7 +204,8 @@ checkBiocViews <- function(pkgdir)
 
 
     rec <- NULL
-    tryCatch(suppressWarnings(rec <- recommendBiocViews(pkgdir, branch)),
+    tryCatch(suppressMessages(
+        suppressWarnings(rec <- recommendBiocViews(pkgdir, branch))),
         error=function(e){
         })
 
