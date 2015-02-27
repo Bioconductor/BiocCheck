@@ -179,6 +179,16 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for canned comments in man pages...")
     checkForPromptComments(package_dir)
 
+    handleMessage("Checking if package already exists in CRAN...")
+    checkIsPackageAlreadyInRepo(package_name, "CRAN")
+
+    if (!is.null(dots[["new-package"]]))
+    {
+        handleMessage("Checking if new package already exists in Bioconductor...")
+        checkIsPackageAlreadyInRepo(package_name, "Bioconductor")
+
+    }
+
     if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD")))
     {
         handleMessage("Checking for bioc-devel mailing list subscription...")
