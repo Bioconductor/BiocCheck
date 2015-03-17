@@ -102,6 +102,9 @@ BiocCheck <- function(package, ...)
     }
     checkVersionNumber(package_dir, !is.null(dots[["new-package"]]))
 
+    handleMessage("Checking R Version dependency...")
+    checkRVersionDependency(package_dir)
+
     if (is.null(dots[["no-check-bioc-views"]]))
     {
         handleMessage("Checking biocViews...")

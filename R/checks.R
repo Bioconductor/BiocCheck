@@ -22,6 +22,34 @@ checkForVersionNumberMismatch <- function(package, package_dir)
     }
 }
 
+checkRVersionDependency <- function(package_dir)
+{
+    desc <- file.path(package_dir, "DESCRIPTION")
+    dcf <- read.dcf(desc)
+    if ("Depends" %in% colnames(dcf))
+    {
+        res <- cleanupDependency(dcf[, "Depends"], FALSE)
+        if ("R" %in% res)
+        {
+            ind <- which(res == "R")
+            verStr <- names(res)[ind]
+            if (nchar(verStr))
+            {
+                ver <- as.package_version(verStr)
+                bv <- package_version(sprintf("%s.%s",
+                    BiocInstaller:::R_VERSION$major,
+                    BiocInstaller:::R_VERSION$minor))
+                if (ver < bv)
+                {
+                    handleRecommended(sprintf(
+                        "Update R version dependency from %s to %s.",
+                        ver, bv))
+                }
+            }
+        }
+    }
+}
+
 checkForDirectSlotAccess <- function(parsedCode, package_name)
 {
     res <- findSymbolInParsedCode(parsedCode, package_name, "@", "'@'")

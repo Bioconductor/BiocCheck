@@ -561,3 +561,29 @@ test_checkForDirectSlotAccess <- function()
     checkEquals(.considerations$getNum(), 0)
     zeroCounters()
 }
+
+test_checkRVersionDependency <- function()
+{
+    desc <- file.path(tempdir(), "DESCRIPTION")
+    cat("Depends: R (>= 1.0.0)", file=desc)
+    BiocCheck:::checkRVersionDependency(dirname(desc))
+    checkEquals(.recommendations$getNum(), 1)
+    zeroCounters()
+
+    cat("Depends: R", file=desc)
+    BiocCheck:::checkRVersionDependency(dirname(desc))
+    checkEquals(.recommendations$getNum(), 0)
+    zeroCounters()
+
+    cat("Imports: foobar)", file=desc)
+    BiocCheck:::checkRVersionDependency(dirname(desc))
+    checkEquals(.recommendations$getNum(), 0)
+    zeroCounters()
+
+    cat("Depends: R (>= 10000.0.0)", file=desc) # this test might fail some day!
+    BiocCheck:::checkRVersionDependency(dirname(desc))
+    checkEquals(.recommendations$getNum(), 0)
+    zeroCounters()
+
+    unlink(desc)
+}

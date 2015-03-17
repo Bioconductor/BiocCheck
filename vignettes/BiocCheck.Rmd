@@ -101,7 +101,6 @@ when (re-)installing `BiocCheck` but you can safely ignore it.
 * Reports if it can't figure out how objects were
   initialized (`CONSIDER`).
 
-
 ## Vignette Checks
 
 Can be disabled with `--no-check-vignettes`.
@@ -127,6 +126,12 @@ package type cannot be determined.
 * Checks for a valid version, that format is correct and that 
   version number is appropriate for this version of Bioconductor.
   (`REQUIRED`).
+* If you specify an R version in the `Depends:` field of your
+  `DESCRIPTION` file, `BiocCheck` checks to make sure that the R version
+  specified matches the version currently used by 
+  Bioconductor. This prevents the package from being
+  used in earlier versions of R, which is not recommended
+  and is a frequent cause of errors. (`RECOMMENDED`)
 
 For more information on package versions, see the
 [Version Numbering HOWTO](http://www.bioconductor.org/developers/how-to/version-numbering/).
