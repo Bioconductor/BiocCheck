@@ -7,6 +7,32 @@ getVigSources <- function(dir)
         ignore.case=TRUE, full.names=TRUE)
 }
 
+checkForVersionNumberMismatch <- function(package, package_dir)
+{
+    bn <- basename(package)
+    bn <- sub(".tar.gz", "", bn, TRUE)
+    ver <- strsplit(bn, "_")[[1]][2]
+    dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
+    dcfVer <- unname(dcf[, "Version"])
+    if (!ver == dcfVer)
+    {
+        handleRequired(paste("Version number in tarball", 
+            "filename must match Version field in DESCRIPTION.",
+            "(Tip: create tarball with R CMD build)"))
+    }
+}
+
+checkForDirectSlotAccess <- function(parsedCode, package_name)
+{
+    res <- findSymbolInParsedCode(parsedCode, package_name, "@", "'@'")
+    if (res > 0)
+    {
+        handleConsideration(paste("Using accessors;",
+            "don't access S4 class slots via",
+            "'@' in examples/vignettes."))
+    }
+}
+
 checkVignetteDir <- function(pkgdir, checkingDir)
 {
     vigdir <- file.path(pkgdir, "vignettes")
@@ -898,8 +924,9 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
         }
     }
 
+    ratio <- (exportingPagesCount - noExamplesCount) / exportingPagesCount 
     if (exportingPagesCount > 0 
-        && (noExamplesCount / exportingPagesCount) >= (0.8 / 1.0))
+        && ratio  <= (0.8 / 1.0))
     {
         handleRequired(paste0("At least 80% of man pages documenting ",
             "exported objects must have runnable examples.",

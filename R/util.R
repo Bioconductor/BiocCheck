@@ -93,10 +93,14 @@ parseFile <- function(infile, pkgdir)
         if ("VignetteBuilder" %in% colnames(dcf) && dcf[,"VignetteBuilder"] == "knitr")
         {
             outfile <- file.path(tempdir(), "parseFile.tmp")
+            # copy file to work around https://github.com/yihui/knitr/issues/970
+            # which is actually fixed but not in CRAN yet (3/16/15)
+            tmpin <- file.path(tempdir(), "tmpin")
+            file.copy(infile, tmpin)
             suppressWarnings(suppressMessages(capture.output({
-                purl(infile, outfile, documentation=0L)
+                purl(tmpin, outfile, documentation=0L)
             })))
-            
+            file.remove(tmpin)
         } else {
             oof <- file.path(tempdir(), basename(infile))
             oof <- sapply(strsplit(oof, "\\."),

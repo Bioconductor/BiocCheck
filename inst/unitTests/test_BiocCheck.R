@@ -524,3 +524,40 @@ test_checkForBiocDevelSubscription <- function()
     }
 
 }
+
+test_checkForVersionNumberMismatch <- function()
+{
+    browser()
+    pkgpath <- create_test_package('badpkg', list(Version="0.0.1"))
+    oldwd <- getwd()
+    on.exit(setwd(oldwd))
+    setwd(tempdir())
+    tools:::.build_packages("badpkg")
+    setwd(oldwd)
+    oldname <- file.path(tempdir(), "badpkg_0.0.1.tar.gz")
+    newname <- file.path(dirname(pkgpath), "badpkg_9.9.9.tar.gz")
+    file.rename(oldname, newname)
+    BiocCheck:::installAndLoad(newname)
+
+    BiocCheck:::checkForVersionNumberMismatch(newname,
+        BiocCheck:::.get_package_dir(newname))
+    checkEquals(.requirements$getNum(), 1)
+    zeroCounters()
+}
+
+test_checkForDirectSlotAccess <- function()
+{
+    pkgpath <- create_test_package('testpkg', list(VignetteBuilder="knitr"))
+    parsedCode <- list(FooBar=BiocCheck:::parseFile(
+        system.file("testfiles", "directSlotAccess.Rmd",
+        package="BiocCheck"), pkgpath))
+    res <- BiocCheck:::checkForDirectSlotAccess(parsedCode, pkgpath)
+    checkEquals(.considerations$getNum(), 1)
+    zeroCounters()
+    parsedCode <- list(FooBar=BiocCheck:::parseFile(
+        system.file("testfiles", "noDirectSlotAccess.Rmd",
+        package="BiocCheck"), pkgpath))
+    res <- BiocCheck:::checkForDirectSlotAccess(parsedCode, pkgpath)
+    checkEquals(.considerations$getNum(), 0)
+    zeroCounters()
+}
