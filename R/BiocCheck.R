@@ -73,6 +73,9 @@ BiocCheck <- function(package, ...)
 
     ## checks
 
+    if (!checkingDir)
+        checkForVersionNumberMismatch(package, package_dir)
+
     checkForBadDepends(file.path(tempdir(), "lib", package_name))
 
 
@@ -123,6 +126,8 @@ BiocCheck <- function(package, ...)
 
     handleMessage("Parsing R code in R directory, examples, vignettes...")
 
+    handleMessage("Checking for direct slot access...")
+    checkForDirectSlotAccess(parsedCode, package_name)
 
     handleMessage("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",
