@@ -132,6 +132,11 @@ package type cannot be determined.
   Bioconductor. This prevents the package from being
   used in earlier versions of R, which is not recommended
   and is a frequent cause of errors. (`RECOMMENDED`)
+* Checks that the package version specified in your
+  package tarball (if you are checking a tarball) matches
+  the value of the `Version:` field in your `DESCRIPTION` file.
+  If it doesn't, it usually means you did not build the tarball
+  with `R CMD build`. (`REQUIRED`)
 
 For more information on package versions, see the
 [Version Numbering HOWTO](http://www.bioconductor.org/developers/how-to/version-numbering/).
@@ -245,6 +250,14 @@ available via `biocLite()`. It is available from
   your own package within code in the R directory or in man page
   examples, because it's not necessary. In these contexts, your 
   package is already loaded.
+* `BiocCheck` checks for direct slot access to S4 objects in
+  vignette and example code. This code should **always** use 
+  accessors to interact with S4 classes. Since you may be using
+  S4 classes (which don't provide accessors) from another package,
+  the severity is only  `CONSIDER`. But if the S4
+  object is defined in your package, it's **mandatory** to write
+  accessors for it and to use them (instead of direct slot access)
+  in all vignette and example code.
 
 ## DESCRIPTION/NAMESPACE consistency checks
 
