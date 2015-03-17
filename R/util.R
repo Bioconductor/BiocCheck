@@ -59,13 +59,34 @@ installAndLoad <- function(pkg)
     suppressPackageStartupMessages(do.call(library, args))
 }
 
-cleanupDependency <- function(input)
+# Takes as input the value of an Imports, Depends, 
+# or LinkingTo field and returns a named character
+# vector of Bioconductor dependencies, where the names
+# are version specifiers or blank.
+cleanupDependency <- function(input, remove.R=TRUE)
 {
     if (is.null(input)) return(character(0))
     output <- gsub("\\s", "", input)
+    raw_nms <- output
+    nms <- strsplit(raw_nms, ",")[[1]]
+    namevec <- vector(mode = "character", length(nms))
     output <- gsub("\\([^)]*\\)", "", output)
     res <- strsplit(output, ",")[[1]]
-    unique(res[which(res != "R")])
+    for (i in 1:length(nms))
+    {
+        if(grepl(">=", nms[i], fixed=TRUE))
+        {
+            tmp <- gsub(".*>=", "", nms[i])
+            tmp <- gsub(")", "", tmp, fixed=TRUE)
+            namevec[i] <- tmp
+        } else {
+            namevec[i] = ''
+        }
+    }
+    names(res) <- namevec
+    if (remove.R)
+        res <- res[which(res != "R")]
+    res
 }
 
 getAllDependencies <- function(pkgdir)
