@@ -108,7 +108,11 @@ BiocCheck <- function(package, ...)
     if (is.null(dots[["no-check-bioc-views"]]))
     {
         handleMessage("Checking biocViews...")
-        checkBiocViews(package_dir)
+        result <- checkBiocViews(package_dir)
+        if(result)
+        {
+            .msg("See http://bioconductor.org/developers/how-to/biocViews/")
+        }
     }
     handleMessage("Checking build system compatibility...")
     checkBBScompatibility(package_dir)
