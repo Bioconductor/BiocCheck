@@ -202,11 +202,12 @@ getParent <- function(view, biocViewsVocab)
 
 checkBiocViews <- function(pkgdir)
 {
+    dirty <- FALSE
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if (!"biocViews" %in% colnames(dcf))
     {
         handleRequired("Add some biocViews!")
-        return()
+        return(TRUE)
     }
     biocViews <- dcf[, "biocViews"]
     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
@@ -222,7 +223,7 @@ checkBiocViews <- function(pkgdir)
     {
         handleRecommended(paste0("Use biocViews from one category only",
             " (one of Software, ExperimentData, AnnotationData)"))
-        return()
+        return(TRUE)
     }
     branch <- unique(parents)
 
@@ -239,6 +240,7 @@ checkBiocViews <- function(pkgdir)
             collapse=", ")
         handleRecommended(paste("Use valid biocViews. Invalid ones:",
             badViews))
+        dirty <- TRUE
     }
 
     if (packageVersion("biocViews") < package_version("1.33.9"))
@@ -271,41 +273,12 @@ checkBiocViews <- function(pkgdir)
             handleConsideration(paste(
                 "Adding some of these automatically suggested biocViews: ",
                 rec$recommended))
+            dirty <- TRUE
         }
 
 
     }
-
-
-
-    # if (!"biocViews" %in% colnames(dcf))
-    # {
-    #     handleRecommended("Add some biocViews!")
-    #     return()
-    # } else {
-    #     biocViews <- dcf[, "biocViews"]
-    #     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
-    #     biocViewsVocab <- NULL ## to keep R CMD check happy
-    #     data("biocViewsVocab", package="biocViews", envir=environment())
-    #     if (!all(views %in% nodes(biocViewsVocab)))
-    #     {
-    #         badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
-    #             collapse=", ")
-    #         handleRecommended(paste("Use valid biocViews. Invalid ones:",
-    #             badViews))
-    #     }
-    # }
-
-    # parents <- c()
-    # for (view in views)
-    # {
-    #     parents <- c(parents, getParent(view, biocViewsVocab))
-    # }
-    # if (length(unique(parents)) > 1)
-    # {
-    #     handleRecommended(paste0("Use biocViews from one category only",
-    #         " (one of Software, ExperimentData, AnnotationData)"))
-    # }
+    return(dirty)
 }
 
 checkBBScompatibility <- function(pkgdir)
