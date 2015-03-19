@@ -52,6 +52,8 @@ checkRVersionDependency <- function(package_dir)
 
 checkForDirectSlotAccess <- function(parsedCode, package_name)
 {
+    idx <- grepl("\\.R$", names(parsedCode), ignore.case=TRUE)
+    parsedCode <- parsedCode[!idx]
     res <- findSymbolInParsedCode(parsedCode, package_name, "@", "'@'")
     if (res > 0)
     {
