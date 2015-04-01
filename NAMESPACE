@@ -1,7 +1,7 @@
 import(optparse)
 import(methods)
 import(BiocInstaller)
-import(graph)
+importMethodsFrom(graph, acc, nodes)
 import(biocViews)
 import(httr)
 importFrom(devtools, create, unload)
