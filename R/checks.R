@@ -37,8 +37,8 @@ checkRVersionDependency <- function(package_dir)
             {
                 ver <- as.package_version(verStr)
                 bv <- package_version(sprintf("%s.%s",
-                    BiocInstaller:::R_VERSION$major,
-                    BiocInstaller:::R_VERSION$minor))
+                    getRversion()$major,
+                    getRversion()$minor))
                 if (ver < bv)
                 {
                     handleRecommended(sprintf(
