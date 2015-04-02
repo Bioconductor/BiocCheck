@@ -66,6 +66,7 @@ installAndLoad <- function(pkg)
 cleanupDependency <- function(input, remove.R=TRUE)
 {
     if (is.null(input)) return(character(0))
+    if (!nchar(input)) return(character(0))
     output <- gsub("\\s", "", input)
     raw_nms <- output
     nms <- strsplit(raw_nms, ",")[[1]]
