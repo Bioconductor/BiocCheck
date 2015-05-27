@@ -1,5 +1,11 @@
+---
+title: "BiocCheck"
+output:
+  BiocStyle::html_document:
+    toc: true
+---
 <!--
-%\VignetteEngine{knitr::knitr}
+%% \VignetteEngine{knitr::rmarkdown}
 %\VignetteIndexEntry{BiocCheck}
 -->
 
@@ -353,3 +359,20 @@ mailing list, and if not, `REQUIRE`s that you
 subscribe. All maintainers must subscribe to this list.
 You can subscribe
 [here](https://stat.ethz.ch/mailman/listinfo/bioc-devel).
+
+## Support site Registration Check
+
+The main place people ask questions about Bioconductor packages
+is our [support site](https://support.bioconductor.org).
+In order to provide people with the best support, package
+maintainers are `REQUIRE`d to register at the support site using
+the same email address that is in the `Maintainer` field of
+their package `DESCRIPTION` file. Please 
+[register](https://support.bioconductor.org/accounts/signup/)
+and then optionally include your (lowercased) package name in
+the list of
+[watched tags](https://support.bioconductor.org/profile/#div_id_watched_tags).
+When a question is asked and tagged with your package name, you'll get 
+an email. (If you don't add your package to the list of watched
+tags, this will be automatically done for you).
+

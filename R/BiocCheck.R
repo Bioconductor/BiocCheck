@@ -207,6 +207,10 @@ BiocCheck <- function(package, ...)
         checkForBiocDevelSubscription(package_dir)
     }
 
+    handleMessage("Checking for support site registration...")
+    checkForSupportSiteRegistration(package_dir)
+
+
     ## Summary
     .msg("\n\nSummary:")
     .msg("REQUIRED count: %s", .requirements$getNum())
