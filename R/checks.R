@@ -1088,35 +1088,33 @@ checkForPromptComments <- function(pkgdir)
     }
 }
 
+
+
+
+checkForSupportSiteRegistration <- function(package_dir)
+{
+    email <- getMaintainerEmail(package_dir)
+    if (tolower(email) == "maintainer@bioconductor.org")
+    {
+        handleMessage("Maintainer email is ok.")
+        return()
+    }
+    url <- paste0("https://support.bioconductor.org/api/email/",
+        email, "/")
+    if(suppressMessages(content(GET(url))))
+    {
+        handleMessage("Maintainer is registered at support site!")
+    } else {
+        handleRequired(paste0("Maintainer must register at the support site;",
+            " visit https://support.bioconductor.org/accounts/signup/ ."))
+    }
+       
+}
+
+
 checkForBiocDevelSubscription <- function(pkgdir)
 {
-    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-    if ("Maintainer" %in% colnames(dcf))
-    {
-        m <- dcf[, "Maintainer"]
-        ret <- regexec("<([^>]*)>", m)[[1]]
-        ml <- attr(ret, "match.length")
-        email <- substr(m, ret[2], ret[2]+ml[2]-1)
-    } else if ("Authors@R" %in% colnames(dcf)) {
-        ar <- dcf[, "Authors@R"]
-        env <- new.env(parent=emptyenv())
-        env[["c"]] = c
-        env[["person"]] <- utils::person
-        pp <- parse(text=ar, keep.source=TRUE) 
-        tryCatch(people <- eval(pp, env),
-            error=function(e) {
-                # could not parse Authors@R
-                return()
-            })
-        for (person in people)
-        {
-            if ("cre" %in% person$role) 
-            {
-                email <- person$email
-            }
-        }
-       
-    }
+    email <- getMaintainerEmail(pkgdir)
     if (!exists("email"))
         return()
     if (tolower(email) == "maintainer@bioconductor.org")

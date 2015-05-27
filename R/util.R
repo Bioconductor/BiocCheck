@@ -248,3 +248,35 @@ isInfrastructurePackage <- function(pkgDir)
     views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
     "Infrastructure" %in% views
 }
+
+getMaintainerEmail <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if ("Maintainer" %in% colnames(dcf))
+    {
+        m <- dcf[, "Maintainer"]
+        ret <- regexec("<([^>]*)>", m)[[1]]
+        ml <- attr(ret, "match.length")
+        email <- substr(m, ret[2], ret[2]+ml[2]-1)
+    } else if ("Authors@R" %in% colnames(dcf)) {
+        ar <- dcf[, "Authors@R"]
+        env <- new.env(parent=emptyenv())
+        env[["c"]] = c
+        env[["person"]] <- utils::person
+        pp <- parse(text=ar, keep.source=TRUE) 
+        tryCatch(people <- eval(pp, env),
+            error=function(e) {
+                # could not parse Authors@R
+                return()
+            })
+        for (person in people)
+        {
+            if ("cre" %in% person$role) 
+            {
+                email <- person$email
+            }
+        }
+       
+    }
+    return(email)
+}
