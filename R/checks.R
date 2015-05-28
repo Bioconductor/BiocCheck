@@ -825,35 +825,18 @@ doesManPageHaveRunnableExample <- function(rd)
     hasExamples <- any(unlist(lapply(rd,
         function(x) attr(x, "Rd_tag") == "\\examples")))
     if (!hasExamples) return(FALSE)
-    ex <- capture.output(Rd2ex(rd))
+
+    tc <- textConnection("ex", "w")
+    Rd2ex(rd, commentDonttest = TRUE, out = tc)
+    close(tc)
+
     if(!length(ex))
         return(FALSE)
-    removeDontTest <- function(lines)
-    {
-        idxs <- c()
-        insideDontTest <- FALSE
-        
-        for (i in 1:length(lines))
-        {
-            line = lines[i]
-            if (line == "## No test: "  || insideDontTest || line == "## End(No test)" )
-            {
-                idxs <- append(idxs, i)
-                insideDontTest <- TRUE
-                if (line == "## End(No test)" )
-                        insideDontTest <- FALSE
-            }
-        }
-        if (length(idxs))
-            lines[-idxs]
-        else
-            lines
-    }
-    ex <- removeDontTest(ex)
-    ex <- grep("^\\s*$", ex, invert=TRUE, value=TRUE)
-    ex <- grep("^\\s*#", value=TRUE, ex, invert=TRUE)
-    ex <- ex[nchar(ex) > 0]
-    as.logical(length(ex))
+
+    parsed <- try(parse(text = ex), silent = TRUE)
+
+    # if code contains only comments the length with be 0
+    length(parsed) && !inherits(parsed, "try-error")
 }
 
 checkForValueSection <- function(pkgdir)
