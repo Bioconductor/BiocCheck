@@ -314,7 +314,10 @@ NEWS files are a good way to keep users up-to-date on changes
 to your package. Excerpts from properly formatted NEWS
 files will be included in Bioconductor release announcements
 to tell users what has changed in your package in the last
-release.
+release. In order for this to happen, your NEWS file must
+be formatted in a specific way; you may want to consider
+using an `inst/NEWS.Rd` file instead as the format
+is more well-defined.
 
 More information on NEWS files is available in the help topic
 `?news`.
