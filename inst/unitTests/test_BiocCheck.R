@@ -359,7 +359,7 @@ test_checkDescriptionNamespaceConsistency <- function()
 
 test_checkImportSuggestions <- function()
 {
-    if (suppressMessages(suppressWarnings(require(codetoolsBioC))))
+    if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC"))))
     {
         suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
         checkTrue(!is.null(suggestions)) # sometimes it works and sometimes it doesn't

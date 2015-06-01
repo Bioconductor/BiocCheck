@@ -212,6 +212,7 @@ checkBiocViews <- function(pkgdir)
 {
     dirty <- FALSE
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    handleMessage("Checking that biocViews are present...")
     if (!"biocViews" %in% colnames(dcf))
     {
         handleRequired("Add some biocViews!")
@@ -227,6 +228,7 @@ checkBiocViews <- function(pkgdir)
     {
         parents <- c(parents, getParent(view, biocViewsVocab))
     }
+    handleMessage("Checking that biocViews come from the same category...")
     if (length(unique(parents)) > 1)
     {
         handleRecommended(paste0("Use biocViews from one category only",
@@ -242,6 +244,7 @@ checkBiocViews <- function(pkgdir)
     else
         env <- .GlobalEnv
 
+    handleMessage("Checking biocViews validity...")
     if (!all(views %in% nodes(biocViewsVocab)))
     {
         badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
@@ -268,6 +271,7 @@ checkBiocViews <- function(pkgdir)
 
 
     rec <- NULL
+    handleMessage("Checking for recommended biocViews...")
     tryCatch(suppressMessages(
         suppressWarnings(rec <- recommendBiocViews(pkgdir, branch))),
         error=function(e){
@@ -292,11 +296,13 @@ checkBiocViews <- function(pkgdir)
 checkBBScompatibility <- function(pkgdir)
 {
     lines <- readLines(file.path(pkgdir, "DESCRIPTION"), warn=FALSE)
+    handleMessage("Checking for blank lines in DESCRIPTION...")
     if (any(nchar(lines)==0))
     {
         handleRequired("Remove blank lines from DESCRIPTION!")
         return()
     }
+    handleMessage("Checking for whitespace in DESCRIPTION field names...")
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if (any(grepl("\\s", colnames(dcf))))
     {
@@ -305,6 +311,7 @@ checkBBScompatibility <- function(pkgdir)
     }
     segs <- strsplit(pkgdir, .Platform$file.sep)[[1]]
     pkgNameFromDir <- segs[length(segs)]
+    handleMessage("Checking that Package field matches dir/tarball name...")
     if (dcf[, "Package"] != pkgNameFromDir)
     {
         handleRequired(sprintf(
@@ -312,11 +319,13 @@ checkBBScompatibility <- function(pkgdir)
             pkgNameFromDir, dcf[, "Package"]))
             return()
     }
+    handleMessage("Checking for Version field...")
     if (!"Version" %in% colnames(dcf))
     {
         handleRequired("Version field in DESCRIPTION!")
         return()
     }
+    handleMessage("Checking for valid maintainer...")
     maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf))
     {
@@ -557,6 +566,7 @@ checkForBadDepends <- function(pkgdir)
                 }
             }
 
+            handleMessage("Checking if other packages can import this one...")
 
             if (length(errObjects) > 0)
             {
@@ -571,6 +581,9 @@ checkForBadDepends <- function(pkgdir)
                     paste(errFunctions, collapse=", "), pkgname)
                 handleRequired(msg)
             }
+
+            handleMessage("Checking to see if we understand object initialization....")
+
 
             if (length(noteObjects) > 0)
             {
@@ -1144,7 +1157,7 @@ checkIsPackageAlreadyInRepo <- function(pkgName,
     conn <- url(repo.url)
     dcf <- read.dcf(conn)
     close(conn)
-    if (pkgName %in% dcf[,"Package"])
+    if (tolower(pkgName) %in% tolower(dcf[,"Package"]))
     {
         if(repo=="CRAN")
             msg <- "Package must be removed from CRAN."
