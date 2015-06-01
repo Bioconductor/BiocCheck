@@ -117,7 +117,7 @@ parseFile <- function(infile, pkgdir)
             outfile <- file.path(tempdir(), "parseFile.tmp")
             # copy file to work around https://github.com/yihui/knitr/issues/970
             # which is actually fixed but not in CRAN yet (3/16/15)
-            tmpin <- file.path(tempdir(), "tmpin")
+            tmpin <- file.path(tempdir(), basename(infile))
             file.copy(infile, tmpin)
             suppressWarnings(suppressMessages(capture.output({
                 purl(tmpin, outfile, documentation=0L)
