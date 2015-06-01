@@ -2,8 +2,8 @@
 .Rhistory
 .RData
 BiocCheck.Rproj
-.Rbuildignore
 vignettes/*.md
+vignettes/*.R
 vignettes/*.html
 vignettes/sync.sh
 *.so

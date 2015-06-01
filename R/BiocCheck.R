@@ -73,8 +73,10 @@ BiocCheck <- function(package, ...)
 
     ## checks
 
-    if (!checkingDir)
+    if (!checkingDir) {
+        handleMessage("Checking for version number mismatch...")
         checkForVersionNumberMismatch(package, package_dir)
+    }
 
     checkForBadDepends(file.path(tempdir(), "lib", package_name))
 
@@ -84,6 +86,7 @@ BiocCheck <- function(package, ...)
         pkgType <- getPkgType(package_dir)
         if ((is.na(pkgType)) || pkgType == "Software") 
         {
+            handleMessage("Checking vignette directory...")
             if (is.na(pkgType))
                 msg <- "Unknown package type, checking vignette directories..."
             else
@@ -100,6 +103,7 @@ BiocCheck <- function(package, ...)
         handleMessage("Checking new package version number...")
         checkNewPackageVersionNumber(package_dir)
     }
+    handleMessage("Checking version number validity...")
     checkVersionNumber(package_dir, !is.null(dots[["new-package"]]))
 
     handleMessage("Checking R Version dependency...")
@@ -122,7 +126,7 @@ BiocCheck <- function(package, ...)
 
     handleMessage("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name, parsedCode)
-    if (suppressMessages(suppressWarnings(require(codetoolsBioC))))
+    if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC"))))
     {
         handleMessage("Checking for namespace import suggestions...")
         checkImportSuggestions(package_name)
@@ -131,7 +135,7 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for deprecated package usage...")
     checkDeprecatedPackages(package_dir)
 
-    handleMessage("Parsing R code in R directory, examples, vignettes...")
+    handleMessage("Checking parsed R code in R directory, examples, vignettes...")
 
     handleMessage("Checking for direct slot access...")
     checkForDirectSlotAccess(parsedCode, package_name)
@@ -218,7 +222,7 @@ BiocCheck <- function(package, ...)
     .msg("CONSIDERATION count: %s", .considerations$getNum())
     .msg(paste0("For detailed information about these checks, ",
     "see the BiocCheck vignette, available at ",
-        sprintf("http://www.bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#Interpreting_BiocCheck_output",
+        sprintf("http://bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#interpreting-bioccheck-output",
             BiocInstaller:::BIOC_VERSION)),
         exdent=0)
 
