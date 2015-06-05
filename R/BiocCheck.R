@@ -126,7 +126,8 @@ BiocCheck <- function(package, ...)
 
     handleMessage("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name, parsedCode)
-    if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC"))))
+    if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
+        quietly=TRUE))))
     {
         handleMessage("Checking for namespace import suggestions...")
         checkImportSuggestions(package_name)
