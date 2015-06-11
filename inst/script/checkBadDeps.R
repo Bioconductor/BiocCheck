@@ -14,7 +14,6 @@ suppressMessages({
             libdir <- sub("/$|\\$", "", libdir)
         # }
         .libPaths(c(libdir, .libPaths()))
-        library(codetools)
-        cat(capture.output(checkUsageEnv(getNamespace(pkgname))), sep="\n")
+        cat(utils::capture.output(codetools::checkUsageEnv(base::getNamespace(pkgname))), sep="\n")
     })
 })
