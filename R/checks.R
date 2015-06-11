@@ -627,7 +627,8 @@ getBadDeps <- function(pkgdir)
     args <- sprintf("-q --vanilla --slave -f %s --args %s",
         system.file("script", "checkBadDeps.R", package="BiocCheck"),
         dQuote(pkgdir))
-    system2(cmd, args, stdout=TRUE, stderr=FALSE)
+    system2(cmd, args, stdout=TRUE, stderr=FALSE,
+        env="R_DEFAULT_PACKAGES=NULL")
 }
 
 
