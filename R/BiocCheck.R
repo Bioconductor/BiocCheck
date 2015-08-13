@@ -51,7 +51,7 @@ BiocCheck <- function(package, ...)
 
     d <- list(...)
     if (length(d))
-        dots <- list(...)
+        dots <- d[[1]]
     else
         dots <- list()
 
