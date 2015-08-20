@@ -141,7 +141,7 @@ checkNewPackageVersionNumber <- function(pkgdir)
 
 }
 
-checkVersionNumber <- function(pkgdir, new_package=FALSE)
+checkVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     version <- dcf[, "Version"]
