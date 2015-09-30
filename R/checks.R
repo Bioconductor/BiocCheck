@@ -1125,18 +1125,17 @@ checkForBiocDevelSubscription <- function(pkgdir)
         handleMessage("Maintainer email is ok.")
         return()
     }
-    y <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel",
+    response <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel",
         body=list(adminpw=Sys.getenv("BIOC_DEVEL_PASSWORD")))
-    l <- content(y, as="text")
-    if(grepl("Authorization\\s+failed\\.", l))
+    if (status_code(response) != 200)
     {
-        # couldn't log in...
+        # couldn't log in
         return()
     }
-    z <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
+    response2 <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
         body=list(findmember=email))
-    l <- content(z, as="text")
-    if(grepl(paste0(">", tolower(email), "<"), tolower(l), fixed=TRUE))
+    content <- content(response2, as="text")
+    if(grepl(paste0(">", tolower(email), "<"), tolower(content), fixed=TRUE))
     {
         handleMessage("Maintainer is subscribed to bioc-devel!")
     } else {
