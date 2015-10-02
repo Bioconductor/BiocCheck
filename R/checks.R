@@ -1127,10 +1127,13 @@ checkForBiocDevelSubscription <- function(pkgdir)
     }
     response <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel",
         body=list(adminpw=Sys.getenv("BIOC_DEVEL_PASSWORD")))
-    if (status_code(response) != 200)
+    if (status_code(response) >= 300)
     {
-        # The server may return an HTTP 500 or 401 (etc.), fail fast in those cases
-        stop(paste0("An error occurred communicating with mailing list: 'https://stat.ethz.ch/mailman/admin/bioc-devel'.  ","Server returned status: ",status_code(response)))
+        warning(immediate. = TRUE,
+             "An error occurred communicating with mailing list: ",
+             "'https://stat.ethz.ch/mailman/admin/bioc-devel'. ",
+             "Server returned status: ", status_code(response))
+        return()
     }
     response2 <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
         body=list(findmember=email))
