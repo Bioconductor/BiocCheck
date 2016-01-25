@@ -124,8 +124,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
 
-    handleMessage(sprintf(
-        "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
+    message(sprintf(
+        "      # of chunks: %s, # of eval=FALSE: %s (%i%%)",
         chunks, efs,  as.integer(percent)))
     if (percent >= 50)
         handleRecommended("Evaluate more vignette chunks.")
@@ -602,8 +602,8 @@ checkForBadDepends <- function(pkgdir)
                     "data set loaded with data(), or perhaps part of",
                     "an object referenced in with() or within()."),
                     grammar$object_objects,
-                    sQuote(paste(noteObjects, collapse=", ")),
-                    paste(noteFunctions, collapse=", "),
+                    sQuote(paste(trimws(noteObjects), collapse=", ")),
+                    paste(trimws(noteFunctions), collapse=", "),
                     grammar$was_were,
                     grammar$itis_theyare)
 
@@ -800,18 +800,18 @@ checkFunctionLengths <- function(parsedCode, pkgname)
         h <- head(df, n=5)
         if (nrow(h))
         {
-            handleMessage(sprintf(
+            message(sprintf(
                 "  The longest function is %s lines long", max(h$length)))
-            handleMessage(sprintf("  The longest %s functions are:", nrow(h)))
+            message(sprintf("  The longest %s functions are:", nrow(h)))
             for (i in 1:nrow(h))
             {
                 row <- df[i,]
                 if (grepl("\\.R$", row$filename, ignore.case=TRUE))
                 {
-                    handleMessage(sprintf("    %s() (%s, line %s): %s lines",
+                    message(sprintf("      %s() (%s, line %s): %s lines",
                         row$functionName, row$filename, row$startLine, row$length))
                 } else {
-                    handleMessage(sprintf("    %s() (%s): %s lines",
+                    message(sprintf("      %s() (%s): %s lines",
                         row$functionName, row$filename, row$length))
                 }
             }
