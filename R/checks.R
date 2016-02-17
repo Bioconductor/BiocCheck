@@ -505,7 +505,7 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
         {
             handleRecommended(sprintf(
                 "Import %s in DESCRIPTION as well as NAMESPACE.",
-                paste(badones, collapse=", ")))
+                paste(unique(badones), collapse=", ")))
         }
     }
 }
