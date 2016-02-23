@@ -124,6 +124,7 @@ parseFile <- function(infile, pkgdir)
             })))
             file.remove(tmpin)
         } else {
+            full.infile <- normalizePath(infile)
             oof <- file.path(tempdir(), basename(infile))
             oof <- sapply(strsplit(oof, "\\."),
                 function(x) paste(x[1:(length(x)-1)], collapse="."))
@@ -132,7 +133,10 @@ parseFile <- function(infile, pkgdir)
                     oldwd <- getwd()
                     on.exit(setwd(oldwd))
                     setwd(tempdir())
-                    Stangle(infile)
+                    Stangle(full.infile)
+                    badname <- paste0(basename(infile), ".R")
+                    if (file.exists(badname))
+                        file.rename(badname, outfile)
             })))
         }
 
