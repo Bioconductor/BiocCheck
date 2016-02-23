@@ -16,7 +16,7 @@ checkForVersionNumberMismatch <- function(package, package_dir)
     dcfVer <- unname(dcf[, "Version"])
     if (!ver == dcfVer)
     {
-        handleRequired(paste("Version number in tarball", 
+        handleRequired(paste("Version number in tarball",
             "filename must match Version field in DESCRIPTION.",
             "(Tip: create tarball with R CMD build)"))
     }
@@ -103,6 +103,20 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 #                " probably put there by R CMD build."))
         }
     }
+
+
+    vigns <- tools:::pkgVignettes(dir=pkgdir, check=TRUE)
+    if (is.null(vigns))
+    {
+        handleRequired("No vignettes!")
+        return()
+    }
+    if (length(vigns$msg))
+    {
+        handleRequired(paste(vigns$msg, collapse="\n"))
+        return()
+    }
+
 
     chunks <- 0
     efs <- 0
@@ -239,7 +253,7 @@ checkBiocViews <- function(pkgdir)
 
 
 #    biocViewsVocab <- NULL ## to keep R CMD check happy
-    if (interactive()) 
+    if (interactive())
         env <- environment()
     else
         env <- .GlobalEnv
@@ -256,7 +270,7 @@ checkBiocViews <- function(pkgdir)
 
     if (packageVersion("biocViews") < package_version("1.33.9"))
     {
-        if (branch == "Software") 
+        if (branch == "Software")
         {
             branch = "software"
         } else if (branch == "AnnotationData")
@@ -332,7 +346,7 @@ checkBBScompatibility <- function(pkgdir)
         env <- new.env(parent=emptyenv())
         env[["c"]] = c
         env[["person"]] <- utils::person
-        pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE) 
+        pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE)
         tryCatch(people <- eval(pp, env),
             error=function(e) {
                 handleRequired("AuthorsR@ field must be valid R code!")
@@ -375,7 +389,7 @@ checkBBScompatibility <- function(pkgdir)
         handleRequired("Maintainer or Authors@R field in DESCRIPTION file!")
         return()
     }
-    # now need to make sure that regexes work, a la python/BBS 
+    # now need to make sure that regexes work, a la python/BBS
     regex = '(.*\\S)\\s*<(.*)>\\s*'
     match <- regexec(regex, maintainer)[[1]]
     match.length <- attr(match, "match.length")
@@ -392,9 +406,9 @@ checkBBScompatibility <- function(pkgdir)
 ## to run tests.
 ## OOPS - R CMD check is looking at the INSTALLED directory
 checkUnitTests <- function(pkgdir)
-{   
+{
     ## begin code stolen from tools:::.check_packages
-    dir.exists <- function(x) !is.na(isdir <- file.info(x)$isdir) & 
+    dir.exists <- function(x) !is.na(isdir <- file.info(x)$isdir) &
         isdir
     ## ...
     tests_dir <- file.path(pkgdir, "tests")
@@ -417,7 +431,7 @@ checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
             TRUE)
     })
 
-    if (any(res > 0)) 
+    if (any(res > 0))
     {
         d <- getLoadedDLLs()
         if (pkgname %in% names(d))
@@ -439,7 +453,7 @@ checkImportSuggestions <- function(pkgname)
     tryCatch({
         suppressMessages({
             suppressWarnings({
-                suggestions <- 
+                suggestions <-
                     capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
             })
         })
@@ -572,12 +586,12 @@ checkForBadDepends <- function(pkgdir)
             {
                 msg <- sprintf(paste(
                     ## FIXME show the actual package names?
-                    "Packages (%s) which provide %s", 
+                    "Packages (%s) which provide %s",
                     "(used in %s)",
                     "should be imported in the NAMESPACE file,",
                     "otherwise packages that import %s could fail."),
                     paste(errPkgs, collapse=", " ),
-                    paste(errObjects, collapse=", "), 
+                    paste(errObjects, collapse=", "),
                     paste(errFunctions, collapse=", "), pkgname)
                 handleRequired(msg)
             }
@@ -650,7 +664,7 @@ getFunctionLengths <- function(df)
             funcLines <- NULL
             funcName <- "_anonymous_"
             # attempt to get function name
-            if (funcRowId >= 3) 
+            if (funcRowId >= 3)
             {
                 up1 <- lst[[as.character(funcRowId -1)]]
                 #up1 <- df[as.character(funcRowId - 1),]
@@ -683,7 +697,7 @@ getFunctionLengths <- function(df)
                         startLine=funcStartLine, endLine=endLine)
                     break
                 } else {
-                    if (thisRow$parent > 0) 
+                    if (thisRow$parent > 0)
                     {
                         saveme <- thisRowId
                     }
@@ -725,7 +739,7 @@ doesFileLoadPackage <- function(df, pkgname)
                 {
                     prevRow <- df[curRow$idx -1,]
                     prevPrevRow <- df[curRow$idx -2,]
-                    if (!(prevRow$token == "EQ_SUB" && 
+                    if (!(prevRow$token == "EQ_SUB" &&
                         prevRow$text == "=" &&
                         prevPrevRow$token == "SYMBOL_SUB" &&
                         prevPrevRow$text == "help"))
@@ -734,7 +748,7 @@ doesFileLoadPackage <- function(df, pkgname)
                     }
                 }
             }
-        }    
+        }
     res
     }
 }
@@ -761,7 +775,7 @@ checkForLibraryMe <- function(pkgname, parsedCode)
     {
         msg <- sprintf("The following files call library or require on %s.
             This is not necessary.\n%s", pkgname,
-            paste(badfiles, collapse=", "))    
+            paste(badfiles, collapse=", "))
         handleRecommended(msg)
     }
 
@@ -791,7 +805,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
         }
     }
     message("")
-    
+
     colnames <- c("filename","functionName","length","startLine","endLine")
     if (ncol(df) == length(colnames))
     {
@@ -828,8 +842,8 @@ old.checkExportsAreDocumented <- function(pkgdir, pkgname)
     for (manpage in manpages)
     {
         rd <- parse_Rd(manpage)
-        name <- 
-            unlist(rd[unlist(lapply(rd, function(x) 
+        name <-
+            unlist(rd[unlist(lapply(rd, function(x)
                 attr(x, "Rd_tag") == "\\name"))][[1]][1])
         aliases <- unlist(lapply(rd[unlist(lapply(rd,
             function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
@@ -882,7 +896,7 @@ checkForValueSection <- function(pkgdir)
 
         if ("\\usage" %in% tags && !is.null(value))
         {
-            if ((is.list(value[[1]]) && length(value[[1]]) == 0) || 
+            if ((is.list(value[[1]]) && length(value[[1]]) == 0) ||
                 nchar(gsub("^\\s+|\\s+$", "", paste(unlist(value), collapse='')))==0 )
             {
                 badpages <- append(badpages, basename(manpage))
@@ -911,8 +925,8 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     for (manpage in manpages)
     {
         rd <- parse_Rd(manpage)
-        name <- 
-            unlist(rd[unlist(lapply(rd, function(x) 
+        name <-
+            unlist(rd[unlist(lapply(rd, function(x)
                 attr(x, "Rd_tag") == "\\name"))][[1]][1])
         aliases <- unlist(lapply(rd[unlist(lapply(rd,
             function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
@@ -922,16 +936,16 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
         {
             exportingPagesCount <- exportingPagesCount + 1
         }
-        if (length(exportedTopics) && 
-            !doesManPageHaveRunnableExample(rd)) 
+        if (length(exportedTopics) &&
+            !doesManPageHaveRunnableExample(rd))
         {
             noExamplesCount <- noExamplesCount + 1
             badManPages <- append(badManPages, basename(manpage))
         }
     }
 
-    ratio <- (exportingPagesCount - noExamplesCount) / exportingPagesCount 
-    if (exportingPagesCount > 0 
+    ratio <- (exportingPagesCount - noExamplesCount) / exportingPagesCount
+    if (exportingPagesCount > 0
         && ratio  <= (0.8 / 1.0))
     {
         handleRequired(paste0("At least 80% of man pages documenting ",
@@ -951,23 +965,23 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
 
 checkNEWS <- function(pkgdir)
 {
-    newsloc <- file.path(pkgdir, c("inst", "inst", "."), 
+    newsloc <- file.path(pkgdir, c("inst", "inst", "."),
             c("NEWS.Rd", "NEWS", "NEWS"))
     news <- head(newsloc[file.exists(newsloc)], 1)
-    if (0L == length(news)) 
+    if (0L == length(news))
     {
         handleConsideration(paste0("Adding a NEWS file, so your ",
             "package news will be included",
             " in Bioconductor release announcements."))
         return()
     }
-    .build_news_db_from_package_NEWS_Rd <- 
+    .build_news_db_from_package_NEWS_Rd <-
         get(".build_news_db_from_package_NEWS_Rd", getNamespace("tools"))
     .news_reader_default <-
         get(".news_reader_default", getNamespace("tools"))
     tryCatch({
         suppressWarnings({
-            db <- if (grepl("Rd$", news)) 
+            db <- if (grepl("Rd$", news))
                 .build_news_db_from_package_NEWS_Rd(news)
             else .news_reader_default(news)
         })
@@ -1019,7 +1033,7 @@ checkFormatting <- function(pkgdir)
             if (length(long))
             {
                 ## TODO/FIXME We could tell the user here which lines are long
-                ## in which files. 
+                ## in which files.
                 longlines <- longlines + length(long)
             }
 
@@ -1111,7 +1125,7 @@ checkForSupportSiteRegistration <- function(package_dir)
         handleRequired(paste0("Maintainer must register at the support site;",
             " visit https://support.bioconductor.org/accounts/signup/ ."))
     }
-       
+
 }
 
 
