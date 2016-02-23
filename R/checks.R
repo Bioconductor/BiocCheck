@@ -412,12 +412,21 @@ checkUnitTests <- function(pkgdir)
         isdir
     ## ...
     tests_dir <- file.path(pkgdir, "tests")
-    if (!(dir.exists(tests_dir) && length(dir(tests_dir, pattern = "\\.(R|Rin)$"))))
+    cond <- length(dir(tests_dir, pattern = "\\.(R|Rin)$"))
+    if (dir.exists(tests_dir) && (!cond))
+    {
+        handleRequired(paste("Add a .R or .Rin file in tests/ directory",
+            "or unit tests will not be run by R CMD check! See",
+            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/",
+            "for details on configuring unit tests."))
+        return()
+    }
+    if (!(dir.exists(tests_dir) && cond))
     ## end stolen code
     {
         msg <- paste0("Adding unit tests.\n",
             "  We strongly encourage them. See\n",
-            "  http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/."
+            "  http://bioconductor.org/developers/how-to/unitTesting-guidelines/."
             )
         handleConsideration(msg)
     }
