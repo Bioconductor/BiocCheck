@@ -104,17 +104,20 @@ checkVignetteDir <- function(pkgdir, checkingDir)
         }
     }
 
+    if (file.exists(file.path("pkgdir", "DESCRIPTION")))
+    {
+        vigns <- tools:::pkgVignettes(dir=pkgdir, check=TRUE)
+        if (is.null(vigns))
+        {
+            handleRequired("No vignettes!")
+            return()
+        }
+        if (length(vigns$msg))
+        {
+            handleRequired(paste(vigns$msg, collapse="\n"))
+            return()
+        }
 
-    vigns <- tools:::pkgVignettes(dir=pkgdir, check=TRUE)
-    if (is.null(vigns))
-    {
-        handleRequired("No vignettes!")
-        return()
-    }
-    if (length(vigns$msg))
-    {
-        handleRequired(paste(vigns$msg, collapse="\n"))
-        return()
     }
 
 
@@ -151,7 +154,7 @@ checkNewPackageVersionNumber <- function(pkgdir)
     version <- dcf[, "Version"]
         if(!grepl("^0[-.]99[-.][0-9]+$", version))
             handleRequired(sprintf
-                ("New package version starting with 0.99; got %s.",version))
+                ("New package version starting with 0.99.* (e.g., 0.99.0, 0.99.1, ...); got '%s'.",version))
 
 }
 
@@ -236,6 +239,14 @@ checkBiocViews <- function(pkgdir)
     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
     views <- gsub("\\s", "", views)
     data("biocViewsVocab", package="biocViews", envir=environment())
+
+    handleMessage("Checking for non-trivial biocViews...")
+    toplevel <- c("Software", "AnnotationData", "ExperimentData")
+    if (all(views %in% toplevel)) {
+        handleRequired(sprintf("Add biocViews other than %s",
+                               paste(unique(views), collapse=", ")))
+        return(TRUE)
+    }
 
     parents <- c()
     for (view in views)
