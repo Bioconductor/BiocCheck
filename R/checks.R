@@ -218,6 +218,8 @@ getPkgType <- function(pkgdir)
 getParent <- function(view, biocViewsVocab)
 {
     topLevel <- c("Software", "ExperimentData", "AnnotationData")
+    if (view %in% topLevel)
+        return(view)
     for (level in topLevel) {
         if (view %in% names(acc(biocViewsVocab, level)[[level]]))
             return(level)
