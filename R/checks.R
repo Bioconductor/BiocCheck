@@ -199,13 +199,8 @@ getPkgType <- function(pkgdir)
     views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
     biocViewsVocab <- NULL ## to keep R CMD check happy
     data("biocViewsVocab", package="biocViews", envir=environment())
-    if (!all(views %in% nodes(biocViewsVocab)))
-    {
-        badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
-            collapse=", ")
-        views <- views[!views %in% badViews]
-        if (length(views) == 0) return(NA)
-    }
+    if (any(!views %in% nodes(biocViewsVocab)))
+        return(NA)
     parents <- c()
     for (view in views)
     {

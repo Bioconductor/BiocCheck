@@ -5,7 +5,7 @@ message("You may see some warnings here -- they don't indicate unit test problem
 
 library(devtools)
 
-.printf <- BiocCheck:::.printf 
+.printf <- BiocCheck:::.printf
 
 parsedCode <- NULL
 
@@ -28,7 +28,7 @@ inspect <- function()
 create_test_package <- function(pkgpath, description=list(),
     extraActions=function(path=NULL){})
 {
-    canned <- list(Author="Test Author", 
+    canned <- list(Author="Test Author",
         Maintainer="Test Maintainer <test@test.com>", "Authors@R"=NULL)
     for (name in names(description))
     {
@@ -45,7 +45,7 @@ create_test_package <- function(pkgpath, description=list(),
 checkError <- function(msg)
 {
     if (missing(msg)) msg = ""
-    # .printf("Errors: %s, Warnings: %s, Notes: %s", 
+    # .printf("Errors: %s, Warnings: %s, Notes: %s",
     #     .requirements$getNum(),
     #     .recommendations$getNum(),
     #     .considerations$getNum())
@@ -101,8 +101,8 @@ test_vignettes0 <- function()
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "vignettes", "test.Rnw"))
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE) ## vig dir w/source file
 
-    checkTrue(.requirements$getNum() == 0 
-        && .recommendations$getNum() == 0 
+    checkTrue(.requirements$getNum() == 0
+        && .recommendations$getNum() == 0
         && .considerations$getNum() == 0,
         "expected no errors/warnings/notes")
     zeroCounters()
@@ -113,8 +113,8 @@ test_vignettes0 <- function()
 
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE)
 
-    checkTrue(.requirements$getNum() == 0 
-        && .recommendations$getNum() == 1 
+    checkTrue(.requirements$getNum() == 0
+        && .recommendations$getNum() == 1
         && .considerations$getNum() == 0,
         "expected 1 warning, no notes or errors")
     zeroCounters()
@@ -122,12 +122,12 @@ test_vignettes0 <- function()
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.Rmd"))
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE)
-    checkTrue(.recommendations$getNum() == 1, 
+    checkTrue(.recommendations$getNum() == 1,
         "Rmd file not seen as valid vignette source")
     zeroCounters()
     BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, FALSE)
 #   I don't think we should even mention this. So commenting it out.
-#    checkTrue(.considerations$getNum() == 1, 
+#    checkTrue(.considerations$getNum() == 1,
 #        "no complaints about vignette sources in inst/doc of tarball")
     zeroCounters()
 
@@ -147,7 +147,7 @@ test_checkVersionNumber <- function()
     setVersion("1.2.3.4")
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
     checkError("Version 1.2.3.4 doesn't cause error!")
-    isDevel <- ((packageVersion("BiocInstaller")$minor %% 2) == 1) 
+    isDevel <- ((packageVersion("BiocInstaller")$minor %% 2) == 1)
     zeroCounters()
     if (isDevel)
     {
@@ -204,7 +204,7 @@ test_checkBBScompatibility <- function()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Blank line in DESCRIPTION doesn't cause error")
     zeroCounters()
-    
+
     cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Package name which doesn't match dir name does not cause error!")
@@ -276,7 +276,7 @@ test_checkRegistrationOfEntryPoints <- function()
         package="BiocCheck"))
 
     BiocCheck:::checkRegistrationOfEntryPoints("testpkg1", parsedCode1)
-    checkTrue(.recommendations$getNum() == 1, 
+    checkTrue(.recommendations$getNum() == 1,
         "unregistered code not flagged!")
 }
 
@@ -286,7 +286,7 @@ test_checkDeprecatedPackages <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkDeprecatedPackages(UNIT_TEST_TEMPDIR)
     checkError("Depending on multicore didn't cause error!")
-   
+
 }
 
 test_parseFile <- function()
@@ -297,7 +297,7 @@ test_parseFile <- function()
     checkTrue(all(dim(df) == c(6,9)))
 }
 
-test_checkTorF <- function() 
+test_checkTorF <- function()
 {
     if (is.null(parsedCode))
         parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
@@ -365,7 +365,7 @@ test_checkImportSuggestions <- function()
         suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
         checkTrue(!is.null(suggestions)) # sometimes it works and sometimes it doesn't
 
- 
+
         BiocCheck:::installAndLoad(create_test_package('testpkg'))
         suggestions <- BiocCheck:::checkImportSuggestions("testpkg")
         checkTrue(length(suggestions) == 0)
@@ -405,16 +405,16 @@ test_getFunctionLengths <- function()
     df <- getParseData(parse(file, keep.source=TRUE))
     res <- BiocCheck:::getFunctionLengths(df)
     expected <-
-        structure(list(`_anonymous_.1` = structure(c(2, 1, 2), .Names = c("length", 
-        "startLine", "endLine")), fa = structure(c(1, 3, 3), .Names = c("length", 
-        "startLine", "endLine")), f2 = structure(c(1, 6, 6), .Names = c("length", 
-        "startLine", "endLine")), f3 = structure(c(5, 9, 13), .Names = c("length", 
-        "startLine", "endLine")), f4 = structure(c(4, 16, 19), .Names = c("length", 
-        "startLine", "endLine")), `_anonymous_.23` = structure(c(6, 23, 
-        28), .Names = c("length", "startLine", "endLine")), f5 = structure(c(1, 
-        31, 31), .Names = c("length", "startLine", "endLine")), f6 = structure(c(1, 
-        33, 33), .Names = c("length", "startLine", "endLine")), f7 = structure(c(6, 
-        35, 40), .Names = c("length", "startLine", "endLine"))), .Names = c("_anonymous_.1", 
+        structure(list(`_anonymous_.1` = structure(c(2, 1, 2), .Names = c("length",
+        "startLine", "endLine")), fa = structure(c(1, 3, 3), .Names = c("length",
+        "startLine", "endLine")), f2 = structure(c(1, 6, 6), .Names = c("length",
+        "startLine", "endLine")), f3 = structure(c(5, 9, 13), .Names = c("length",
+        "startLine", "endLine")), f4 = structure(c(4, 16, 19), .Names = c("length",
+        "startLine", "endLine")), `_anonymous_.23` = structure(c(6, 23,
+        28), .Names = c("length", "startLine", "endLine")), f5 = structure(c(1,
+        31, 31), .Names = c("length", "startLine", "endLine")), f6 = structure(c(1,
+        33, 33), .Names = c("length", "startLine", "endLine")), f7 = structure(c(6,
+        35, 40), .Names = c("length", "startLine", "endLine"))), .Names = c("_anonymous_.1",
         "fa", "f2", "f3", "f4", "_anonymous_.23", "f5", "f6", "f7"))
     checkTrue(all.equal(expected, res))
 }
@@ -422,7 +422,7 @@ test_getFunctionLengths <- function()
 test_getFunctionLengths2 <- function()
 {
     load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
-    BiocCheck:::checkFunctionLengths("IRanges", IRangesParsedCode)    
+    BiocCheck:::checkFunctionLengths("IRanges", IRangesParsedCode)
 }
 
 test_checkExportsAreDocumented <- function()
@@ -481,8 +481,9 @@ test_getPkgType <- function()
    cat("biocViews: GeneCardsCustomSchema, ChipManufacturer", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals("AnnotationData", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 
+   # Cancer is not a valid biocView, so return NA
    cat("biocViews: Cancer, HapMap", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-   checkEquals("ExperimentData", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
+   checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 }
 
 test_checkForBiocDevelSubscription <- function()
