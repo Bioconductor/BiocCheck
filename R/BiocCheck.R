@@ -1,15 +1,22 @@
 
-getArgParser <- function()
+getOptionList <- function()
 {
-    option_list <- list(
+    list(
         make_option("--no-check-vignettes", action="store_true",
             help="disable vignette checks"),
         make_option("--new-package", action="store_true",
             help="enable checks specific to new packages"),
         make_option("--no-check-bioc-views", action="store_true",
-            help="disable biocViews-specific checks (for non-BioC packages)")
-
+            help="disable biocViews-specific checks (for non-BioC packages)"),
+        make_option("--build-output-file", type="character",
+            help="file containing output of R CMD build, for optional additional analysis",
+            metavar="build-output-file")
         )
+}
+
+getArgParser <- function()
+{
+    option_list <- getOptionList()
     OptionParser(usage = "R CMD BiocCheck [options] package",
         option_list=option_list)
 }
@@ -51,9 +58,13 @@ BiocCheck <- function(package, ...)
 
     d <- list(...)
     if (length(d))
+    {
         dots <- d[[1]]
-    else
+        names(dots) <- names(d)
+    } else {
         dots <- list()
+    }
+
 
     if (length(package)==0)
         .stop("Supply a package directory or source tarball.")
@@ -84,7 +95,7 @@ BiocCheck <- function(package, ...)
     if (is.null(dots[["no-check-vignettes"]]))
     {
         pkgType <- getPkgType(package_dir)
-        if ((is.na(pkgType)) || pkgType == "Software") 
+        if ((is.na(pkgType)) || pkgType == "Software")
         {
             handleMessage("Checking vignette directory...")
             if (is.na(pkgType))
@@ -93,6 +104,11 @@ BiocCheck <- function(package, ...)
                 msg <- "This is a software package, checking vignette directories..."
             handleMessage(msg)
             checkVignetteDir(package_dir, checkingDir)
+            if ("build-output-file" %in% names(dots))
+            {
+                handleMessage("Checking whether vignette is built with 'R CMD build'...")
+                checkIsVignetteBuilt(package_dir, dots[["build-output-file"]])
+            }
         } else {
             handleMessage("This is not a software package, skipping vignette checks...")
         }

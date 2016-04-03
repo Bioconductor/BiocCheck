@@ -1201,3 +1201,19 @@ checkIsPackageAlreadyInRepo <- function(pkgName,
         handleRequired(msg)
     }
 }
+
+checkIsVignetteBuilt <- function(package_dir, build_output_file)
+{
+    if (!file.exists(build_output_file))
+    {
+        stop(sprintf("build output file '%s' does not exist!", build_output_file))
+    }
+    lines <- readLines(build_output_file)
+    if (!any(grepl("^\\* creating vignettes \\.\\.\\.", lines)))
+    {
+        msg <- "Vignette must be built by
+        'R CMD build'. Please see the `Vignette Checks` section of
+        the BiocCheck vignette."
+        handleRequired(msg)
+    }
+}
