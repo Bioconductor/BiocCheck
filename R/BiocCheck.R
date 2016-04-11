@@ -60,7 +60,6 @@ BiocCheck <- function(package, ...)
     if (length(d))
     {
         dots <- d[[1]]
-        names(dots) <- names(d)
     } else {
         dots <- list()
     }
