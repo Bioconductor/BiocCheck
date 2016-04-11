@@ -146,7 +146,7 @@ It simply looks for a line that starts:
 
     * creating vignettes ...
 
-If this line is present, it means `R` has not detected that a vignette
+If this line is not present, it means `R` has not detected that a vignette
 needs to be built.
 
 It's `REQUIRED` that the vignette be built.
