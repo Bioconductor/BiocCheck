@@ -1031,7 +1031,6 @@ checkFormatting <- function(pkgdir)
 
     for (file in files)
     {
-
         if (file.exists(file) && file.info(file)$size == 0)
         {
             pkgname <- getPkgNameFromPkgDir(pkgdir)
@@ -1043,7 +1042,8 @@ checkFormatting <- function(pkgdir)
         {
             lines <- readLines(file, warn=FALSE)
             totallines <- totallines + length(lines)
-            n <- nchar(lines)
+            n <- nchar(lines, allowNA=TRUE)
+            n <- n[!is.na(n)]
 
             names(n) <- seq_along(1:length(n))
             long <- n[n > 80]
