@@ -128,7 +128,7 @@ BiocCheck <- function(package, ...)
     {
         handleMessage("Checking biocViews...")
         result <- checkBiocViews(package_dir)
-        if(result)
+        if(!result)
         {
             .msg("See http://bioconductor.org/developers/how-to/biocViews/")
         }
