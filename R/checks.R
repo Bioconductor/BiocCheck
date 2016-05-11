@@ -230,7 +230,7 @@ checkBiocViews <- function(pkgdir)
     if (!"biocViews" %in% colnames(dcf))
     {
         handleRequired("Add some biocViews!")
-        return(FALSE)
+        return(TRUE)
     }
     biocViews <- dcf[, "biocViews"]
     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
@@ -242,7 +242,7 @@ checkBiocViews <- function(pkgdir)
     if (all(views %in% toplevel)) {
         handleRequired(sprintf("Add biocViews other than %s",
                                paste(unique(views), collapse=", ")))
-        return(FALSE)
+        return(TRUE)
     }
 
     parents <- c()
@@ -255,7 +255,7 @@ checkBiocViews <- function(pkgdir)
     {
         handleRecommended(paste0("Use biocViews from one category only",
             " (one of Software, ExperimentData, AnnotationData)"))
-        return(FALSE)
+        return(TRUE)
     }
     branch <- unique(parents)
 
@@ -312,7 +312,7 @@ checkBiocViews <- function(pkgdir)
 
 
     }
-    return(!dirty)
+    return(dirty)
 }
 
 checkBBScompatibility <- function(pkgdir)

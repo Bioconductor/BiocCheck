@@ -18,23 +18,20 @@ handleMessage <- function(msg, appendLF=TRUE)
 
 handleRequired <- function(msg)
 {
-    if (exists(".requirements", envir=.GlobalEnv))
-        .requirements$add(msg)
+    .requirements$add(msg)
     .msg("* REQUIRED: %s", msg, indent=4, exdent=6)
     #.stop(msg)
 }
 
 handleRecommended <- function(msg)
 {
-    if (exists(".recommendations", envir=.GlobalEnv))
-        .recommendations$add(msg)
+    .recommendations$add(msg)
     .msg("* RECOMMENDED: %s", msg, indent=4, exdent=6)
 }
 
 handleConsideration <- function(msg)
 {
-    if (exists(".considerations", envir=.GlobalEnv))
-        .considerations$add(msg)
+    .considerations$add(msg)
     .msg("* CONSIDER: %s", msg, indent=4, exdent=6)
 }
 
@@ -48,7 +45,7 @@ installAndLoad <- function(pkg)
         sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
         libdir, pkg),
         stdout=NULL, stderr=stderr)
-    if (res != 0)
+    if (res != 0) 
     {
         cat(paste(readLines(stderr), collapse="\n"))
         handleRequired(sprintf("%s must be installable!", pkg))
@@ -62,7 +59,7 @@ installAndLoad <- function(pkg)
     suppressPackageStartupMessages(do.call(library, args))
 }
 
-# Takes as input the value of an Imports, Depends,
+# Takes as input the value of an Imports, Depends, 
 # or LinkingTo field and returns a named character
 # vector of Bioconductor dependencies, where the names
 # are version specifiers or blank.
@@ -99,7 +96,7 @@ getAllDependencies <- function(pkgdir)
     fields <- c("Depends", "Imports", "Suggests", "Enhances", "LinkingTo")
     out <- c()
     for (field in fields)
-    {
+    {   
         if (field %in% colnames(dcf))
             out <- append(out, cleanupDependency(dcf[, field]))
     }
@@ -143,7 +140,7 @@ parseFile <- function(infile, pkgdir)
             })))
         }
 
-    } else if (grepl("\\.Rd$", infile, TRUE))
+    } else if (grepl("\\.Rd$", infile, TRUE)) 
     {
         rd <- parse_Rd(infile)
         outfile <- file.path(tempdir(), "parseFile.tmp")
@@ -183,8 +180,8 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
     for (filename in names(parsedCode))
     {
         df <- parsedCode[[filename]]
-        matchedrows <-
-            df[which(df$token ==
+        matchedrows <- 
+            df[which(df$token == 
                 token & df$text == symbolName),]
         if (nrow(matchedrows) > 0)
         {
@@ -270,7 +267,7 @@ getMaintainerEmail <- function(pkgdir)
         env <- new.env(parent=emptyenv())
         env[["c"]] = c
         env[["person"]] <- utils::person
-        pp <- parse(text=ar, keep.source=TRUE)
+        pp <- parse(text=ar, keep.source=TRUE) 
         tryCatch(people <- eval(pp, env),
             error=function(e) {
                 # could not parse Authors@R
@@ -278,12 +275,12 @@ getMaintainerEmail <- function(pkgdir)
             })
         for (person in people)
         {
-            if ("cre" %in% person$role)
+            if ("cre" %in% person$role) 
             {
                 email <- person$email
             }
         }
-
+       
     }
     return(email)
 }
