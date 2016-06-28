@@ -9,10 +9,10 @@ Depends: R (>= 3.2.0)
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
-Imports: biocViews (>= 1.33.7), BiocInstaller, graph,
-        devtools (>= 1.4.1), httr, knitr, tools, optparse,
-        codetools, methods
-Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, rmarkdown
+Imports: biocViews (>= 1.33.7), BiocInstaller, graph, httr, tools, optparse,
+         codetools, methods
+Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, rmarkdown, knitr,
+          devtools (>= 1.4.1)
 Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck/issues
