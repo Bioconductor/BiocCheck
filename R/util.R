@@ -54,7 +54,7 @@ installAndLoad <- function(pkg)
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]
     args <- list(package=pkgname, lib.loc=libdir)
     if (paste0("package:",pkgname) %in% search())
-        suppressWarnings(unload(file.path(libdir, pkgname)))
+        suppressWarnings(unloadNamespace(pkgname))
 
     suppressPackageStartupMessages(do.call(library, args))
 }
@@ -114,13 +114,16 @@ parseFile <- function(infile, pkgdir)
         dcf <- read.dcf(desc)
         if ("VignetteBuilder" %in% colnames(dcf) && dcf[,"VignetteBuilder"] == "knitr")
         {
+            if (!requireNamespace("knitr")) {
+                stop("'knitr' package required to check knitr-based vignettes")
+            }
             outfile <- file.path(tempdir(), "parseFile.tmp")
             # copy file to work around https://github.com/yihui/knitr/issues/970
             # which is actually fixed but not in CRAN yet (3/16/15)
             tmpin <- file.path(tempdir(), basename(infile))
             file.copy(infile, tmpin)
             suppressWarnings(suppressMessages(capture.output({
-                purl(tmpin, outfile, documentation=0L)
+                knitr::purl(tmpin, outfile, documentation=0L)
             })))
             file.remove(tmpin)
         } else {
