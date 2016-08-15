@@ -36,7 +36,7 @@ create_test_package <- function(pkgpath, description=list(),
     }
     path <- file.path(tempdir(), pkgpath)
     unlink(path, recursive=TRUE)
-    suppressMessages(create(path, canned))
+    suppressMessages(capture.output(create(path, canned)))
     cat("#", file=file.path(path, "NAMESPACE"))
     extraActions(path)
     path
