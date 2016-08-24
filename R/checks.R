@@ -126,7 +126,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     for (file in vigdircontents)
     {
         lines <- readLines(file, warn=FALSE)
-        vignetteType <- knitr:::detect_pattern(lines, knitr:::file_ext(file))
+        vignetteType <- knitr:::detect_pattern(lines, tools::file_ext(file))
         if (is.null(vignetteType)) {
             chunklines <- character(0)
         } else {
@@ -235,6 +235,7 @@ checkBiocViews <- function(pkgdir)
     biocViews <- dcf[, "biocViews"]
     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
     views <- gsub("\\s", "", views)
+    biocViewsVocab <- NULL
     data("biocViewsVocab", package="biocViews", envir=environment())
 
     handleMessage("Checking for non-trivial biocViews...")
@@ -877,7 +878,8 @@ doesManPageHaveRunnableExample <- function(rd)
         function(x) attr(x, "Rd_tag") == "\\examples")))
     if (!hasExamples) return(FALSE)
 
-    tc <- textConnection("ex", "w")
+    ex <- character()
+    tc <- textConnection("ex", "w", local=TRUE)
     Rd2ex(rd, commentDonttest = TRUE, out = tc)
     close(tc)
 
