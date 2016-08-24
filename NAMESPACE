@@ -11,3 +11,4 @@ importFrom(utils, Stangle, capture.output, data, getParseData, head,
 
 export(BiocCheck)
 export(usage)
+export(.requirements, .recommendations, .considerations)

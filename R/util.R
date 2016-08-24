@@ -37,19 +37,30 @@ handleConsideration <- function(msg)
 
 installAndLoad <- function(pkg)
 {
+    r_libs_user_old <- Sys.getenv("R_LIBS_USER")
+    on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
+    r_libs_user <- paste(.libPaths(), collapse=.Platform$path.sep)
+    Sys.setenv(R_LIBS_USER=r_libs_user)
+
     libdir <- file.path(tempdir(), "lib")
     unlink(libdir, recursive=TRUE)
-    dir.create(libdir, showWarnings=FALSE)
+    if (!dir.create(libdir, showWarnings=FALSE))
+        stop("'dir.create' failed")
     stderr <- file.path(tempdir(), "install.stderr")
-    res <- system2(file.path(Sys.getenv("R_HOME"), "bin", "R"),
-        sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
-        libdir, pkg),
-        stdout=NULL, stderr=stderr)
+    if (!file.create(stderr))
+        stop("'file.create' stderr failed")
+    cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
+    args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
+                    libdir, pkg)
+    res <- system2(cmd, args, stdout=NULL, stderr=stderr)
     if (res != 0) 
     {
-        cat(paste(readLines(stderr), collapse="\n"))
+        cat(" cmd: ", cmd,
+            "\n  args: ", args,
+            "\n  stderr:",
+            "\n  ", paste(readLines(stderr), collapse="\n  "),
+            "\n", sep="")
         handleRequired(sprintf("%s must be installable!", pkg))
-
     }
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]
     args <- list(package=pkgname, lib.loc=libdir)
@@ -230,16 +241,6 @@ getPkgNameFromPkgDir <- function(pkgdir)
     ret <- sub(t, "", pkgdir)
     ret <- gsub(.Platform$file.sep, "", ret)
     ret
-}
-
-loadRefClasses <- function()
-{
-    assign(".requirements", new("MsgClass", msg=character(0)),
-        envir=.GlobalEnv)
-    assign(".recommendations", new("MsgClass", msg=character(0)),
-        envir=.GlobalEnv)
-    assign(".considerations", new("MsgClass", msg=character(0)),
-        envir=.GlobalEnv)
 }
 
 isInfrastructurePackage <- function(pkgDir)
