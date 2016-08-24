@@ -106,7 +106,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     if (file.exists(file.path("pkgdir", "DESCRIPTION")))
     {
-        vigns <- tools:::pkgVignettes(dir=pkgdir, check=TRUE)
+        vigns <- tools::pkgVignettes(dir=pkgdir, check=TRUE)
         if (is.null(vigns))
         {
             handleRequired("No vignettes!")
