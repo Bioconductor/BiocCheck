@@ -521,21 +521,27 @@ test_checkForBiocDevelSubscription <- function()
 test_checkForVersionNumberMismatch <- function()
 {
     pkgpath <- create_test_package('badpkg', list(Version="0.0.1"))
-    oldwd <- getwd()
-    on.exit(setwd(oldwd))
-    setwd(tempdir())
+    stopifnot(file.exists(pkgpath))
+
     cmd <- sprintf('"%s"/bin/R CMD build %s', R.home(), pkgpath)
     result <- system(cmd, intern=TRUE)
-    setwd(oldwd)
-    oldname <- file.path(tempdir(), "badpkg_0.0.1.tar.gz")
-    newname <- file.path(dirname(pkgpath), "badpkg_9.9.9.tar.gz")
-    file.rename(oldname, newname)
+
+    oldname <- "badpkg_0.0.1.tar.gz"
+    newname <- "badpkg_9.9.9.tar.gz"
+    if (!file.rename(oldname, newname))
+        stop("'file.rename()' failed to rename badkpgk",
+             "\n  oldname: ", oldname, " newname: ", newname,
+             "\n  cmd: ", cmd,
+             "\n  result:",
+             "\n    ", paste(result, collapse="\n    "),
+             "\n")
     BiocCheck:::installAndLoad(newname)
 
-    BiocCheck:::checkForVersionNumberMismatch(newname,
+    BiocCheck:::checkForVersionNumberMismatch(
+        newname,
         BiocCheck:::.get_package_dir(newname))
     checkEquals(.requirements$getNum(), 1)
-    zeroCounters()
+    .zeroCounters()
 }
 
 test_checkForDirectSlotAccess <- function()
