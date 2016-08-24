@@ -44,7 +44,7 @@ usage <- function()
 
 BiocCheck <- function(package, ...)
 {
-    loadRefClasses()
+    .zeroCounters()
     package <- normalizePath(package)
     # be careful here:
     if (.Platform$OS.type=="windows")
