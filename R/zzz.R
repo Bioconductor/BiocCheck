@@ -1,4 +1,4 @@
-setRefClass("MsgClass",
+.MsgClass <- setRefClass("MsgClass",
     fields=list(
         msg="character"
     ),
@@ -10,6 +10,20 @@ setRefClass("MsgClass",
         )
 )
 
+## singletons. Exported but 'hidden' from ls() by the '.'
+
+.requirements <- .MsgClass()
+
+.recommendations <- .MsgClass()
+
+.considerations <- .MsgClass()
+
+.zeroCounters <- function()
+{
+    .requirements$zero()
+    .recommendations$zero()
+    .considerations$zero()
+}
 
 .isScriptInstalled <- function()
 {
