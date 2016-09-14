@@ -561,7 +561,7 @@ checkForBadDepends <- function(pkgdir)
         if (any(res != -1))
         {
             res <- substr(output, res, nchar(output))
-            fns <- unique(substr(output, fns, fmatch.length-1))
+            fns <- substr(output, fns, fmatch.length-1)
             res <- gsub("'", "", fixed=TRUE, res)
             badFunctions <- paste(fns, collapse=", ")
             badObjects <- paste(res, collapse=", ")
