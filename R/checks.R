@@ -563,6 +563,9 @@ checkForBadDepends <- function(pkgdir)
             res <- substr(output, res, nchar(output))
             fns <- unique(substr(output, fns, fmatch.length-1))
             res <- gsub("'", "", fixed=TRUE, res)
+            inGlobals <- res %in% globalVariables(package=pkgname)
+            res <- res[!inGlobals]
+            fns <- fns[!inGlobals]
             badFunctions <- paste(fns, collapse=", ")
             badObjects <- paste(res, collapse=", ")
 
@@ -572,7 +575,7 @@ checkForBadDepends <- function(pkgdir)
             noteObjects <- c()
             noteFunctions <- c()
 
-            for (i in 1:length(fns))
+            for (i in seq_along(fns))
             {
                 found <- FALSE
                 sym <- res[i]

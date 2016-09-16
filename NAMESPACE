@@ -7,7 +7,7 @@ import(httr)
 importFrom(tools, parse_Rd, Rd2ex)
 importFrom(codetools, checkUsageEnv)
 importFrom(utils, Stangle, capture.output, data, getParseData, head,
-    packageDescription, packageVersion, untar)
+    packageDescription, packageVersion, untar, globalVariables)
 
 export(BiocCheck)
 export(usage)
