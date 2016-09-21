@@ -2,37 +2,38 @@
 
 .debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
     .printf(...)
+
 .msg <- function(..., appendLF=TRUE, indent=0, exdent=2)
 {
     txt <- sprintf(...)
     message(paste(strwrap(txt, indent=indent, exdent=exdent), collapse="\n"),
         appendLF=appendLF)
 }
-.stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
+.stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
 handleMessage <- function(msg, appendLF=TRUE)
 {
     .msg("* %s", msg, appendLF=appendLF)
 }
 
-handleRequired <- function(msg)
+handleError <- function(msg)
 {
-    .requirements$add(msg)
-    .msg("* REQUIRED: %s", msg, indent=4, exdent=6)
+    .error$add(msg)
+    .msg("* ERROR: %s", msg, indent=4, exdent=6)
     #.stop(msg)
 }
 
-handleRecommended <- function(msg)
+handleWarning <- function(msg)
 {
-    .recommendations$add(msg)
-    .msg("* RECOMMENDED: %s", msg, indent=4, exdent=6)
+    .warning$add(msg)
+    .msg("* WARNING: %s", msg, indent=4, exdent=6)
 }
 
-handleConsideration <- function(msg)
+handleNote <- function(msg)
 {
-    .considerations$add(msg)
-    .msg("* CONSIDER: %s", msg, indent=4, exdent=6)
+    .note$add(msg)
+    .msg("* NOTE: %s", msg, indent=4, exdent=6)
 }
 
 installAndLoad <- function(pkg)
@@ -60,7 +61,7 @@ installAndLoad <- function(pkg)
             "\n  stderr:",
             "\n  ", paste(readLines(stderr), collapse="\n  "),
             "\n", sep="")
-        handleRequired(sprintf("%s must be installable!", pkg))
+        handleError(sprintf("%s must be installable!", pkg))
     }
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]
     args <- list(package=pkgname, lib.loc=libdir)

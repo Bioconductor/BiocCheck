@@ -12,17 +12,17 @@
 
 ## singletons. Exported but 'hidden' from ls() by the '.'
 
-.requirements <- .MsgClass()
+.error <- .MsgClass()
 
-.recommendations <- .MsgClass()
+.warning <- .MsgClass()
 
-.considerations <- .MsgClass()
+.note <- .MsgClass()
 
 .zeroCounters <- function()
 {
-    .requirements$zero()
-    .recommendations$zero()
-    .considerations$zero()
+    .error$zero()
+    .warning$zero()
+    .note$zero()
 }
 
 .isScriptInstalled <- function()
