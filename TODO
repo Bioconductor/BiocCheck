@@ -25,8 +25,8 @@ X  either change NOTE to something else or be
     something more severe.
 X  remove ! from formatting NOTEs
   indent more -- maybe everything except
-  * REQUIRED
-  * RECOMMENDED
+  * ERROR
+  * WARNING
   * NOTE
   (and summary)
 

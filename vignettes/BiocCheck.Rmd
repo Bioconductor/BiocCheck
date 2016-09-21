@@ -11,23 +11,22 @@ output:
 
 # `BiocCheck`
 
-`BiocCheck` encapsulates Bioconductor package guidelines
-and best practices, analyzing packages and reporting three
-categories of issues:
+`BiocCheck` encapsulates _Bioconductor_ package guidelines and best
+practices, analyzing packages and reporting three categories of
+issues:
 
-* **REQUIRED** (Equivalent to an `ERROR` in `R CMD check`). This means the package
-  is missing something critical and it cannot be accepted into Bioconductor
-  until the issue is fixed. (`BiocCheck` will continue past a `required`
-  error, thus it is possible to have more than one, but it will exit
-  with an error code if run from the OS command line.)
-* **RECOMMENDED** (Equivalent to a `WARNING` in `R CMD check`). We strongly
-  encourage that these issues be fixed. In the weeks leading up to a
-  Bioconductor release we will ask package authors to fix these issues.
-* **CONSIDER**: Not necessarily something bad, just something we wanted to point
-  out. package authors don't need to take action on these, but they can.
-  These are analagous   to `NOTE`s in `R CMD check`, though unlike
-  `NOTE`s, there is no   expectation that they will increase in severity
-  over time.
+* **ERROR**. This means the package is missing something critical and
+  it cannot be accepted into _Bioconductor_ until the issue is
+  fixed. (`BiocCheck` will continue past an `ERROR`, thus it is
+  possible to have more than one, but it will exit with an error code
+  if run from the OS command line.)
+* **WARNING**. These issues almost always need to be addressed before
+  the package is added to _Bioconductor_. In the weeks leading up to a
+  _Bioconductor_ release we will ask package authors to fix these
+  issues.
+* **NOTE**: Not necessarily something bad, just something we wanted to
+  point out. package authors don't need to take action on these, but
+  they can.
 
 # Using `BiocCheck`
 
@@ -47,8 +46,7 @@ library(BiocCheck)
 BiocCheck("packageDirOrTarball")
 ```
 
-
-R CMD BiocCheck takes options which can be seen by running
+`R CMD BiocCheck` takes options which can be seen by running
 
     R CMD BiocCheck --help
 
@@ -56,51 +54,52 @@ R CMD BiocCheck takes options which can be seen by running
 suppressPackageStartupMessages(library(BiocCheck))
 usage()
 ```
-Note that the `--new-package` option is turned in in the package
-builder attached to the Bioconductor package tracker, since this
-is almost always used to build new packages that have been submitted.
-
+Note that the `--new-package` option is turned on in the package
+builder attached to the _Bioconductor_ package tracker, since this is
+almost always used to build new packages that have been submitted.
 
 # When should `BiocCheck` be run
 
 Run `BiocCheck` after running `R CMD check`.
 
-Note that `BiocCheck` is not a replacement for `R CMD check`;
-it is complementary. It should be run after `R CMD check`
-completes successfully.
+Note that `BiocCheck` is not a replacement for `R CMD check`; it is
+complementary. It should be run after `R CMD check` completes
+successfully.
 
 # Installing `BiocCheck`
 
 `BiocCheck` should be installed as follows:
 
 ```{r eval=FALSE}
-source("http://bioconductor.org/biocLite.R")
+source("https://bioconductor.org/biocLite.R")
 biocLite("BiocCheck")
 library(BiocCheck)
 ```
 
 The package loading process attempts to install a script called
-`BiocCheck`  (`BiocCheck.bat` on Windows) into  the `bin` directory of
+`BiocCheck` (`BiocCheck.bat` on Windows) into the `bin` directory of
 your `R` installation. If it fails to do that (most likely due to
 insufficient permissions), it will tell you, saying something like:
 
     Failed to copy the "script/BiocCheck" script to
-    /Library/Frameworks/R.framework/Resources/bin. If you want to be able
-    to run 'R CMD BiocCheck' you'll need to copy it yourself to a directory on your PATH, making sure it is executable.
-    See the BiocCheck vignette for more information.
+    /Library/Frameworks/R.framework/Resources/bin. If you want to be
+    able to run 'R CMD BiocCheck' you'll need to copy it yourself to a
+    directory on your PATH, making sure it is executable.  See the
+    BiocCheck vignette for more information.
 
-You can fix the problem by following these instructions (noting that `R` may
-live in a different directory on your system than what is shown above).
+You can fix the problem by following these instructions (noting that
+`R` may live in a different directory on your system than what is
+shown above).
 
 If you don't have permission to copy this file to the `bin` directory
 of your `R` installation, you can, as noted, copy it to any directory
 that's in your PATH. For assistance modifying your PATH, see this link
-([Windows](http://www.computerhope.com/issues/ch000549.htm)) or
-this one ([Mac/Unix](http://kb.iu.edu/data/acar.html)).
+([Windows](http://www.computerhope.com/issues/ch000549.htm)) or this
+one ([Mac/Unix](http://kb.iu.edu/data/acar.html)).
 
-If you manually copy this file to a directory in your PATH that is
-not your R bin directory, you'll continue to see the above message
-when (re-)installing `BiocCheck` but you can safely ignore it.
+If you manually copy this file to a directory in your PATH that is not
+your R bin directory, you'll continue to see the above message when
+(re-)installing `BiocCheck` but you can safely ignore it.
 
 # Interpreting `BiocCheck` output
 
@@ -108,34 +107,32 @@ Actual `BiocCheck` output is shown below in **bold**.
 
 ## Dependency Checks
 
-* **Checking if other packages can import this one...**
-  Checks to make sure that there will be no import problems
-  if another package imports your package. (`REQUIRED`)
-* **Checking to see if we understand object initialization....**
-  Reports if it can't figure out how objects were
-  initialized (`CONSIDER`).
+**Checking if other packages can import this one...**
+
+* Checks to make sure that there will be no import problems if another
+  package imports your package (`ERROR`).
+
+**Checking to see if we understand object initialization....**
+
+Reports if it can't figure out how objects were initialized (`NOTE`).
 
 ## Vignette Checks
 
 Can be disabled with `--no-check-vignettes`.
 
-
 **Checking vignette directory...**
 
+Only run if your package is a software package (as determined by your
+[biocViews](#biocViews_Checks)), or if package type cannot be
+determined.
 
-Only run if your package is a software package (as
-determined by your [biocViews](#biocViews_Checks)), or if
-package type cannot be determined.
-
-* Checks that `vignettes` directory exists. (`REQUIRED`)
-* Checks that it contains vignette sources
-  (*.Rmd, *.Rnw, *.Rrst, *.Rhtml, *.Rtex)
-  (`REQUIRED`)
-* If checking a directory (not a tarball), and vignette sources
-  exist in inst/doc, `RECOMMEND` they be removed.
-* Report the number of eval=FALSE chunks; if it's more than 50%
-  of the total, `RECOMMEND` that more chunks be evaluated.
-
+* Checks that the `vignettes` directory exists (`ERROR`).
+* Checks that the `vignettes` directory only contains vignette sources
+  *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
+* Checks whether, while checking a directory (not a tarball), vignette
+  sources exist in inst/doc (`ERROR`).
+* Checks wheher the number of `eval=FALSE` chunks is more than 50% of
+  the total (`ERROR`).
 
 **Checking whether vignette is built with 'R CMD build'...**
 
@@ -146,10 +143,8 @@ It simply looks for a line that starts:
 
     * creating vignettes ...
 
-If this line is not present, it means `R` has not detected that a vignette
-needs to be built.
-
-It's `REQUIRED` that the vignette be built.
+If this line is not present, it means `R` has not detected that a
+vignette needs to be built (`ERROR`).
 
 If you have vignette sources yet still get this message, there could
 be several causes:
@@ -157,96 +152,96 @@ be several causes:
 * Missing or invalid `VignetteBuilder` line in the `DESCRIPTION` file.
 * Missing or invalid `VignetteEngine` line in the vignette source.
 
-See `knitr`'s [package vignette](http://yihui.name/knitr/demo/vignette/)
-page, or the
-[Non-Sweave vignettes](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Non_002dSweave-vignettes)
-section of "Writing R Extensions" for more information.
+See `knitr`'s [package vignette][1] page, or the
+[Non-Sweave vignettes][2] section of "Writing R Extensions" for more
+information.
 
-
-
+[1]: http://yihui.name/knitr/demo/vignette/
+[2]: https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Non_002dSweave-vignettes
 
 ## Version Checks
 
-**Checking version number...**
-
 * **Checking new package version number...**
-  Checks that the version number is valid for a new Bioconductor
-  package. This is only done if the `--new-package` option is supplied.
-  (`REQUIRED`).
+  Checks that the version number is valid for a new _Bioconductor_
+  package. This is only done if the `--new-package` option is
+  supplied (`ERROR`).
 * **Checking version number validity...**
-  Checks for a valid version, that format is correct and that
-  version number is appropriate for this version of Bioconductor.
-  (`REQUIRED`).
+  Checks for a valid version, that format is correct and that version
+  number is appropriate for this version of _Bioconductor_ (`ERROR`).
 * **Checking R Version dependency...**
   If you specify an R version in the `Depends:` field of your
-  `DESCRIPTION` file, `BiocCheck` checks to make sure that the R version
-  specified matches the version currently used by
-  Bioconductor. This prevents the package from being
-  used in earlier versions of R, which is not recommended
-  and is a frequent cause of errors. (`RECOMMENDED`)
-* **Checking for version number mismatch...** Checks that the
-  package version specified in your
-  package tarball (if you are checking a tarball) matches
-  the value of the `Version:` field in your `DESCRIPTION` file.
-  If it doesn't, it usually means you did not build the tarball
-  with `R CMD build`. (`REQUIRED`)
+  `DESCRIPTION` file, `BiocCheck` checks to make sure that the R
+  version specified matches the version currently used by
+  _Bioconductor_. This prevents the package from being used in earlier
+  versions of R, which is not recommended and is a frequent cause of
+  user confusion (`WARNING`).
+* **Checking for version number mismatch...**
+  Checks that the package version specified in your package tarball
+  (if you are checking a tarball) matches the value of the `Version:`
+  field in your `DESCRIPTION` file.  If it doesn't, it usually means
+  you did not build the tarball with `R CMD build`. (`ERROR`)
 
 For more information on package versions, see the
-[Version Numbering HOWTO](http://www.bioconductor.org/developers/how-to/version-numbering/).
+[Version Numbering HOWTO][3].
+
+[3]: http://www.bioconductor.org/developers/how-to/version-numbering/
 
 ## biocViews Checks
 
-These can be disabled with the `--no-check-bioc-views` option,
-which might be useful when checking non-Bioconductor packages
-(since biocViews is a concept unique to Bioconductor).
+These can be disabled with the `--no-check-bioc-views` option, which
+might be useful when checking non-_Bioconductor_ packages (since
+biocViews is a concept unique to _Bioconductor_).
 
 **Checking biocViews...**
 
 * **Checking that biocViews are present...**
-  Checks that a `biocViews` field is present in the DESCRIPTION file.
-  (`REQUIRED`).
+  Checks that a `biocViews` field is present in the DESCRIPTION file
+  (`ERROR`).
 * **Checking for non-trivial biocViews...**
-  Checks that biocViews are more specific than the top-level terms Software,
-  AnnotationData, or ExperimentData (`REQUIRED`)
+  Checks that biocViews are more specific than the top-level terms
+  Software, AnnotationData, or ExperimentData (`ERROR`).
 * **Checking biocViews validity...**
-  Checks for valid views and displays invalid ones. Note that biocViews
-  are case-sensitive. (`RECOMMENDED`)
+  Checks for valid views and displays invalid ones. Note that
+  biocViews are case-sensitive (`WARNING`).
 * **Checking that biocViews come from the same category...**
   Checks that all views come from the same parent (one of Software,
-  AnnotationData, ExperimentData) (`RECOMMENDED`).
+  AnnotationData, ExperimentData) (`WARNING`).
 * **Checking for recommended biocViews...**
   Uses the `recommendBiocViews()` function from `biocViews` to
   automatically suggest some biocViews for your package.
 
 More information about biocViews is available in the
-[Using biocViews HOWTO](http://www.bioconductor.org/developers/how-to/biocViews/).
+[Using biocViews HOWTO][4].
+
+[4]: http://www.bioconductor.org/developers/how-to/biocViews/
 
 ## Build System Compatibility Checks
 
-The Bioconductor Build System (BBS) is our nightly build system and it has
-certain requirements. Packages which don't meet these requirements can
-be silently skipped by BBS, so it's important to make sure
-that every package meets the requirements. All of the following items
-are `REQUIRED`.
+The _Bioconductor_ Build System (BBS) is our nightly build system and
+it has certain requirements. Packages which don't meet these
+requirements can be silently skipped by BBS, so it's important to make
+sure that every package meets the requirements.
 
 **Checking build system compatibility...**
 
 * **Checking for blank lines in DESCRIPTION...**
-  Checks to make sure there are no blank lines in the
-  DESCRIPTION file.
+  Checks to make sure there are no blank lines in the DESCRIPTION
+  file (`ERROR`).
 * **Checking for whitespace in DESCRIPTION field names...**
-  Checks to make sure there is no whitespace in DESCRIPTION
-  file field names.
+  Checks to make sure there is no whitespace in DESCRIPTION file field
+  names (`ERROR`).
 * **Checking that Package field matches dir/tarball name...**
-  Checks to make sure that `Package` field of DESCRIPTION file
-  matches directory or tarball name.
+  Checks to make sure that `Package` field of DESCRIPTION file matches
+  directory or tarball name (`ERROR`).
 * **Checking for Version field...**
-  Checks to make sure a `Version` field is present in
-  the DESCRIPTION file.
+  Checks to make sure a `Version` field is present in the DESCRIPTION
+  file (`ERROR`).
 * **Checking for valid maintainer...**
   Checks to make sure the DESCRIPTION file has either a `Maintainer`
   field, or a valid `Authors@R` field which resolves to a valid
-  `Maintainer`, which consists of:
+  `Maintainer` (`ERROR`).
+
+  A valid `Authors@R` field consists of:
     * A valid R object of class `person`.
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
@@ -255,26 +250,23 @@ are `REQUIRED`.
 
 **Checking unit tests...**
 
-We strongly believe in unit tests, though we do not at present
-require them. For more on what unit tests are, why they are helpful,
-and how to implement them, read our
-[Unit Testing HOWTO](http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/).
+We strongly recommend unit tests, though we do not at present require
+them. For more on what unit tests are, why they are helpful, and how
+to implement them, read our [Unit Testing HOWTO][5].
+
+[5]: http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/
 
 At present we just check to see whether unit tests are present, and if not,
-urge you to `CONSIDER` adding them.
+urge you to add them (`NOTE`).
 
 ## Native Routine Registration Checks
 
 **Checking native routine registration...**
 
-Calls to native (C or Fortran) code entry points should be registered with
-R. This is documented in the
-[Writing R Extensions](http://cran.r-project.org/doc/manuals/r-release/R-exts.html#Registering-native-routines)
-manual.
+Calls to native (C or Fortran) code entry points should be registered
+with R; see [Writing R Extensions][6] (`ERROR`).
 
-If `BiocCheck` detects that your package has native code, but no
-entry points have been registered, it will `RECOMMEND` that you
-register them.
+[6]: http://cran.r-project.org/doc/manuals/r-release/R-exts.html#Registering-native-routines
 
 ## Namespace Import Suggestion Checks
 
@@ -285,150 +277,140 @@ to see if it has suggestions for the "Imports" section of your package
 NAMESPACE.
 
 `codetoolsBioC` is an experimental package that is not presently
-available via `biocLite()`. It is available from
-[our Subversion repository](https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/codetoolsBioC)
- with the credentials readonly/readonly.
+available via `biocLite()`. It is available from our
+[Subversion repository][7] with the credentials readonly/readonly.
+Output of codetoolsBioC is printed to the screen but `BiocCheck` does
+not label it ERROR, WARNING, or NOTE.
 
- Output of codetoolsBioC is printed to the screen but `BiocCheck`
- does not label it REQUIRED, RECOMMENDED, or CONSIDER.
+[7]: https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/codetoolsBioC
 
 ## Deprecated Package Checks
 
 **Checking for deprecated package usage...**
 
- At present, this just looks to see whether your package has a
- dependency on the `multicore` package, and if so, `REQUIRE`s you
- to remove it. `multicore` does not work on Windows, but the
- `parallel` package has all of the same functionality and works
- on all operating systems.
+At present, this looks to see whether your package has a dependency on
+the `multicore` package (`ERROR`).
 
- Note that `parallel` supports two types of parallelism: forking and socket clusters. Forking only works on Windows if the number of cores is set to 1,
- meaning there is no gain from parallelizing code. Socket clusters
- work on all operating systems.
+Our recommendation is to use [BiocParallel][7.1]. Note that 'fork'
+clusters do not rpovide any gain from parallelizing code on
+Windows. Socket clusters work on all operating systems.
+
+[7.1]: https://bioconductor.org/packages/BiocParallel
 
 ## Code Parsing Checks
 
- `BiocCheck` parses the code in your package's R directory,
- and in evaluated man page and vignette examples to look for various
- symbols, which result in issues of varying severity:
+`BiocCheck` parses the code in your package's R directory, and in
+evaluated man page and vignette examples to look for various symbols,
+which result in issues of varying severity.
 
 **Checking parsed R code in R directory, examples, vignettes...**
 
 * **Checking for T...** **Checking for F...**
-  It's `RECOMMENDED` to replace `T` and `F` with `TRUE` and `FALSE`.
-  This is because `T` and `F` are ordinary variables whose value
-  can be altered, leading to unexpected results, whereas the value
-  of `TRUE` and `FALSE` cannot be changed.
+  It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
+  is because `T` and `F` are ordinary variables whose value can be
+  altered, leading to unexpected results, whereas the value of `TRUE`
+  and `FALSE` cannot be changed  (`WARNING`).
 * **Checking for browser()...**
-  It's `RECOMMENDED` to remove `browser()` calls from code. This
-  function causes the command-line R debugger to be invoked, and
-  should not be used in production code (though it's OK to wrap
-  such calls in a conditional that evaluates to TRUE if some debugging
-  option is set).
+  `browser()` causes the command-line R debugger to be invoked, and
+  should not be used in production code (though it's OK to wrap such
+  calls in a conditional that evaluates to TRUE if some debugging
+  option is set)  (`WARNING`).
 * **Checking for <<-...**
-  `CONSIDER` removing the symbol `<<-` from R code; it's generally
-  not a good idea to use it.
-* **Checking for library/require of *(your package name)*...**
-  We `RECOMMEND` that you not call `library()` or `require()` on
-  your own package within code in the R directory or in man page
-  examples, because it's not necessary. In these contexts, your
-  package is already loaded.
+  Non-local assignment using `<<-` is bad practice. It can over-write
+  user-defined symbols, and introduces non-linear paths of evaluation
+  that are difficult to debug (`NOTE`).
+* **Checking for library/require of *(your package name)*...** (`ERROR`)
+  It is not necessary to call `library()` or `require()` on your own
+  package within code in the R directory or in man page examples. In
+  these contexts, your package is already loaded.
 * **Checking for direct slot access...**
-  `BiocCheck` checks for direct slot access to S4 objects in
-  vignette and example code. This code should **always** use
-  accessors to interact with S4 classes. Since you may be using
-  S4 classes (which don't provide accessors) from another package,
-  the severity is only  `CONSIDER`. But if the S4
-  object is defined in your package, it's **mandatory** to write
-  accessors for it and to use them (instead of direct slot access)
-  in all vignette and example code.
+  `BiocCheck` checks for direct slot access (via `@` or `slot()`) to
+  S4 objects in vignette and example code. This code should **always**
+  use accessors to interact with S4 classes. Since you may be using S4
+  classes (which don't provide accessors) from another package, the
+  severity is only `NOTE`. But if the S4 object is defined in your
+  package, it's **mandatory** to write accessors for it and to use
+  them (instead of direct slot access) in all vignette and example
+  code (`NOTE`).
 
 ## DESCRIPTION/NAMESPACE consistency checks
 
 **Checking DESCRIPTION/NAMESPACE consistency...**
 
-`BiocCheck` detects packages that are imported in
-NAMESPACE but not DESCRIPTION, or vice versa, and
-`RECOMMENDS` fixing them, with an explanation of
-how to do so.
+`BiocCheck` detects packages that are imported in NAMESPACE but not
+DESCRIPTION, or vice versa, and provides an explanation of how to fix
+this (`ERROR`).
 
 ## Function length checking
 
 **Checking function lengths**
 
-`BiocCheck` prints an informative message about the length
-(in lines) of your five longest functions (this includes functions
-in your R directory and in evaluated man page and vignette examples).
+`BiocCheck` prints an informative message about the length (in lines)
+of your five longest functions (this includes functions in your R
+directory and in evaluated man page and vignette examples).
 
-`BiocCheck` does not assign severity to long functions, but
-you may want to consider breaking up long functions into smaller
-ones. This is a basic refactoring technique that results
-in code that's easier to read, debug, test, and maintain.
+`BiocCheck` does not assign severity to long functions, but you may
+want to consider breaking up long functions into smaller ones. This is
+a basic refactoring technique that results in code that's easier to
+read, debug, test, reuse, and maintain.
 
-## Man Page checking
+## man page checking
 
 **Checking man pages...**
 
-`RECOMMENDS` that every man page has a non-empty
-`\value` section. Other man page checks may be added in the future.
+Every man page must have a non-empty `\value` section. (`ERROR`)
 
 ## Runnable Examples Checking
 
 **Checking exported objects have runnable examples...**
 
-`BiocCheck` looks at all man pages which document exported objects
-and lists the ones that don't contain runnable examples (either because
-there is no `examples` section or because its examples are tagged
-with `dontrun` or `donttest`).
-It's `REQUIRED` that at least 80% of these man
-pages have runnable examples. If more than 80% of these pages
-have runnable examples, but some are still missing, `BiocCheck`
-lists the missing ones and asks you to `CONSIDER` adding runnable
-examples to them.
+`BiocCheck` looks at all man pages which document exported objects and
+lists the ones that don't contain runnable examples (either because
+there is no `examples` section or because its examples are tagged with
+`dontrun` or `donttest`). Runnable examples are a key part of literate
+programming and help ensure that your code does what you say it does.
 
-Runnable examples are a key part of literate programming and
-help ensure that your code does what you say it does.
+* Checks that at least 80% of man pages must have runnable examples (`ERROR`).
+* Checks that, if more than 80% of the man pages have runnable
+  examples, but some are still missing, `BiocCheck` lists the missing
+  ones and asks you to add runnable examples to them (`NOTE`).
 
 ## NEWS checks
 
 **Checking package NEWS...**
 
-`BiocCheck` looks to see if there is a valid NEWS file
-(NEWS or NEWS.Rd) either in the 'inst' directory or in
-the top-level directory of your package, and checks whether
-it is properly formatted.
+`BiocCheck` looks to see if there is a valid NEWS file (NEWS or
+NEWS.Rd) either in the 'inst' directory or in the top-level directory
+of your package, and checks whether it is properly formatted (`NOTE`).
 
-NEWS files are a good way to keep users up-to-date on changes
-to your package. Excerpts from properly formatted NEWS
-files will be included in Bioconductor release announcements
-to tell users what has changed in your package in the last
-release. In order for this to happen, your NEWS file must
-be formatted in a specific way; you may want to consider
-using an `inst/NEWS.Rd` file instead as the format
-is more well-defined.
+NEWS files are a good way to keep users up-to-date on changes to your
+package. Excerpts from properly formatted NEWS files will be included
+in _Bioconductor_ release announcements to tell users what has changed
+in your package in the last release. In order for this to happen, your
+NEWS file must be formatted in a specific way; you may want to
+consider using an `inst/NEWS.Rd` file instead as the format is more
+well-defined.
 
-More information on NEWS files is available in the help topic
-`?news`.
+More information on NEWS files is available in the help topic `?news`.
 
 ## Formatting checks
 
 **Checking formatting of DESCRIPTION, NAMESPACE, man pages, R source, and vignette source...**
 
-There is no 100% correct way to format code. There are various
-style guides, and these checks adhere to
-[Bioconductor's Style Guide](http://www.bioconductor.org/developers/how-to/coding-style/).
+There is no 100% correct way to format code. These checks adhere to the
+[_Bioconductor_ Style Guide][8] (`NOTE`).
 
-We ask only that you `CONSIDER` adhering to this guide.
+[8]: http://www.bioconductor.org/developers/how-to/coding-style/
 
-In particular, we think it's important to avoid very long lines in code.
-Note that some text editors do not wrap text automatically, requiring
-horizontal scrolling in order to read it. Also note that R syntax
-is very flexible and whitespace can be inserted almost anywhere in
-an expression, making it easy to break up long lines.
+We think it's important to avoid very long lines in code.  Note that
+some text editors do not wrap text automatically, requiring horizontal
+scrolling in order to read it. Also note that R syntax is very
+flexible and whitespace can be inserted almost anywhere in an
+expression, making it easy to break up long lines.
 
-These checks are run against not just R code, but the DESCRIPTION
-and NAMESPACE files as well as man pages and vignette source files.
-All of these files allow long lines to be broken up.
+These checks are run against not just R code, but the DESCRIPTION and
+NAMESPACE files as well as man pages and vignette source files.  All
+of these files allow long lines to be broken up.
 
 ## Canned Comments check
 
@@ -439,51 +421,50 @@ RStudio. These skeletons contain comments that look like this:
 
     %%  ~~ A concise (1-5 lines) description of the dataset. ~~
 
-`BiocCheck` asks you to `CONSIDER` removing such comments.
+`BiocCheck` asks you to remove such comments (`NOTE`).
 
 ## Duplication checks
 
 * **Checking if package already exists in CRAN...**
-  If a package with the same name (case differences are ignored)
-  exists in CRAN, we `REQUIRE` that you rename your
-  package.
-* **Checking if new package already exists in Bioconductor...**
-  Only run if the `--new-package` flag is turned on.
-  If a package with the same name (case differences are ignored)
-  already exists in Bioconductor, we `REQUIRE` that you rename
-  your package.
 
+  A package with the same name (case differences are ignored) cannot
+  exist in CRAN (`ERROR`).
+* **Checking if new package already exists in _Bioconductor_...**
+  Only run if the `--new-package` flag is turned on.  A package
+  with the same name (case differences are ignored) cannot  exist in
+  _Bioconductor_ (`ERROR`).
 
 ## bioc-devel Subscription Check
 
 **Checking for bioc-devel mailing list subscription...**
 
-This only applies if `BiocCheck` is run on the
-Bioconductor build machines, because this step requires
-special authorization.
+This only applies if `BiocCheck` is run on the _Bioconductor_ build
+machines, because this step requires special authorization.
 
-If this authorization is present, `BiocCheck` will
-check to see if the email address in the Maintainer
-(or Authors@R) field is subscribed to the bioc-devel
-mailing list, and if not, `REQUIRE`s that you
-subscribe. All maintainers must subscribe to this list.
-You can subscribe
-[here](https://stat.ethz.ch/mailman/listinfo/bioc-devel).
+* Check that the email address in the Maintainer (or Authors@R) field
+  is subscribed to the bioc-devel mailing list (`ERROR`).
 
-## Support site Registration Check
+  All maintainers must subscribe to the bioc-devel mailing list, with
+  the email address used in the DESCRIPTION file.  You can subscribe
+  [here][9].
+
+[9]: https://stat.ethz.ch/mailman/listinfo/bioc-devel
+
+## Support Site Registration Check
 
 **Checking for support site registration...**
 
-The main place people ask questions about Bioconductor packages
-is our [support site](https://support.bioconductor.org).
-In order to provide people with the best support, package
-maintainers are `REQUIRE`d to register at the support site using
-the same email address that is in the `Maintainer` field of
-their package `DESCRIPTION` file. Please
-[register](https://support.bioconductor.org/accounts/signup/)
-and then optionally include your (lowercased) package name in
-the list of
-[watched tags](https://support.bioconductor.org/profile/#div_id_watched_tags).
-When a question is asked and tagged with your package name, you'll get
-an email. (If you don't add your package to the list of watched
-tags, this will be automatically done for you).
+* Check that the package maintainer is register at our
+  [support site][10] using the same email address that is in the
+  `Maintainer` field of their package `DESCRIPTION` file (`ERROR`).
+
+  The main place people ask questions about _Bioconductor_ packages is
+  the support site.  Please [register][11] and then optionally include
+  your (lowercased) package name in the list of [watched tags][12].
+  When a question is asked and tagged with your package name, you'll
+  get an email. (If you don't add your package to the list of watched
+  tags, this will be automatically done for you).
+
+[10]: https://support.bioconductor.org
+[11]: https://support.bioconductor.org/accounts/signup/
+[12]: https://support.bioconductor.org/profile/#div_id_watched_tags
