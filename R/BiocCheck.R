@@ -159,13 +159,13 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",
         "SYMBOL")
-    if (res > 0) handleRecommended(sprintf(
+    if (res > 0) handleWarning(sprintf(
         "Use TRUE instead of T (found in %s files)",
         res))
     handleMessage("Checking for F...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "F",
         "SYMBOL")
-    if (res > 0) handleRecommended(sprintf(
+    if (res > 0) handleWarning(sprintf(
         "Use FALSE instead of F (found in %s files)",
         res))
 
@@ -173,7 +173,7 @@ BiocCheck <- function(package, ...)
     res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
         "SYMBOL_FUNCTION_CALL")
     if (res > 0)
-        handleRecommended(sprintf(
+        handleWarning(sprintf(
             "Remove browser() statements (found in %s files)",
             res))
 
@@ -181,13 +181,12 @@ BiocCheck <- function(package, ...)
     res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
         "LEFT_ASSIGN")
     if (res > 0)
-        handleConsideration(sprintf("Avoiding '<<-'' if possible (found in %s files)",
+        handleNote(sprintf("Avoiding '<<-'' if possible (found in %s files)",
             res))
 
     handleMessage(sprintf("Checking for library/require of %s...",
         package_name))
     checkForLibraryMe(package_name, parsedCode)
-
 
     handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
     checkDescriptionNamespaceConsistency(package_name)
@@ -230,12 +229,11 @@ BiocCheck <- function(package, ...)
     handleMessage("Checking for support site registration...")
     checkForSupportSiteRegistration(package_dir)
 
-
     ## Summary
     .msg("\n\nSummary:")
-    .msg("REQUIRED count: %s", .requirements$getNum())
-    .msg("RECOMMENDED count: %s", .recommendations$getNum())
-    .msg("CONSIDERATION count: %s", .considerations$getNum())
+    .msg("ERROR count: %d", .error$getNum())
+    .msg("WARNING count: %d", .warning$getNum())
+    .msg("NOTE count: %d", .note$getNum())
     .msg(paste0("For detailed information about these checks, ",
     "see the BiocCheck vignette, available at ",
         sprintf("http://bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#interpreting-bioccheck-output",
@@ -243,7 +241,7 @@ BiocCheck <- function(package, ...)
         exdent=0)
 
 
-    if (.requirements$getNum() > 0)
+    if (.error$getNum() > 0)
     {
         errcode <- 1
         .msg("BiocCheck FAILED.")
@@ -255,9 +253,10 @@ BiocCheck <- function(package, ...)
     {
         q("no", errcode)
     } else {
-        return (list(requirements=.requirements$get(),
-            recommendations=.recommendations$get(),
-            considerations=.considerations$get()))
+        return (list(
+            error=.error$get(),
+            warning=.warning$get(),
+            note=.note$get()))
     }
 
 }
