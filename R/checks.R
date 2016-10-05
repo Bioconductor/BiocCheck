@@ -1,5 +1,3 @@
-
-
 getVigSources <- function(dir)
 {
     dir(dir,
@@ -507,10 +505,31 @@ checkDeprecatedPackages <- function(pkgdir)
     }
 }
 
+.checkEnv <- function(env, walker) {
+    ## look at all closures in 'env' using codetools-derived 'walker'
+    for (n in ls(env, all.names = TRUE)) {
+        v <- get(n, envir = env)
+        if (typeof(v) == "closure")
+            walkCode(body(v), walker)
+    }
+    walker
+}
 
-
-
-
+.colonWalker <- function() {
+    ## record all pkg used as pkg::foo or pkg:::bar
+    PKGS <- character()
+    collector <- function(e, w)
+        PKGS <<- append(PKGS, as.character(e[[2]]))
+    list(handler=function(v, w) {
+        switch(v, "::"=collector, ":::"=collector, NULL)
+    }, call=function(e, w) {
+        for (ee in as.list(e)) if (!missing(ee)) walkCode(ee, w)
+    }, leaf = function(e, w) {
+        NULL
+    }, done = function() {
+        sort(unique(PKGS))
+    })
+}
 
 checkDescriptionNamespaceConsistency <- function(pkgname)
 {
@@ -522,9 +541,15 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
     if(!(all(dImports %in% nImports)))
     {
         badones <- dImports[!dImports %in% nImports]
-        handleWarning(sprintf(
-            "Import %s in NAMESPACE as well as DESCRIPTION.",
-            paste(badones, collapse=", ")))
+        tryCatch({
+            ## FIXME: not 100% confident that the following always succeeds
+            dcolon <- .checkEnv(loadNamespace(pkgname), .colonWalker())$done()
+            badones <- setdiff(badones, dcolon)
+        }, error=function(...) NULL)
+        if (length(badones))
+            handleWarning(sprintf(
+                "Import %s in NAMESPACE as well as DESCRIPTION.",
+                paste(badones, collapse=", ")))
     }
     if (!all (nImports %in% dImports))
     {
