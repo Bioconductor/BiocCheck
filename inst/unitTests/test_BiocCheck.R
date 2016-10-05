@@ -34,8 +34,10 @@ create_test_package <- function(pkgpath, description=list(),
     }
     path <- file.path(tempdir(), pkgpath)
     unlink(path, recursive=TRUE)
-    devtools::create(path, canned, rstudio=FALSE)
-    message("PACKAGE CREATED")
+    capture.output({
+        suppressMessages(devtools::create(path, canned, rstudio=FALSE))
+    })
+
     cat("#", file=file.path(path, "NAMESPACE"))
     extraActions(path)
     path
