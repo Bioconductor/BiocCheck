@@ -5,7 +5,7 @@ importMethodsFrom(graph, acc, nodes)
 import(biocViews)
 import(httr)
 importFrom(tools, parse_Rd, Rd2ex)
-importFrom(codetools, checkUsageEnv)
+importFrom(codetools, walkCode)
 importFrom(utils, Stangle, capture.output, data, getParseData, head,
     packageDescription, packageVersion, untar, globalVariables)
 
