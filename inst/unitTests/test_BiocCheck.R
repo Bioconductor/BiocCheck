@@ -323,16 +323,58 @@ test_checkForBrowser <- function()
 
 test_checkDescriptionNamespaceConsistency <- function()
 {
+    run_check <- function(pkg)
+        suppressMessages({
+            BiocCheck:::checkDescriptionNamespaceConsistency(pkg)
+        })
+
     testpkg <- 'testpkg'
 
     .zeroCounters()
 
     pkgpath <- create_test_package(testpkg, list(Imports="devtools"))
     BiocCheck:::installAndLoad(pkgpath)
-    BiocCheck:::checkDescriptionNamespaceConsistency(testpkg)
+    run_check(testpkg)
     checkTrue(.warning$getNum() == 1)
     checkEquals("Import devtools in NAMESPACE as well as DESCRIPTION.",
         .warning$get()[1])
+
+    .zeroCounters()
+
+    pkgpath <- create_test_package(
+        testpkg, list(Imports="devtools"),
+        extraActions=function(path) {
+            cat("import(devtools)\n", file=file.path(path, "NAMESPACE"))
+        })
+    BiocCheck:::installAndLoad(pkgpath)
+    run_check(testpkg)
+    checkTrue(.warning$getNum() == 0L)
+
+    .zeroCounters()
+
+    pkgpath <- create_test_package(
+        testpkg, list(Imports="devtools"),
+        extraActions=function(path) {
+            cat("f = function() devtools::create()\n",
+                file=file.path(path, "R", "f.R"))
+        })
+    BiocCheck:::installAndLoad(pkgpath)
+    run_check(testpkg)
+    checkTrue(.warning$getNum() == 0L)
+
+    .zeroCounters()
+
+    pkgpath <- create_test_package(
+        testpkg, list(Imports="devtools, dplyr"),
+        extraActions=function(path) {
+            cat("f = function() devtools::create()\n",
+                file=file.path(path, "R", "f.R"))
+        })
+    BiocCheck:::installAndLoad(pkgpath)
+    run_check(testpkg)
+    checkTrue(.warning$getNum() == 1L)
+    checkIdentical("Import dplyr in NAMESPACE as well as DESCRIPTION.",
+                   .warning$get())
 
     .zeroCounters()
 
@@ -340,14 +382,12 @@ test_checkDescriptionNamespaceConsistency <- function()
         cat("import(devtools)\n", file=file.path(path, "NAMESPACE"))
     })
     BiocCheck:::installAndLoad(pkgpath)
-
     checkTrue("devtools" %in% names(getNamespaceImports(testpkg)))
 
-    BiocCheck:::checkDescriptionNamespaceConsistency(testpkg)
+    run_check(testpkg)
     checkTrue(.warning$getNum() == 1)
     checkEquals("Import devtools in DESCRIPTION as well as NAMESPACE.",
         .warning$get()[1])
-
 }
 
 test_checkImportSuggestions <- function()
