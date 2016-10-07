@@ -55,8 +55,7 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
     res <- findSymbolInParsedCode(parsedCode, package_name, "@", "'@'")
     if (res > 0)
     {
-        handleNote(paste("Using accessors;",
-            "don't access S4 class slots via",
+        handleNote(paste("Use accessors; don't access S4 class slots via",
             "'@' in examples/vignettes."))
     }
 }
@@ -300,11 +299,11 @@ checkBiocViews <- function(pkgdir)
 
     if (!is.null(rec))
     {
-        if (length(rec$recommended) == 1 && rec$recommended == "")
+        if (length(rec$recommended) == 1 && !nzchar(rec$recommended))
         {
         } else {
             handleNote(paste(
-                "Adding some of these automatically suggested biocViews: ",
+                "Consider adding these automatically suggested biocViews: ",
                 rec$recommended))
             dirty <- TRUE
         }
@@ -431,8 +430,8 @@ checkUnitTests <- function(pkgdir)
     if (!(dir.exists(tests_dir) && cond))
     ## end stolen code
     {
-        msg <- paste0("Adding unit tests.\n",
-            "  We strongly encourage them. See\n",
+        msg <- paste0(
+            "Consider adding unit tests. We strongly encourage them. See\n",
             "  http://bioconductor.org/developers/how-to/unitTesting-guidelines/."
             )
         handleNote(msg)
@@ -657,7 +656,7 @@ checkForBadDepends <- function(pkgdir)
                 }
 
                 msg <- sprintf(paste(
-                    "Clarifying how %s %s (used in %s)",
+                    "Consider clarifying how %s %s (used in %s)",
                     "%s initialized. Maybe %s part of a",
                     "data set loaded with data(), or perhaps part of",
                     "an object referenced in with() or within()."),
@@ -1000,7 +999,7 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
             "The following pages do not:"))
     } else {
         if (length(badManPages) > 0)
-        handleNote(paste0("Adding runnable examples to the following ",
+        handleNote(paste("Consider adding runnable examples to the following",
             "man pages which document exported objects:"))
     }
     if (length(badManPages) > 0)
@@ -1017,9 +1016,9 @@ checkNEWS <- function(pkgdir)
     news <- head(newsloc[file.exists(newsloc)], 1)
     if (0L == length(news))
     {
-        handleNote(paste0("Adding a NEWS file, so your ",
-            "package news will be included",
-            " in Bioconductor release announcements."))
+        handleNote(paste(
+            "Consider adding a NEWS file, so your package news will be included",
+            "in Bioconductor release announcements."))
         return()
     }
     .build_news_db_from_package_NEWS_Rd <-
@@ -1064,7 +1063,7 @@ checkFormatting <- function(pkgdir)
         if (file.exists(file) && file.info(file)$size == 0)
         {
             pkgname <- getPkgNameFromPkgDir(pkgdir)
-            handleNote(sprintf("Adding content to the empty file %s.",
+            handleNote(sprintf("Add content to the empty file %s.",
                 mungeName(file, pkgname)))
         }
 
@@ -1105,24 +1104,24 @@ checkFormatting <- function(pkgdir)
     {
         ok <- FALSE
         handleNote(sprintf(
-            "Shortening lines; %s lines (%i%%) are > 80 characters long.",
-            longlines, as.integer((longlines/totallines) * (100/1) )))
+            "Consider shorter lines; %s lines (%i%%) are > 80 characters long.",
+            longlines, as.integer((longlines/totallines) * 100)))
     }
     if (tablines > 0)
     {
         ok <- FALSE
         handleNote(sprintf(
-            "Replacing tabs with 4 spaces; %s lines (%i%%) contain tabs.",
+            "Consider 4 spaces instead of tabs; %s lines (%i%%) contain tabs.",
             tablines, as.integer((tablines/totallines) * (100/1) )))
     }
     if (badindentlines > 0)
     {
         ok <- FALSE
-        handleNote(sprintf(paste0(
-            "Indenting lines with a multiple of 4 spaces;",
-            " %s lines (%i%%) are not."),
+        handleNote(sprintf(paste(
+            "Consider indenting lines with a multiple of 4 spaces;",
+            "%s lines (%i%%) are not."),
             badindentlines,
-            as.integer((badindentlines/totallines) * (100/1) )))
+            as.integer((badindentlines/totallines) * 100)))
 
     }
 
@@ -1147,7 +1146,7 @@ checkForPromptComments <- function(pkgdir)
     if (length(bad) > 0)
     {
         handleNote(sprintf(
-            "Removing generated comments from man pages %s ",
+            "Remove generated comments from man pages %s ",
             paste(bad, collapse=", ")))
     }
 }
