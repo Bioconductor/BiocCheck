@@ -412,6 +412,10 @@ These checks are run against not just R code, but the DESCRIPTION and
 NAMESPACE files as well as man pages and vignette source files.  All
 of these files allow long lines to be broken up.
 
+The output of this check includes the first 6 offending lines of code;
+see more with `BiocCheck:::checkFormatting("path/to/YourPackage",
+nlines=Inf)`.
+
 ## Canned Comments check
 
 **Checking for canned comments in man pages...**
