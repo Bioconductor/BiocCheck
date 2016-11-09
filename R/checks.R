@@ -1062,6 +1062,10 @@ checkFormatting <- function(pkgdir, nlines=6)
     {
         if (file.exists(file) && file.info(file)$size == 0)
         {
+<<<<<<< d8d36c8df634481a167156b5abb5333efa32e30e
+=======
+            pkgname <- getPkgNameFromPkgDir(pkgdir)
+>>>>>>> make NOTEs somewhat more grammatical
             handleNote(sprintf("Add content to the empty file %s.",
                 mungeName(file, pkgname)))
         }
@@ -1090,8 +1094,12 @@ checkFormatting <- function(pkgdir, nlines=6)
         ok <- FALSE
         handleNote(sprintf(
             "Consider shorter lines; %s lines (%i%%) are > 80 characters long.",
+<<<<<<< d8d36c8df634481a167156b5abb5333efa32e30e
             n, round((n / totallines) * 100)))
         handleContext(long, nlines)
+=======
+            longlines, as.integer((longlines/totallines) * 100)))
+>>>>>>> make NOTEs somewhat more grammatical
     }
 
     if (n <- nrow(tab))
@@ -1099,18 +1107,30 @@ checkFormatting <- function(pkgdir, nlines=6)
         ok <- FALSE
         handleNote(sprintf(
             "Consider 4 spaces instead of tabs; %s lines (%i%%) contain tabs.",
+<<<<<<< d8d36c8df634481a167156b5abb5333efa32e30e
             n, round((n / totallines) * 100)))
         handleContext(tab, nlines)
+=======
+            tablines, as.integer((tablines/totallines) * (100/1) )))
+>>>>>>> make NOTEs somewhat more grammatical
     }
 
     if (n <- nrow(indent))
     {
         ok <- FALSE
         handleNote(sprintf(paste(
+<<<<<<< d8d36c8df634481a167156b5abb5333efa32e30e
             "Consider multiples of 4 spaces for line indents,",
             "%s lines (%i%%) are not."),
             n, round((n / totallines) * 100)))
         handleContext(indent, nlines)
+=======
+            "Consider indenting lines with a multiple of 4 spaces;",
+            "%s lines (%i%%) are not."),
+            badindentlines,
+            as.integer((badindentlines/totallines) * 100)))
+
+>>>>>>> make NOTEs somewhat more grammatical
     }
 
     if (!ok)
