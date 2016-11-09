@@ -1041,28 +1041,27 @@ checkNEWS <- function(pkgdir)
     })
 }
 
-checkFormatting <- function(pkgdir)
+checkFormatting <- function(pkgdir, nlines=6)
 {
-    files <- c(file.path(pkgdir, "NAMESPACE"),
+    pkgname <- basename(pkgdir)
+    files <- c(
+        file.path(pkgdir, "NAMESPACE"),
         dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
-        full.names=TRUE),
+            full.names=TRUE),
         dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
             pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
             ignore.case=TRUE),
         dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
             full.names=TRUE)
         )
-    longlines <- 0L
     totallines <- 0L
-    tablines <- 0L
-    badindentlines <- 0L
     ok <- TRUE
+    long <- tab <- indent <- Context()
 
     for (file in files)
     {
         if (file.exists(file) && file.info(file)$size == 0)
         {
-            pkgname <- getPkgNameFromPkgDir(pkgdir)
             handleNote(sprintf("Add content to the empty file %s.",
                 mungeName(file, pkgname)))
         }
@@ -1071,58 +1070,47 @@ checkFormatting <- function(pkgdir)
         {
             lines <- readLines(file, warn=FALSE)
             totallines <- totallines + length(lines)
+
             n <- nchar(lines, allowNA=TRUE)
-            n <- n[!is.na(n)]
+            idx <- !is.na(n) & (n > 80L)
+            long <- rbind(long, Context(pkgname, file, lines, idx))
 
-            names(n) <- seq_along(1:length(n))
-            long <- n[n > 80]
-            if (length(long))
-            {
-                ## TODO/FIXME We could tell the user here which lines are long
-                ## in which files.
-                longlines <- longlines + length(long)
-            }
-
-            tabs <- grepl("\t", lines)
-            if (any(tabs))
-            {
-                tablines <- tablines + length(which(tabs))
-            }
+            idx <- grepl("\t", lines)
+            tab <- rbind(tab, Context(pkgname, file, lines, idx))
 
             res <- regexpr("^([ ]+)", lines)
-            if (any(res > -1))
-            {
-                match.length <- attr(res, "match.length")
-                indents <- match.length[match.length > -1]
-                badindentlinesinthisfile <- length(which(indents %% 4 != 0))
-                badindentlines <- badindentlines + badindentlinesinthisfile
-            }
-
+            match.length <- attr(res, "match.length")
+            idx <- (match.length != -1L) & (match.length %% 4 != 0)
+            indent <- rbind(indent, Context(pkgname, file, lines, idx))
         }
     }
-    if (longlines > 0)
+
+    if (n <- nrow(long))
     {
         ok <- FALSE
         handleNote(sprintf(
             "Consider shorter lines; %s lines (%i%%) are > 80 characters long.",
-            longlines, as.integer((longlines/totallines) * 100)))
+            n, round((n / totallines) * 100)))
+        handleContext(long, nlines)
     }
-    if (tablines > 0)
+
+    if (n <- nrow(tab))
     {
         ok <- FALSE
         handleNote(sprintf(
             "Consider 4 spaces instead of tabs; %s lines (%i%%) contain tabs.",
-            tablines, as.integer((tablines/totallines) * (100/1) )))
+            n, round((n / totallines) * 100)))
+        handleContext(tab, nlines)
     }
-    if (badindentlines > 0)
+
+    if (n <- nrow(indent))
     {
         ok <- FALSE
         handleNote(sprintf(paste(
-            "Consider indenting lines with a multiple of 4 spaces;",
+            "Consider multiples of 4 spaces for line indents,",
             "%s lines (%i%%) are not."),
-            badindentlines,
-            as.integer((badindentlines/totallines) * 100)))
-
+            n, round((n / totallines) * 100)))
+        handleContext(indent, nlines)
     }
 
     if (!ok)
