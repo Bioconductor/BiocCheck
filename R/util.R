@@ -12,6 +12,27 @@
 
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
+.verbatim <- function(..., appendLF=TRUE, indent=6, exdent=8)
+{
+    ## don't wrap elements of msg; indent first line by 'indent',
+    ## subsequent lines by 'exdent'
+    txt <- sprintf(...)
+    if (length(txt)) {
+        prefix <- paste(rep(" ", indent), collapse="")
+        txt[1] <- paste0(prefix, txt[1])
+    }
+    if (length(txt) > 1L) {
+        prefix <- paste(rep(" ", exdent), collapse="")
+        txt[-1] <- paste0(prefix, txt[-1])
+    }
+    message(paste(txt, collapse="\n"), appendLF=appendLF)
+}
+
+handleVerbatim <- function(msg, appendLF=TRUE)
+{
+    .verbatim("%s", msg, appendLF=appendLF)
+}
+
 handleMessage <- function(msg, appendLF=TRUE)
 {
     .msg("* %s", msg, appendLF=appendLF)
@@ -234,14 +255,6 @@ mungeName <- function(name, pkgname)
     name <- gsub(twoseps, .Platform$file.sep, name, fixed=TRUE)
     pos <- regexpr(pkgname, name)
     substr(name, pos+1+nchar(pkgname), nchar(name))
-}
-
-getPkgNameFromPkgDir <- function(pkgdir)
-{
-    t <- tempdir()
-    ret <- sub(t, "", pkgdir)
-    ret <- gsub(.Platform$file.sep, "", ret)
-    ret
 }
 
 isInfrastructurePackage <- function(pkgDir)
