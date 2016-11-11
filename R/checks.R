@@ -168,21 +168,22 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
     }
     tryCatch({
         pv <- package_version(version)
+        x <- pv$major
         y <- pv$minor
         mod <- y %% 2
         biocY <- packageVersion("BiocInstaller")$minor
         bioc.mod <- biocY %% 2
         isDevel <- (bioc.mod == 1)
-        if (mod != bioc.mod)
-        {
+        if (x == 0) {
+            handleNote("x of x.y.z version is 0; pre-release package")
+        } else if (mod != bioc.mod) {
             shouldBe <- ifelse(isDevel, "odd", "even")
             vers <- ifelse(isDevel, "devel", "release")
             handleWarning(sprintf("y of x.y.z version should be %s in %s",
-                    shouldBe, vers))
+                                  shouldBe, vers))
         }
 
-        },
-        error=function(e) handleError("Valid package version"))
+    }, error=function(e) handleError("Valid package version"))
 }
 
 getPkgType <- function(pkgdir)
