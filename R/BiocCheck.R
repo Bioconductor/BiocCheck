@@ -70,21 +70,16 @@ BiocCheck <- function(package, ...)
     package_dir <- .get_package_dir(package)
     package_name <- .get_package_name(package)
 
-
-    handleMessage(sprintf("This is BiocCheck, version %s.",
-        packageVersion("BiocCheck")))
-
-    handleMessage(paste0("BiocCheck is a work in progress. Output",
-        "  and severity of issues may change."))
-
-
-    handleMessage("Installing package...")
+    handleMessage(paste(
+        sprintf("This is BiocCheck version %s.", packageVersion("BiocCheck")),
+        "BiocCheck is a work in progress. Output and severity of issues may",
+        "change. Installing package..."), indent=0, exdent=0)
     installAndLoad(package)
 
     ## checks
 
     if (!checkingDir) {
-        handleMessage("Checking for version number mismatch...")
+        handleCheck("Checking for version number mismatch...")
         checkForVersionNumberMismatch(package, package_dir)
     }
 
@@ -96,80 +91,79 @@ BiocCheck <- function(package, ...)
         pkgType <- getPkgType(package_dir)
         if ((is.na(pkgType)) || pkgType == "Software")
         {
-            handleMessage("Checking vignette directory...")
-            if (is.na(pkgType))
-                msg <- "Unknown package type, checking vignette directories..."
-            else
-                msg <- "This is a software package, checking vignette directories..."
+            handleCheck("Checking vignette directory...")
+            msg <- sprintf(
+                "This is a%s package",
+                if (is.na(pkgType)) "n unknown type of" else " software")
             handleMessage(msg)
             checkVignetteDir(package_dir, checkingDir)
             if ("build-output-file" %in% names(dots))
             {
-                handleMessage("Checking whether vignette is built with 'R CMD build'...")
+                handleCheck("Checking whether vignette is built with 'R CMD build'...")
                 checkIsVignetteBuilt(package_dir, dots[["build-output-file"]])
             }
         } else {
             handleMessage("This is not a software package, skipping vignette checks...")
         }
     }
-    handleMessage("Checking version number...")
+    handleCheck("Checking version number...")
     if (!is.null(dots[["new-package"]]))
     {
-        handleMessage("Checking new package version number...")
+        handleCheck("Checking new package version number...")
         checkNewPackageVersionNumber(package_dir)
     }
-    handleMessage("Checking version number validity...")
+    handleCheck("Checking version number validity...")
     checkVersionNumber(package_dir, !is.null(dots[["new-package"]]))
 
-    handleMessage("Checking R Version dependency...")
+    handleCheck("Checking R Version dependency...")
     checkRVersionDependency(package_dir)
 
     if (is.null(dots[["no-check-bioc-views"]]))
     {
-        handleMessage("Checking biocViews...")
+        handleCheck("Checking biocViews...")
         result <- checkBiocViews(package_dir)
         if(result)
         {
             .msg("See http://bioconductor.org/developers/how-to/biocViews/")
         }
     }
-    handleMessage("Checking build system compatibility...")
+    handleCheck("Checking build system compatibility...")
     checkBBScompatibility(package_dir)
-    handleMessage("Checking unit tests...")
+    handleCheck("Checking unit tests...")
     checkUnitTests(package_dir)
     parsedCode <- parseFiles(package_dir)
 
-    handleMessage("Checking native routine registration...")
+    handleCheck("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name, parsedCode)
     if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
         quietly=TRUE))))
     {
-        handleMessage("Checking for namespace import suggestions...")
+        handleCheck("Checking for namespace import suggestions...")
         checkImportSuggestions(package_name)
     }
 
-    handleMessage("Checking for deprecated package usage...")
+    handleCheck("Checking for deprecated package usage...")
     checkDeprecatedPackages(package_dir)
 
-    handleMessage("Checking parsed R code in R directory, examples, vignettes...")
+    handleCheck("Checking parsed R code in R directory, examples, vignettes...")
 
-    handleMessage("Checking for direct slot access...")
+    handleCheck("Checking for direct slot access...")
     checkForDirectSlotAccess(parsedCode, package_name)
 
-    handleMessage("Checking for T...")
+    handleCheck("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",
         "SYMBOL")
     if (res > 0) handleWarning(sprintf(
         "Use TRUE instead of T (found in %s files)",
         res))
-    handleMessage("Checking for F...")
+    handleCheck("Checking for F...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "F",
         "SYMBOL")
     if (res > 0) handleWarning(sprintf(
         "Use FALSE instead of F (found in %s files)",
         res))
 
-    handleMessage("Checking for browser()...")
+    handleCheck("Checking for browser()...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
         "SYMBOL_FUNCTION_CALL")
     if (res > 0)
@@ -177,56 +171,56 @@ BiocCheck <- function(package, ...)
             "Remove browser() statements (found in %s files)",
             res))
 
-    handleMessage("Checking for <<-...")
+    handleCheck("Checking for <<-...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
         "LEFT_ASSIGN")
     if (res > 0)
         handleNote(sprintf(
             "Avoid '<<-'' if possible (found in %s files)", res))
 
-    handleMessage(sprintf("Checking for library/require of %s...",
+    handleCheck(sprintf("Checking for library/require of %s...",
         package_name))
     checkForLibraryMe(package_name, parsedCode)
 
-    handleMessage("Checking DESCRIPTION/NAMESPACE consistency...")
+    handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
     checkDescriptionNamespaceConsistency(package_name)
 
-    handleMessage("Checking function lengths", appendLF=FALSE)
+    handleCheck("Checking function lengths", appendLF=FALSE)
     checkFunctionLengths(parsedCode, package_name)
 
-    handleMessage("Checking man pages...") # could add more man page checks...
+    handleCheck("Checking man pages...") # could add more man page checks...
     checkForValueSection(package_dir)
 
-    handleMessage("Checking exported objects have runnable examples...")
+    handleCheck("Checking exported objects have runnable examples...")
     checkExportsAreDocumented(package_dir, package_name)
 
-    handleMessage("Checking package NEWS...")
+    handleCheck("Checking package NEWS...")
     checkNEWS(package_dir)
 
-    handleMessage(paste0("Checking formatting of DESCRIPTION, NAMESPACE, ",
+    handleCheck(paste0("Checking formatting of DESCRIPTION, NAMESPACE, ",
         "man pages, R source, and vignette source..."))
     checkFormatting(package_dir)
 
-    handleMessage("Checking for canned comments in man pages...")
+    handleCheck("Checking for canned comments in man pages...")
     checkForPromptComments(package_dir)
 
-    handleMessage("Checking if package already exists in CRAN...")
+    handleCheck("Checking if package already exists in CRAN...")
     checkIsPackageAlreadyInRepo(package_name, "CRAN")
 
     if (!is.null(dots[["new-package"]]))
     {
-        handleMessage("Checking if new package already exists in Bioconductor...")
+        handleCheck("Checking if new package already exists in Bioconductor...")
         checkIsPackageAlreadyInRepo(package_name, "Bioconductor")
 
     }
 
     if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD")))
     {
-        handleMessage("Checking for bioc-devel mailing list subscription...")
+        handleCheck("Checking for bioc-devel mailing list subscription...")
         checkForBiocDevelSubscription(package_dir)
     }
 
-    handleMessage("Checking for support site registration...")
+    handleCheck("Checking for support site registration...")
     checkForSupportSiteRegistration(package_dir)
 
     ## Summary

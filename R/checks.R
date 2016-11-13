@@ -138,8 +138,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
 
-    message(sprintf(
-        "      # of chunks: %s, # of eval=FALSE: %s (%i%%)",
+    handleMessage(sprintf(
+        "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
         chunks, efs,  as.integer(percent)))
     if (percent >= 50)
         handleWarning("Evaluate more vignette chunks.")
@@ -175,12 +175,13 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
         bioc.mod <- biocY %% 2
         isDevel <- (bioc.mod == 1)
         if (x == 0) {
-            handleNote("x of x.y.z version is 0; pre-release package")
+            handleMessage(sprintf(
+                "Package version %s; pre-release", as.character(pv)))
         } else if (mod != bioc.mod) {
             shouldBe <- ifelse(isDevel, "odd", "even")
             vers <- ifelse(isDevel, "devel", "release")
-            handleWarning(sprintf("y of x.y.z version should be %s in %s",
-                                  shouldBe, vers))
+            handleWarning(sprintf(
+                "y of x.y.z version should be %s in %s", shouldBe, vers))
         }
 
     }, error=function(e) handleError("Valid package version"))
@@ -224,7 +225,7 @@ checkBiocViews <- function(pkgdir)
 {
     dirty <- FALSE
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-    handleMessage("Checking that biocViews are present...")
+    handleCheck("Checking that biocViews are present...")
     if (!"biocViews" %in% colnames(dcf))
     {
         handleError("Add some biocViews!")
@@ -236,7 +237,7 @@ checkBiocViews <- function(pkgdir)
     biocViewsVocab <- NULL
     data("biocViewsVocab", package="biocViews", envir=environment())
 
-    handleMessage("Checking for non-trivial biocViews...")
+    handleCheck("Checking for non-trivial biocViews...")
     toplevel <- c("Software", "AnnotationData", "ExperimentData")
     if (all(views %in% toplevel)) {
         handleError(sprintf("Add biocViews other than %s",
@@ -249,7 +250,7 @@ checkBiocViews <- function(pkgdir)
     {
         parents <- c(parents, getParent(view, biocViewsVocab))
     }
-    handleMessage("Checking that biocViews come from the same category...")
+    handleCheck("Checking that biocViews come from the same category...")
     if (length(unique(parents)) > 1)
     {
         handleWarning(paste0("Use biocViews from one category only",
@@ -265,7 +266,7 @@ checkBiocViews <- function(pkgdir)
     else
         env <- .GlobalEnv
 
-    handleMessage("Checking biocViews validity...")
+    handleCheck("Checking biocViews validity...")
     if (!all(views %in% nodes(biocViewsVocab)))
     {
         badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
@@ -292,7 +293,7 @@ checkBiocViews <- function(pkgdir)
 
 
     rec <- NULL
-    handleMessage("Checking for recommended biocViews...")
+    handleCheck("Checking for recommended biocViews...")
     tryCatch(suppressMessages(
         suppressWarnings(rec <- recommendBiocViews(pkgdir, branch))),
         error=function(e){
@@ -317,13 +318,13 @@ checkBiocViews <- function(pkgdir)
 checkBBScompatibility <- function(pkgdir)
 {
     lines <- readLines(file.path(pkgdir, "DESCRIPTION"), warn=FALSE)
-    handleMessage("Checking for blank lines in DESCRIPTION...")
+    handleCheck("Checking for blank lines in DESCRIPTION...")
     if (any(nchar(lines)==0))
     {
         handleError("Remove blank lines from DESCRIPTION!")
         return()
     }
-    handleMessage("Checking for whitespace in DESCRIPTION field names...")
+    handleCheck("Checking for whitespace in DESCRIPTION field names...")
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if (any(grepl("\\s", colnames(dcf))))
     {
@@ -332,7 +333,7 @@ checkBBScompatibility <- function(pkgdir)
     }
     segs <- strsplit(pkgdir, .Platform$file.sep)[[1]]
     pkgNameFromDir <- segs[length(segs)]
-    handleMessage("Checking that Package field matches dir/tarball name...")
+    handleCheck("Checking that Package field matches dir/tarball name...")
     if (dcf[, "Package"] != pkgNameFromDir)
     {
         handleError(sprintf(
@@ -340,13 +341,13 @@ checkBBScompatibility <- function(pkgdir)
             pkgNameFromDir, dcf[, "Package"]))
             return()
     }
-    handleMessage("Checking for Version field...")
+    handleCheck("Checking for Version field...")
     if (!"Version" %in% colnames(dcf))
     {
         handleError("Version field in DESCRIPTION!")
         return()
     }
-    handleMessage("Checking for valid maintainer...")
+    handleCheck("Checking for valid maintainer...")
     maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf))
     {
@@ -484,13 +485,13 @@ checkImportSuggestions <- function(pkgname)
         (suggestions != "ERROR"))
     {
             handleMessage("Namespace import suggestions are:")
-            message(paste(suggestions, collapse="\n"))
+            handleVerbatim(suggestions, indent=4, exdent=4, width=100000)
             handleMessage("--END of namespace import suggestions.")
     }
 
     if ((!is.null(suggestions)) && (!length(suggestions)))
     {
-        message("  No suggestions.")
+        handleMessage("No suggestions.")
     }
 
     suggestions
@@ -626,7 +627,7 @@ checkForBadDepends <- function(pkgdir)
                 }
             }
 
-            handleMessage("Checking if other packages can import this one...")
+            handleCheck("Checking if other packages can import this one...")
 
             if (length(errObjects) > 0)
             {
@@ -642,7 +643,7 @@ checkForBadDepends <- function(pkgdir)
                 handleError(msg)
             }
 
-            handleMessage("Checking to see if we understand object initialization....")
+            handleCheck("Checking to see if we understand object initialization....")
 
 
             if (length(noteObjects) > 0)
@@ -860,19 +861,22 @@ checkFunctionLengths <- function(parsedCode, pkgname)
         h <- head(df, n=5)
         if (nrow(h))
         {
-            message(sprintf(
-                "  The longest function is %s lines long", max(h$length)))
-            message(sprintf("  The longest %s functions are:", nrow(h)))
+            handleMessage(sprintf(
+                "The longest function is %s lines long", max(h$length)))
+            handleMessage(sprintf(
+                "The longest %s functions are:", nrow(h)))
             for (i in 1:nrow(h))
             {
                 row <- df[i,]
                 if (grepl("\\.R$", row$filename, ignore.case=TRUE))
                 {
-                    message(sprintf("      %s() (%s, line %s): %s lines",
-                        row$functionName, row$filename, row$startLine, row$length))
+                    handleMessage(sprintf(
+                        "%s() (%s, line %s): %s lines", row$functionName,
+                        row$filename, row$startLine, row$length))
                 } else {
-                    message(sprintf("      %s() (%s): %s lines",
-                        row$functionName, row$filename, row$length))
+                    handleMessage(sprintf(
+                        "%s() (%s): %s lines", row$functionName, row$filename,
+                        row$length))
                 }
             }
         }
@@ -922,40 +926,33 @@ doesManPageHaveRunnableExample <- function(rd)
 
 checkForValueSection <- function(pkgdir)
 {
+    pkgname <- basename(pkgdir)
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
-    badpages <- c()
-    for (manpage in manpages)
-    {
+    ok <- vapply(manpages, function(manpage) {
         rd <- parse_Rd(manpage)
         tags <- tools:::RdTags(rd)
 
         value <- NULL
         if ("\\usage" %in% tags && (!"\\value" %in% tags))
-        {
-            badpages <- append(badpages, basename(manpage))
-            next
-        }
+            return(FALSE)
 
         if ("\\value" %in% tags)
             value <- rd[grep("\\value", tags)]
 
-
         if ("\\usage" %in% tags && !is.null(value))
         {
-            if ((is.list(value[[1]]) && length(value[[1]]) == 0) ||
-                nchar(gsub("^\\s+|\\s+$", "", paste(unlist(value), collapse='')))==0 )
-            {
-                badpages <- append(badpages, basename(manpage))
-            }
+            tst <- (is.list(value[[1]]) && length(value[[1]]) == 0) ||
+                nchar(gsub("^\\s+|\\s+$", "", paste(unlist(value), collapse='')))==0
+            if (tst)
+                return(FALSE)
         }
-
-    }
-    if (length(badpages)) {
-        handleWarning(paste("Add non-empty \\value sections to the",
-            "following man pages:"))
-        .msg(paste(badpages, collapse=", "), indent=6, exdent=6)
-
+        TRUE
+    }, logical(1))
+    if (!all(ok)) {
+        handleWarning(sprintf(
+            "Add non-empty \\value sections to the following man pages: %s",
+            paste(mungeName(manpages[!ok], pkgname), collapse=", ")))
     }
 }
 
@@ -1116,7 +1113,8 @@ checkFormatting <- function(pkgdir, nlines=6)
 
     if (!ok)
     {
-        message("  See http://bioconductor.org/developers/how-to/coding-style/")
+        url <- "http://bioconductor.org/developers/how-to/coding-style/"
+        handleMessage(sprintf("See %s", url))
     }
 }
 

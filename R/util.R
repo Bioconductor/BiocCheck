@@ -12,7 +12,8 @@
 
 .stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
 
-.verbatim <- function(..., appendLF=TRUE, indent=6, exdent=8)
+.verbatim <-
+    function(..., appendLF=TRUE, indent=6, exdent=8, width=getOption("width"))
 {
     ## don't wrap elements of msg; indent first line by 'indent',
     ## subsequent lines by 'exdent'
@@ -25,15 +26,13 @@
         prefix <- paste(rep(" ", exdent), collapse="")
         txt[-1] <- paste0(prefix, txt[-1])
     }
+    txt <- ifelse((!is.na(txt)) & (nchar(txt) > width),
+                  sprintf("%s...", substr(txt, 1, width - 3)),
+                  txt)
     message(paste(txt, collapse="\n"), appendLF=appendLF)
 }
 
-handleVerbatim <- function(msg, appendLF=TRUE)
-{
-    .verbatim("%s", msg, appendLF=appendLF)
-}
-
-handleMessage <- function(msg, appendLF=TRUE)
+handleCheck <- function(msg, appendLF=TRUE)
 {
     .msg("* %s", msg, appendLF=appendLF)
 }
@@ -55,6 +54,16 @@ handleNote <- function(msg)
 {
     .note$add(msg)
     .msg("* NOTE: %s", msg, indent=4, exdent=6)
+}
+
+handleMessage <- function(msg, indent=4, exdent=6)
+{
+    .msg("  %s", msg, indent=indent, exdent=exdent)
+}
+
+handleVerbatim <- function(msg, indent=4, exdent=6, width=getOption("width"))
+{
+    .verbatim("%s", msg, indent=indent, exdent=exdent, width=width)
 }
 
 installAndLoad <- function(pkg)
@@ -216,9 +225,7 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
     for (filename in names(parsedCode))
     {
         df <- parsedCode[[filename]]
-        matchedrows <- 
-            df[which(df$token == 
-                token & df$text == symbolName),]
+        matchedrows <- df[which(df$token == token & df$text == symbolName),]
         if (nrow(matchedrows) > 0)
         {
             matches[[filename]] <- matchedrows[, c(1,2)]
@@ -236,12 +243,12 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
             if (!silent)
             {
                 if (grepl("\\.R$", name, ignore.case=TRUE))
-                    message(sprintf("      Found %s%s in %s (line %s, column %s)",
-                        symbolName, parens,
-                        mungeName(name, pkgname), x[i,1], x[i,2]))
+                    handleMessage(sprintf(
+                        "Found %s%s in %s (line %s, column %s)", symbolName,
+                        parens, mungeName(name, pkgname), x[i,1], x[i,2]))
                 else
-                    message(sprintf("      Found %s%s in %s",
-                        symbolName, parens,
+                    handleMessage(sprintf(
+                        "Found %s%s in %s", symbolName, parens,
                         mungeName(name, pkgname))) # FIXME test this
             }
         }
