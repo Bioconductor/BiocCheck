@@ -18,9 +18,10 @@ Context <- function(pkg="", file="", lines=character(), idx=logical()) {
 #' @param ctxt Object derived from Context()
 #'
 #' @return None; side effect is output on the message stream
-handleContext <- function(ctxt, nlines=6) {
+handleContext <- function(ctxt, nlines=6, width=getOption("width")) {
     ctxt <- head(ctxt, nlines)
-    handleVerbatim(c(
+    txt <- c(
         sprintf("First %d lines:", nrow(ctxt)),
-        sprintf("%s:%d %s", ctxt$File, ctxt$Line, ctxt$Context)))
+        sprintf("%s:%d %s", ctxt$File, ctxt$Line, ctxt$Context))
+    handleVerbatim(txt, width=width)
 }
