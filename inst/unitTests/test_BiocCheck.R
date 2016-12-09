@@ -365,7 +365,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     .zeroCounters()
 
     pkgpath <- create_test_package(
-        testpkg, list(Imports="devtools, dplyr"),
+        testpkg, list(Imports="devtools, BiocCheck"),
         extraActions=function(path) {
             cat("f = function() devtools::create()\n",
                 file=file.path(path, "R", "f.R"))
@@ -373,7 +373,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     BiocCheck:::installAndLoad(pkgpath)
     run_check(testpkg)
     checkTrue(.warning$getNum() == 1L)
-    checkIdentical("Import dplyr in NAMESPACE as well as DESCRIPTION.",
+    checkIdentical("Import BiocCheck in NAMESPACE as well as DESCRIPTION.",
                    .warning$get())
 
     .zeroCounters()
