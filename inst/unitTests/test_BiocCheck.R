@@ -409,12 +409,14 @@ test_checkImportSuggestions <- function()
 test_checkForBadDepends <- function()
 {
     BiocCheck:::installAndLoad(system.file("testpackages", "testpkg0",
-        package="BiocCheck"))
+                                           package="BiocCheck"))
+    BiocCheck:::.zeroCounters()
     BiocCheck:::checkForBadDepends(file.path(tempdir(), "lib", "testpkg0"))
-    checkEquals(1, .error$getNum())
-    checkEquals(1, .note$getNum())
-    checkTrue(grepl("baddep", .error$get()[1]))
-    checkTrue(grepl("colone", .note$get()[1]))
+
+    checkEquals(1, BiocCheck:::.error$getNum())
+    checkEquals(1, BiocCheck:::.note$getNum())
+    checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
+    checkTrue(grepl("how 2 object", BiocCheck:::.note$get()[1]))
 }
 
 test_doesFileLoadPackage <- function()
