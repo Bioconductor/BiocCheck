@@ -576,108 +576,55 @@ checkForBadDepends <- function(pkgdir)
     depends <- append(depends,
         cleanupDependency(packageDescription(pkgname)$Imports))
     output <- getBadDeps(pkgdir)
-    if (!is.null(output))
-    {
-        output <- unique(unlist(strsplit(output, "\n")))
-        output <- output[grep("no visible", output)]
-        if (length(output) == 0) return()
-        res <- regexpr("'[^']*'$", output)
-        fns <- regexpr("^[^:]*:", output)
-        fmatch.length <- attr(fns, "match.length")
-        if (any(res != -1))
-        {
-            res <- substr(output, res, nchar(output))
-            fns <- unique(substr(output, fns, fmatch.length-1))
-            res <- gsub("'", "", fixed=TRUE, res)
-            inGlobals <- res %in% globalVariables(package=pkgname)
-            res <- res[!inGlobals]
-            fns <- fns[!inGlobals]
-            badFunctions <- paste(fns, collapse=", ")
-            badObjects <- paste(res, collapse=", ")
+    if (is.null(output))
+        return()
 
-            errObjects <- c()
-            errFunctions <- c()
-            errPkgs <- c()
-            noteObjects <- c()
-            noteFunctions <- c()
+    output <- unique(unlist(strsplit(output, "\n")))
+    output <- output[grep("no visible", output)]
+    if (length(output) == 0) return()
+    res <- regexpr("'[^']*'", output)
+    fns <- regexpr("^[^:]*:", output)
+    if (all(res == -1L))
+        return()
 
-            for (i in seq_along(fns))
-            {
-                found <- FALSE
-                sym <- res[i]
-                func <- fns[i]
-                if (length(depends) >  0)
-                {
-                    for (j in 1:length(depends))
-                    {
-                        dep <- depends[j]
-                        if (sym %in% getNamespaceExports(dep))
-                        {
-                            errObjects <- append(errObjects, sym)
-                            errFunctions <- append(errFunctions, func)
-                            errPkgs <- append(errPkgs, dep)
-                            found <- TRUE
-                        }
-                    }
-                }
-                if (!found)
-                {
-                    noteObjects <- append(noteObjects, sym)
-                    noteFunctions <- append(noteFunctions, func)
-                }
-            }
+    res <- gsub("'", "", regmatches(output, res))
+    fns <- sub(":$", "", regmatches(output, fns))
+    inGlobals <- res %in% globalVariables(package=pkgname)
+    res <- res[!inGlobals]
+    fns <- fns[!inGlobals]
 
-            handleCheck("Checking if other packages can import this one...")
+    pkgs <- character(length(fns))
+    for (pkg in depends)
+        pkgs[fns %in% getNamespaceExports(pkg)] <- pkg
+    found <- nzchar(pkgs)
+    
+    handleCheck("Checking if other packages can import this one...")
+    if (any(found)) {
+        msg <- sprintf(
+            "Packages providing %d object(s) used in this package
+             should be imported in the NAMESPACE file, otherwise
+             packages importing this package may fail.",
+            sum(found))
+        handleError(msg)
 
-            if (length(errObjects) > 0)
-            {
-                msg <- sprintf(paste(
-                    ## FIXME show the actual package names?
-                    "Packages (%s) which provide %s",
-                    "(used in %s)",
-                    "should be imported in the NAMESPACE file,",
-                    "otherwise packages that import %s could fail."),
-                    paste(errPkgs, collapse=", " ),
-                    paste(errObjects, collapse=", "),
-                    paste(errFunctions, collapse=", "), pkgname)
-                handleError(msg)
-            }
-
-            handleCheck("Checking to see if we understand object initialization....")
-
-
-            if (length(noteObjects) > 0)
-            {
-                if (length(noteObjects) == 1)
-                {
-                    grammar <- list(object_objects="object", was_were="was",
-                        itis_theyare="it is")
-                } else {
-                    grammar <- list(object_objects="objects", was_were="were",
-                        itis_theyare="they are")
-                }
-
-                msg <- sprintf(paste(
-                    "Consider clarifying how %s %s (used in %s)",
-                    "%s initialized. Maybe %s part of a",
-                    "data set loaded with data(), or perhaps part of",
-                    "an object referenced in with() or within()."),
-                    grammar$object_objects,
-                    sQuote(paste(trimws(noteObjects), collapse=", ")),
-                    paste(trimws(noteFunctions), collapse=", "),
-                    grammar$was_were,
-                    grammar$itis_theyare)
-
-                handleNote(msg)
-            }
-
-        }
+        msg <- sprintf("%s::%s (%s)", pkgs[found], res[found], fns[found])
+        handleVerbatim(c("package::object (function)", msg))
     }
 
+    handleCheck("Checking to see if we understand object initialization...")
+    if (!all(found)) {
+        msg <- sprintf(
+            "Consider clarifying how %d object(s) are initialized.
+             Maybe %s part of a data set loaded with data(), or perhaps
+             part of an object referenced in with() or within().",
+            sum(!found),
+            if (sum(!found) == 1L) "it is" else "they are")
+        handleNote(msg)
+
+        msg <- sprintf("%s (%s)", res[!found], fns[!found])
+        handleVerbatim(c("object (function)", msg))
+    }
 }
-
-
-
 
 getBadDeps <- function(pkgdir)
 {
