@@ -880,6 +880,10 @@ checkForValueSection <- function(pkgdir)
         rd <- parse_Rd(manpage)
         tags <- tools:::RdTags(rd)
 
+        type <- docType(rd)
+        if (identical(type, "data"))
+            return(TRUE)
+
         value <- NULL
         if ("\\usage" %in% tags && (!"\\value" %in% tags))
             return(FALSE)
