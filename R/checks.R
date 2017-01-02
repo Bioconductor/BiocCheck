@@ -14,9 +14,9 @@ checkForVersionNumberMismatch <- function(package, package_dir)
     dcfVer <- unname(dcf[, "Version"])
     if (!ver == dcfVer)
     {
-        handleError(paste("Version number in tarball",
-            "filename must match Version field in DESCRIPTION.",
-            "(Tip: create tarball with R CMD build)"))
+        handleError(
+            "Version number in tarball filename must match Version field ",
+            "in DESCRIPTION. (Tip: create tarball with R CMD build)")
     }
 }
 
@@ -39,9 +39,9 @@ checkRVersionDependency <- function(package_dir)
                     getRversion()$minor))
                 if (ver < bv)
                 {
-                    handleWarning(sprintf(
-                        "Update R version dependency from %s to %s.",
-                        ver, bv))
+                    handleWarning(
+                        "Update R version dependency from ", ver, " to ", bv,
+                        ".")
                 }
             }
         }
@@ -55,8 +55,9 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
     res <- findSymbolInParsedCode(parsedCode, package_name, "@", "'@'")
     if (res > 0)
     {
-        handleNote(paste("Use accessors; don't access S4 class slots via",
-            "'@' in examples/vignettes."))
+        handleNote(
+            "Use accessors; don't access S4 class slots via ",
+            "'@' in examples/vignettes.")
     }
 }
 
@@ -72,13 +73,13 @@ checkVignetteDir <- function(pkgdir, checkingDir)
                 indent=2)
             return()
         }
-        handleError("'vignettes' directory!")
+        handleError("No 'vignettes' directory.")
         return()
     }
     vigdircontents <- getVigSources(vigdir)
     if (length(vigdircontents)==0)
     {
-        handleError("vignette sources in vignettes/ directory.")
+        handleError("No vignette sources in vignettes/ directory.")
         return()
     }
     instdocdircontents <- getVigSources(instdocdir)
@@ -86,9 +87,9 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     {
         if (checkingDir)
         {
-            handleWarning(paste0(
-                "Remove vignette sources from inst/doc;",
-                " they belong in vignettes/."))
+            handleWarning(
+                "Remove vignette sources from inst/doc; ",
+                "they belong in vignettes/.")
 
         } else {
             # Do we really want to emit a NOTE
@@ -106,12 +107,12 @@ checkVignetteDir <- function(pkgdir, checkingDir)
         vigns <- tools::pkgVignettes(dir=pkgdir, check=TRUE)
         if (is.null(vigns))
         {
-            handleError("No vignettes!")
+            handleError("No vignette found.")
             return()
         }
         if (length(vigns$msg))
         {
-            handleError(paste(vigns$msg, collapse="\n"))
+            handleError(paste0(vigns$msg, collapse="\n"))
             return()
         }
 
@@ -150,9 +151,9 @@ checkNewPackageVersionNumber <- function(pkgdir)
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     version <- dcf[, "Version"]
         if(!grepl("^0[-.]99[-.][0-9]+$", version))
-            handleError(sprintf
-                ("New package version starting with 0.99.* (e.g., 0.99.0, 0.99.1, ...); got '%s'.",version))
-
+            handleError(
+                "New package version starting with 0.99.* (e.g., 0.99.0, ",
+                "0.99.1, ...); got ",sQuote(version), ".")
 }
 
 checkVersionNumber <- function(pkgdir, new_package=FALSE)
@@ -162,8 +163,9 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
     regex <- "^[0-9]+[-\\.]([0-9]+)[-\\.][0-9]+$"
     if(!grepl(regex, version))
     {
-        handleError(paste0("Valid package Version, see",
-            " http://www.bioconductor.org/developers/how-to/version-numbering/"))
+        handleError(
+            "Invalid package Version, see ",
+            "http://www.bioconductor.org/developers/how-to/version-numbering/")
         return()
     }
     tryCatch({
@@ -175,16 +177,15 @@ checkVersionNumber <- function(pkgdir, new_package=FALSE)
         bioc.mod <- biocY %% 2
         isDevel <- (bioc.mod == 1)
         if (x == 0) {
-            handleMessage(sprintf(
-                "Package version %s; pre-release", as.character(pv)))
+            handleMessage("Package version ", as.character(pv), "; pre-release")
         } else if (mod != bioc.mod) {
             shouldBe <- ifelse(isDevel, "odd", "even")
             vers <- ifelse(isDevel, "devel", "release")
-            handleWarning(sprintf(
-                "y of x.y.z version should be %s in %s", shouldBe, vers))
+            handleWarning(
+                "y of x.y.z version should be ", shouldBe, " in ", vers)
         }
 
-    }, error=function(e) handleError("Valid package version"))
+    }, error=function(e) handleError("Invalid package version"))
 }
 
 getPkgType <- function(pkgdir)
@@ -228,7 +229,7 @@ checkBiocViews <- function(pkgdir)
     handleCheck("Checking that biocViews are present...")
     if (!"biocViews" %in% colnames(dcf))
     {
-        handleError("Add some biocViews!")
+        handleError("No biocViews terms found.")
         return(TRUE)
     }
     biocViews <- dcf[, "biocViews"]
@@ -240,8 +241,8 @@ checkBiocViews <- function(pkgdir)
     handleCheck("Checking for non-trivial biocViews...")
     toplevel <- c("Software", "AnnotationData", "ExperimentData")
     if (all(views %in% toplevel)) {
-        handleError(sprintf("Add biocViews other than %s",
-                               paste(unique(views), collapse=", ")))
+        handleError(
+            "Add biocViews other than ", paste(unique(views), collapse=", "))
         return(TRUE)
     }
 
@@ -253,8 +254,8 @@ checkBiocViews <- function(pkgdir)
     handleCheck("Checking that biocViews come from the same category...")
     if (length(unique(parents)) > 1)
     {
-        handleWarning(paste0("Use biocViews from one category only",
-            " (one of Software, ExperimentData, AnnotationData)"))
+        handleWarning("Use biocViews from one category only ",
+            "(one of Software, ExperimentData, AnnotationData)")
         return(TRUE)
     }
     branch <- unique(parents)
@@ -271,8 +272,8 @@ checkBiocViews <- function(pkgdir)
     {
         badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
             collapse=", ")
-        handleWarning(paste("Use valid biocViews. Invalid ones:",
-            badViews))
+
+        handleWarning("Use valid biocViews. Invalid ones: ", badViews)
         dirty <- TRUE
     }
 
@@ -301,12 +302,11 @@ checkBiocViews <- function(pkgdir)
 
     if (!is.null(rec))
     {
-        if (length(rec$recommended) == 1 && !nzchar(rec$recommended))
-        {
+        if (length(rec$recommended) == 1 && !nzchar(rec$recommended)) {
         } else {
-            handleNote(paste(
+            handleNote(
                 "Consider adding these automatically suggested biocViews: ",
-                rec$recommended))
+                rec$recommended)
             dirty <- TRUE
         }
 
@@ -321,7 +321,7 @@ checkBBScompatibility <- function(pkgdir)
     handleCheck("Checking for blank lines in DESCRIPTION...")
     if (any(nchar(lines)==0))
     {
-        handleError("Remove blank lines from DESCRIPTION!")
+        handleError("Remove blank lines from DESCRIPTION.")
         return()
     }
     handleCheck("Checking for whitespace in DESCRIPTION field names...")
@@ -333,18 +333,18 @@ checkBBScompatibility <- function(pkgdir)
     }
     segs <- strsplit(pkgdir, .Platform$file.sep)[[1]]
     pkgNameFromDir <- segs[length(segs)]
-    handleCheck("Checking that Package field matches dir/tarball name...")
+    handleCheck("Checking that Package field matches directory/tarball name...")
     if (dcf[, "Package"] != pkgNameFromDir)
     {
-        handleError(sprintf(
-            "Package dir %s must match Package: field ( got %s)!",
-            pkgNameFromDir, dcf[, "Package"]))
-            return()
+        handleError(
+            "Package directory '", pkgNameFromDir, "' must match Package: ",
+            "field (got '", dcf[, "Package"], "').")
+        return()
     }
     handleCheck("Checking for Version field...")
     if (!"Version" %in% colnames(dcf))
     {
-        handleError("Version field in DESCRIPTION!")
+        handleError("No 'Version:' field in DESCRIPTION.")
         return()
     }
     handleCheck("Checking for valid maintainer...")
@@ -357,12 +357,12 @@ checkBBScompatibility <- function(pkgdir)
         pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE)
         tryCatch(people <- eval(pp, env),
             error=function(e) {
-                handleError("AuthorsR@ field must be valid R code!")
+                handleError("AuthorsR@ field must be valid R code.")
             })
         if (!exists("people")) return()
         if (!"person" %in% class(people))
         {
-            handleError("Authors@R must evaluate to 'person' object!")
+            handleError("Authors@R must evaluate to 'person' object.")
             return()
         }
         for (person in people)
@@ -388,13 +388,13 @@ checkBBScompatibility <- function(pkgdir)
         }
         if (is.null(maintainer))
         {
-            handleError("One author with maintainer (cre) role.")
+            handleError("Must have one author with maintainer (cre) role.")
             return()
         }
     } else if ("Maintainer" %in% colnames(dcf)) {
         maintainer <- dcf[,"Maintainer"]
     } else {
-        handleError("Maintainer or Authors@R field in DESCRIPTION file!")
+        handleError("No Maintainer or Authors@R field in DESCRIPTION file.")
         return()
     }
     # now need to make sure that regexes work, a la python/BBS
@@ -404,7 +404,7 @@ checkBBScompatibility <- function(pkgdir)
     #if (!  (all(match)  > 0) && (all(match.length) > 0) )
     if (match == -1 && match.length == -1)
     {
-        handleError("Email address in Maintainer field.")
+        handleError("No email address in Maintainer field.")
         return()
     }
 }
@@ -423,19 +423,20 @@ checkUnitTests <- function(pkgdir)
     cond <- length(dir(tests_dir, pattern = "\\.(R|Rin)$"))
     if (dir.exists(tests_dir) && (!cond))
     {
-        handleError(paste("Add a .R or .Rin file in tests/ directory",
-            "or unit tests will not be run by R CMD check! See",
-            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/",
-            "for details on configuring unit tests."))
+        handleError(
+            "Add a .R or .Rin file in tests/ directory or unit tests will ",
+            "not be run by R CMD check. See ",
+            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/")
         return()
     }
     if (!(dir.exists(tests_dir) && cond))
     ## end stolen code
     {
         msg <- paste0(
-            "Consider adding unit tests. We strongly encourage them. See\n",
-            "  http://bioconductor.org/developers/how-to/unitTesting-guidelines/."
-            )
+            "Consider adding unit tests. We strongly encourage them. See",
+            "\n  ",
+            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/."
+        )
         handleNote(msg)
     }
 }
@@ -448,38 +449,29 @@ checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
             TRUE)
     })
 
-    if (any(res > 0))
-    {
-        d <- getLoadedDLLs()
-        if (pkgname %in% names(d))
-        {
-            r <- getDLLRegisteredRoutines(pkgname)
-            if (sum(sapply(r, length)) == 0)
-            {
-                handleWarning(
-                    paste0("Register native routines!",
-                        " see http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines"))
-            }
-        }
-    }
+    if (!any(res > 0))
+        return()
+    d <- getLoadedDLLs()
+    if (!pkgname %in% names(d))
+        return()
+    r <- getDLLRegisteredRoutines(pkgname)
+    if (sum(sapply(r, length)) != 0)
+        return()
+    handleWarning(
+        "Register native routines; see ",
+        "http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines")
 }
 
 checkImportSuggestions <- function(pkgname)
 {
     suggestions <- NULL
-    tryCatch({
-        suppressMessages({
-            suppressWarnings({
-                suggestions <-
-                    capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
-            })
-        })
-    },
-        error=function(e){
-            suggestions <- "ERROR"
-            handleMessage("Could not get namespace suggestions.")
+    tryCatch(suppressMessages(suppressWarnings({
+        suggestions <-
+            capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
+    })), error=function(e) {
+        suggestions <- "ERROR"
+        handleMessage("Could not get namespace suggestions.")
     })
-
 
     if(length(suggestions) && (!is.null(suggestions)) &&
         (suggestions != "ERROR"))
@@ -501,8 +493,8 @@ checkDeprecatedPackages <- function(pkgdir)
 {
     if ("multicore" %in% getAllDependencies(pkgdir))
     {
-        handleError(paste("Use 'parallel' instead of 'multicore'.",
-            " 'multicore' is deprecated and does not work on Windows."))
+        handleError("Use 'parallel' instead of 'multicore'. ",
+            "'multicore' is deprecated and does not work on Windows.")
     }
 }
 
@@ -548,9 +540,9 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
             badones <- setdiff(badones, dcolon)
         }, error=function(...) NULL)
         if (length(badones))
-            handleWarning(sprintf(
-                "Import %s in NAMESPACE as well as DESCRIPTION.",
-                paste(badones, collapse=", ")))
+            handleWarning(
+                "Import ", paste(badones, collapse=", "), " in NAMESPACE ",
+                "as well as DESCRIPTION.")
     }
     if (!all (nImports %in% dImports))
     {
@@ -561,9 +553,9 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
         }
         if (length(badones))
         {
-            handleWarning(sprintf(
-                "Import %s in DESCRIPTION as well as NAMESPACE.",
-                paste(unique(badones), collapse=", ")))
+            handleWarning(
+                "Import ", paste(unique(badones), collapse=", "), " in ",
+                "DESCRIPTION as well as NAMESPACE.")
         }
     }
 }
@@ -600,12 +592,10 @@ checkForBadDepends <- function(pkgdir)
     
     handleCheck("Checking if other packages can import this one...")
     if (any(found)) {
-        msg <- sprintf(
-            "Packages providing %d object(s) used in this package
-             should be imported in the NAMESPACE file, otherwise
-             packages importing this package may fail.",
-            sum(found))
-        handleError(msg)
+        handleError(
+            "Packages providing ", sum(found), " object(s) used in this ",
+            "package should be imported in the NAMESPACE file, otherwise ",
+            "packages importing this package may fail.")
 
         msg <- sprintf("%s::%s (%s)", pkgs[found], res[found], fns[found])
         handleVerbatim(c("package::object (function)", msg))
@@ -613,13 +603,12 @@ checkForBadDepends <- function(pkgdir)
 
     handleCheck("Checking to see if we understand object initialization...")
     if (!all(found)) {
-        msg <- sprintf(
-            "Consider clarifying how %d object(s) are initialized.
-             Maybe %s part of a data set loaded with data(), or perhaps
-             part of an object referenced in with() or within().",
-            sum(!found),
-            if (sum(!found) == 1L) "it is" else "they are")
-        handleNote(msg)
+        n <- sum(!found)
+        handleNote(
+            "Consider clarifying how ", n, " object(s) are initialized. ",
+            "Maybe ", if (n == 1L) "it is" else "they are", " ",
+            "part of a data set loaded with data(), or perhaps part of an ",
+            "object referenced in with() or within().")
 
         msg <- sprintf("%s (%s)", res[!found], fns[!found])
         handleVerbatim(c("object (function)", msg))
@@ -682,11 +671,11 @@ getFunctionLengths <- function(df)
                 if (thisRowId == max || thisRow$parent > funcRow$parent)
                 {
                     lineToExamine <- ifelse(thisRowId == max, max, saveme)
-                    #endLine <- df[rownames(df) == as.character(lineToExamine), "line2"]
+
                     endLine <- lst[[as.character(lineToExamine)]]$line2
                     funcLines <- endLine - (funcStartLine -1)
-                    if(funcName == "_anonymous_") funcName <- paste0(funcName, ".",
-                        funcStartLine)
+                    if(funcName == "_anonymous_")
+                        funcName <- paste0(funcName, ".", funcStartLine)
                     res[[funcName]] <- c(length=funcLines,
                         startLine=funcStartLine, endLine=endLine)
                     break
@@ -808,11 +797,10 @@ checkFunctionLengths <- function(parsedCode, pkgname)
         h <- head(df, n=5)
         if (nrow(h))
         {
-            handleMessage(sprintf(
-                "The longest function is %s lines long", max(h$length)))
-            handleMessage(sprintf(
-                "The longest %s functions are:", nrow(h)))
-            for (i in 1:nrow(h))
+            handleMessage(
+                "The longest function is ", max(h$length) , " lines long")
+            handleMessage("The longest ", nrow(h), " functions are:")
+            for (i in seq_len(nrow(h)))
             {
                 row <- df[i,]
                 if (grepl("\\.R$", row$filename, ignore.case=TRUE))
@@ -893,17 +881,18 @@ checkForValueSection <- function(pkgdir)
 
         if ("\\usage" %in% tags && !is.null(value))
         {
+            values <- paste(unlist(value), collapse='')
             tst <- (is.list(value[[1]]) && length(value[[1]]) == 0) ||
-                nchar(gsub("^\\s+|\\s+$", "", paste(unlist(value), collapse='')))==0
+                nchar(gsub("^\\s+|\\s+$", "", values)) == 0
             if (tst)
                 return(FALSE)
         }
         TRUE
     }, logical(1))
     if (!all(ok)) {
-        handleWarning(sprintf(
-            "Add non-empty \\value sections to the following man pages: %s",
-            paste(mungeName(manpages[!ok], pkgname), collapse=", ")))
+        handleWarning(
+            "Add non-empty \\value sections to the following man pages: ",
+            paste(mungeName(manpages[!ok], pkgname), collapse=", "))
     }
 }
 
@@ -943,13 +932,13 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     if (exportingPagesCount > 0
         && ratio  <= (0.8 / 1.0))
     {
-        handleError(paste0("At least 80% of man pages documenting ",
-            "exported objects must have runnable examples. ",
-            "The following pages do not:"))
-    } else {
-        if (length(badManPages) > 0)
-        handleNote(paste("Consider adding runnable examples to the following",
-            "man pages which document exported objects:"))
+        handleError(
+            "At least 80% of man pages documenting exported objects must ",
+            "have runnable examples. The following pages do not:")
+    } else if (length(badManPages) > 0) {
+        handleNote(
+            "Consider adding runnable examples to the following ",
+            "man pages which document exported objects:")
     }
     if (length(badManPages) > 0)
         .msg(paste(badManPages, collapse=", "), indent=6)
@@ -965,9 +954,9 @@ checkNEWS <- function(pkgdir)
     news <- head(newsloc[file.exists(newsloc)], 1)
     if (0L == length(news))
     {
-        handleNote(paste(
-            "Consider adding a NEWS file, so your package news will be included",
-            "in Bioconductor release announcements."))
+        handleNote(
+            "Consider adding a NEWS file, so your package news will be ",
+            "included in Bioconductor release announcements.")
         return()
     }
     .build_news_db_from_package_NEWS_Rd <-
@@ -984,9 +973,9 @@ checkNEWS <- function(pkgdir)
         ## FIXME find a good reference to creating well-formed NEWS, and
         ## reference it here.
         ## Surprisingly, there does not seem to be one.
-        handleWarning(sprintf(paste0("Fix formatting of %s!",
-            " Malformed package NEWS will not be included ",
-            "in Bioconductor release announcements."), basename(news)))
+        handleWarning(
+            "Fix formatting of ", basename(news), ". Malformed package NEWS ",
+            "will not be included in Bioconductor release announcements.")
     })
 }
 
@@ -994,15 +983,15 @@ checkFormatting <- function(pkgdir, nlines=6)
 {
     pkgname <- basename(pkgdir)
     files <- c(
+        dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
+            full.names=TRUE),
         file.path(pkgdir, "NAMESPACE"),
         dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
             full.names=TRUE),
         dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
             pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
-            ignore.case=TRUE),
-        dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
-            full.names=TRUE)
-        )
+            ignore.case=TRUE)
+    )
     totallines <- 0L
     ok <- TRUE
     long <- tab <- indent <- Context()
@@ -1011,8 +1000,8 @@ checkFormatting <- function(pkgdir, nlines=6)
     {
         if (file.exists(file) && file.info(file)$size == 0)
         {
-            handleNote(sprintf("Add content to the empty file %s.",
-                mungeName(file, pkgname)))
+            handleNote("Add content to the empty file ",
+                mungeName(file, pkgname))
         }
 
         if (file.exists(file) && file.info(file)$size > 0)
@@ -1055,17 +1044,16 @@ checkFormatting <- function(pkgdir, nlines=6)
     if (n <- nrow(indent))
     {
         ok <- FALSE
-        handleNote(sprintf(paste(
-            "Consider multiples of 4 spaces for line indents,",
-            "%s lines (%i%%) are not."),
-            n, round((n / totallines) * 100)))
+        handleNote(
+            "Consider multiples of 4 spaces for line indents, ", n, " lines",
+            "(", round((n / totallines) * 100), "%) are not.")
         handleContext(indent, nlines)
     }
 
     if (!ok)
     {
-        url <- "http://bioconductor.org/developers/how-to/coding-style/"
-        handleMessage(sprintf("See %s", url))
+        handleMessage(
+            "See http://bioconductor.org/developers/how-to/coding-style/")
     }
 }
 
@@ -1083,14 +1071,11 @@ checkForPromptComments <- function(pkgdir)
     }
     if (length(bad) > 0)
     {
-        handleNote(sprintf(
-            "Remove generated comments from man pages %s ",
-            paste(bad, collapse=", ")))
+        handleNote(
+            "Remove generated comments from man pages ",
+            paste(bad, collapse=", "))
     }
 }
-
-
-
 
 checkForSupportSiteRegistration <- function(package_dir)
 {
@@ -1100,16 +1085,18 @@ checkForSupportSiteRegistration <- function(package_dir)
         handleMessage("Maintainer email is ok.")
         return()
     }
-    url <- paste0("https://support.bioconductor.org/api/email/",
-        email, "/")
-    if(suppressMessages(content(GET(url))))
-    {
-        handleMessage("Maintainer is registered at support site!")
+    url <- paste0("https://support.bioconductor.org/api/email/", email, "/")
+    response <- tryCatch(GET(url), error=identity)
+    if (inherits(response, "error")) {
+        handleMessage(
+            "Unable to connect to support site:",
+            "\n  ", conditionMessage(response))
+    } else if (suppressMessages(content(response))) {
+        handleMessage("Maintainer is registered at support site.")
     } else {
-        handleError(paste0("Maintainer must register at the support site;",
-            " visit https://support.bioconductor.org/accounts/signup/ ."))
+        handleError("Maintainer must register at the support site; ",
+            "visit https://support.bioconductor.org/accounts/signup/ .")
     }
-
 }
 
 
@@ -1123,48 +1110,51 @@ checkForBiocDevelSubscription <- function(pkgdir)
         handleMessage("Maintainer email is ok.")
         return()
     }
-    response <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel",
-        body=list(adminpw=Sys.getenv("BIOC_DEVEL_PASSWORD")))
-    if (status_code(response) >= 300)
-    {
-        warning(immediate. = TRUE,
-             "An error occurred communicating with mailing list: ",
-             "'https://stat.ethz.ch/mailman/admin/bioc-devel'. ",
-             "Server returned status: ", status_code(response))
+    response <- tryCatch({
+        POST(
+            "https://stat.ethz.ch/mailman/admin/bioc-devel",
+            body=list(adminpw=Sys.getenv("BIOC_DEVEL_PASSWORD")))
+    }, error=identity)
+    if (inherits(response, "error")) {
+        handleMessage(
+            "Unable to connect to mailing list",
+            "\n  ", conditionMessage(response))
+        return()
+    } else if (status_code(response) >= 300) {
+        handleMessage(
+            "Unable to connect to mailing list",
+            "\n  status code ", status_code(response))
         return()
     }
-    response2 <- POST("https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
+    response2 <- POST(
+        "https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
         body=list(findmember=email))
     content <- content(response2, as="text")
     if(grepl(paste0(">", tolower(email), "<"), tolower(content), fixed=TRUE))
     {
-        handleMessage("Maintainer is subscribed to bioc-devel!")
+        handleMessage("Maintainer is subscribed to bioc-devel.")
     } else {
-        handleError(paste0(
-            "Maintainer should subscribe to the bioc-devel mailing list.",
-            " Subscribe here: ",
-            "https://stat.ethz.ch/mailman/listinfo/bioc-devel"))
+        handleError(
+            "Maintainer must subscribe to the bioc-devel mailing list. ",
+            "Subscribe here: https://stat.ethz.ch/mailman/listinfo/bioc-devel")
     }
 }
 
-checkIsPackageAlreadyInRepo <- function(pkgName,
-    repo=c("CRAN", "Bioconductor"))
+checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft"))
 {
-    if (repo=="CRAN")
-        repo.url <- "http://cran.fhcrc.org/src/contrib/PACKAGES"
-    else
-        repo.url <- sprintf("%s/src/contrib/PACKAGES",
-            biocinstallRepos()["BioCsoft"])
+    repo <- match.arg(repo)
+    repo.url <- sprintf("%s/src/contrib/PACKAGES", biocinstallRepos()[repo])
     conn <- url(repo.url)
-    dcf <- read.dcf(conn)
+    dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
     close(conn)
-    if (tolower(pkgName) %in% tolower(dcf[,"Package"]))
-    {
-        if(repo=="CRAN")
+    if (inherits(dcf, "error")) {
+        handleMessage("Unable to access repository ", biocinstallRepos()[repo])
+    } else if (tolower(pkgName) %in% tolower(dcf[,"Package"])) {
+        if (repo == "CRAN")
             msg <- "Package must be removed from CRAN."
-        else
-            msg <- sprintf("Rename your package (%s already exists in Bioconductor).",
-                pkgName)
+        else {
+            msg <- paste0("'", pkgName, "' already exists in Bioconductor.")
+        }
         handleError(msg)
     }
 }
@@ -1173,7 +1163,7 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
 {
     if (!file.exists(build_output_file))
     {
-        stop(sprintf("build output file '%s' does not exist!", build_output_file))
+        stop("build output file '", build_output_file, "' does not exist.")
     }
     lines <- readLines(build_output_file)
     if (!any(grepl("^\\* creating vignettes \\.\\.\\.", lines)))

@@ -26,38 +26,40 @@
         prefix <- paste(rep(" ", exdent), collapse="")
         txt[-1] <- paste0(prefix, txt[-1])
     }
-    txt <- ifelse((!is.na(txt)) & (nchar(txt) > width),
-                  sprintf("%s...", substr(txt, 1, width - 3)),
-                  txt)
+    txt <- ifelse(
+        (!is.na(txt)) & (nchar(txt) > width),
+        sprintf("%s...", substr(txt, 1, width - 3)),
+        txt)
     message(paste(txt, collapse="\n"), appendLF=appendLF)
 }
 
-handleCheck <- function(msg, appendLF=TRUE)
+handleCheck <- function(..., appendLF=TRUE)
 {
+    msg <- paste0(...)
     .msg("* %s", msg, appendLF=appendLF)
 }
 
-handleError <- function(msg)
+handleError <- function(...)
 {
-    .error$add(msg)
+    msg <- .error$add(...)
     .msg("* ERROR: %s", msg, indent=4, exdent=6)
-    #.stop(msg)
 }
 
-handleWarning <- function(msg)
+handleWarning <- function(...)
 {
-    .warning$add(msg)
+    msg <- .warning$add(...)
     .msg("* WARNING: %s", msg, indent=4, exdent=6)
 }
 
-handleNote <- function(msg)
+handleNote <- function(...)
 {
-    .note$add(msg)
+    msg <- .note$add(...)
     .msg("* NOTE: %s", msg, indent=4, exdent=6)
 }
 
-handleMessage <- function(msg, indent=4, exdent=6)
+handleMessage <- function(..., indent=4, exdent=6)
 {
+    msg <- paste0(...)
     .msg("  %s", msg, indent=indent, exdent=exdent)
 }
 
@@ -91,7 +93,7 @@ installAndLoad <- function(pkg)
             "\n  stderr:",
             "\n  ", paste(readLines(stderr), collapse="\n  "),
             "\n", sep="")
-        handleError(sprintf("%s must be installable!", pkg))
+        handleError(pkg, " must be installable.")
     }
     pkgname <- strsplit(basename(pkg), "_")[[1]][1]
     args <- list(package=pkgname, lib.loc=libdir)
@@ -154,7 +156,8 @@ parseFile <- function(infile, pkgdir)
         outfile <- NULL
         desc <- file.path(pkgdir, "DESCRIPTION")
         dcf <- read.dcf(desc)
-        if ("VignetteBuilder" %in% colnames(dcf) && dcf[,"VignetteBuilder"] == "knitr")
+        if ("VignetteBuilder" %in% colnames(dcf) &&
+            dcf[,"VignetteBuilder"] == "knitr")
         {
             if (!requireNamespace("knitr")) {
                 stop("'knitr' package required to check knitr-based vignettes")
@@ -305,7 +308,6 @@ getMaintainerEmail <- function(pkgdir)
                 email <- person$email
             }
         }
-       
     }
     return(email)
 }

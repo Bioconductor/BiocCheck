@@ -19,12 +19,12 @@ usage()
 \arguments{
   \item{package}{
     A directory or tarball (.tar.gz file) containing an R source package.
-}
+  }
   \item{\dots}{
     Run \code{usage()} to see the available options. When running
     \code{BiocCheck} interactively, options can be passed like so:
     \verb{BiocCheck(package, `no-check-vignettes`=TRUE)}
-}
+  }
 }
 
 
