@@ -9,8 +9,9 @@
 #'
 #' @return a data.frame() with columns File, Line, and Context
 Context <- function(pkg="", file="", lines=character(), idx=logical()) {
-    data.frame(File=rep(mungeName(file, pkg), sum(idx)), Line=which(idx),
-               Context=lines[idx], stringsAsFactors=FALSE)
+    data.frame(
+        File=rep(mungeName(file, pkg), sum(idx)), Line=which(idx),
+        Context=lines[idx], stringsAsFactors=FALSE)
 }
 
 #' Report context of events to user

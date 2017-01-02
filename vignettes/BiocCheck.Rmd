@@ -395,7 +395,8 @@ More information on NEWS files is available in the help topic `?news`.
 
 ## Formatting checks
 
-**Checking formatting of DESCRIPTION, NAMESPACE, man pages, R source, and vignette source...**
+**Checking formatting of DESCRIPTION, NAMESPACE, man pages, R source,
+  and vignette source...**
 
 There is no 100% correct way to format code. These checks adhere to the
 [_Bioconductor_ Style Guide][8] (`NOTE`).

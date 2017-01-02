@@ -9,7 +9,7 @@ getOptionList <- function()
         make_option("--no-check-bioc-views", action="store_true",
             help="disable biocViews-specific checks (for non-BioC packages)"),
         make_option("--build-output-file", type="character",
-            help="file containing output of R CMD build, for optional additional analysis",
+            help="file containing R CMD build output, for additional analysis",
             metavar="build-output-file")
         )
 }
@@ -70,10 +70,10 @@ BiocCheck <- function(package, ...)
     package_dir <- .get_package_dir(package)
     package_name <- .get_package_name(package)
 
-    handleMessage(paste(
-        sprintf("This is BiocCheck version %s.", packageVersion("BiocCheck")),
-        "BiocCheck is a work in progress. Output and severity of issues may",
-        "change. Installing package..."), indent=0, exdent=0)
+    handleMessage(
+        "This is BiocCheck version ", packageVersion("BiocCheck"), ". ",
+        "BiocCheck is a work in progress. Output and severity of issues may ",
+        "change. Installing package...", indent=0, exdent=0)
     installAndLoad(package)
 
     ## checks
@@ -99,11 +99,13 @@ BiocCheck <- function(package, ...)
             checkVignetteDir(package_dir, checkingDir)
             if ("build-output-file" %in% names(dots))
             {
-                handleCheck("Checking whether vignette is built with 'R CMD build'...")
+                handleCheck(
+                    "Checking whether vignette is built with 'R CMD build'...")
                 checkIsVignetteBuilt(package_dir, dots[["build-output-file"]])
             }
         } else {
-            handleMessage("This is not a software package, skipping vignette checks...")
+            handleMessage(
+                "This is not a software package, skipping vignette checks...")
         }
     }
     handleCheck("Checking version number...")
@@ -153,30 +155,25 @@ BiocCheck <- function(package, ...)
     handleCheck("Checking for T...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "T",
         "SYMBOL")
-    if (res > 0) handleWarning(sprintf(
-        "Use TRUE instead of T (found in %s files)",
-        res))
+    if (res > 0)
+        handleWarning("Use TRUE instead of T (found in ", res, " files)")
     handleCheck("Checking for F...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "F",
         "SYMBOL")
-    if (res > 0) handleWarning(sprintf(
-        "Use FALSE instead of F (found in %s files)",
-        res))
+    if (res > 0)
+        handleWarning("Use FALSE instead of F (found in ", res, " files)")
 
     handleCheck("Checking for browser()...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
         "SYMBOL_FUNCTION_CALL")
     if (res > 0)
-        handleWarning(sprintf(
-            "Remove browser() statements (found in %s files)",
-            res))
+        handleWarning("Remove browser() statements (found in ", res, " files)")
 
     handleCheck("Checking for <<-...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
         "LEFT_ASSIGN")
     if (res > 0)
-        handleNote(sprintf(
-            "Avoid '<<-'' if possible (found in %s files)", res))
+        handleNote("Avoid '<<-' if possible (found in ", res, " files)")
 
     handleCheck(sprintf("Checking for library/require of %s...",
         package_name))
@@ -197,8 +194,9 @@ BiocCheck <- function(package, ...)
     handleCheck("Checking package NEWS...")
     checkNEWS(package_dir)
 
-    handleCheck(paste0("Checking formatting of DESCRIPTION, NAMESPACE, ",
-        "man pages, R source, and vignette source..."))
+    handleCheck(
+        "Checking formatting of DESCRIPTION, NAMESPACE, ",
+        "man pages, R source, and vignette source...")
     checkFormatting(package_dir)
 
     handleCheck("Checking for canned comments in man pages...")
@@ -210,7 +208,7 @@ BiocCheck <- function(package, ...)
     if (!is.null(dots[["new-package"]]))
     {
         handleCheck("Checking if new package already exists in Bioconductor...")
-        checkIsPackageAlreadyInRepo(package_name, "Bioconductor")
+        checkIsPackageAlreadyInRepo(package_name, "BioCsoft")
 
     }
 
@@ -228,9 +226,11 @@ BiocCheck <- function(package, ...)
     .msg("ERROR count: %d", .error$getNum())
     .msg("WARNING count: %d", .warning$getNum())
     .msg("NOTE count: %d", .note$getNum())
-    .msg(paste0("For detailed information about these checks, ",
-    "see the BiocCheck vignette, available at ",
-        sprintf("http://bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#interpreting-bioccheck-output",
+    .msg(paste0(
+        "For detailed information about these checks, see the BiocCheck ",
+        "vignette, available at ",
+        sprintf(
+            "https://bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#interpreting-bioccheck-output",
             BiocInstaller:::BIOC_VERSION)),
         exdent=0)
 
