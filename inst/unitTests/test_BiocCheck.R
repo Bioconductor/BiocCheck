@@ -263,14 +263,14 @@ test_installAndLoad <- function()
 
 test_checkRegistrationOfEntryPoints <- function()
 {
-    parsedCode1 <- BiocCheck:::parseFiles(system.file("testpackages",
-        "testpkg1", package="BiocCheck"))
-    BiocCheck:::installAndLoad(system.file("testpackages", "testpkg1",
-        package="BiocCheck"))
+    pkg <- "testpkg1"
+    on.exit(tryCatch(unloadNamespace(pkg), error=invisible))
+    pkgdir <- system.file("testpackages", pkg, package="BiocCheck")
+    parsedCode1 <- BiocCheck:::parseFiles(pkgdir)
+    BiocCheck:::installAndLoad(pkgdir)
 
-    BiocCheck:::checkRegistrationOfEntryPoints("testpkg1", parsedCode1)
-    checkTrue(.warning$getNum() == 1,
-        "unregistered code not flagged!")
+    BiocCheck:::checkRegistrationOfEntryPoints(pkg, parsedCode1)
+    checkTrue(.warning$getNum() == 1, "unregistered code not flagged!")
 }
 
 test_checkDeprecatedPackages <- function()
