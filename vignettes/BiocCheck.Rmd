@@ -246,6 +246,10 @@ sure that every package meets the requirements.
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
 
+<!--* **Checking for valid development URL in DESCRIPTION...**
+  Checks to make sure the DESCRIPTION file has a valid github
+  `DevelopmentURL` field, if missing resolves to an (`ERROR`) -->
+
 ## Unit Test Checks
 
 **Checking unit tests...**
