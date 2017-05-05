@@ -84,7 +84,7 @@ installAndLoad <- function(pkg)
         stop("'file.create' stderr failed")
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
-                    libdir, pkg)
+                    libdir, shQuote(pkg))
     res <- system2(cmd, args, stdout=NULL, stderr=stderr)
     if (res != 0) 
     {
