@@ -88,7 +88,7 @@ installAndLoad <- function(pkg)
     res <- system2(cmd, args, stdout=NULL, stderr=stderr)
     if (res != 0) 
     {
-        cat(" cmd: ", cmd,
+        cat("  cmd: ", cmd,
             "\n  args: ", args,
             "\n  stderr:",
             "\n  ", paste(readLines(stderr), collapse="\n  "),
