@@ -1,0 +1,6 @@
+CHANGES IN VERSION 1.14
+-----------------------
+
+BUG FIXES
+
+    o Use shell quotes to allow spaces in package paths
