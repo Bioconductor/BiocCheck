@@ -212,11 +212,8 @@ BiocCheck <- function(package, ...)
 
     }
 
-    if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD")))
-    {
-        handleCheck("Checking for bioc-devel mailing list subscription...")
-        checkForBiocDevelSubscription(package_dir)
-    }
+    handleCheck("Checking for bioc-devel mailing list subscription...")
+    checkForBiocDevelSubscription(package_dir)
 
     handleCheck("Checking for support site registration...")
     checkForSupportSiteRegistration(package_dir)

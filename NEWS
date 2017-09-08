@@ -1,6 +1,12 @@
 CHANGES IN VERSION 1.14
 -----------------------
 
+NEW FEATURES
+
+    o NOTE when maintainer subscription to bioc-devel mailing list
+      cannot be checked (checking requires mailing list admin
+      password).
+
 BUG FIXES
 
     o Use shell quotes to allow spaces in package paths
