@@ -8,6 +8,7 @@ importFrom(tools, parse_Rd, Rd2ex)
 importFrom(codetools, walkCode)
 importFrom(utils, Stangle, capture.output, data, getParseData, head,
     packageDescription, packageVersion, untar, globalVariables)
+importFrom(stringdist, stringdistmatrix)
 
 export(BiocCheck)
 export(usage)

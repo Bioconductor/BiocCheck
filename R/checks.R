@@ -238,6 +238,20 @@ getParent <- function(view, biocViewsVocab)
     }
 }
 
+checkIndivFileSizes <- function(pkgdir)
+{
+    if (getPkgType(pkgdir) == "Software") {
+        maxSize <- 5*10^6 ## 5MB
+        allFiles <- list.files(pkgdir, all.files=TRUE, recursive=TRUE)
+        allFilesFullName <- file.path(pkgdir, allFiles)
+        sizes <- file.size(allFilesFullName)
+        largeFiles <- paste(allFiles[sizes > maxSize], collapse=" ")
+        if (any(sizes > maxSize)) {
+            handleWarning("The following files are over 5MB in size: ", largeFiles)
+            return(TRUE)
+        }
+    }
+}
 
 checkBiocViews <- function(pkgdir)
 {
@@ -251,7 +265,7 @@ checkBiocViews <- function(pkgdir)
     }
     biocViews <- dcf[, "biocViews"]
     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
-    views <- gsub("\\s", "", views)
+    # views <- gsub("\\s", "", views)
     biocViewsVocab <- NULL
     data("biocViewsVocab", package="biocViews", envir=environment())
 
@@ -287,10 +301,22 @@ checkBiocViews <- function(pkgdir)
     handleCheck("Checking biocViews validity...")
     if (!all(views %in% nodes(biocViewsVocab)))
     {
-        badViews <- paste(views[!(views %in% nodes(biocViewsVocab))],
-            collapse=", ")
+        badViews <- views[!(views %in% nodes(biocViewsVocab))]
+        badViewsVec <- paste(badViews, collapse=", ")
 
-        handleWarning("Use valid biocViews. Invalid ones: ", badViews)
+        terms <- c(badViews, nodes(biocViewsVocab))
+        distmat <- stringdistmatrix(terms,useNames="strings",method="lv")
+        distmat <- as.data.frame(as.matrix(distmat))
+        idx <- apply(distmat, 2, function(x) x>0 & x<3)
+        distmat <- apply(idx, 1:2, function(x) if(isTRUE(x)) x<-1 else x<- NA)
+        distmat <- distmat[, badViews]
+
+        suggestedViews <- lapply(badViews, function(x) {
+            res <- distmat[,x][!is.na(distmat[,x])]
+            paste0('"', x, '"', " is an invalid biocView. Did you mean: ", paste(names(res), collapse=", "))
+        })
+
+        handleWarning(unlist(suggestedViews))
         dirty <- TRUE
     }
 

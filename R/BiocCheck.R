@@ -120,6 +120,9 @@ BiocCheck <- function(package, ...)
     handleCheck("Checking R Version dependency...")
     checkRVersionDependency(package_dir)
 
+    handleCheck("Checking individual file sizes...")
+    checkIndivFileSizes(package_dir)
+
     if (is.null(dots[["no-check-bioc-views"]]))
     {
         handleCheck("Checking biocViews...")
