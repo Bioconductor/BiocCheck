@@ -630,7 +630,7 @@ checkForBadDepends <- function(pkgdir)
 
     pkgs <- character(length(fns))
     for (pkg in depends)
-        pkgs[fns %in% getNamespaceExports(pkg)] <- pkg
+        pkgs[res %in% getNamespaceExports(pkg)] <- pkg
     found <- nzchar(pkgs)
     
     handleCheck("Checking if other packages can import this one...")
@@ -640,8 +640,8 @@ checkForBadDepends <- function(pkgdir)
             "package should be imported in the NAMESPACE file, otherwise ",
             "packages importing this package may fail.")
 
-        msg <- sprintf("%s::%s (%s)", pkgs[found], res[found], fns[found])
-        handleVerbatim(c("package::object (function)", msg))
+        msg <- sprintf("  %s::%s (%s)", pkgs[found], res[found], fns[found])
+        handleVerbatim(c("", "package::object (function)", msg, ""))
     }
 
     handleCheck("Checking to see if we understand object initialization...")

@@ -408,11 +408,10 @@ test_checkImportSuggestions <- function()
 
 test_checkForBadDepends <- function()
 {
-    BiocCheck:::installAndLoad(system.file("testpackages", "testpkg0",
-                                           package="BiocCheck"))
+    pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    BiocCheck:::installAndLoad(pkg)
     BiocCheck:::.zeroCounters()
     BiocCheck:::checkForBadDepends(file.path(tempdir(), "lib", "testpkg0"))
-
     checkEquals(1, BiocCheck:::.error$getNum())
     checkEquals(1, BiocCheck:::.note$getNum())
     checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
