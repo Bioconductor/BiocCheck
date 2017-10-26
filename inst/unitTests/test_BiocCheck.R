@@ -164,22 +164,35 @@ test_checkNewPackageVersionNumber <- function()
 
 test_checkBiocViews <- function()
 {
+    .zeroCounters()
     cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
     checkTrue(.error$getNum() == 1,
         "missing biocViews doesn't produce error")
+
     .zeroCounters()
-    cat("biocViews: foo, Cancer, bar,\n    baz", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    cat(
+        "biocViews: foo, Cancer, bar,\n    baz",
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
+    )
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() == 1,
-        "invalid biocViews don't produce warning")
-    cat("biocViews: GO, CellBasedAssays", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkTrue(
+        .warning$getNum() == 4, "invalid biocViews don't produce warning"
+    )
+
     .zeroCounters()
+    cat(
+        "biocViews: GO, CellBasedAssays",
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
+    )
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() == 0,
-        "valid biocViews produce warning")
+    checkTrue(.warning$getNum() == 0, "valid biocViews produce warning")
+
     .zeroCounters()
-    cat("biocViews: aCGH, ChipName", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    cat(
+        "biocViews: aCGH, ChipName",
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
+    )
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
     checkTrue(.warning$getNum() == 1,
         "biocViews from multiple categories don't produce warning")

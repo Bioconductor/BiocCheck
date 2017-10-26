@@ -240,14 +240,18 @@ getParent <- function(view, biocViewsVocab)
 
 checkIndivFileSizes <- function(pkgdir)
 {
-    if (getPkgType(pkgdir) == "Software") {
+    pkgType <- getPkgType(pkgdir)
+    if (is.na(pkgType) ||  pkgType == "Software") {
         maxSize <- 5*10^6 ## 5MB
         allFiles <- list.files(pkgdir, all.files=TRUE, recursive=TRUE)
         allFilesFullName <- file.path(pkgdir, allFiles)
         sizes <- file.size(allFilesFullName)
         largeFiles <- paste(allFiles[sizes > maxSize], collapse=" ")
         if (any(sizes > maxSize)) {
-            handleWarning("The following files are over 5MB in size: ", largeFiles)
+            handleWarning(
+                "The following files are over 5MB in size: ",
+                paste0("'", largeFiles, "'", collapse = " ")
+            )
             return(TRUE)
         }
     }
@@ -277,11 +281,9 @@ checkBiocViews <- function(pkgdir)
         return(TRUE)
     }
 
-    parents <- c()
-    for (view in views)
-    {
-        parents <- c(parents, getParent(view, biocViewsVocab))
-    }
+    parents <-
+        unlist(lapply(views, getParent, biocViewsVocab), use.names=FALSE)
+
     handleCheck("Checking that biocViews come from the same category...")
     if (length(unique(parents)) > 1)
     {
@@ -305,43 +307,42 @@ checkBiocViews <- function(pkgdir)
         badViewsVec <- paste(badViews, collapse=", ")
 
         terms <- c(badViews, nodes(biocViewsVocab))
-        distmat <- stringdistmatrix(terms,useNames="strings",method="lv")
-        distmat <- as.data.frame(as.matrix(distmat))
-        idx <- apply(distmat, 2, function(x) x>0 & x<3)
-        distmat <- apply(idx, 1:2, function(x) if(isTRUE(x)) x<-1 else x<- NA)
-        distmat <- distmat[, badViews]
+        distmat <- stringdistmatrix(terms, useNames="strings", method="lv")
+        distmat <- as.matrix(distmat)
+        distmat <- distmat > 0 & distmat < 3
+        distmat[badViews, badViews] = FALSE
 
-        suggestedViews <- lapply(badViews, function(x) {
-            res <- distmat[,x][!is.na(distmat[,x])]
-            paste0('"', x, '"', " is an invalid biocView. Did you mean: ", paste(names(res), collapse=", "))
-        })
+        suggestedViews <- vapply(badViews, function(view) {
+            alt <- colnames(distmat)[distmat[view,]]
+            msg <- paste0("'", view, "' is an invalid BiocViews term.")
+            if (length(alt))
+                msg <- paste0(
+                    msg, " Did you mean: ",
+                    paste0("'", alt, "'", collapse = " ")
+            )
+            msg
+        }, character(1))
 
         handleWarning(unlist(suggestedViews))
         dirty <- TRUE
     }
 
-    if (packageVersion("biocViews") < package_version("1.33.9"))
-    {
-        if (branch == "Software")
-        {
+    if (packageVersion("biocViews") < package_version("1.33.9")) {
+        if (branch == "Software") {
             branch = "software"
-        } else if (branch == "AnnotationData")
-        {
+        } else if (branch == "AnnotationData") {
             branch = "annotation"
-        } else if (branch == "ExperimentData")
-        {
+        } else if (branch == "ExperimentData") {
             branch = "experiment"
         }
     }
 
-
-
-    rec <- NULL
     handleCheck("Checking for recommended biocViews...")
-    tryCatch(suppressMessages(
-        suppressWarnings(rec <- recommendBiocViews(pkgdir, branch))),
-        error=function(e){
-        })
+    rec <- tryCatch(suppressMessages(suppressWarnings({
+        recommendBiocViews(pkgdir, branch)
+    })), error=function(e) {
+        NULL
+    })
 
     if (!is.null(rec))
     {
@@ -352,8 +353,6 @@ checkBiocViews <- function(pkgdir)
                 rec$recommended)
             dirty <- TRUE
         }
-
-
     }
     return(dirty)
 }
