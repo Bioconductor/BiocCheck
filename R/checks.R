@@ -483,6 +483,25 @@ checkUnitTests <- function(pkgdir)
     }
 }
 
+## check if testthat contains skip_on_bioc() and throw note of it does
+checkSkipOnBioc <- function(pkgdir)
+{
+    pkgdir <- file.path(pkgdir, "tests", "testthat")
+    if (file.exists(pkgdir)) {
+        testfiles <- list.files(pkgdir, pattern = ".R$")
+        testfiles_full <- file.path(pkgdir, testfiles)
+        msg <- lapply(seq_along(testfiles), function(idx){
+            tokens <- getParseData(parse(testfiles_full[idx], keep.source=TRUE))
+            if ("skip_on_bioc" %in% unlist(tokens))
+                testfiles[idx]
+        })
+        msg <- paste(unlist(msg), collapse = " ")
+        if (msg != "") {
+            handleNote("skip_on_bioc() found in testthat files: ", msg)
+        }
+    }
+}
+
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
 {
     symbols <-  c(".C", ".Call", ".Fortran", ".External")

@@ -137,6 +137,7 @@ BiocCheck <- function(package, ...)
     handleCheck("Checking unit tests...")
     checkUnitTests(package_dir)
     parsedCode <- parseFiles(package_dir)
+    checkSkipOnBioc(package_dir)
 
     handleCheck("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name, parsedCode)
