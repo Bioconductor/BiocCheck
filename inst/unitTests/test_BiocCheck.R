@@ -265,6 +265,10 @@ test_checkUnitTests <- function()
     .zeroCounters()
     BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
     checkTrue(stillZero())
+    .zeroCounters()
+    BiocCheck:::checkSkipOnBioc(system.file("testpackages",
+        "testpkg0", package="BiocCheck"))
+    checkTrue(.note$getNum() == 1)
 }
 
 test_installAndLoad <- function()
