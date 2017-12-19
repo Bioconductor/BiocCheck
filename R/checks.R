@@ -488,7 +488,7 @@ checkSkipOnBioc <- function(pkgdir)
 {
     pkgdir <- file.path(pkgdir, "tests", "testthat")
     if (file.exists(pkgdir)) {
-        testfiles <- list.files(pkgdir, pattern = ".R$")
+        testfiles <- list.files(pkgdir)
         testfiles_full <- file.path(pkgdir, testfiles)
         msg <- lapply(seq_along(testfiles), function(idx){
             tokens <- getParseData(parse(testfiles_full[idx], keep.source=TRUE))
@@ -500,6 +500,44 @@ checkSkipOnBioc <- function(pkgdir)
             handleNote("skip_on_bioc() found in testthat files: ", msg)
         }
     }
+}
+
+checkPoorCoding <- function(pkgdir)
+{
+    pkgdir <- file.path(pkgdir, "R")
+    rfiles <- list.files(pkgdir)
+    rfiles_full <- file.path(pkgdir, rfiles)
+    msg_installs <- lapply(seq_along(rfiles), function(idx){
+        tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
+        if (any(c("biocLite", "install.packages", "update.packages") %in%
+          unlist(tokens)))
+            rfiles[idx]
+    })
+    msg_sapply <- lapply(seq_along(rfiles), function(idx){
+        tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
+        if ("sapply" %in% unlist(tokens)) rfiles[idx]
+    })
+    msg_seq <- lapply(seq_along(rfiles), function(idx){
+        tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
+        tokens <- tokens[tokens[,"token"] != "expr",]
+        colons <- which(tokens[,"text"] == ":")
+        lapply(colons, function(i) {
+            temp_tokens <- tokens[i-1,]
+            if (temp_tokens[,"text"] == "1") 
+                paste0(rfiles[idx], ":L", temp_tokens[,"line1"])
+        })
+    })
+
+    msg_installs <- paste(unlist(msg_installs), collapse = " ")
+    msg_sapply <- paste(unlist(msg_sapply), collapse = " ")
+    msg_seq <- paste(unlist(msg_seq), collapse = " ")
+
+    if (msg_installs != "")
+        handleNote("biocLite, install.packages, or update.packges found in R files: ", msg_installs)
+    if (msg_sapply != "")
+        handleNote("sapply found in R files", msg_sapply)
+    if (msg_seq != "")
+        handleNote("1:... found in R files", msg_seq)
 }
 
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
