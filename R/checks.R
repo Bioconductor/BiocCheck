@@ -509,13 +509,17 @@ checkPoorCoding <- function(pkgdir)
     rfiles_full <- file.path(pkgdir, rfiles)
     msg_installs <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
-        if (any(c("biocLite", "install.packages", "update.packages") %in%
-          unlist(tokens)))
-            rfiles[idx]
+        tokens <- tokens[tokens[,"text"] %in% c("biocLite", "install.packages", "update.packages"),]
+        lapply(tokens[,"line1"], function(i){
+            paste0(rfiles[idx], ":L", i)
+        })
     })
     msg_sapply <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
-        if ("sapply" %in% unlist(tokens)) rfiles[idx]
+        tokens <- tokens[tokens[,"text"] == "sapply",]
+        lapply(tokens[,"line1"], function(i){
+            paste0(rfiles[idx], ":L", i)
+        })
     })
     msg_seq <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
@@ -535,9 +539,9 @@ checkPoorCoding <- function(pkgdir)
     if (msg_installs != "")
         handleNote("biocLite, install.packages, or update.packges found in R files: ", msg_installs)
     if (msg_sapply != "")
-        handleNote("sapply found in R files", msg_sapply)
+        handleNote("sapply found in R files: ", msg_sapply)
     if (msg_seq != "")
-        handleNote("1:... found in R files", msg_seq)
+        handleNote("1:... found in R files: ", msg_seq)
 }
 
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)

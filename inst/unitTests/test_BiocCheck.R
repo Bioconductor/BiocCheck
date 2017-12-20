@@ -269,6 +269,10 @@ test_checkUnitTests <- function()
     BiocCheck:::checkSkipOnBioc(system.file("testpackages",
         "testpkg0", package="BiocCheck"))
     checkTrue(.note$getNum() == 1)
+    .zeroCOunters()
+    BiocCheck:::checkPoorCoding(system.file("testpackages",
+        "testpkg0", package="BiocCheck"))
+    checkTrue(.note$getNum() == 3)
 }
 
 test_installAndLoad <- function()
