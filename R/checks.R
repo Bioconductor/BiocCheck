@@ -488,7 +488,7 @@ checkSkipOnBioc <- function(pkgdir)
 {
     pkgdir <- file.path(pkgdir, "tests", "testthat")
     if (file.exists(pkgdir)) {
-        testfiles <- list.files(pkgdir)
+        testfiles <- list.files(pkgdir, pattern = ".R$")
         testfiles_full <- file.path(pkgdir, testfiles)
         msg <- lapply(seq_along(testfiles), function(idx){
             tokens <- getParseData(parse(testfiles_full[idx], keep.source=TRUE))
@@ -507,16 +507,20 @@ checkLibraryCalls <- function(pkgdir)
     pkgdir <- file.path(pkgdir, "R")
     rfiles <- list.files(pkgdir)
     rfiles_full <- file.path(pkgdir, rfiles)
+    badCalls <- c("biocLite", "install.packages", "update.packages")
     msg_installs <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
-        tokens <- tokens[tokens[,"text"] %in% c("biocLite", "install.packages", "update.packages"),]
-        lapply(tokens[,"line1"], function(i){
-            paste0(rfiles[idx], ":", i)
-        })
+        tokens <- tokens[tokens[,"text"] %in% badCalls, , drop = FALSE]
+        sprintf("%s: %d", rfiles[idx], tokens[,"line1"])
     })
-    msg_installs <- paste(unlist(msg_installs), collapse = " ")
-    if (msg_installs != "")
-        handleNote("biocLite, install.packages, or update.packges found in R files: ", msg_installs)
+    msg_installs <- unlist(msg_installs)
+    if (length(msg_installs) > 0) {
+        handleNote(
+            "biocLite, install.packages, or update.packages found in R files"
+        )
+        for (msg in msg_installs)
+            handleMessage(msg)
+    }
 }
 
 checkCodingPractice <- function(pkgdir)
@@ -528,27 +532,33 @@ checkCodingPractice <- function(pkgdir)
     msg_sapply <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] == "sapply", ,drop=FALSE]
-        sprintf("%s (line %d, column %d)", rfiles[idx], tokens[,"line1"], tokens[,"col1"])
+        sprintf(
+            "%s (line %d, column %d)",
+            rfiles[idx], tokens[,"line1"], tokens[,"col1"]
+        )
     })
     msg_sapply <- unlist(msg_sapply)
-    msg_seq <- lapply(seq_along(rfiles), function(idx){
+    msg_seq <- lapply(seq_along(rfiles), function(idx) {
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
         colons <- which(tokens[,"text"] == ":") - 1
         colons <- colons[tokens[colons, "text"] == "1"]
         tokens <- tokens[colons, , drop=FALSE]
         tokens <- tokens[ tokens[,"text"] == "1", , drop=FALSE]
-        sprintf("%s (line %d, column %d)", rfiles[idx], tokens[,"line1"], tokens[,"col1"])
-    }
+        sprintf(
+            "%s (line %d, column %d)",
+            rfiles[idx], tokens[,"line1"], tokens[,"col1"]
+        )
+    })
     msg_seq <- unlist(msg_seq)
 
     if (length(msg_sapply) > 0) {
-        handleNote("Avoid sapply(); use vapply() found in files: ")
+        handleNote("Avoid sapply(); use vapply() found in files:")
         for (msg in msg_sapply)
             handleMessage(msg)
     }
     if (length(msg_seq) > 0) {
-        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files: ")
+        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files:")
         for (msg in msg_seq)
             handleMessage(msg)
     }

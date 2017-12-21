@@ -267,14 +267,16 @@ urge you to add them (`NOTE`).
 
 **Checking coding practices...**
 
-Checks to see whether certain programming practices are found in the R directory.
+Checks to see whether certain programming practices are found in the R
+directory.
 
-We recommend that `vapply()` be used instead of `sapply()`.
+We recommend that `vapply()` be used instead of `sapply()`. Problems
+arise when the `X` argument to `sapply()` has length 0; the return
+type is then a `list()` rather than a vector or array.
 
-We recommend that `seq_len()` or `seq_along` be used instead of `1:...`. This is
-because the case `1:0` comes out to equal `1:0` which may be an unexpected or
-unwanted result. In addition, using `seq_len` or `seq_along` provides a slight
-increase in performance.
+We recommend that `seq_len()` or `seq_along()` be used instead of
+`1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
+which may be an unexpected or unwanted result.
 
 ## Native Routine Registration Checks
 
