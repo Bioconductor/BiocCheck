@@ -521,37 +521,37 @@ checkLibraryCalls <- function(pkgdir)
 
 checkCodingPractice <- function(pkgdir)
 {
-    for (i in 1:10) {}
-    a <- sapply(1:20, function(x) {})
     pkgdir <- file.path(pkgdir, "R")
     rfiles <- list.files(pkgdir)
     rfiles_full <- file.path(pkgdir, rfiles)
     rfiles <- file.path("R", rfiles)
     msg_sapply <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
-        tokens <- tokens[tokens[,"text"] == "sapply",]
-        lapply(seq_len(nrow(tokens)), function(i){
-            paste0(rfiles[idx], " (line ", tokens[i,"line1"], ", column ", tokens[i, "col1"], ")")
-        })
+        tokens <- tokens[tokens[,"text"] == "sapply", ,drop=FALSE]
+        sprintf("%s (line %d, column %d)", rfiles[idx], tokens[,"line1"], tokens[,"col1"])
     })
+    msg_sapply <- unlist(msg_sapply)
     msg_seq <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
-        tokens <- tokens[tokens[,"token"] != "expr",]
-        colons <- which(tokens[,"text"] == ":")
-        lapply(colons, function(i) {
-            temp_tokens <- tokens[i-1,]
-            if (temp_tokens[,"text"] == "1") 
-                paste0(rfiles[idx], " (line ", temp_tokens[,"line1"], ", column ", temp_tokens[,"col1"], ")")
-        })
-    })
+        tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
+        colons <- which(tokens[,"text"] == ":") - 1
+        colons <- colons[tokens[colons, "text"] == "1"]
+        tokens <- tokens[colons, , drop=FALSE]
+        tokens <- tokens[ tokens[,"text"] == "1", , drop=FALSE]
+        sprintf("%s (line %d, column %d)", rfiles[idx], tokens[,"line1"], tokens[,"col1"])
+    }
+    msg_seq <- unlist(msg_seq)
 
-    msg_sapply <- paste(unlist(msg_sapply), collapse = " ")
-    msg_seq <- paste(unlist(msg_seq), collapse = " ")
-
-    if (msg_sapply != "")
-        handleNote("Avoid sapply(); use vapply() found in files: ", msg_sapply)
-    if (msg_seq != "")
-        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files: ", msg_seq)
+    if (length(msg_sapply) > 0) {
+        handleNote("Avoid sapply(); use vapply() found in files: ")
+        for (msg in msg_sapply)
+            handleMessage(msg)
+    }
+    if (length(msg_seq) > 0) {
+        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files: ")
+        for (msg in msg_seq)
+            handleMessage(msg)
+    }
 }
 
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
