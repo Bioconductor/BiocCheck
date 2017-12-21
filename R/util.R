@@ -117,7 +117,7 @@ cleanupDependency <- function(input, remove.R=TRUE)
     namevec <- vector(mode = "character", length(nms))
     output <- gsub("\\([^)]*\\)", "", output)
     res <- strsplit(output, ",")[[1]]
-    for (i in 1:length(nms))
+    for (i in seq_along(nms))
     {
         if(grepl(">=", nms[i], fixed=TRUE))
         {
@@ -174,8 +174,9 @@ parseFile <- function(infile, pkgdir)
         } else {
             full.infile <- normalizePath(infile)
             oof <- file.path(tempdir(), basename(infile))
-            oof <- sapply(strsplit(oof, "\\."),
-                function(x) paste(x[1:(length(x)-1)], collapse="."))
+            oof <- vapply(strsplit(oof, "\\."),
+                function(x) paste(x[seq_len(length(x)-1)], collapse="."),
+                character(1))
             outfile <- paste0(oof, '.R')
             suppressWarnings(suppressMessages(capture.output({
                     oldwd <- getwd()

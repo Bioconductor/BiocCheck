@@ -263,6 +263,19 @@ to implement them, read our [Unit Testing HOWTO][5].
 At present we just check to see whether unit tests are present, and if not,
 urge you to add them (`NOTE`).
 
+## Coding Practices Checks
+
+**Checking coding practices...**
+
+Checks to see whether certain programming practices are found in the R directory.
+
+We recommend that `vapply()` be used instead of `sapply()`.
+
+We recommend that `seq_len()` or `seq_along` be used instead of `1:...`. This is
+because the case `1:0` comes out to equal `1:0` which may be an unexpected or
+unwanted result. In addition, using `seq_len` or `seq_along` provides a slight
+increase in performance.
+
 ## Native Routine Registration Checks
 
 **Checking native routine registration...**

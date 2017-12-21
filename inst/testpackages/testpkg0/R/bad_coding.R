@@ -1,4 +1,4 @@
-bad_fun <- funciton(){
+bad_fun <- function(){
 
     update.packages("base")
 

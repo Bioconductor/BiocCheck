@@ -45,7 +45,7 @@
                 "need to copy it yourself to a directory on your PATH,",
                 "making sure it is executable.",
                 "See the BiocCheck vignette for more information."))
-            for (i in 1:length(msg))
+            for (i in seq_along(msg))
                 func(msg[i])
         } else {
             func("BiocCheck script installed.")

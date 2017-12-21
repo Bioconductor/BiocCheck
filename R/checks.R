@@ -502,7 +502,7 @@ checkSkipOnBioc <- function(pkgdir)
     }
 }
 
-checkPoorCoding <- function(pkgdir)
+checkLibraryCalls <- function(pkgdir)
 {
     pkgdir <- file.path(pkgdir, "R")
     rfiles <- list.files(pkgdir)
@@ -511,14 +511,27 @@ checkPoorCoding <- function(pkgdir)
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] %in% c("biocLite", "install.packages", "update.packages"),]
         lapply(tokens[,"line1"], function(i){
-            paste0(rfiles[idx], ":L", i)
+            paste0(rfiles[idx], ":", i)
         })
     })
+    msg_installs <- paste(unlist(msg_installs), collapse = " ")
+    if (msg_installs != "")
+        handleNote("biocLite, install.packages, or update.packges found in R files: ", msg_installs)
+}
+
+checkCodingPractice <- function(pkgdir)
+{
+    for (i in 1:10) {}
+    a <- sapply(1:20, function(x) {})
+    pkgdir <- file.path(pkgdir, "R")
+    rfiles <- list.files(pkgdir)
+    rfiles_full <- file.path(pkgdir, rfiles)
+    rfiles <- file.path("R", rfiles)
     msg_sapply <- lapply(seq_along(rfiles), function(idx){
         tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] == "sapply",]
-        lapply(tokens[,"line1"], function(i){
-            paste0(rfiles[idx], ":L", i)
+        lapply(seq_len(nrow(tokens)), function(i){
+            paste0(rfiles[idx], " (line ", tokens[i,"line1"], ", column ", tokens[i, "col1"], ")")
         })
     })
     msg_seq <- lapply(seq_along(rfiles), function(idx){
@@ -528,20 +541,17 @@ checkPoorCoding <- function(pkgdir)
         lapply(colons, function(i) {
             temp_tokens <- tokens[i-1,]
             if (temp_tokens[,"text"] == "1") 
-                paste0(rfiles[idx], ":L", temp_tokens[,"line1"])
+                paste0(rfiles[idx], " (line ", temp_tokens[,"line1"], ", column ", temp_tokens[,"col1"], ")")
         })
     })
 
-    msg_installs <- paste(unlist(msg_installs), collapse = " ")
     msg_sapply <- paste(unlist(msg_sapply), collapse = " ")
     msg_seq <- paste(unlist(msg_seq), collapse = " ")
 
-    if (msg_installs != "")
-        handleNote("biocLite, install.packages, or update.packges found in R files: ", msg_installs)
     if (msg_sapply != "")
-        handleNote("sapply found in R files: ", msg_sapply)
+        handleNote("Avoid sapply(); use vapply() found in files: ", msg_sapply)
     if (msg_seq != "")
-        handleNote("1:... found in R files: ", msg_seq)
+        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files: ", msg_seq)
 }
 
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
@@ -558,7 +568,7 @@ checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
     if (!pkgname %in% names(d))
         return()
     r <- getDLLRegisteredRoutines(pkgname)
-    if (sum(sapply(r, length)) != 0)
+    if (sum(lengths(r)) != 0)
         return()
     handleWarning(
         "Register native routines; see ",
@@ -735,14 +745,14 @@ getBadDeps <- function(pkgdir)
 getFunctionLengths <- function(df)
 {
     df <- df[df$terminal & df$parent > -1,]
-    rownames(df) <- seq_along(1:nrow(df))
+    rownames(df) <- seq_len(nrow(df))
     max <- nrow(df)
     res <- list()
     funcRows <- df[df$token == "FUNCTION",]
     lst<-lapply(split(df, rownames(df)), as.list)
     if (nrow(funcRows))
     {
-        for (i in 1:nrow(funcRows))
+        for (i in seq_len(nrow(funcRows)))
         {
             funcRowId <- as.integer(rownames(funcRows)[i])
             funcRow <- funcRows[as.character(funcRowId),]
@@ -798,7 +808,7 @@ getFunctionLengths <- function(df)
 
 doesFileLoadPackage <- function(df, pkgname)
 {
-    df <- cbind(df, idx=seq_along(1:nrow(df)))
+    df <- cbind(df, idx=seq_len(nrow(df)))
     res <- c()
     regex <- paste0("^['|\"]*", pkgname, "['|\"]*$")
     max <- nrow(df)
@@ -806,7 +816,7 @@ doesFileLoadPackage <- function(df, pkgname)
         df$text %in% c("library","require"),]
     if (nrow(reqs))
     {
-        for (i in 1:nrow(reqs))
+        for (i in seq_len(nrow(reqs)))
         {
             reqRow <- reqs[i,]
             currIdx <- reqs[i, "idx"]
@@ -817,7 +827,7 @@ doesFileLoadPackage <- function(df, pkgname)
             lastRowWithThatParent <-
                 rowsWithThatParent[nrow(rowsWithThatParent),]
             rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
-            for (j in 1:nrow(rowsToCheck))
+            for (j in seq_len(nrow(rowsToCheck)))
             {
                 curRow <- rowsToCheck[j,]
                 if (curRow$token %in% c("SYMBOL", "STR_CONST") &&

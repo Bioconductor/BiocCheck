@@ -7,7 +7,7 @@ Authors@R: c(
         email="maintainer@bioconductor.org",
         role=c("aut", "cre")),
     person("Kevin", "Rue", role="ctb"))
-Depends: R (>= 3.4.0)
+Depends: R (>= 3.5.0)
 License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
