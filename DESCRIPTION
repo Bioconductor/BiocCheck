@@ -1,11 +1,12 @@
 Package: BiocCheck
-Version: 1.15.1
+Version: 1.15.2
 Title: Bioconductor-specific package checks
 Description: Executes Bioconductor-specific package checks.
 Authors@R: c(
     person("Bioconductor", "Package Maintainer",
         email="maintainer@bioconductor.org",
         role=c("aut", "cre")),
+    person("Daniel", "von Twisk", role="ctb"),
     person("Kevin", "Rue", role="ctb"))
 Depends: R (>= 3.5.0)
 License: Artistic-2.0
