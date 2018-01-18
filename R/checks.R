@@ -20,23 +20,6 @@ checkForVersionNumberMismatch <- function(package, package_dir)
     }
 }
 
-
-checkValidDevelopmentURL <- function(package_dir)
-{
-    desc <- file.path(package_dir, "DESCRIPTION")
-    devurl <- read.dcf(desc, "DevelopmentURL")
-    if (is.na(devurl)) {
-        handleError("DevelopmentURL: field missing in DESCRIPTION file")
-    }
-    else{
-        # Check if DevURL is valid
-        if (!url.exists(as.character(devurl))) {
-            handleError("Valid DevelopmentURL is required in DESCRIPTION.")
-        }
-    }
-}
-
-
 checkRVersionDependency <- function(package_dir)
 {
     desc <- file.path(package_dir, "DESCRIPTION")
