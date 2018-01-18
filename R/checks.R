@@ -505,13 +505,14 @@ checkSkipOnBioc <- function(pkgdir)
 checkLibraryCalls <- function(pkgdir)
 {
     pkgdir <- file.path(pkgdir, "R")
-    rfiles <- list.files(pkgdir)
-    rfiles_full <- file.path(pkgdir, rfiles)
+    rfiles <- dir(
+        pkgdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE
+    )
     badCalls <- c("biocLite", "install.packages", "update.packages")
-    msg_installs <- lapply(seq_along(rfiles), function(idx){
-        tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
+    msg_installs <- lapply(rfiles, function(rfile){
+        tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] %in% badCalls, , drop = FALSE]
-        sprintf("%s: %d", rfiles[idx], tokens[,"line1"])
+        sprintf("%s: %d", basename(rfile), tokens[,"line1"])
     })
     msg_installs <- unlist(msg_installs)
     if (length(msg_installs) > 0) {
@@ -526,20 +527,18 @@ checkLibraryCalls <- function(pkgdir)
 checkCodingPractice <- function(pkgdir)
 {
     pkgdir <- file.path(pkgdir, "R")
-    rfiles <- list.files(pkgdir)
-    rfiles_full <- file.path(pkgdir, rfiles)
-    rfiles <- file.path("R", rfiles)
-    msg_sapply <- lapply(seq_along(rfiles), function(idx){
-        tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
+    rfiles <- dir(pkgdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE)
+    msg_sapply <- lapply(rfiles, function(rfile){
+        tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] == "sapply", ,drop=FALSE]
         sprintf(
             "%s (line %d, column %d)",
-            rfiles[idx], tokens[,"line1"], tokens[,"col1"]
+            basename(rfile), tokens[,"line1"], tokens[,"col1"]
         )
     })
     msg_sapply <- unlist(msg_sapply)
-    msg_seq <- lapply(seq_along(rfiles), function(idx) {
-        tokens <- getParseData(parse(rfiles_full[idx], keep.source=TRUE))
+    msg_seq <- lapply(rfiles, function(rfile) {
+        tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
         colons <- which(tokens[,"text"] == ":") - 1
         colons <- colons[tokens[colons, "text"] == "1"]
@@ -547,7 +546,7 @@ checkCodingPractice <- function(pkgdir)
         tokens <- tokens[ tokens[,"text"] == "1", , drop=FALSE]
         sprintf(
             "%s (line %d, column %d)",
-            rfiles[idx], tokens[,"line1"], tokens[,"col1"]
+            basename(rfile), tokens[,"line1"], tokens[,"col1"]
         )
     })
     msg_seq <- unlist(msg_seq)
