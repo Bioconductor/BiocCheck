@@ -1035,7 +1035,7 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
 
     ratio <- (exportingPagesCount - noExamplesCount) / exportingPagesCount
     if (exportingPagesCount > 0
-        && ratio  <= (0.8 / 1.0))
+        && ratio  < (0.8 / 1.0))
     {
         handleError(
             "At least 80% of man pages documenting exported objects must ",
