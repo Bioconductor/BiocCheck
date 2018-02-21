@@ -156,7 +156,7 @@ checkNewPackageVersionNumber <- function(pkgdir)
                 "0.99.1, ...); got ",sQuote(version), ".")
 }
 
-checkVersionNumber <- function(pkgdir, new_package=FALSE)
+checkVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     version <- dcf[, "Version"]

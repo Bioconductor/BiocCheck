@@ -113,9 +113,10 @@ BiocCheck <- function(package, ...)
     {
         handleCheck("Checking new package version number...")
         checkNewPackageVersionNumber(package_dir)
+    } else {
+        handleMessage("Checking version number validity...")
+        checkVersionNumber(package_dir)
     }
-    handleCheck("Checking version number validity...")
-    checkVersionNumber(package_dir, !is.null(dots[["new-package"]]))
 
     handleCheck("Checking R Version dependency...")
     checkRVersionDependency(package_dir)
