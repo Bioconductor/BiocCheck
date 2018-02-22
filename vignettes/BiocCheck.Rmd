@@ -131,8 +131,9 @@ determined.
   *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
 * Checks whether, while checking a directory (not a tarball), vignette
   sources exist in inst/doc (`ERROR`).
+* Checks whether vignette title is still using template value (`WARNING`)
 * Checks wheher the number of `eval=FALSE` chunks is more than 50% of
-  the total (`ERROR`).
+  the total (`WARNING`).
 
 **Checking whether vignette is built with 'R CMD build'...**
 
@@ -245,6 +246,7 @@ sure that every package meets the requirements.
     * A valid R object of class `person`.
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
+    * That person must have either `family` or `given` name defined.
 
 <!--* **Checking for valid development URL in DESCRIPTION...**
   Checks to make sure the DESCRIPTION file has a valid github

@@ -118,7 +118,33 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     }
 
+    checkVigTemplate(vigdircontents)
 
+    checkVigChunkEval(vigdircontents)
+}
+
+checkVigTemplate <- function(vigdircontents)
+{
+    badVig <- character(0)
+    for (file in vigdircontents) {
+        lines <- readLines(file, n=100L, warn=FALSE)
+        idx <- grep(lines, pattern="VignetteIndexEntry")
+        if (length(idx) != 0L){
+            title <- tolower(gsub(".*\\{|\\}.*", "", lines[idx]))
+            if (title == "vignette title"){
+                badVig = c(badVig, basename(file))
+            }
+        }
+    }
+    if (length(badVig) != 0L){
+        handleWarning("Vignette[s] still using template values. ",
+                      "Update the following files:")
+        handleMessage(badVig)
+    }
+}
+
+checkVigChunkEval <- function(vigdircontents)
+{
     chunks <- 0
     efs <- 0
     for (file in vigdircontents)

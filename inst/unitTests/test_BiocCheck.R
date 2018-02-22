@@ -127,9 +127,10 @@ test_vignettes0 <- function()
 
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEquals(1, .warning$getNum())
+    checkEquals(2, .warning$getNum())
     checkEquals("Evaluate more vignette chunks.",
-        .warning$get()[1])
+        .warning$get()[2])
+    checkTrue(grepl(pattern="still using template",  .warning$get()[1]))
 }
 
 test_checkVersionNumber <- function()

@@ -1,3 +1,5 @@
+%\VignetteIndexEntry{Vignette Title}
+
 ```{r echo=FALSE}
 ```
 
