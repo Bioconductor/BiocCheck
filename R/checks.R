@@ -413,7 +413,7 @@ checkBBScompatibility <- function(pkgdir)
         }
         if (is.null(maintainer))
         {
-            handleError("Must have one author with maintainer (cre) role.")
+            handleError("Authors@R field in DESCRIPTION file is malformed.")
             return()
         }
     } else if ("Maintainer" %in% colnames(dcf)) {
@@ -429,7 +429,7 @@ checkBBScompatibility <- function(pkgdir)
     #if (!  (all(match)  > 0) && (all(match.length) > 0) )
     if (match == -1 && match.length == -1)
     {
-        handleError("No email address in Maintainer field.")
+        handleError("Maintainer field in DESCRIPTION file is malformed.")
         return()
     }
 }
@@ -694,7 +694,7 @@ checkForBadDepends <- function(pkgdir)
     for (pkg in depends)
         pkgs[res %in% getNamespaceExports(pkg)] <- pkg
     found <- nzchar(pkgs)
-    
+
     handleCheck("Checking if other packages can import this one...")
     if (any(found)) {
         handleError(
