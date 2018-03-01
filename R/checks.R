@@ -91,14 +91,6 @@ checkVignetteDir <- function(pkgdir, checkingDir)
                 "Remove vignette sources from inst/doc; ",
                 "they belong in vignettes/.")
 
-        } else {
-            # Do we really want to emit a NOTE
-            # for a situation that will almost always be true?
-            # I think not, commenting out for now.
-            # Commenting out associated unit test as well.
-#            handleNote(paste0(
-#                "There are vignette sources in inst/doc;",
-#                " probably put there by R CMD build."))
         }
     }
 
@@ -115,12 +107,83 @@ checkVignetteDir <- function(pkgdir, checkingDir)
             handleError(paste0(vigns$msg, collapse="\n"))
             return()
         }
-
     }
+
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if (!"VignetteBuilder" %in% colnames(dcf)) {
+        builder <- NULL
+    } else {
+        builder <- strsplit(gsub(" ", "",dcf[, "VignetteBuilder"], fixed=TRUE),
+                            ",")[[1]]
+    }
+
+    if (!is.null(builder)){
+        checkVigBuilder(builder, vigdircontents)
+    }
+
+    checkVigEngine(builder, vigdircontents)
 
     checkVigTemplate(vigdircontents)
 
     checkVigChunkEval(vigdircontents)
+    
+}
+
+
+checkVigBuilder <- function(builder, vigdircontents)
+{
+# check DESCRIPTION is in at least one vignette
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    badBuilder <- character(0)
+    for (desc in builder){
+        res <- vapply(vigdircontents, vigHelper, logical(1), builder = desc)
+        if(!any(res, na.rm=TRUE)){
+            if (!(desc == "Sweave" && any(vigExt == "rnw"))){
+                badBuilder <- c(badBuilder, desc)
+            }
+        }
+    }
+    if (length(badBuilder) != 0L){
+        handleError("VignetteBuilder listed in DESCRIPTION but not ",
+                    "found as VignetteEngine in any vignettes:")
+        handleMessage(badBuilder)
+    }
+}
+
+vigHelper <- function(vignetteFile, builder){
+    lines <- readLines(vignetteFile, n=100L, warn=FALSE)
+    idx <- grep(lines, pattern="VignetteEngine")
+    if (length(idx) != 0){
+        eng <- gsub("::.*", "", gsub(".*\\{|\\}.*", "", lines[idx]))
+        return(eng %in% builder)
+    } else {
+        return(NA)
+    }
+}
+
+checkVigEngine <- function(builder, vigdircontents)
+{
+# check Engines are in DESCRIPTION
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    dx <- which(vigExt != "rnw")
+    if (length(dx) != 0) {
+        res <- vapply(vigdircontents[dx], vigHelper, logical(1), builder=builder)
+         if (length(which(!res)) != 0L){
+            handleError("VignetteEngine specified but not in DESCRIPTION. ",
+                        "Add the VignetteEngine from the following files to ",
+                        "DESCRIPTION:")
+            handleMessage(basename(names(which(!res))))
+        }
+        nadx <- which(is.na(res))
+        if (length(nadx) != 0L && is.null(builder)){
+            handleError(
+                "No VignetteEngine specified in vignette or DESCRIPTION. ",
+                "Add VignetteEngine to the following files or add a default ",
+                "VignetteBuilder in DESCRIPTION: ")
+            files = res[nadx]
+            handleMessage(basename(names(files)))
+        }
+    }
 }
 
 checkVigTemplate <- function(vigdircontents)
@@ -137,7 +200,7 @@ checkVigTemplate <- function(vigdircontents)
         }
     }
     if (length(badVig) != 0L){
-        handleWarning("Vignette[s] still using template values. ",
+        handleWarning("Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
                       "Update the following files:")
         handleMessage(badVig)
     }
