@@ -64,59 +64,37 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
 checkVignetteDir <- function(pkgdir, checkingDir)
 {
     vigdir <- file.path(pkgdir, "vignettes")
-    instdocdir <- file.path(pkgdir, "inst", "doc")
-    if (!file.exists(vigdir))
-    {
-        if (isInfrastructurePackage(pkgdir))
-        {
-            .msg("  Infrastructure package, vignette not required.",
-                indent=2)
-            return()
-        }
-        handleError("No 'vignettes' directory.")
+
+    res <- checkVigDirExists(pkgdir, vigdir)
+    if (!res)
         return()
-    }
+    
     vigdircontents <- getVigSources(vigdir)
     if (length(vigdircontents)==0)
     {
         handleError("No vignette sources in vignettes/ directory.")
         return()
     }
-    instdocdircontents <- getVigSources(instdocdir)
-    if (length(instdocdircontents) > 0)
-    {
-        if (checkingDir)
-        {
-            handleWarning(
-                "Remove vignette sources from inst/doc; ",
-                "they belong in vignettes/.")
 
-        }
-    }
+    checkInstContents(pkgdir, checkingDir)
 
-    if (file.exists(file.path("pkgdir", "DESCRIPTION")))
-    {
-        vigns <- tools::pkgVignettes(dir=pkgdir, check=TRUE)
-        if (is.null(vigns))
-        {
-            handleError("No vignette found.")
-            return()
-        }
-        if (length(vigns$msg))
-        {
-            handleError(paste0(vigns$msg, collapse="\n"))
-            return()
-        }
-    }
+    #
+    # This appears to never get run because of pkgdir as character
+    # tools::pkgVignettes
+    # 'pkgVignettes' returns an object of class '"pkgVignettes"' if a
+    #  vignette directory is found, otherwise 'NULL'.
+    #  what is this doing?
+    #
+    res <- checkToolsVig(pkgdir)
+    if (!res)
+        return()
 
-    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-    if (!"VignetteBuilder" %in% colnames(dcf)) {
+    desc <- file.path(pkgdir, "DESCRIPTION")
+    if (file.exists(desc))
+        builder <- getVigBuilder(desc)
+    else
         builder <- NULL
-    } else {
-        builder <- strsplit(gsub(" ", "",dcf[, "VignetteBuilder"], fixed=TRUE),
-                            ",")[[1]]
-    }
-
+    
     if (!is.null(builder)){
         checkVigBuilder(builder, vigdircontents)
     }
@@ -129,6 +107,69 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     
 }
 
+checkVigDirExists <- function(pkgdir, vigdir)
+{    
+    if (!file.exists(vigdir))
+    {
+        if (isInfrastructurePackage(pkgdir))
+        {
+            .msg("  Infrastructure package, vignette not required.",
+                indent=2)
+            return(FALSE)
+        }
+        handleError("No 'vignettes' directory.")
+        return(FALSE)
+    } else {
+        return(TRUE)
+    }
+}
+
+checkInstContents <- function(pkgdir, checkingDir)
+{
+    instdocdir <- file.path(pkgdir, "inst", "doc")
+    instdocdircontents <- getVigSources(instdocdir)
+    if (length(instdocdircontents) > 0)
+    {
+        if (checkingDir)
+        {
+                handleWarning(
+                "Remove vignette sources from inst/doc; ",
+                "they belong in vignettes/.")
+        }
+    }
+}
+
+checkToolsVig <- function(pkgdir)
+{
+    if (file.exists(file.path("pkgdir", "DESCRIPTION")))
+    {
+        vigns <- tools::pkgVignettes(dir=pkgdir, check=TRUE)
+        if (is.null(vigns))
+        {
+            handleError("No vignette found.")
+            return(FALSE)
+        }
+        if (length(vigns$msg))
+        {
+            handleError(paste0(vigns$msg, collapse="\n"))
+            return(FALSE)
+        }
+    } else {
+       return(TRUE)
+    }
+}
+
+getVigBuilder <- function(desc)
+{
+    dcf <- read.dcf(desc)
+    if (!"VignetteBuilder" %in% colnames(dcf)) {
+        builder <- NULL
+    } else {
+        builder <- strsplit(gsub(" ", "",dcf[, "VignetteBuilder"], fixed=TRUE),
+                            ",")[[1]]
+    }
+    return(builder)
+}
 
 checkVigBuilder <- function(builder, vigdircontents)
 {
@@ -201,7 +242,7 @@ checkVigTemplate <- function(vigdircontents)
     }
     if (length(badVig) != 0L){
         handleWarning("Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
-                      "Update the following files:")
+                      "Update the following files from using template values:")
         handleMessage(badVig)
     }
 }

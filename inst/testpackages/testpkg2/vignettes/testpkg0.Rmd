@@ -1,0 +1,8 @@
+%\VignetteIndexEntry{A new Title}
+%\VignetteEngine{ThisWillFail}
+
+```{r echo=FALSE}
+```
+
+```{r eval=FALSE}
+```

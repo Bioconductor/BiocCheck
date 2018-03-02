@@ -86,51 +86,84 @@ setVersion <- function(version)
 
 test_vignettes0 <- function()
 {
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE) ## no vignettes dir
-    checkError("Missing vignettes dir doesn't cause error!")
-    dir.create(file.path(UNIT_TEST_TEMPDIR, "vignettes"))
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE) ## empty vignettes dir
-    checkError("Empty vignettes dir doesn't cause error!")
-    cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "vignettes", "test.Rnw"))
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE) ## vig dir w/source file
+    pkgdir <- UNIT_TEST_TEMPDIR
+    vigdir <- file.path(pkgdir, "vignettes")
 
+    ## no vignettes dir ERROR
+    BiocCheck:::checkVigDirExists(pkgdir, vigdir)  
+    checkError("Missing vignettes dir")
+
+    # empty vignette dir ERROR
+    dir.create(vigdir, recursive=TRUE)
+    BiocCheck:::checkVignetteDir(pkgdir, TRUE)
+    checkError("Empty vignettes")
+
+    # vig dir w/ source file  OK
+    cat("nothing", file=file.path(vigdir, "test.Rnw"))
+    BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0
         && .warning$getNum() == 0
         && .note$getNum() == 0,
         "expected no errors/warnings/notes")
     .zeroCounters()
-    instdoc <- file.path(UNIT_TEST_TEMPDIR, "inst", "doc")
+
+    # check rnw file in inst/doc  WARNING
+    instdoc <- file.path(pkgdir, "inst", "doc")
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.rnw"))
-    .zeroCounters()
-
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE)
-
+    BiocCheck:::checkInstContents(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0
         && .warning$getNum() == 1
         && .note$getNum() == 0,
         "expected 1 warning, no notes or errors")
     .zeroCounters()
+
+    # check rmd file in inst/doc  WARNING
     unlink(instdoc, TRUE)
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.Rmd"))
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, TRUE)
+    BiocCheck:::checkInstContents(pkgdir, TRUE)
     checkTrue(.warning$getNum() == 1,
         "Rmd file not seen as valid vignette source")
     .zeroCounters()
-    BiocCheck:::checkVignetteDir(UNIT_TEST_TEMPDIR, FALSE)
-#   I don't think we should even mention this. So commenting it out.
-#    checkTrue(.note$getNum() == 1,
-#        "no complaints about vignette sources in inst/doc of tarball")
+
+    # check vigbuilder ERROR
+    # in Description but not any vignette
+    cat("VignetteBuilder: knitr", file=file.path(pkgdir, "DESCRIPTION"))
+    BiocCheck:::checkVignetteDir(pkgdir, TRUE)
+    checkTrue(.error$getNum() == 1)
     .zeroCounters()
 
-
+    # check vignette builder default
+    # vignette directory currently contains rnw
+    unlink(file.path(pkgdir, "DESCRIPTION"))
+    cat("Title: something", file=file.path(pkgdir, "DESCRIPTION"))
+    BiocCheck:::checkVignetteDir(pkgdir, TRUE)
+    checkTrue(.error$getNum() == 0)
+    # check defined in desc but default vig
+    unlink(file.path(pkgdir, "DESCRIPTION"))
+    cat("VignetteBuilder: Sweave", file=file.path(pkgdir, "DESCRIPTION"))
+    BiocCheck:::checkVignetteDir(pkgdir, TRUE)
+    checkTrue(.error$getNum() == 0)
+    .zeroCounters()
+    
+    # check vignette style of example package
+    # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
     checkEquals(2, .warning$getNum())
     checkEquals("Evaluate more vignette chunks.",
         .warning$get()[2])
-    checkTrue(grepl(pattern="still using template",  .warning$get()[1]))
+    checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[1]))
+    .zeroCounters()
+    
+    # check vignette style of example package
+    BiocCheck:::checkVignetteDir(system.file("testpackages",
+        "testpkg2", package="BiocCheck"), TRUE)
+    checkEquals(2, .error$getNum())
+    checkTrue(grepl(pattern="VignetteBuilder",  .error$get()[1]))
+    checkTrue(grepl(pattern="VignetteEngine",  .error$get()[2]))
+    .zeroCounters()
 }
 
 test_checkVersionNumber <- function()
