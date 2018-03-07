@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.16
+-----------------------
+
+BUG FIXES
+
+    o handle interactive BiocCheck() arguments correctly
+
 CHANGES IN VERSION 1.14
 -----------------------
 

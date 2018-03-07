@@ -56,14 +56,9 @@ BiocCheck <- function(package, ...)
     if (file.exists(package) && file.info(package)$isdir)
         checkingDir <- TRUE
 
-    d <- list(...)
-    if (length(d))
-    {
-        dots <- d[[1]]
-    } else {
-        dots <- list()
-    }
-
+    dots <- list(...)
+    if (length(dots) == 1L && is.list(dots[[1]]))
+        dots <- dots[[1]]               # command line args come as list
 
     if (length(package)==0)
         .stop("Supply a package directory or source tarball.")

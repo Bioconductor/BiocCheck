@@ -155,7 +155,7 @@ checkToolsVig <- function(pkgdir)
             return(FALSE)
         }
     } else {
-       return(TRUE)
+        return(TRUE)
     }
 }
 
@@ -208,11 +208,14 @@ checkVigEngine <- function(builder, vigdircontents)
     vigExt <- tolower(tools::file_ext(vigdircontents))
     dx <- which(vigExt != "rnw")
     if (length(dx) != 0) {
-        res <- vapply(vigdircontents[dx], vigHelper, logical(1), builder=builder)
-         if (length(which(!res)) != 0L){
-            handleError("VignetteEngine specified but not in DESCRIPTION. ",
-                        "Add the VignetteEngine from the following files to ",
-                        "DESCRIPTION:")
+        res <-
+            vapply(vigdircontents[dx], vigHelper, logical(1), builder=builder)
+        if (length(which(!res)) != 0L){
+            handleError(
+                "VignetteEngine specified but not in DESCRIPTION. ",
+                "Add the VignetteEngine from the following files to ",
+                "DESCRIPTION:"
+            )
             handleMessage(basename(names(which(!res))))
         }
         nadx <- which(is.na(res))
@@ -241,8 +244,10 @@ checkVigTemplate <- function(vigdircontents)
         }
     }
     if (length(badVig) != 0L){
-        handleWarning("Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
-                      "Update the following files from using template values:")
+        handleWarning(
+            "Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
+            "Update the following files from using template values:"
+        )
         handleMessage(badVig)
     }
 }
@@ -1344,8 +1349,8 @@ checkForBiocDevelSubscription <- function(pkgdir)
     {
         msg <-
             "Cannot determine whether maintainer is subscribed to the
-             bioc-devel mailing list (requires admin credentials).
-             Subscribe here: https://stat.ethz.ch/mailman/listinfo/bioc-devel"
+            bioc-devel mailing list (requires admin credentials).
+            Subscribe here: https://stat.ethz.ch/mailman/listinfo/bioc-devel"
         handleNote(paste(strwrap(msg), collapse="\n"))
         return()
     }
