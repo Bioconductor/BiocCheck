@@ -390,7 +390,9 @@ checkBiocViews <- function(pkgdir)
     # views <- gsub("\\s", "", views)
     biocViewsVocab <- NULL
     data("biocViewsVocab", package="biocViews", envir=environment())
-
+    handleCheck("Checking package type based on biocViews...")
+    type = guessPackageType(views)
+    handleMessage(type)
     handleCheck("Checking for non-trivial biocViews...")
     toplevel <- c("Software", "AnnotationData", "ExperimentData")
     if (all(views %in% toplevel)) {
