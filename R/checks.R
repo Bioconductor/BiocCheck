@@ -647,14 +647,16 @@ checkLibraryCalls <- function(pkgdir)
 checkCodingPractice <- function(pkgdir)
 {
     Rdir <- file.path(pkgdir, "R")
-    msg_sapply <- checkSapply(Rdir)
 
+    # sapply
+    msg_sapply <- checkSapply(Rdir)
     if (length(msg_sapply) > 0) {
         handleNote("Avoid sapply(); use vapply() found in files:")
         for (msg in msg_sapply)
             handleMessage(msg, indent=6)
     }
 
+    # 1:...
     msg_seq <- check1toN(Rdir)
     if (length(msg_seq) > 0) {
         handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files:")
@@ -662,6 +664,7 @@ checkCodingPractice <- function(pkgdir)
             handleMessage(msg, indent=6)
     }
 
+    # T/F
     res <- checkLogicalUseFiles(pkgdir)
     pkgname <- basename(pkgdir)
     res2 <- findLogicalRdir(pkgname)
@@ -678,6 +681,16 @@ checkCodingPractice <- function(pkgdir)
                 handleMessage(msg, indent=8)
         }
     }
+
+    # class() ==
+    msg_class <- checkClassEqUsage(pkgdir)
+    if (length(msg_class) > 0) {
+        handleNote(" Avoid class()== or class()!= ; use is() or !is()")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_class)
+            handleMessage(msg, indent=8)
+    }
+
 }
 
 checkSapply <- function(Rdir){
@@ -710,6 +723,34 @@ check1toN <- function(Rdir){
         )
     })
     msg_seq <- unlist(msg_seq)
+}
+
+grepPkgDir <- function(pkgdir, greparg){
+    args <- sprintf("%s %s*", greparg, pkgdir)
+    fnd <- tryCatch(
+        system2("grep", args, stdout=TRUE),
+        warning=function(w){character()},
+        error=function(e){character(0)})
+    msg_files <- vapply(fnd,
+                        FUN=function(x, pkgdir){
+                            vl = strsplit(x, split=":")
+                            filename = sub(vl[[1]][1], pattern=pkgdir,
+                                replacement="")
+                            lineNum = vl[[1]][2]
+                            sprintf("%s (line %s)", filename, lineNum)},
+                        FUN.VALUE = character(1),
+                        c(pkgdir=pkgdir),
+                        USE.NAMES=FALSE)
+    msg_files
+}
+
+checkClassEqUsage <- function(pkgdir){
+
+    pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
+    fnd <- grepPkgDir(pkgdir, "-rn 'class(.*)\\s*=='")
+    fnd2 <-grepPkgDir(pkgdir, "-rn 'class(.*)\\s*!='")
+    msg_class <- sort(c(fnd, fnd2))
+    msg_class
 }
 
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
