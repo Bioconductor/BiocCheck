@@ -401,3 +401,22 @@ makeTempRFile <- function(infile){
         character(0)
     }
 }
+
+grepPkgDir <- function(pkgdir, greparg){
+    args <- sprintf("%s %s*", greparg, pkgdir)
+    fnd <- tryCatch(
+        system2("grep", args, stdout=TRUE),
+        warning=function(w){character()},
+        error=function(e){character(0)})
+    msg_files <- vapply(fnd,
+                        FUN=function(x, pkgdir){
+                            vl = strsplit(x, split=":")
+                            filename = sub(vl[[1]][1], pattern=pkgdir,
+                                replacement="")
+                            lineNum = vl[[1]][2]
+                            sprintf("%s (line %s)", filename, lineNum)},
+                        FUN.VALUE = character(1),
+                        c(pkgdir=pkgdir),
+                        USE.NAMES=FALSE)
+    msg_files
+}
