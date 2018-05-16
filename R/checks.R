@@ -68,7 +68,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     res <- checkVigDirExists(pkgdir, vigdir)
     if (!res)
         return()
-    
+
     vigdircontents <- getVigSources(vigdir)
     if (length(vigdircontents)==0)
     {
@@ -94,7 +94,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
         builder <- getVigBuilder(desc)
     else
         builder <- NULL
-    
+
     if (!is.null(builder)){
         checkVigBuilder(builder, vigdircontents)
     }
@@ -104,11 +104,11 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     checkVigTemplate(vigdircontents)
 
     checkVigChunkEval(vigdircontents)
-    
+
 }
 
 checkVigDirExists <- function(pkgdir, vigdir)
-{    
+{
     if (!file.exists(vigdir))
     {
         if (isInfrastructurePackage(pkgdir))
@@ -187,7 +187,7 @@ checkVigBuilder <- function(builder, vigdircontents)
     if (length(badBuilder) != 0L){
         handleError("VignetteBuilder listed in DESCRIPTION but not ",
                     "found as VignetteEngine in any vignettes:")
-        handleMessage(badBuilder)
+        handleMessage(badBuilder, indent=6)
     }
 }
 
@@ -216,7 +216,7 @@ checkVigEngine <- function(builder, vigdircontents)
                 "Add the VignetteEngine from the following files to ",
                 "DESCRIPTION:"
             )
-            handleMessage(basename(names(which(!res))))
+            handleMessage(basename(names(which(!res))), indent=6)
         }
         nadx <- which(is.na(res))
         if (length(nadx) != 0L && is.null(builder)){
@@ -225,7 +225,7 @@ checkVigEngine <- function(builder, vigdircontents)
                 "Add VignetteEngine to the following files or add a default ",
                 "VignetteBuilder in DESCRIPTION: ")
             files = res[nadx]
-            handleMessage(basename(names(files)))
+            handleMessage(basename(names(files)), indent=6)
         }
     }
 }
@@ -248,7 +248,7 @@ checkVigTemplate <- function(vigdircontents)
             "Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
             "Update the following files from using template values:"
         )
-        handleMessage(badVig)
+        handleMessage(badVig, indent=6)
     }
 }
 
@@ -646,8 +646,43 @@ checkLibraryCalls <- function(pkgdir)
 
 checkCodingPractice <- function(pkgdir)
 {
-    pkgdir <- file.path(pkgdir, "R")
-    rfiles <- dir(pkgdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE)
+    Rdir <- file.path(pkgdir, "R")
+    msg_sapply <- checkSapply(Rdir)
+
+    if (length(msg_sapply) > 0) {
+        handleNote("Avoid sapply(); use vapply() found in files:")
+        for (msg in msg_sapply)
+            handleMessage(msg, indent=6)
+    }
+
+    msg_seq <- check1toN(Rdir)
+    if (length(msg_seq) > 0) {
+        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files:")
+        for (msg in msg_seq)
+            handleMessage(msg, indent=6)
+    }
+
+    res <- checkLogicalUseFiles(pkgdir)
+    pkgname <- basename(pkgdir)
+    res2 <- findLogicalRdir(pkgname)
+    if (length(c(res,res2)) > 0 ){
+        handleWarning("Use TRUE/FALSE instead of T/F")
+        if (length(res2) > 0){
+            handleMessage("Found in R/ directory functions:", indent=6)
+            for (msg in res2)
+                handleMessage(msg, indent=8)
+        }
+        if (length(res) > 0){
+            handleMessage("Found in files:", indent=6)
+            for (msg in res)
+                handleMessage(msg, indent=8)
+        }
+    }
+}
+
+checkSapply <- function(Rdir){
+
+    rfiles <- dir(Rdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE)
     msg_sapply <- lapply(rfiles, function(rfile){
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] == "sapply", ,drop=FALSE]
@@ -657,6 +692,11 @@ checkCodingPractice <- function(pkgdir)
         )
     })
     msg_sapply <- unlist(msg_sapply)
+}
+
+check1toN <- function(Rdir){
+
+    rfiles <- dir(Rdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE)
     msg_seq <- lapply(rfiles, function(rfile) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
@@ -670,17 +710,6 @@ checkCodingPractice <- function(pkgdir)
         )
     })
     msg_seq <- unlist(msg_seq)
-
-    if (length(msg_sapply) > 0) {
-        handleNote("Avoid sapply(); use vapply() found in files:")
-        for (msg in msg_sapply)
-            handleMessage(msg)
-    }
-    if (length(msg_seq) > 0) {
-        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files:")
-        for (msg in msg_seq)
-            handleMessage(msg)
-    }
 }
 
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
@@ -1424,4 +1453,30 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
         the BiocCheck vignette."
         handleError(msg)
     }
+}
+
+checkLogicalUseFiles <- function(pkgdir) {
+    Rdir <- file.path(pkgdir, "R")
+    Rfiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[rR]$",
+                  full.names = TRUE)
+    dx <- startsWith(Rfiles, Rdir)
+    RdirFiles <- Rfiles[dx]
+    Rother <- Rfiles[!dx]
+    manFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Dd]$",
+        full.names = TRUE)
+    RNWFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Nn][wW]$",
+        full.names = TRUE)
+    RMDFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Mm][Dd]$",
+        full.names = TRUE)
+
+    allFiles <- c(Rother, RMDFiles, RNWFiles, manFiles)
+    fileNames1 <- character()
+    if (length(allFiles) > 0){
+        convertedFiles <- unlist(lapply(FUN=makeTempRFile, allFiles))
+        vl <- lapply(convertedFiles, findLogicalFile)
+        names(vl) <- c(Rother, RMDFiles, RNWFiles, manFiles)
+        badFiles <- Filter(length, vl)
+        fileNames1 <- names(badFiles)
+    }
+    sub(fileNames1, pattern=paste0(pkgdir,.Platform$file.sep), replacement="")
 }

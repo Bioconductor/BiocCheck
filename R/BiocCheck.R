@@ -1,4 +1,3 @@
-
 getOptionList <- function()
 {
     list(
@@ -156,17 +155,6 @@ BiocCheck <- function(package, ...)
 
     handleCheck("Checking for direct slot access...")
     checkForDirectSlotAccess(parsedCode, package_name)
-
-    handleCheck("Checking for T...")
-    res <- findSymbolInParsedCode(parsedCode, package_name, "T",
-        "SYMBOL")
-    if (res > 0)
-        handleWarning("Use TRUE instead of T (found in ", res, " files)")
-    handleCheck("Checking for F...")
-    res <- findSymbolInParsedCode(parsedCode, package_name, "F",
-        "SYMBOL")
-    if (res > 0)
-        handleWarning("Use FALSE instead of F (found in ", res, " files)")
 
     handleCheck("Checking for browser()...")
     res <- findSymbolInParsedCode(parsedCode, package_name, "browser",

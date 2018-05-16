@@ -1,5 +1,5 @@
 Package: BiocCheck
-Version: 1.17.0
+Version: 1.17.1
 Title: Bioconductor-specific package checks
 Description: Executes Bioconductor-specific package checks.
 Authors@R: c(
@@ -14,9 +14,8 @@ License: Artistic-2.0
 LazyData: true
 VignetteBuilder: knitr
 Imports: biocViews (>= 1.33.7), BiocInstaller, stringdist, graph, httr, tools,
-	 optparse, codetools, methods, utils
-Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, rmarkdown, knitr,
-	  devtools (>= 1.4.1)
+	 optparse, codetools, methods, utils, knitr
+Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, rmarkdown, devtools (>= 1.4.1)
 Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck/issues

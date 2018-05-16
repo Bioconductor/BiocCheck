@@ -90,7 +90,7 @@ test_vignettes0 <- function()
     vigdir <- file.path(pkgdir, "vignettes")
 
     ## no vignettes dir ERROR
-    BiocCheck:::checkVigDirExists(pkgdir, vigdir)  
+    BiocCheck:::checkVigDirExists(pkgdir, vigdir)
     checkError("Missing vignettes dir")
 
     # empty vignette dir ERROR
@@ -146,7 +146,7 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0)
     .zeroCounters()
-    
+
     # check vignette style of example package
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
@@ -156,7 +156,7 @@ test_vignettes0 <- function()
         .warning$get()[2])
     checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[1]))
     .zeroCounters()
-    
+
     # check vignette style of example package
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg2", package="BiocCheck"), TRUE)
@@ -308,10 +308,17 @@ test_checkUnitTests <- function()
         "testpkg0", package="BiocCheck"))
     checkTrue(.note$getNum() == 1)
     .zeroCounters()
-    BiocCheck:::checkCodingPractice(system.file("testpackages",
-        "testpkg0", package="BiocCheck"))
-    checkTrue(.note$getNum() == 2)
-    .zeroCounters()
+
+    # check coding practice
+    pkgdir = system.file("testpackages", "testpkg0", package="BiocCheck")
+    Rdir = file.path(pkgdir, "R")
+    msg_sapply <- BiocCheck:::checkSapply(Rdir)
+    checkTrue(length(msg_sapply) == 1)
+    msg_seq <- BiocCheck:::check1toN(Rdir)
+    checkTrue(length(msg_seq) == 1)
+    pkgdir = system.file("testpackages", "testpkg2", package="BiocCheck")
+    res <- BiocCheck:::checkLogicalUseFiles(pkgdir)
+    checkTrue(length(res) == 1)
 }
 
 test_installAndLoad <- function()
@@ -346,30 +353,9 @@ test_parseFile <- function()
 {
     testFile <- file.path(tempdir(), "testfile.R")
     cat("1 + 1", file=testFile)
-    df <- BiocCheck:::parseFile(testFile, "BiocCHeck")
+    df <- BiocCheck:::parseFile(testFile, "BiocCheck")
     checkTrue(all(dim(df) == c(6,9)))
 }
-
-test_checkTorF <- function()
-{
-    if (is.null(parsedCode))
-        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
-            "testpkg0", package="BiocCheck"))
-
-    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "T",
-        "SYMBOL")
-    checkTrue(res == 1)
-
-
-    ## Even though F is found twice in a single file (morecode.R),
-    ## res is 1, because it keeps track of the number of files that matched,
-    ## not the overall number of matches. Maybe this should change,
-    ## maybe it doesn't matter.
-    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "F",
-        "SYMBOL")
-    checkTrue(res == 1)
-}
-
 
 test_checkForBrowser <- function()
 {

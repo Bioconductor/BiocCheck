@@ -2,6 +2,7 @@
 %\VignetteEngine{ThisWillFail}
 
 ```{r echo=FALSE}
+vl <- T
 ```
 
 ```{r eval=FALSE}

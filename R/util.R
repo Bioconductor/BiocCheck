@@ -86,7 +86,7 @@ installAndLoad <- function(pkg)
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
                     libdir, shQuote(pkg))
     res <- system2(cmd, args, stdout=NULL, stderr=stderr)
-    if (res != 0) 
+    if (res != 0)
     {
         cat("  cmd: ", cmd,
             "\n  args: ", args,
@@ -103,7 +103,7 @@ installAndLoad <- function(pkg)
     suppressPackageStartupMessages(do.call(library, args))
 }
 
-# Takes as input the value of an Imports, Depends, 
+# Takes as input the value of an Imports, Depends,
 # or LinkingTo field and returns a named character
 # vector of Bioconductor dependencies, where the names
 # are version specifiers or blank.
@@ -140,7 +140,7 @@ getAllDependencies <- function(pkgdir)
     fields <- c("Depends", "Imports", "Suggests", "Enhances", "LinkingTo")
     out <- c()
     for (field in fields)
-    {   
+    {
         if (field %in% colnames(dcf))
             out <- append(out, cleanupDependency(dcf[, field]))
     }
@@ -189,7 +189,7 @@ parseFile <- function(infile, pkgdir)
             })))
         }
 
-    } else if (grepl("\\.Rd$", infile, TRUE)) 
+    } else if (grepl("\\.Rd$", infile, TRUE))
     {
         rd <- parse_Rd(infile)
         outfile <- file.path(tempdir(), "parseFile.tmp")
@@ -296,7 +296,7 @@ getMaintainerEmail <- function(pkgdir)
         env <- new.env(parent=emptyenv())
         env[["c"]] = c
         env[["person"]] <- utils::person
-        pp <- parse(text=ar, keep.source=TRUE) 
+        pp <- parse(text=ar, keep.source=TRUE)
         tryCatch(people <- eval(pp, env),
             error=function(e) {
                 # could not parse Authors@R
@@ -304,7 +304,7 @@ getMaintainerEmail <- function(pkgdir)
             })
         for (person in people)
         {
-            if ("cre" %in% person$role) 
+            if ("cre" %in% person$role)
             {
                 email <- person$email
             }
@@ -317,4 +317,87 @@ docType <- function(rd) {
     tags <- tools:::RdTags(rd)
     if (any(tags == "\\docType"))
         as.character(rd[tags == "\\docType"][[1L]])
+}
+
+
+findLogicalFile <- function(fl) {
+    env <- new.env()
+    source(fl, local = env)
+    objs = ls(env, all.names=TRUE)
+    for (obj in objs){
+      if (!is.function(env[[obj]])){
+           rm(list = obj, envir = env)
+      }
+    }
+    globals <- eapply(env, safeFindGlobals)
+    if (length(globals) != 0){
+       names(which(unlist(lapply(globals,
+                                 FUN=function(x){
+                                     any(c("T","F") %in% x)
+                                 }))))
+    }else{
+      character()
+    }
+}
+
+safeFindGlobals <- function(env, ...){ tryCatch(findGlobals(env, ...), error = warning)}
+
+findLogicalRdir <- function(pkgname){
+
+    env <- getNamespace(pkgname)
+    objs <- ls(env, all.names=TRUE)
+    objs <- objs[grep("^.__[CTM]__", objs, invert=TRUE)]
+    globals <- lapply(objs,
+        FUN= function(obj) {
+            value = env[[obj]];
+            if (is.function(value)) findGlobals(value) else character(0)
+        })
+    names(globals) <- objs
+    if (length(globals) != 0){
+        funName <-names(which(unlist(lapply(globals,
+                                            FUN=function(x){
+                                                any(c("T","F") %in% x)
+                                            }))))
+        if (length(funName) > 0 )  paste0(funName, "()") else character()
+    }else{
+      character()
+    }
+}
+
+makeTempRFile <- function(infile){
+    ext <- tolower(tools::file_ext(infile))
+    outfile <- file.path(tempdir(), paste0(basename(infile), ".R"))
+    switch(ext,
+           r = {
+               code <- readLines(infile)
+               validFile <- TRUE
+           },
+           rd = {
+               tempfile <- tools::parse_Rd(infile)
+               code <- capture.output(tools::Rd2ex(tempfile))
+               validFile <- TRUE
+           },
+           rnw = {
+               Stangle(infile, output=outfile, quiet=TRUE)
+               code <- readLines(outfile)
+               validFile <- TRUE
+           },
+           rmd = {
+               knitr::purl(infile, output=outfile, quiet=TRUE)
+               code <- readLines(outfile)
+               validFile = TRUE
+           },
+           {
+               validFile = FALSE
+               code <- NA
+           })
+
+    if (validFile){
+        cat("dummyTest <- function(){", file=outfile, sep="\n")
+        cat(code, file=outfile, sep="\n", append =TRUE)
+        cat("}", file=outfile, sep="\n", append =TRUE)
+        outfile
+    } else {
+        character(0)
+    }
 }
