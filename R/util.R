@@ -342,7 +342,7 @@ findLogicalFile <- function(fl) {
 
 safeFindGlobals <- function(env, ...){ tryCatch(findGlobals(env, ...), error = warning)}
 
-findLogicalRdir <- function(pkgname){
+findLogicalRdir <- function(pkgname, symbol){
 
     env <- getNamespace(pkgname)
     objs <- ls(env, all.names=TRUE)
@@ -356,7 +356,7 @@ findLogicalRdir <- function(pkgname){
     if (length(globals) != 0){
         funName <-names(which(unlist(lapply(globals,
                                             FUN=function(x){
-                                                any(c("T","F") %in% x)
+                                                any(symbol %in% x)
                                             }))))
         if (length(funName) > 0 )  paste0(funName, "()") else character()
     }else{

@@ -684,7 +684,7 @@ checkCodingPractice <- function(pkgdir)
     # T/F
     res <- checkLogicalUseFiles(pkgdir)
     pkgname <- basename(pkgdir)
-    res2 <- findLogicalRdir(pkgname)
+    res2 <- findLogicalRdir(pkgname, c("T","F"))
     if (length(c(res,res2)) > 0 ){
         handleWarning("Use TRUE/FALSE instead of T/F")
         if (length(res2) > 0){
@@ -714,6 +714,15 @@ checkCodingPractice <- function(pkgdir)
         handleNote(" Avoid system() ; use system2()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_sys)
+            handleMessage(msg, indent=8)
+    }
+
+    # set.seed
+    res <- findLogicalRdir(pkgname, "set.seed")
+    if (length(res) > 0){
+        handleWarning("Remove set.seed usage in R code")
+        handleMessage("Found in R/ directory functions:", indent=6)
+        for (msg in res)
             handleMessage(msg, indent=8)
     }
 
