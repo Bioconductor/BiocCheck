@@ -702,7 +702,7 @@ checkCodingPractice <- function(pkgdir)
     # class() ==
     msg_class <- checkClassEqUsage(pkgdir)
     if (length(msg_class) > 0) {
-        handleNote(" Avoid class()== or class()!= ; use is() or !is()")
+        handleWarning(" Avoid class()== or class()!= ; use is() or !is()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_class)
             handleMessage(msg, indent=8)
