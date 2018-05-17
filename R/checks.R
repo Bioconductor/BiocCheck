@@ -105,6 +105,14 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigChunkEval(vigdircontents)
 
+    msg_eval <- checkVigEvalAllFalse(pkgdir)
+    if(length(msg_eval) > 0) {
+        handleWarning(" Vignette set global option 'eval=FALSE'")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_eval)
+            handleMessage(msg, indent=8)
+    }
+
 }
 
 checkVigDirExists <- function(pkgdir, vigdir)
@@ -279,6 +287,15 @@ checkVigChunkEval <- function(vigdircontents)
         chunks, efs,  as.integer(percent)))
     if (percent >= 50)
         handleWarning("Evaluate more vignette chunks.")
+}
+
+checkVigEvalAllFalse <- function(pkgdir){
+
+    pkgdir <- file.path(pkgdir, "vignettes")
+    Vigdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
+    msg_eval <- grepPkgDir(Vigdir,
+                           "-rn 'knitr::opts_chunk\\$set(.*eval\\s*=\\s*F'")
+    msg_eval
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
