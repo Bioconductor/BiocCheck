@@ -215,6 +215,25 @@ checkVigEngine <- function(builder, vigdircontents)
 # check Engines are in DESCRIPTION
     vigExt <- tolower(tools::file_ext(vigdircontents))
     dx <- which(vigExt != "rnw")
+
+    # check for very rare case that mulitple build
+    # engines specified in vignette
+    builderRes <- grepPkgDir(file.path(dirname(vigdircontents[1]),
+                                       .Platform$file.sep),
+                             "-rn 'VignetteEngine{'")
+    filenames <- vapply(builderRes,
+                        FUN=function(x){strsplit(x,
+                            split=" ")[[1]][1]},
+                        character(1))
+    inval <- names(which(table(filenames) > 1))
+    if (length(inval) > 0){
+        handleError("More than one VignetteEngine specified.")
+        handleMessage("Found in vignette/ files:", indent=6)
+        for (msg in inval)
+            handleMessage(msg, indent=8)
+
+        dx <- dx[!(basename(vigdircontents[dx]) %in% inval)]
+    }
     if (length(dx) != 0) {
         res <-
             vapply(vigdircontents[dx], vigHelper, logical(1), builder=builder)
