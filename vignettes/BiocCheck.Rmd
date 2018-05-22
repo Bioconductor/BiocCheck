@@ -131,9 +131,13 @@ determined.
   *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
 * Checks whether, while checking a directory (not a tarball), vignette
   sources exist in inst/doc (`ERROR`).
+* Checks that vignetteBuilder in DESCRIPTION and VignetteEngine in vignette
+  are compatible (`ERROR`)
 * Checks whether vignette title is still using template value (`WARNING`)
 * Checks wheher the number of `eval=FALSE` chunks is more than 50% of
   the total (`WARNING`).
+* Checks whether the global vignette code option is set to `eval=FALSE`.
+  The majority of vignette code is expected to be evaluated (`WARNING`)
 
 **Checking whether vignette is built with 'R CMD build'...**
 
@@ -272,13 +276,28 @@ urge you to add them (`NOTE`).
 Checks to see whether certain programming practices are found in the R
 directory.
 
-We recommend that `vapply()` be used instead of `sapply()`. Problems
-arise when the `X` argument to `sapply()` has length 0; the return
-type is then a `list()` rather than a vector or array.
+* We recommend that `vapply()` be used instead of `sapply()`. Problems
+  arise when the `X` argument to `sapply()` has length 0; the return
+  type is then a `list()` rather than a vector or array. (`NOTE`)
 
-We recommend that `seq_len()` or `seq_along()` be used instead of
-`1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
-which may be an unexpected or unwanted result.
+* We recommend that `seq_len()` or `seq_along()` be used instead of
+  `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
+  which may be an unexpected or unwanted result (`NOTE`).
+
+* **Checking for T...** **Checking for F...**
+  It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
+  is because `T` and `F` are ordinary variables whose value can be
+  altered, leading to unexpected results, whereas the value of `TRUE`
+  and `FALSE` cannot be changed  (`WARNING`).
+
+* Avoid `class()==` and `class()!=` instead use `is()`. (`WARNING`)
+
+* Use `system2()` over `system()`. 'system2' is a more portable and
+  flexible interface than 'system'.(`NOTE`)
+
+* Use of `set.seed()` in R code.  The `set.seed` should not be set in
+  R functions directly. The user should always have the option for
+  the set.seed and know when it is being invoked. (`WARNING`)
 
 ## Native Routine Registration Checks
 
@@ -326,11 +345,6 @@ which result in issues of varying severity.
 
 **Checking parsed R code in R directory, examples, vignettes...**
 
-* **Checking for T...** **Checking for F...**
-  It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
-  is because `T` and `F` are ordinary variables whose value can be
-  altered, leading to unexpected results, whereas the value of `TRUE`
-  and `FALSE` cannot be changed  (`WARNING`).
 * **Checking for browser()...**
   `browser()` causes the command-line R debugger to be invoked, and
   should not be used in production code (though it's OK to wrap such
