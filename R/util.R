@@ -322,7 +322,10 @@ docType <- function(rd) {
 
 findLogicalFile <- function(fl) {
     env <- new.env()
-    source(fl, local = env)
+    tryCatch(source(fl, local = env),
+             error = function(err){
+                 return(character())
+             })
     objs = ls(env, all.names=TRUE)
     for (obj in objs){
       if (!is.function(env[[obj]])){
