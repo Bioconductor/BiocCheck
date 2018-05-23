@@ -41,7 +41,7 @@ usage <- function()
     BiocCheck(file, opt)
 }
 
-BiocCheck <- function(package, ...)
+BiocCheck <- function(package=".", ...)
 {
     .zeroCounters()
     package <- normalizePath(package)
