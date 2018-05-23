@@ -168,7 +168,7 @@ parseFile <- function(infile, pkgdir)
             tmpin <- file.path(tempdir(), basename(infile))
             file.copy(infile, tmpin)
             suppressWarnings(suppressMessages(capture.output({
-                knitr::purl(tmpin, outfile, documentation=0L)
+                knitr::purl(input=tmpin, output=outfile, documentation=0L)
             })))
             file.remove(tmpin)
         } else {
@@ -386,7 +386,7 @@ makeTempRFile <- function(infile){
                validFile <- TRUE
            },
            rmd = {
-               knitr::purl(infile, output=outfile, quiet=TRUE)
+               knitr::purl(input=infile, output=outfile, quiet=TRUE)
                code <- readLines(outfile)
                validFile = TRUE
            },
