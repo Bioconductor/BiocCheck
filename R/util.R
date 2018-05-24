@@ -417,6 +417,12 @@ grepPkgDir <- function(pkgdir, greparg){
                             filename = sub(vl[[1]][1], pattern=pkgdir,
                                 replacement="")
                             lineNum = vl[[1]][2]
+                            if (tolower(.Platform$OS.type) == "windows"){
+                                filename = sub(
+                                    paste(vl[[1]][1], vl[[1]][2], sep=":"),
+                                    pattern=pkgdir, replacement="")
+                                lineNum = vl[[1]][3]
+                            }
                             sprintf("%s (line %s)", filename, lineNum)},
                         FUN.VALUE = character(1),
                         c(pkgdir=pkgdir),
