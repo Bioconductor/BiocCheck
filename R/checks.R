@@ -950,8 +950,8 @@ checkForBadDepends <- function(pkgdir)
             "package should be imported in the NAMESPACE file, otherwise ",
             "packages importing this package may fail.")
 
-        msg <- sprintf("  %s::%s (%s)", pkgs[found], res[found], fns[found])
-        handleVerbatim(c("", "package::object (function)", msg, ""))
+        msg <- sprintf("  %s::%s in %s()", pkgs[found], res[found], fns[found])
+        handleVerbatim(c("", "package::object in function()", msg, ""))
     }
 
     handleCheck("Checking to see if we understand object initialization...")
@@ -963,8 +963,8 @@ checkForBadDepends <- function(pkgdir)
             "part of a data set loaded with data(), or perhaps part of an ",
             "object referenced in with() or within().")
 
-        msg <- sprintf("%s (%s)", res[!found], fns[!found])
-        handleVerbatim(c("object (function)", msg))
+        msg <- sprintf("%s (%s)", fns[!found], res[!found])
+        handleVerbatim(c("function (object)", msg))
     }
 }
 
