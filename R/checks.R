@@ -791,7 +791,7 @@ checkClassEqUsage <- function(pkgdir){
 checkSystemCall <- function(pkgdir){
 
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    msg_sys <- grepPkgDir(pkgdir, "-rn 'system(.*'")
+    msg_sys <- grepPkgDir(pkgdir, "-rn '^system(.*'")
 }
 
 checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
