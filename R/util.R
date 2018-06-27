@@ -370,8 +370,7 @@ findLogicalRdir <- function(pkgname, symbol){
 makeTempRFile <- function(infile){
     ext <- tolower(tools::file_ext(infile))
     outfile <- file.path(tempdir(), paste0(basename(infile), ".R"))
-    if(ext == 'rnw' & length(grepPkgDir(
-                infile, "-rn 'VignetteEngine{.*knitr.*}'")) > 0){
+    if(ext == 'rnw' & isTRUE(vigHelper(infile, "knitr")[1])){
         ext <- 'rmd'
     }
     switch(ext,
