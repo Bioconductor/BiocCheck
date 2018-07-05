@@ -233,7 +233,7 @@ BiocCheck <- function(package=".", ...)
         errcode <- 0
     }
 
-    if ("Called_from_command_line" %in% names(dots))
+    if (!interactive() || "Called_from_command_line" %in% names(dots))
     {
         q("no", errcode)
     } else {
