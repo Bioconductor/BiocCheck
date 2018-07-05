@@ -1,13 +1,13 @@
 ---
-title: "BiocCheck"
+title: "BiocCheck: Ensuring Bioconductor package guidelines"
 output:
   BiocStyle::html_document:
     toc: true
+vignette: >
+  % \VignetteIndexEntry{BiocCheck: Ensuring Bioconductor package guidelines}
+  % \VignetteEngine{knitr::rmarkdown}
+  % \VignetteEncoding{UTF-8}
 ---
-<!--
-%% \VignetteEngine{knitr::rmarkdown}
-%\VignetteIndexEntry{BiocCheck}
--->
 
 # `BiocCheck`
 
@@ -36,7 +36,7 @@ as
     R CMD BiocCheck package
 
 Where `package` is either a directory containing an R package, or a source
-tarball (.tar.gz file).
+tarball (`.tar.gz` file).
 
 `BiocCheck` can also be run interactively:
 
@@ -65,6 +65,16 @@ Run `BiocCheck` after running `R CMD check`.
 Note that `BiocCheck` is not a replacement for `R CMD check`; it is
 complementary. It should be run after `R CMD check` completes
 successfully.
+
+`BiocCheck` can also be run via the [Travis-CI](https://www.travis-ci.org/)
+(continuous integration) system. This service allows automatic testing of R
+packages in a controlled build environment.
+
+Simply add the following line to your package's `.travis.yml` file:
+
+```{yml}
+bioc_check: true
+```
 
 # Installing `BiocCheck`
 
