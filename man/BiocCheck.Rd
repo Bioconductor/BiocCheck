@@ -86,10 +86,8 @@ Dan Tenenbaum
 
 \examples{
 packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+BiocCheck(packageDir, `quit-with-status`=FALSE)
 
-\dontrun{
-    BiocCheck(packageDir)
-}
 ## or from the operating system's command line as:
 ## R CMD BiocCheck myPackage
 
