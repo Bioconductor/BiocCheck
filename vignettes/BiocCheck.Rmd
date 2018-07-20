@@ -331,7 +331,7 @@ to see if it has suggestions for the "Imports" section of your package
 NAMESPACE.
 
 `codetoolsBioC` is an experimental package that is not presently
-available via `biocLite()`. It is available from our
+available via `BiocManager::install()`. It is available from our
 [Subversion repository][7] with the credentials readonly/readonly.
 Output of codetoolsBioC is printed to the screen but `BiocCheck` does
 not label it ERROR, WARNING, or NOTE.

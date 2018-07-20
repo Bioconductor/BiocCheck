@@ -706,7 +706,7 @@ checkLibraryCalls <- function(pkgdir)
     rfiles <- dir(
         pkgdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE
     )
-    badCalls <- c("biocLite", "install.packages", "update.packages")
+    badCalls <- c("biocLite", "install.packages", "update.packages", "install")
     msg_installs <- lapply(rfiles, function(rfile){
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] %in% badCalls, , drop = FALSE]
@@ -715,7 +715,7 @@ checkLibraryCalls <- function(pkgdir)
     msg_installs <- unlist(msg_installs)
     if (length(msg_installs) > 0) {
         handleNote(
-            "biocLite, install.packages, or update.packages found in R files"
+            "install, biocLite, install.packages, or update.packages found in R files"
         )
         for (msg in msg_installs)
             handleMessage(msg)
