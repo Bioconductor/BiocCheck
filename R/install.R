@@ -1,9 +1,9 @@
 .installScript <- function()
 {
     onWindows <- (.Platform$OS.type == "windows")
-    files <- "BiocCheck"
+    files <- c("BiocCheck", "BiocCheckGitClone")
     if (onWindows)
-        files <- "BiocCheck.bat"
+        files <- c("BiocCheck.bat", "BiocCheckGitClone.bat")
 
     srcDir <- system.file("script", package="BiocCheck")
     srcFile <- file.path(srcDir, files)
@@ -35,11 +35,13 @@
 
         if (is.null(res) || !res || res == -1)
         {
-            script <- "BiocCheck"
+            script <- c("BiocCheck", "BiocCheckGitClone")
             if (onWindows)
-                script <- "BiocCheck.bat"
+                script <- c("BiocCheck.bat", "BiocCheckGitClone.bat")
             msg <- strwrap(paste(
-                'Failed to copy the', paste0("script/", script), 'script to',
+                'Failed to copy the', paste0("script/", script,
+                                             collapse=" or "),
+                'script to',
                 paste0(file.path(Sys.getenv("R_HOME"), "bin"), "."),
                 "If you want to be able to run 'R CMD BiocCheck' you'll",
                 "need to copy it yourself to a directory on your PATH,",
@@ -48,7 +50,7 @@
             for (i in seq_along(msg))
                 func(msg[i])
         } else {
-            func("BiocCheck script installed.")
+            func("BiocCheck and BiocCheckGitClone script installed.")
         }
     }
 

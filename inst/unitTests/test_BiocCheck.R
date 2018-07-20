@@ -164,6 +164,15 @@ test_vignettes0 <- function()
     checkTrue(grepl(pattern="VignetteBuilder",  .error$get()[1]))
     checkTrue(grepl(pattern="VignetteEngine",  .error$get()[2]))
     .zeroCounters()
+
+    # check vignette 'intermediate' files
+    vigdir <- system.file("testpackages", "testpkg2", "vignettes",
+                          package="BiocCheck")
+    vigdircontents <- BiocCheck:::getVigSources(vigdir)
+    BiocCheck:::checkVigFiles(vigdir, vigdircontents)
+    checkEquals(1, .note$getNum())
+    .zeroCounters()
+
 }
 
 test_checkVersionNumber <- function()
@@ -230,6 +239,17 @@ test_checkBiocViews <- function()
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
     checkTrue(.warning$getNum() == 1,
         "biocViews from multiple categories don't produce warning")
+}
+
+test_badFiles <- function(){
+    pkgdir <- UNIT_TEST_TEMPDIR
+    dir.create(pkgdir)
+    badfile <- file.path(pkgdir, "something.Rproj")
+    file.create(badfile)
+    BiocCheck:::checkBadFiles(pkgdir)
+    checkEquals(1, .error$getNum())
+    .zeroCounters()
+    unlink(pkgdir)
 }
 
 test_checkBBScompatibility <- function()

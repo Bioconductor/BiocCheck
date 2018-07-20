@@ -78,6 +78,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkInstContents(pkgdir, checkingDir)
 
+    checkVigFiles(vigdir, vigdircontents)
     #
     # This appears to never get run because of pkgdir as character
     # tools::pkgVignettes
@@ -143,6 +144,30 @@ checkInstContents <- function(pkgdir, checkingDir)
                 handleWarning(
                 "Remove vignette sources from inst/doc; ",
                 "they belong in vignettes/.")
+        }
+    }
+}
+
+checkVigFiles <- function(vigdir, vigdircontents){
+    vigs <- tolower(basename(vigdircontents))
+    allvigfiles <- setdiff(tolower(dir(vigdir, all.files=TRUE, ignore.case=TRUE,
+                               recursive=TRUE)), vigs)
+
+    if (length(allvigfiles) != 0){
+        badFiles <- unlist(lapply(vigs,
+                           FUN = function(x, allvigfiles){
+                               vl <- tools::file_path_sans_ext(x)
+                               badext <- c(".tex", ".html", ".pdf",
+                                           ".aux", ".log")
+                               ext <- paste0(vl, badext)
+                               fnd <- intersect(allvigfiles, ext)
+                               fnd
+                           },
+                           allvigfiles = allvigfiles))
+        if (length(badFiles) != 0){
+            handleNote("Potential intermediate files found:")
+            for (msg in badFiles)
+                handleMessage(paste0("vignettes/", msg), indent=8)
         }
     }
 }
@@ -1579,4 +1604,35 @@ checkLogicalUseFiles <- function(pkgdir) {
         fileNames1 <- names(badFiles)
     }
     sub(fileNames1, pattern=paste0(pkgdir,.Platform$file.sep), replacement="")
+}
+
+checkBadFiles <- function(package_dir){
+    # taken from
+    #https://github.com/wch/r-source/blob/trunk/src/library/tools/R/build.R#L462
+    # and
+    #https://github.com/wch/r-source/blob/trunk/src/library/tools/R/check.R#L4025
+    hidden_file_ext = c(".renviron", ".rprofile", ".rproj", ".rproj.user",
+                       ".rhistory", ".rapp.history",
+                       ".o", ".sl", ".so", ".dylib",
+                       ".a", ".dll", ".def",
+                       ".ds_store", "unsrturl.bst",
+                       ".log", ".aux",
+                       ".backups", ".cproject", ".directory",
+                       ".dropbox", ".exrc", ".gdb.history",
+                       ".gitattributes", ".gitmodules",
+                       ".hgtags",
+                       ".project", ".seed", ".settings", ".tm_properties")
+
+    fls <- dir(package_dir, ignore.case=TRUE, recursive=TRUE, all.files=TRUE)
+    dx <- unlist(lapply(hidden_file_ext,
+        FUN=function(x, suffix){
+            which(endsWith(x, suffix))
+        }, x=tolower(fls)))
+    badFiles <- fls[dx]
+
+    if (length(badFiles) != 0){
+        handleError("System Files found that should not be git tracked:")
+        for(msg in badFiles)
+            handleMessage(msg, indent=8)
+    }
 }

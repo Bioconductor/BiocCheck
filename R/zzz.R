@@ -1,14 +1,15 @@
 .isScriptInstalled <- function()
 {
-    if (nchar(Sys.which("BiocCheck")))
+    if (all(as.logical(nchar(
+        Sys.which(c("BiocCheck", "BiocCheckGitClone"))))))
         return(TRUE)
 
     onWindows <- (.Platform$OS.type == "windows")
 
     if (onWindows)
-        file <- "BiocCheck.bat"
+        file <- c("BiocCheck.bat", "BiocCheckGitClone.bat")
     else
-        file <- "BiocCheck"
+        file <- c("BiocCheck", "BiocCheckGitClone")
 
     path <- file.path(Sys.getenv("R_HOME"), "bin")
 
