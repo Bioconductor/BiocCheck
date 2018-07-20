@@ -1602,7 +1602,8 @@ checkLogicalUseFiles <- function(pkgdir) {
         badFiles <- Filter(length, vl)
         fileNames1 <- names(badFiles)
     }
-    sub(fileNames1, pattern=paste0(pkgdir,.Platform$file.sep), replacement="")
+    sub(fileNames1, pattern=paste0(pkgdir,.Platform$file.sep),
+        replacement="", fixed=TRUE)
 }
 
 checkBadFiles <- function(package_dir){
