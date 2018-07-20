@@ -392,6 +392,24 @@ getParent <- function(view, biocViewsVocab)
     }
 }
 
+checkPackageSize <- function(pkg, pkgdir, size=4){
+    pkgType <- getPkgType(pkgdir)
+    if (is.na(pkgType) ||  pkgType == "Software") {
+        maxSize <- size*10^6 ## 4MB
+        pkgSize <- file.size(pkg)
+        if (pkgSize > maxSize){
+            handleError(
+                "Package Source tarball exceeds Bioconductor size requirement.")
+            handleMessage(paste0("Package Size: ",
+                                 as.character(round(pkgSize/(10^6),4)), " MB"),
+                          indent=8)
+            handleMessage(paste0("Size Requirement: ",
+                                 sprintf("%.4f", round(maxSize/(10^6),4)), " MB"),
+                          indent=8)
+        }
+    }
+}
+
 checkIndivFileSizes <- function(pkgdir)
 {
     pkgType <- getPkgType(pkgdir)

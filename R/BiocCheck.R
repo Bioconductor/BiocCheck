@@ -115,6 +115,15 @@ BiocCheck <- function(package=".", ...)
     handleCheck("Checking R Version dependency...")
     checkRVersionDependency(package_dir)
 
+    source_tarball <- grepl("\\.tar\\.gz$", package)
+    handleCheck("Checking package size...")
+    if (source_tarball){
+        checkPackageSize(package, package_dir, size=4)
+    } else {
+        handleMessage("Skipped... only checked on source tarball",
+                      indent=8)
+    }
+
     handleCheck("Checking individual file sizes...")
     checkIndivFileSizes(package_dir)
 
