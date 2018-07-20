@@ -1,3 +1,21 @@
+CHANGES IN VERSION 1.17
+-----------------------
+
+NEW FEATURES
+
+    o (1.17.18) Update devel to use BiocManager instructions instead of
+    BiocInstaller
+
+    o (1.17.17) Add a new function that can be run interactive or command line
+    BiocCheckGitClone which is only run on a source directory not a
+    tarball. This will check for bad system files
+
+    o (1.17.17) BiocCheck addition: Checks vignette directory for intermediate
+    and end files that should not be included.
+
+    o (1.17.16) Checks for Bioconductor package size requirement if checking
+    tarball
+
 CHANGES IN VERSION 1.16
 -----------------------
 

@@ -71,9 +71,9 @@ successfully.
 `BiocCheck` should be installed as follows:
 
 ```{r eval=FALSE}
-source("https://bioconductor.org/biocLite.R")
-biocLite("BiocCheck")
-library(BiocCheck)
+if (!"BiocManager" %in% rownames(installed.packages()))
+     install.packages("BiocManager")
+BiocManager::install("BiocCheck")
 ```
 
 The package loading process attempts to install a script called
@@ -191,6 +191,17 @@ For more information on package versions, see the
 
 [3]: http://www.bioconductor.org/developers/how-to/version-numbering/
 
+## Package and File Size Check
+
+* **Checking package size**
+  Checks that the package size meets _Bioconductor_ requirements. The current
+  package size limit is 4 MB for Software packages. Experiment Data and
+  Annotation packages are excluded from this check. This check is only run if
+  checking a source tarball. (ERROR)
+
+* **Checking individual file sizes**
+  The current size limit for all individual files is 5 MB. (WARNING)
+
 ## biocViews Checks
 
 These can be disabled with the `--no-check-bioc-views` option, which
@@ -202,6 +213,9 @@ biocViews is a concept unique to _Bioconductor_).
 * **Checking that biocViews are present...**
   Checks that a `biocViews` field is present in the DESCRIPTION file
   (`ERROR`).
+* **Checking package type based on biocViews**
+  Gives an indication if the package is identified as a Software, Annotation,
+  Experiment, or Workflow package.
 * **Checking for non-trivial biocViews...**
   Checks that biocViews are more specific than the top-level terms
   Software, AnnotationData, or ExperimentData (`ERROR`).
@@ -508,3 +522,67 @@ machines, because this step requires special authorization.
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/
 [12]: https://support.bioconductor.org/profile/#div_id_watched_tags
+
+# `BiocCheckGitClone`
+
+
+`BiocCheckGitClone` provides a few additional _Bioconductor_ package checks that
+can only should be run on a open source directory (raw git clone) NOT a
+tarball. Reporting similarly in three categories as discussed above:
+
+* **ERROR**.
+
+* **WARNING**.
+
+* **NOTE**.
+
+# Using `BiocCheckGitClone`
+
+Most commonly you will use BiocCheckGitClone from your operating system command
+line, as
+
+    R CMD BiocCheckGitClone package
+
+Where `package` is a directory containing an R package.
+
+`BiocCheckGitClone` can also be run interactively:
+
+
+```{r eval=FALSE}
+library(BiocCheck)
+BiocCheckGitClone("packageDir")
+```
+
+# Installing `BiocCheckGitClone`
+
+Please see previous Installing `BiocCheck` section.
+
+# Interpreting `BiocCheckGitClone` output
+
+Actual `BiocCheckGitClone` output is shown below in **bold**.
+
+## Bad File Check
+
+**Checking valid files**
+
+There are a number of files that should not be git tracked. This check notifies
+if any of these files are present (`ERROR`)
+
+The current list of files checked is as follows:
+
+```
+    hidden_file_ext = c(".renviron", ".rprofile", ".rproj", ".rproj.user",
+		       ".rhistory", ".rapp.history",
+		       ".o", ".sl", ".so", ".dylib",
+		       ".a", ".dll", ".def",
+		       ".ds_store", "unsrturl.bst",
+		       ".log", ".aux",
+		       ".backups", ".cproject", ".directory",
+		       ".dropbox", ".exrc", ".gdb.history",
+		       ".gitattributes", ".gitmodules",
+		       ".hgtags",
+		       ".project", ".seed", ".settings", ".tm_properties")
+```
+
+These files may be included in your personal directories but should be added to
+a `.gitignore` file so they are not git tracked.
