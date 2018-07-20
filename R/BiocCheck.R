@@ -230,7 +230,7 @@ BiocCheck <- function(package=".", ...)
         "vignette, available at ",
         sprintf(
             "https://bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#interpreting-bioccheck-output",
-            BiocInstaller:::BIOC_VERSION)),
+            BiocManager::version())),
         exdent=0)
 
 

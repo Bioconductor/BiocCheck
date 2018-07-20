@@ -16,6 +16,11 @@ NEW FEATURES
     o (1.17.16) Checks for Bioconductor package size requirement if checking
     tarball
 
+BUG FIXES
+
+    o (1.17.19) Updated internal functions to use BiocManger instead of
+    BiocInstaller
+
 CHANGES IN VERSION 1.16
 -----------------------
 

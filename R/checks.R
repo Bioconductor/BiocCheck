@@ -369,9 +369,8 @@ checkVersionNumber <- function(pkgdir)
         x <- pv$major
         y <- pv$minor
         mod <- y %% 2
-        biocY <- packageVersion("BiocInstaller")$minor
-        bioc.mod <- biocY %% 2
-        isDevel <- (bioc.mod == 1)
+        isDevel <- (BiocManager:::.version_bioc("devel") == BiocManager::version())
+        bioc.mod <- ifelse(isDevel, 1, 0)
         if (x == 0) {
             handleMessage("Package version ", as.character(pv), "; pre-release")
         } else if (mod != bioc.mod) {
@@ -1548,12 +1547,12 @@ checkForBiocDevelSubscription <- function(pkgdir)
 checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft"))
 {
     repo <- match.arg(repo)
-    repo.url <- sprintf("%s/src/contrib/PACKAGES", biocinstallRepos()[repo])
+    repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
     conn <- url(repo.url)
     dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
     close(conn)
     if (inherits(dcf, "error")) {
-        handleMessage("Unable to access repository ", biocinstallRepos()[repo])
+        handleMessage("Unable to access repository ", BiocManager::repositories()[repo])
     } else if (tolower(pkgName) %in% tolower(dcf[,"Package"])) {
         if (repo == "CRAN")
             msg <- "Package must be removed from CRAN."

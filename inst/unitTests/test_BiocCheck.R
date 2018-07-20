@@ -183,7 +183,7 @@ test_checkVersionNumber <- function()
     setVersion("1.2.3.4")
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
     checkError("Version 1.2.3.4 doesn't cause error!")
-    isDevel <- ((packageVersion("BiocInstaller")$minor %% 2) == 1)
+    isDevel <- (BiocManager:::.version_bioc("devel") == BiocManager::version())
     .zeroCounters()
     if (isDevel)
     {
