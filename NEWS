@@ -3,6 +3,9 @@ CHANGES IN VERSION 1.17
 
 NEW FEATURES
 
+    o (1.17.21) Added quit-with-status option to both BiocCheck and
+    BiocCheckGitClone for compatibility with travis
+
     o (1.17.18) Update devel to use BiocManager instructions instead of
     BiocInstaller
 

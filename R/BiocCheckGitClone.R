@@ -1,6 +1,9 @@
 getOptionList2 <- function()
 {
-    list()
+    list(
+         make_option("--quit-with-status", action="store_true",
+            help="enable exit code option when performing check")
+        )
 }
 
 getArgParser2 <- function()
@@ -8,6 +11,16 @@ getArgParser2 <- function()
     option_list <- getOptionList2()
     OptionParser(usage = "R CMD BiocCheckGitClone [options] package",
         option_list=option_list)
+}
+
+usage2 <- function()
+{
+    print_help(getArgParser2())
+    if (interactive())
+    {
+        cat("When running interactively, options can be passed like so:\n")
+        cat("BiocCheck(package, `quit-with-status`=TRUE)\n")
+    }
 }
 
 .BiocCheckGitCloneFromCommandLine <- function()
@@ -57,7 +70,7 @@ BiocCheckGitClone <- function(package=".", ...){
 
     handleCheck("Checking valid files...")
     checkBadFiles(package_dir)
-   
+
     ## Summary
     .msg("\n\nSummary:")
     .msg("ERROR count: %d", .error$getNum())
@@ -80,7 +93,8 @@ BiocCheckGitClone <- function(package=".", ...){
         errcode <- 0
     }
 
-    if ("Called_from_command_line" %in% names(dots))
+    if (isTRUE(dots[["quit-with-status"]]) ||
+        "Called_from_command_line" %in% names(dots))
     {
         q("no", errcode)
     } else {
@@ -89,6 +103,4 @@ BiocCheckGitClone <- function(package=".", ...){
             warning=.warning$get(),
             note=.note$get()))
     }
-    
 }
-    

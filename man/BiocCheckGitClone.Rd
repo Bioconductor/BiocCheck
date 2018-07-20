@@ -1,11 +1,12 @@
 \name{BiocCheckGitClone}
 \alias{BiocCheckGitClone}
+\alias{usage2}
 \title{
 Additional checks for a package for compliance with Bioconductor package guidelines
 }
 \description{
 Analyzes \code{R} packages for compliance with Bioconductor package guidelines
-and best practices. Divides output into three categories: 
+and best practices. Divides output into three categories:
 ERROR, WARNING, and NOTE.
 This function is mostly meant to be called from the operating system's
 command line (via \code{R CMD BiocCheckGitClone}). Not meant
@@ -13,13 +14,14 @@ to replace \code{R CMD check} or \code{R CMD BiocCheck}, which should always be 
 }
 \usage{
 BiocCheckGitClone(package=".", ...)
+usage2()
 }
 \arguments{
   \item{package}{
     A directory containing an R source package. Not a package tar ball.
   }
-  \item{\dots}{Currently not used but left to add option command line
-    arguments}  
+  \item{\dots}{Only available option currently is quit-with-status.
+    See \code{BiocCheck}}
 }
 
 
@@ -35,7 +37,7 @@ command line, as
 
 where \code{package} is a directory containing an \code{R} source package.
 
-\code{BiocCheckGitClone} is not meant as a replacement for 
+\code{BiocCheckGitClone} is not meant as a replacement for
 \code{R CMD check} or \code{R CMD BiocCheck}, which should always be run first
 for best results.
 
@@ -71,9 +73,9 @@ Lori Shepherd
 
 \examples{
 packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")
-BiocCheckGitClone(packageDir)
+BiocCheckGitClone(packageDir, `quit-with-status`=FALSE)
 
 ## or from the operating system's command line as:
-## R CMD BiocCheck myPackage
+## R CMD BiocCheckGitClone myPackage
 
 }
