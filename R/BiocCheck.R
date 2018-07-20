@@ -9,7 +9,9 @@ getOptionList <- function()
             help="disable biocViews-specific checks (for non-BioC packages)"),
         make_option("--build-output-file", type="character",
             help="file containing R CMD build output, for additional analysis",
-            metavar="build-output-file")
+            metavar="build-output-file"),
+        make_option("--quit-with-status", action="store_true",
+            help="enable exit code option when performing check")
         )
 }
 
@@ -242,7 +244,8 @@ BiocCheck <- function(package=".", ...)
         errcode <- 0
     }
 
-    if ("Called_from_command_line" %in% names(dots))
+    if (isTRUE(dots[["quit-with-status"]]) ||
+        "Called_from_command_line" %in% names(dots))
     {
         q("no", errcode)
     } else {

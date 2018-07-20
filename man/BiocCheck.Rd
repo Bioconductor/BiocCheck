@@ -80,7 +80,7 @@ Dan Tenenbaum
 
 \examples{
 packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")
-BiocCheck(packageDir)
+BiocCheck(packageDir, `quit-with-status`=FALSE)
 
 ## or from the operating system's command line as:
 ## R CMD BiocCheck myPackage
