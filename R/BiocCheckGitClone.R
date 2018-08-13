@@ -61,8 +61,7 @@ BiocCheckGitClone <- function(package=".", ...){
     handleMessage(
         "This is BiocCheckGitClone version ", packageVersion("BiocCheck"), ". ",
         "BiocCheckGitClone is a work in progress. Output and severity of issues may ",
-        "change. Installing package...", indent=0, exdent=0)
-    installAndLoad(package)
+        "change.", indent=0, exdent=0)
 
     source_tarball <- grepl("\\.tar\\.gz$", package)
     if(source_tarball)
