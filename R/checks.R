@@ -407,7 +407,7 @@ getPkgType <- function(pkgdir)
 
 getParent <- function(view, biocViewsVocab)
 {
-    topLevel <- c("Software", "ExperimentData", "AnnotationData")
+    topLevel <- c("Software", "ExperimentData", "AnnotationData", "Workflow")
     if (view %in% topLevel)
         return(view)
     for (level in topLevel) {
@@ -472,7 +472,7 @@ checkBiocViews <- function(pkgdir)
     type = guessPackageType(views)
     handleMessage(type)
     handleCheck("Checking for non-trivial biocViews...")
-    toplevel <- c("Software", "AnnotationData", "ExperimentData")
+    toplevel <- c("Software", "AnnotationData", "ExperimentData", "Workflow")
     if (all(views %in% toplevel)) {
         handleError(
             "Add biocViews other than ", paste(unique(views), collapse=", "))
@@ -486,7 +486,7 @@ checkBiocViews <- function(pkgdir)
     if (length(unique(parents)) > 1)
     {
         handleWarning("Use biocViews from one category only ",
-            "(one of Software, ExperimentData, AnnotationData)")
+            "(one of Software, ExperimentData, AnnotationData, Workflow)")
         return(TRUE)
     }
     branch <- unique(parents)
