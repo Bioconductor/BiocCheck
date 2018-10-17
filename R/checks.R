@@ -106,6 +106,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigChunkEval(vigdircontents)
 
+    checkVigBiocInst(pkgdir)
+
     msg_eval <- checkVigEvalAllFalse(pkgdir)
     if(length(msg_eval) > 0) {
         handleWarning(" Vignette set global option 'eval=FALSE'")
@@ -340,6 +342,19 @@ checkVigEvalAllFalse <- function(pkgdir){
     msg_eval <- grepPkgDir(Vigdir,
                            "-rn 'knitr::opts_chunk\\$set(.*eval\\s*=\\s*F'")
     msg_eval
+}
+
+checkVigBiocInst <- function(pkgdir) {
+    vigdir <- file.path(pkgdir, "vignettes")
+    vigdir <- sprintf("%s%s", vigdir, .Platform$file.sep)
+    msg_return <- grepPkgDir(vigdir,
+        "-Ern 'BiocInstaller|biocLite|useDevel|biocinstallRepos'")
+    if (length(msg_return)) {
+        handleWarning(" BiocInstaller code found in vignette(s)")
+        handleMessage("Found in file(s):", indent=6)
+        for (msg in msg_return)
+            handleMessage(msg, indent=8)
+    }
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
