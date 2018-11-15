@@ -490,9 +490,9 @@ RStudio. These skeletons contain comments that look like this:
 ## Duplication checks
 
 * **Checking if package already exists in CRAN...**
+  This can be disabled with the `--no-check-CRAN` option. A package with the same
+  name (case differences are ignored) cannot exist in CRAN (`ERROR`).
 
-  A package with the same name (case differences are ignored) cannot
-  exist in CRAN (`ERROR`).
 * **Checking if new package already exists in _Bioconductor_...**
   Only run if the `--new-package` flag is turned on.  A package
   with the same name (case differences are ignored) cannot  exist in
@@ -503,7 +503,8 @@ RStudio. These skeletons contain comments that look like this:
 **Checking for bioc-devel mailing list subscription...**
 
 This only applies if `BiocCheck` is run on the _Bioconductor_ build
-machines, because this step requires special authorization.
+machines, because this step requires special authorization. This can be disabled
+with the `--no-check-bioc-help` option.
 
 * Check that the email address in the Maintainer (or Authors@R) field
   is subscribed to the bioc-devel mailing list (`ERROR`).
@@ -521,6 +522,7 @@ machines, because this step requires special authorization.
 * Check that the package maintainer is register at our
   [support site][10] using the same email address that is in the
   `Maintainer` field of their package `DESCRIPTION` file (`ERROR`).
+  This can be disabled with the `--no-check-bioc-help` option.
 
   The main place people ask questions about _Bioconductor_ packages is
   the support site.  Please [register][11] and then optionally include

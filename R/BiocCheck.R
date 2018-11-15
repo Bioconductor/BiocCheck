@@ -5,8 +5,12 @@ getOptionList <- function()
             help="disable vignette checks"),
         make_option("--new-package", action="store_true",
             help="enable checks specific to new packages"),
+        make_option("--no-check-CRAN", action="store_true",
+            help="disable check for if package exists in CRAN"),
         make_option("--no-check-bioc-views", action="store_true",
             help="disable biocViews-specific checks (for non-BioC packages)"),
+        make_option("--no-check-bioc-help", action="store_true",
+            help="disable check for registration on Bioconductor mailing list and support site"),
         make_option("--build-output-file", type="character",
             help="file containing R CMD build output, for additional analysis",
             metavar="build-output-file"),
@@ -206,21 +210,26 @@ BiocCheck <- function(package=".", ...)
     handleCheck("Checking for canned comments in man pages...")
     checkForPromptComments(package_dir)
 
-    handleCheck("Checking if package already exists in CRAN...")
-    checkIsPackageAlreadyInRepo(package_name, "CRAN")
+    if (is.null(dots[["no-check-CRAN"]]))
+    {
+        handleCheck("Checking if package already exists in CRAN...")
+        checkIsPackageAlreadyInRepo(package_name, "CRAN")
+    }
 
     if (!is.null(dots[["new-package"]]))
     {
         handleCheck("Checking if new package already exists in Bioconductor...")
         checkIsPackageAlreadyInRepo(package_name, "BioCsoft")
-
     }
 
-    handleCheck("Checking for bioc-devel mailing list subscription...")
-    checkForBiocDevelSubscription(package_dir)
+    if (is.null(dots[["no-check-bioc-help"]]))
+    {
+        handleCheck("Checking for bioc-devel mailing list subscription...")
+        checkForBiocDevelSubscription(package_dir)
 
-    handleCheck("Checking for support site registration...")
-    checkForSupportSiteRegistration(package_dir)
+        handleCheck("Checking for support site registration...")
+        checkForSupportSiteRegistration(package_dir)
+    }
 
     ## Summary
     .msg("\n\nSummary:")
