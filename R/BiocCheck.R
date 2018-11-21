@@ -108,6 +108,7 @@ BiocCheck <- function(package=".", ...)
                 "This is not a software package, skipping vignette checks...")
         }
     }
+
     handleCheck("Checking version number...")
     if (!is.null(dots[["new-package"]]))
     {
@@ -144,18 +145,24 @@ BiocCheck <- function(package=".", ...)
     }
     handleCheck("Checking build system compatibility...")
     checkBBScompatibility(package_dir)
+
     handleCheck("Checking unit tests...")
     checkUnitTests(package_dir)
-    parsedCode <- parseFiles(package_dir)
+
     handleCheck("Checking skip_on_bioc() in tests...")
     checkSkipOnBioc(package_dir)
+
     handleCheck("Checking library calls...")
     checkLibraryCalls(package_dir)
+
     handleCheck("Checking coding practice...")
     checkCodingPractice(package_dir)
 
+    parsedCode <- parseFiles(package_dir)
+
     handleCheck("Checking native routine registration...")
     checkRegistrationOfEntryPoints(package_name, parsedCode)
+
     if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
         quietly=TRUE))))
     {

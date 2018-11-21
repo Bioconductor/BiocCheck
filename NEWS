@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.19
+-----------------------
+
+NEW FEATURES
+
+    o (1.19.1) New Check options to turn off if in CRAN (--no-check-CRAN) and
+    Bioconductor mailing list and support site (--no-check-bioc-help)
+
 CHANGES IN VERSION 1.17
 -----------------------
 

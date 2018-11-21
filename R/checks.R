@@ -1,9 +1,9 @@
-getVigSources <- function(dir)
-{
-    dir(dir,
-        pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
-        ignore.case=TRUE, full.names=TRUE)
-}
+##########################
+#
+#  Checks for BiocCheck
+#
+###########################
+
 
 checkForVersionNumberMismatch <- function(package, package_dir)
 {
@@ -20,44 +20,58 @@ checkForVersionNumberMismatch <- function(package, package_dir)
     }
 }
 
-checkRVersionDependency <- function(package_dir)
+## Make sure this is run after pkg is installed.
+checkForBadDepends <- function(pkgdir)
 {
-    desc <- file.path(package_dir, "DESCRIPTION")
-    dcf <- read.dcf(desc)
-    if ("Depends" %in% colnames(dcf))
-    {
-        res <- cleanupDependency(dcf[, "Depends"], FALSE)
-        if ("R" %in% res)
-        {
-            ind <- which(res == "R")
-            verStr <- names(res)[ind]
-            if (nchar(verStr))
-            {
-                ver <- as.package_version(verStr)
-                bv <- package_version(sprintf("%s.%s",
-                    getRversion()$major,
-                    getRversion()$minor))
-                if (ver < bv)
-                {
-                    handleWarning(
-                        "Update R version dependency from ", ver, " to ", bv,
-                        ".")
-                }
-            }
-        }
-    }
-}
+    pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
+    depends <- cleanupDependency(packageDescription(pkgname)$Depends)
+    depends <- append(depends,
+        cleanupDependency(packageDescription(pkgname)$Imports))
+    output <- getBadDeps(pkgdir)
+    if (is.null(output))
+        return()
 
-checkForDirectSlotAccess <- function(parsedCode, package_name)
-{
-    idx <- grepl("\\.R$", names(parsedCode), ignore.case=TRUE)
-    parsedCode <- parsedCode[!idx]
-    res <- findSymbolInParsedCode(parsedCode, package_name, "@", "'@'")
-    if (res > 0)
-    {
+    output <- unique(unlist(strsplit(output, "\n")))
+    output <- output[grep("no visible", output)]
+    if (length(output) == 0) return()
+    res <- regexpr("'[^']*'", output)
+    fns <- regexpr("^[^:]*:", output)
+    if (all(res == -1L))
+        return()
+
+    res <- gsub("'", "", regmatches(output, res))
+    fns <- sub(":$", "", regmatches(output, fns))
+    inGlobals <- res %in% globalVariables(package=pkgname)
+    res <- res[!inGlobals]
+    fns <- fns[!inGlobals]
+
+    pkgs <- character(length(fns))
+    for (pkg in depends)
+        pkgs[res %in% getNamespaceExports(pkg)] <- pkg
+    found <- nzchar(pkgs)
+
+    handleCheck("Checking if other packages can import this one...")
+    if (any(found)) {
+        handleError(
+            "Packages providing ", sum(found), " object(s) used in this ",
+            "package should be imported in the NAMESPACE file, otherwise ",
+            "packages importing this package may fail.")
+
+        msg <- sprintf("  %s::%s in %s()", pkgs[found], res[found], fns[found])
+        handleVerbatim(c("", "package::object in function()", msg, ""))
+    }
+
+    handleCheck("Checking to see if we understand object initialization...")
+    if (!all(found)) {
+        n <- sum(!found)
         handleNote(
-            "Use accessors; don't access S4 class slots via ",
-            "'@' in examples/vignettes.")
+            "Consider clarifying how ", n, " object(s) are initialized. ",
+            "Maybe ", if (n == 1L) "it is" else "they are", " ",
+            "part of a data set loaded with data(), or perhaps part of an ",
+            "object referenced in with() or within().")
+
+        msg <- sprintf("%s (%s)", fns[!found], res[!found])
+        handleVerbatim(c("function (object)", msg))
     }
 }
 
@@ -194,18 +208,6 @@ checkToolsVig <- function(pkgdir)
     }
 }
 
-getVigBuilder <- function(desc)
-{
-    dcf <- read.dcf(desc)
-    if (!"VignetteBuilder" %in% colnames(dcf)) {
-        builder <- NULL
-    } else {
-        builder <- strsplit(gsub(" ", "",dcf[, "VignetteBuilder"], fixed=TRUE),
-                            ",")[[1]]
-    }
-    return(builder)
-}
-
 checkVigBuilder <- function(builder, vigdircontents)
 {
 # check DESCRIPTION is in at least one vignette
@@ -223,17 +225,6 @@ checkVigBuilder <- function(builder, vigdircontents)
         handleError("VignetteBuilder listed in DESCRIPTION but not ",
                     "found as VignetteEngine in any vignettes:")
         handleMessage(badBuilder, indent=6)
-    }
-}
-
-vigHelper <- function(vignetteFile, builder){
-    lines <- readLines(vignetteFile, n=100L, warn=FALSE)
-    idx <- grep(lines, pattern="VignetteEngine")
-    if (length(idx) != 0){
-        eng <- gsub("::.*", "", gsub(".*\\{|\\}.*", "", lines[idx]))
-        return(eng %in% builder)
-    } else {
-        return(NA)
     }
 }
 
@@ -357,6 +348,22 @@ checkVigBiocInst <- function(pkgdir) {
     }
 }
 
+checkIsVignetteBuilt <- function(package_dir, build_output_file)
+{
+    if (!file.exists(build_output_file))
+    {
+        stop("build output file '", build_output_file, "' does not exist.")
+    }
+    lines <- readLines(build_output_file)
+    if (!any(grepl("^\\* creating vignettes \\.\\.\\.", lines)))
+    {
+        msg <- "Vignette must be built by
+        'R CMD build'. Please see the `Vignette Checks` section of
+        the BiocCheck vignette."
+        handleError(msg)
+    }
+}
+
 checkNewPackageVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
@@ -398,36 +405,31 @@ checkVersionNumber <- function(pkgdir)
     }, error=function(e) handleError("Invalid package version"))
 }
 
-getPkgType <- function(pkgdir)
+checkRVersionDependency <- function(package_dir)
 {
-    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-    if (!"biocViews" %in% colnames(dcf))
+    desc <- file.path(package_dir, "DESCRIPTION")
+    dcf <- read.dcf(desc)
+    if ("Depends" %in% colnames(dcf))
     {
-        return(NA)
-    }
-    biocViews <- dcf[, "biocViews"]
-    views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
-    biocViewsVocab <- NULL ## to keep R CMD check happy
-    data("biocViewsVocab", package="biocViews", envir=environment())
-    if (any(!views %in% nodes(biocViewsVocab)))
-        return(NA)
-    parents <- c()
-    for (view in views)
-    {
-        parents <- c(parents, getParent(view, biocViewsVocab))
-    }
-    u <- unique(parents)
-    if (length(u)==1) return(u) else return(NA)
-}
-
-getParent <- function(view, biocViewsVocab)
-{
-    topLevel <- c("Software", "ExperimentData", "AnnotationData", "Workflow")
-    if (view %in% topLevel)
-        return(view)
-    for (level in topLevel) {
-        if (view %in% names(acc(biocViewsVocab, level)[[level]]))
-            return(level)
+        res <- cleanupDependency(dcf[, "Depends"], FALSE)
+        if ("R" %in% res)
+        {
+            ind <- which(res == "R")
+            verStr <- names(res)[ind]
+            if (nchar(verStr))
+            {
+                ver <- as.package_version(verStr)
+                bv <- package_version(sprintf("%s.%s",
+                    getRversion()$major,
+                    getRversion()$minor))
+                if (ver < bv)
+                {
+                    handleWarning(
+                        "Update R version dependency from ", ver, " to ", bv,
+                        ".")
+                }
+            }
+        }
     }
 }
 
@@ -908,30 +910,44 @@ checkDeprecatedPackages <- function(pkgdir)
     }
 }
 
-.checkEnv <- function(env, walker) {
-    ## look at all closures in 'env' using codetools-derived 'walker'
-    for (n in ls(env, all.names = TRUE)) {
-        v <- get(n, envir = env)
-        if (typeof(v) == "closure")
-            walkCode(body(v), walker)
+checkForDirectSlotAccess <- function(parsedCode, package_name)
+{
+    idx <- grepl("\\.R$", names(parsedCode), ignore.case=TRUE)
+    parsedCode <- parsedCode[!idx]
+    res <- findSymbolInParsedCode(parsedCode, package_name, "@", "'@'")
+    if (res > 0)
+    {
+        handleNote(
+            "Use accessors; don't access S4 class slots via ",
+            "'@' in examples/vignettes.")
     }
-    walker
 }
 
-.colonWalker <- function() {
-    ## record all pkg used as pkg::foo or pkg:::bar
-    PKGS <- character()
-    collector <- function(e, w)
-        PKGS <<- append(PKGS, as.character(e[[2]]))
-    list(handler=function(v, w) {
-        switch(v, "::"=collector, ":::"=collector, NULL)
-    }, call=function(e, w) {
-        for (ee in as.list(e)) if (!missing(ee)) walkCode(ee, w)
-    }, leaf = function(e, w) {
-        NULL
-    }, done = function() {
-        sort(unique(PKGS))
-    })
+checkForLibraryMe <- function(pkgname, parsedCode)
+{
+    badfiles <- c()
+    for (filename in names(parsedCode))
+    {
+        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
+            next
+        df <- parsedCode[[filename]]
+        if (nrow(df))
+        {
+            res <- doesFileLoadPackage(df, pkgname)
+            if (length(res))
+            {
+                badfiles <- append(badfiles, mungeName(filename, pkgname))
+            }
+        }
+    }
+    if (length(badfiles))
+    {
+        msg <- sprintf("The following files call library or require on %s.
+            This is not necessary.\n%s", pkgname,
+            paste(badfiles, collapse=", "))
+        handleWarning(msg)
+    }
+
 }
 
 checkDescriptionNamespaceConsistency <- function(pkgname)
@@ -968,210 +984,6 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
                 "DESCRIPTION as well as NAMESPACE.")
         }
     }
-}
-
-## Make sure this is run after pkg is installed.
-checkForBadDepends <- function(pkgdir)
-{
-    pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
-    depends <- cleanupDependency(packageDescription(pkgname)$Depends)
-    depends <- append(depends,
-        cleanupDependency(packageDescription(pkgname)$Imports))
-    output <- getBadDeps(pkgdir)
-    if (is.null(output))
-        return()
-
-    output <- unique(unlist(strsplit(output, "\n")))
-    output <- output[grep("no visible", output)]
-    if (length(output) == 0) return()
-    res <- regexpr("'[^']*'", output)
-    fns <- regexpr("^[^:]*:", output)
-    if (all(res == -1L))
-        return()
-
-    res <- gsub("'", "", regmatches(output, res))
-    fns <- sub(":$", "", regmatches(output, fns))
-    inGlobals <- res %in% globalVariables(package=pkgname)
-    res <- res[!inGlobals]
-    fns <- fns[!inGlobals]
-
-    pkgs <- character(length(fns))
-    for (pkg in depends)
-        pkgs[res %in% getNamespaceExports(pkg)] <- pkg
-    found <- nzchar(pkgs)
-
-    handleCheck("Checking if other packages can import this one...")
-    if (any(found)) {
-        handleError(
-            "Packages providing ", sum(found), " object(s) used in this ",
-            "package should be imported in the NAMESPACE file, otherwise ",
-            "packages importing this package may fail.")
-
-        msg <- sprintf("  %s::%s in %s()", pkgs[found], res[found], fns[found])
-        handleVerbatim(c("", "package::object in function()", msg, ""))
-    }
-
-    handleCheck("Checking to see if we understand object initialization...")
-    if (!all(found)) {
-        n <- sum(!found)
-        handleNote(
-            "Consider clarifying how ", n, " object(s) are initialized. ",
-            "Maybe ", if (n == 1L) "it is" else "they are", " ",
-            "part of a data set loaded with data(), or perhaps part of an ",
-            "object referenced in with() or within().")
-
-        msg <- sprintf("%s (%s)", fns[!found], res[!found])
-        handleVerbatim(c("function (object)", msg))
-    }
-}
-
-getBadDeps <- function(pkgdir)
-{
-    cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
-    oldquotes <- getOption("useFancyQuotes")
-    on.exit(options(useFancyQuotes=oldquotes))
-    options(useFancyQuotes=FALSE)
-    args <- sprintf("-q --vanilla --slave -f %s --args %s",
-        system.file("script", "checkBadDeps.R", package="BiocCheck"),
-        dQuote(pkgdir))
-    system2(cmd, args, stdout=TRUE, stderr=FALSE,
-        env="R_DEFAULT_PACKAGES=NULL")
-}
-
-
-getFunctionLengths <- function(df)
-{
-    df <- df[df$terminal & df$parent > -1,]
-    rownames(df) <- seq_len(nrow(df))
-    max <- nrow(df)
-    res <- list()
-    funcRows <- df[df$token == "FUNCTION",]
-    lst<-lapply(split(df, rownames(df)), as.list)
-    if (nrow(funcRows))
-    {
-        for (i in seq_len(nrow(funcRows)))
-        {
-            funcRowId <- as.integer(rownames(funcRows)[i])
-            funcRow <- funcRows[as.character(funcRowId),]
-            funcStartLine <- funcRow$line1 # this might get updated later
-            funcLines <- NULL
-            funcName <- "_anonymous_"
-            # attempt to get function name
-            if (funcRowId >= 3)
-            {
-                up1 <- lst[[as.character(funcRowId -1)]]
-                #up1 <- df[as.character(funcRowId - 1),]
-                #up2 <- df[as.character(funcRowId - 2),]
-                up2 <- lst[[as.character(funcRowId -2)]]
-                if (up1$token %in% c("EQ_ASSIGN", "LEFT_ASSIGN") &&
-                    up2$token == "SYMBOL")
-                {
-                    funcName <- up2$text
-                    funcStartLine <- up2$line1
-                }
-            }
-            j <- funcRowId + 1
-            saveme <- NULL
-            while (TRUE)
-            {
-                #thisRowId <- as.integer(rownames(df)[j])
-                thisRowId <- j
-                #thisRow <- df[thisRowId,]
-                thisRow <- lst[[as.character(thisRowId)]]
-                if (thisRowId == max || thisRow$parent > funcRow$parent)
-                {
-                    lineToExamine <- ifelse(thisRowId == max, max, saveme)
-
-                    endLine <- lst[[as.character(lineToExamine)]]$line2
-                    funcLines <- endLine - (funcStartLine -1)
-                    if(funcName == "_anonymous_")
-                        funcName <- paste0(funcName, ".", funcStartLine)
-                    res[[funcName]] <- c(length=funcLines,
-                        startLine=funcStartLine, endLine=endLine)
-                    break
-                } else {
-                    if (thisRow$parent > 0)
-                    {
-                        saveme <- thisRowId
-                    }
-                }
-                j <- j + 1
-            }
-
-        }
-    }
-    res
-}
-
-doesFileLoadPackage <- function(df, pkgname)
-{
-    df <- cbind(df, idx=seq_len(nrow(df)))
-    res <- c()
-    regex <- paste0("^['|\"]*", pkgname, "['|\"]*$")
-    max <- nrow(df)
-    reqs <- df[df$token == "SYMBOL_FUNCTION_CALL" &
-        df$text %in% c("library","require"),]
-    if (nrow(reqs))
-    {
-        for (i in seq_len(nrow(reqs)))
-        {
-            reqRow <- reqs[i,]
-            currIdx <- reqs[i, "idx"]
-            if ((currIdx + 1) >= max) return(res)
-            i1 = df[df$idx == currIdx+1,]
-            p <- i1$parent
-            rowsWithThatParent <- df[df$parent == p,]
-            lastRowWithThatParent <-
-                rowsWithThatParent[nrow(rowsWithThatParent),]
-            rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
-            for (j in seq_len(nrow(rowsToCheck)))
-            {
-                curRow <- rowsToCheck[j,]
-                if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
-                    grepl(regex, curRow$text))
-                {
-                    prevRow <- df[curRow$idx -1,]
-                    prevPrevRow <- df[curRow$idx -2,]
-                    if (!(prevRow$token == "EQ_SUB" &&
-                        prevRow$text == "=" &&
-                        prevPrevRow$token == "SYMBOL_SUB" &&
-                        prevPrevRow$text == "help"))
-                    {
-                        res <- append(res, reqRow$line1)
-                    }
-                }
-            }
-        }
-    res
-    }
-}
-
-
-checkForLibraryMe <- function(pkgname, parsedCode)
-{
-    badfiles <- c()
-    for (filename in names(parsedCode))
-    {
-        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
-            next
-        df <- parsedCode[[filename]]
-        if (nrow(df))
-        {
-            res <- doesFileLoadPackage(df, pkgname)
-            if (length(res))
-            {
-                badfiles <- append(badfiles, mungeName(filename, pkgname))
-            }
-        }
-    }
-    if (length(badfiles))
-    {
-        msg <- sprintf("The following files call library or require on %s.
-            This is not necessary.\n%s", pkgname,
-            paste(badfiles, collapse=", "))
-        handleWarning(msg)
-    }
-
 }
 
 checkFunctionLengths <- function(parsedCode, pkgname)
@@ -1226,47 +1038,6 @@ checkFunctionLengths <- function(parsedCode, pkgname)
             }
         }
     }
-}
-
-## This needs work. Doesn't R CMD check do this anyway?
-old.checkExportsAreDocumented <- function(pkgdir, pkgname)
-{
-    namesAndAliases <- character(0)
-    manpages <- dir(file.path(pkgdir, "man"),
-        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
-    for (manpage in manpages)
-    {
-        rd <- parse_Rd(manpage)
-        name <-
-            unlist(rd[unlist(lapply(rd, function(x)
-                attr(x, "Rd_tag") == "\\name"))][[1]][1])
-        aliases <- unlist(lapply(rd[unlist(lapply(rd,
-            function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
-        namesAndAliases <- append(namesAndAliases, c(name, aliases))
-    }
-    exports <- getNamespaceExports(pkgname)
-    bad <- (!exports %in% unique(namesAndAliases))
-    exports[bad]
-}
-
-doesManPageHaveRunnableExample <- function(rd)
-{
-    hasExamples <- any(unlist(lapply(rd,
-        function(x) attr(x, "Rd_tag") == "\\examples")))
-    if (!hasExamples) return(FALSE)
-
-    ex <- character()
-    tc <- textConnection("ex", "w", local=TRUE)
-    Rd2ex(rd, commentDonttest = TRUE, out = tc)
-    close(tc)
-
-    if(!length(ex))
-        return(FALSE)
-
-    parsed <- try(parse(text = ex), silent = TRUE)
-
-    # if code contains only comments the length with be 0
-    length(parsed) && !inherits(parsed, "try-error")
 }
 
 checkForValueSection <- function(pkgdir)
@@ -1487,28 +1258,24 @@ checkForPromptComments <- function(pkgdir)
     }
 }
 
-checkForSupportSiteRegistration <- function(package_dir)
+checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft"))
 {
-    email <- getMaintainerEmail(package_dir)
-    if (tolower(email) == "maintainer@bioconductor.org")
-    {
-        handleMessage("Maintainer email is ok.")
-        return()
-    }
-    url <- paste0("https://support.bioconductor.org/api/email/", email, "/")
-    response <- tryCatch(GET(url), error=identity)
-    if (inherits(response, "error")) {
-        handleMessage(
-            "Unable to connect to support site:",
-            "\n  ", conditionMessage(response))
-    } else if (suppressMessages(content(response))) {
-        handleMessage("Maintainer is registered at support site.")
-    } else {
-        handleError("Maintainer must register at the support site; ",
-            "visit https://support.bioconductor.org/accounts/signup/ .")
+    repo <- match.arg(repo)
+    repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
+    conn <- url(repo.url)
+    dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
+    close(conn)
+    if (inherits(dcf, "error")) {
+        handleMessage("Unable to access repository ", BiocManager::repositories()[repo])
+    } else if (tolower(pkgName) %in% tolower(dcf[,"Package"])) {
+        if (repo == "CRAN")
+            msg <- "Package must be removed from CRAN."
+        else {
+            msg <- paste0("'", pkgName, "' already exists in Bioconductor.")
+        }
+        handleError(msg)
     }
 }
-
 
 checkForBiocDevelSubscription <- function(pkgdir)
 {
@@ -1559,67 +1326,36 @@ checkForBiocDevelSubscription <- function(pkgdir)
     }
 }
 
-checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft"))
+checkForSupportSiteRegistration <- function(package_dir)
 {
-    repo <- match.arg(repo)
-    repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
-    conn <- url(repo.url)
-    dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
-    close(conn)
-    if (inherits(dcf, "error")) {
-        handleMessage("Unable to access repository ", BiocManager::repositories()[repo])
-    } else if (tolower(pkgName) %in% tolower(dcf[,"Package"])) {
-        if (repo == "CRAN")
-            msg <- "Package must be removed from CRAN."
-        else {
-            msg <- paste0("'", pkgName, "' already exists in Bioconductor.")
-        }
-        handleError(msg)
-    }
-}
-
-checkIsVignetteBuilt <- function(package_dir, build_output_file)
-{
-    if (!file.exists(build_output_file))
+    email <- getMaintainerEmail(package_dir)
+    if (tolower(email) == "maintainer@bioconductor.org")
     {
-        stop("build output file '", build_output_file, "' does not exist.")
+        handleMessage("Maintainer email is ok.")
+        return()
     }
-    lines <- readLines(build_output_file)
-    if (!any(grepl("^\\* creating vignettes \\.\\.\\.", lines)))
-    {
-        msg <- "Vignette must be built by
-        'R CMD build'. Please see the `Vignette Checks` section of
-        the BiocCheck vignette."
-        handleError(msg)
+    url <- paste0("https://support.bioconductor.org/api/email/", email, "/")
+    response <- tryCatch(GET(url), error=identity)
+    if (inherits(response, "error")) {
+        handleMessage(
+            "Unable to connect to support site:",
+            "\n  ", conditionMessage(response))
+    } else if (suppressMessages(content(response))) {
+        handleMessage("Maintainer is registered at support site.")
+    } else {
+        handleError("Maintainer must register at the support site; ",
+            "visit https://support.bioconductor.org/accounts/signup/ .")
     }
 }
 
-checkLogicalUseFiles <- function(pkgdir) {
-    Rdir <- file.path(pkgdir, "R")
-    Rfiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[rR]$",
-                  full.names = TRUE)
-    dx <- startsWith(Rfiles, Rdir)
-    RdirFiles <- Rfiles[dx]
-    Rother <- Rfiles[!dx]
-    manFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Dd]$",
-        full.names = TRUE)
-    RNWFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Nn][wW]$",
-        full.names = TRUE)
-    RMDFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Mm][Dd]$",
-        full.names = TRUE)
 
-    allFiles <- c(Rother, RMDFiles, RNWFiles, manFiles)
-    fileNames1 <- character()
-    if (length(allFiles) > 0){
-        convertedFiles <- unlist(lapply(FUN=makeTempRFile, allFiles))
-        vl <- lapply(convertedFiles, findLogicalFile)
-        names(vl) <- c(Rother, RMDFiles, RNWFiles, manFiles)
-        badFiles <- Filter(length, vl)
-        fileNames1 <- names(badFiles)
-    }
-    sub(fileNames1, pattern=paste0(pkgdir,.Platform$file.sep),
-        replacement="", fixed=TRUE)
-}
+
+#######################################
+#
+#  Checks for BiocCheckGitClone
+#
+#######################################
+
 
 checkBadFiles <- function(package_dir){
     # taken from
