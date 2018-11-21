@@ -433,10 +433,10 @@ checkRVersionDependency <- function(package_dir)
     }
 }
 
-checkPackageSize <- function(pkg, pkgdir, size=4){
+checkPackageSize <- function(pkg, pkgdir, size=5){
     pkgType <- getPkgType(pkgdir)
     if (is.na(pkgType) ||  pkgType == "Software") {
-        maxSize <- size*10^6 ## 4MB
+        maxSize <- size*10^6 ## 5MB
         pkgSize <- file.size(pkg)
         if (pkgSize > maxSize){
             handleError(

@@ -6,15 +6,13 @@
 - Make sure every (non-trivial) class has a show() method.
    or at least display the #/% of classes that don't.
 
-- dontrun / eval=FALSE
+- dontrun / dontcheck/ / eval=FALSE
     warnings - note percent 
-
-- detect OS-specific code?
 
 - print() cat() message() warning() error() (mis)use?
 
-- if () '%' vs '%%' # & vs &&, | vs || ?
+- if /while ()  & vs &&, | vs || ?
 
-- devtools? codetoolsBioC?
+- related - organize and revamp codetoolsBioC?
 
 - NEWS properly formatted?

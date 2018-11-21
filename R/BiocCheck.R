@@ -83,6 +83,7 @@ BiocCheck <- function(package=".", ...)
         checkForVersionNumberMismatch(package, package_dir)
     }
 
+    handleCheck("Checking Package Dependencies...")
     checkForBadDepends(file.path(tempdir(), "lib", package_name))
 
 
@@ -125,7 +126,7 @@ BiocCheck <- function(package=".", ...)
     source_tarball <- grepl("\\.tar\\.gz$", package)
     handleCheck("Checking package size...")
     if (source_tarball){
-        checkPackageSize(package, package_dir, size=4)
+        checkPackageSize(package, package_dir, size=5)
     } else {
         handleMessage("Skipped... only checked on source tarball",
                       indent=8)
