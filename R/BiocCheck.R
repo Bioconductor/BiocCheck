@@ -86,29 +86,8 @@ BiocCheck <- function(package=".", ...)
     handleCheck("Checking Package Dependencies...")
     checkForBadDepends(file.path(tempdir(), "lib", package_name))
 
-
-    if (is.null(dots[["no-check-vignettes"]]))
-    {
-        pkgType <- getPkgType(package_dir)
-        if ((is.na(pkgType)) || pkgType == "Software")
-        {
-            handleCheck("Checking vignette directory...")
-            msg <- sprintf(
-                "This is a%s package",
-                if (is.na(pkgType)) "n unknown type of" else " software")
-            handleMessage(msg)
-            checkVignetteDir(package_dir, checkingDir)
-            if ("build-output-file" %in% names(dots))
-            {
-                handleCheck(
-                    "Checking whether vignette is built with 'R CMD build'...")
-                checkIsVignetteBuilt(package_dir, dots[["build-output-file"]])
-            }
-        } else {
-            handleMessage(
-                "This is not a software package, skipping vignette checks...")
-        }
-    }
+    handleCheck("Checking for deprecated package usage...")
+    checkDeprecatedPackages(package_dir)
 
     handleCheck("Checking version number...")
     if (!is.null(dots[["new-package"]]))
@@ -144,25 +123,12 @@ BiocCheck <- function(package=".", ...)
             .msg("See http://bioconductor.org/developers/how-to/biocViews/")
         }
     }
+
     handleCheck("Checking build system compatibility...")
     checkBBScompatibility(package_dir)
 
-    handleCheck("Checking unit tests...")
-    checkUnitTests(package_dir)
-
-    handleCheck("Checking skip_on_bioc() in tests...")
-    checkSkipOnBioc(package_dir)
-
-    handleCheck("Checking library calls...")
-    checkLibraryCalls(package_dir)
-
-    handleCheck("Checking coding practice...")
-    checkCodingPractice(package_dir)
-
-    parsedCode <- parseFiles(package_dir)
-
-    handleCheck("Checking native routine registration...")
-    checkRegistrationOfEntryPoints(package_name, parsedCode)
+    handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
+    checkDescriptionNamespaceConsistency(package_name)
 
     if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
         quietly=TRUE))))
@@ -171,52 +137,63 @@ BiocCheck <- function(package=".", ...)
         checkImportSuggestions(package_name)
     }
 
-    handleCheck("Checking for deprecated package usage...")
-    checkDeprecatedPackages(package_dir)
+    if (is.null(dots[["no-check-vignettes"]]))
+    {
+        pkgType <- getPkgType(package_dir)
+        if ((is.na(pkgType)) || pkgType == "Software")
+        {
+            handleCheck("Checking vignette directory...")
+            msg <- sprintf(
+                "This is a%s package",
+                if (is.na(pkgType)) "n unknown type of" else " software")
+            handleMessage(msg)
+            checkVignetteDir(package_dir, checkingDir)
+            if ("build-output-file" %in% names(dots))
+            {
+                handleCheck(
+                    "Checking whether vignette is built with 'R CMD build'...")
+                checkIsVignetteBuilt(package_dir, dots[["build-output-file"]])
+            }
+        } else {
+            handleMessage(
+                "This is not a software package, skipping vignette checks...")
+        }
+    }
 
-    handleCheck("Checking parsed R code in R directory, examples, vignettes...")
+    handleCheck("Checking library calls...")
+    checkLibraryCalls(package_dir)
 
-    handleCheck("Checking for direct slot access...")
-    checkForDirectSlotAccess(parsedCode, package_name)
-
-    handleCheck("Checking for browser()...")
-    res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
-        "SYMBOL_FUNCTION_CALL")
-    if (res > 0)
-        handleWarning("Remove browser() statements (found in ", res, " files)")
-
-    handleCheck("Checking for <<-...")
-    res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
-        "LEFT_ASSIGN")
-    if (res > 0)
-        handleNote("Avoid '<<-' if possible (found in ", res, " files)")
+    parsedCode <- parseFiles(package_dir)
 
     handleCheck(sprintf("Checking for library/require of %s...",
         package_name))
     checkForLibraryMe(package_name, parsedCode)
 
-    handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
-    checkDescriptionNamespaceConsistency(package_name)
+    handleCheck("Checking native routine registration...")
+    checkRegistrationOfEntryPoints(package_name, parsedCode)
+
+    handleCheck("Checking coding practice...")
+    checkCodingPractice(package_dir, parsedCode, package_name)
 
     handleCheck("Checking function lengths", appendLF=FALSE)
     checkFunctionLengths(parsedCode, package_name)
 
-    handleCheck("Checking man pages...") # could add more man page checks...
-    checkForValueSection(package_dir)
-
-    handleCheck("Checking exported objects have runnable examples...")
-    checkExportsAreDocumented(package_dir, package_name)
-
+    handleCheck("Checking man page documentation...")
+    checkManDocumentation(package_dir, package_name)
+     
     handleCheck("Checking package NEWS...")
     checkNEWS(package_dir)
+
+    handleCheck("Checking unit tests...")
+    checkUnitTests(package_dir)
+
+    handleCheck("Checking skip_on_bioc() in tests...")
+    checkSkipOnBioc(package_dir)
 
     handleCheck(
         "Checking formatting of DESCRIPTION, NAMESPACE, ",
         "man pages, R source, and vignette source...")
     checkFormatting(package_dir)
-
-    handleCheck("Checking for canned comments in man pages...")
-    checkForPromptComments(package_dir)
 
     if (is.null(dots[["no-check-CRAN"]]))
     {

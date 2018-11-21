@@ -75,292 +75,12 @@ checkForBadDepends <- function(pkgdir)
     }
 }
 
-checkVignetteDir <- function(pkgdir, checkingDir)
+checkDeprecatedPackages <- function(pkgdir)
 {
-    vigdir <- file.path(pkgdir, "vignettes")
-
-    res <- checkVigDirExists(pkgdir, vigdir)
-    if (!res)
-        return()
-
-    vigdircontents <- getVigSources(vigdir)
-    if (length(vigdircontents)==0)
+    if ("multicore" %in% getAllDependencies(pkgdir))
     {
-        handleError("No vignette sources in vignettes/ directory.")
-        return()
-    }
-
-    checkInstContents(pkgdir, checkingDir)
-
-    checkVigFiles(vigdir, vigdircontents)
-    #
-    # This appears to never get run because of pkgdir as character
-    # tools::pkgVignettes
-    # 'pkgVignettes' returns an object of class '"pkgVignettes"' if a
-    #  vignette directory is found, otherwise 'NULL'.
-    #  what is this doing?
-    #
-    res <- checkToolsVig(pkgdir)
-    if (!res)
-        return()
-
-    desc <- file.path(pkgdir, "DESCRIPTION")
-    if (file.exists(desc))
-        builder <- getVigBuilder(desc)
-    else
-        builder <- NULL
-
-    if (!is.null(builder)){
-        checkVigBuilder(builder, vigdircontents)
-    }
-
-    checkVigEngine(builder, vigdircontents)
-
-    checkVigTemplate(vigdircontents)
-
-    checkVigChunkEval(vigdircontents)
-
-    checkVigBiocInst(pkgdir)
-
-    msg_eval <- checkVigEvalAllFalse(pkgdir)
-    if(length(msg_eval) > 0) {
-        handleWarning(" Vignette set global option 'eval=FALSE'")
-        handleMessage("Found in files:", indent=6)
-        for (msg in msg_eval)
-            handleMessage(msg, indent=8)
-    }
-
-}
-
-checkVigDirExists <- function(pkgdir, vigdir)
-{
-    if (!file.exists(vigdir))
-    {
-        if (isInfrastructurePackage(pkgdir))
-        {
-            .msg("  Infrastructure package, vignette not required.",
-                indent=2)
-            return(FALSE)
-        }
-        handleError("No 'vignettes' directory.")
-        return(FALSE)
-    } else {
-        return(TRUE)
-    }
-}
-
-checkInstContents <- function(pkgdir, checkingDir)
-{
-    instdocdir <- file.path(pkgdir, "inst", "doc")
-    instdocdircontents <- getVigSources(instdocdir)
-    if (length(instdocdircontents) > 0)
-    {
-        if (checkingDir)
-        {
-                handleWarning(
-                "Remove vignette sources from inst/doc; ",
-                "they belong in vignettes/.")
-        }
-    }
-}
-
-checkVigFiles <- function(vigdir, vigdircontents){
-    vigs <- tolower(basename(vigdircontents))
-    allvigfiles <- setdiff(tolower(dir(vigdir, all.files=TRUE, ignore.case=TRUE,
-                               recursive=TRUE)), vigs)
-
-    if (length(allvigfiles) != 0){
-        badFiles <- unlist(lapply(vigs,
-                           FUN = function(x, allvigfiles){
-                               vl <- tools::file_path_sans_ext(x)
-                               badext <- c(".tex", ".html", ".pdf",
-                                           ".aux", ".log")
-                               ext <- paste0(vl, badext)
-                               fnd <- intersect(allvigfiles, ext)
-                               fnd
-                           },
-                           allvigfiles = allvigfiles))
-        if (length(badFiles) != 0){
-            handleNote("Potential intermediate files found:")
-            for (msg in badFiles)
-                handleMessage(paste0("vignettes/", msg), indent=8)
-        }
-    }
-}
-
-checkToolsVig <- function(pkgdir)
-{
-    if (file.exists(file.path("pkgdir", "DESCRIPTION")))
-    {
-        vigns <- tools::pkgVignettes(dir=pkgdir, check=TRUE)
-        if (is.null(vigns))
-        {
-            handleError("No vignette found.")
-            return(FALSE)
-        }
-        if (length(vigns$msg))
-        {
-            handleError(paste0(vigns$msg, collapse="\n"))
-            return(FALSE)
-        }
-    } else {
-        return(TRUE)
-    }
-}
-
-checkVigBuilder <- function(builder, vigdircontents)
-{
-# check DESCRIPTION is in at least one vignette
-    vigExt <- tolower(tools::file_ext(vigdircontents))
-    badBuilder <- character(0)
-    for (desc in builder){
-        res <- vapply(vigdircontents, vigHelper, logical(1), builder = desc)
-        if(!any(res, na.rm=TRUE)){
-            if (!(desc == "Sweave" && any(vigExt == "rnw"))){
-                badBuilder <- c(badBuilder, desc)
-            }
-        }
-    }
-    if (length(badBuilder) != 0L){
-        handleError("VignetteBuilder listed in DESCRIPTION but not ",
-                    "found as VignetteEngine in any vignettes:")
-        handleMessage(badBuilder, indent=6)
-    }
-}
-
-checkVigEngine <- function(builder, vigdircontents)
-{
-# check Engines are in DESCRIPTION
-    vigExt <- tolower(tools::file_ext(vigdircontents))
-    dx <- which(vigExt != "rnw")
-
-    # check for very rare case that mulitple build
-    # engines specified in vignette
-    builderRes <- grepPkgDir(file.path(dirname(vigdircontents[1]),
-                                       .Platform$file.sep),
-                             "-rn 'VignetteEngine{'")
-    filenames <- vapply(builderRes,
-                        FUN=function(x){strsplit(x,
-                            split=" ")[[1]][1]},
-                        character(1))
-    inval <- names(which(table(filenames) > 1))
-    if (length(inval) > 0){
-        handleError("More than one VignetteEngine specified.")
-        handleMessage("Found in vignette/ files:", indent=6)
-        for (msg in inval)
-            handleMessage(msg, indent=8)
-
-        dx <- dx[!(basename(vigdircontents[dx]) %in% inval)]
-    }
-    if (length(dx) != 0) {
-        res <-
-            vapply(vigdircontents[dx], vigHelper, logical(1), builder=builder)
-        if (length(which(!res)) != 0L){
-            handleError(
-                "VignetteEngine specified but not in DESCRIPTION. ",
-                "Add the VignetteEngine from the following files to ",
-                "DESCRIPTION:"
-            )
-            handleMessage(basename(names(which(!res))), indent=6)
-        }
-        nadx <- which(is.na(res))
-        if (length(nadx) != 0L && is.null(builder)){
-            handleError(
-                "No VignetteEngine specified in vignette or DESCRIPTION. ",
-                "Add VignetteEngine to the following files or add a default ",
-                "VignetteBuilder in DESCRIPTION: ")
-            files = res[nadx]
-            handleMessage(basename(names(files)), indent=6)
-        }
-    }
-}
-
-checkVigTemplate <- function(vigdircontents)
-{
-    badVig <- character(0)
-    for (file in vigdircontents) {
-        lines <- readLines(file, n=100L, warn=FALSE)
-        idx <- grep(lines, pattern="VignetteIndexEntry")
-        if (length(idx) != 0L){
-            title <- tolower(gsub(".*\\{|\\}.*", "", lines[idx]))
-            if (title == "vignette title"){
-                badVig = c(badVig, basename(file))
-            }
-        }
-    }
-    if (length(badVig) != 0L){
-        handleWarning(
-            "Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
-            "Update the following files from using template values:"
-        )
-        handleMessage(badVig, indent=6)
-    }
-}
-
-checkVigChunkEval <- function(vigdircontents)
-{
-    chunks <- 0
-    efs <- 0
-    for (file in vigdircontents)
-    {
-        lines <- readLines(file, warn=FALSE)
-        vignetteType <- knitr:::detect_pattern(lines, tools::file_ext(file))
-        if (is.null(vignetteType)) {
-            chunklines <- character(0)
-        } else {
-            chunkPattern <- knitr::all_patterns[[vignetteType]]$chunk.begin
-            chunklines <- lines[grep(chunkPattern, lines)]
-        }
-        chunks <- chunks + length(chunklines)
-
-        efs <- efs +
-            length(grep("eval\\s?=\\s?FALSE", chunklines))
-    }
-
-    percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
-
-    handleMessage(sprintf(
-        "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
-        chunks, efs,  as.integer(percent)))
-    if (percent >= 50)
-        handleWarning("Evaluate more vignette chunks.")
-}
-
-checkVigEvalAllFalse <- function(pkgdir){
-
-    pkgdir <- file.path(pkgdir, "vignettes")
-    Vigdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    msg_eval <- grepPkgDir(Vigdir,
-                           "-rn 'knitr::opts_chunk\\$set(.*eval\\s*=\\s*F'")
-    msg_eval
-}
-
-checkVigBiocInst <- function(pkgdir) {
-    vigdir <- file.path(pkgdir, "vignettes")
-    vigdir <- sprintf("%s%s", vigdir, .Platform$file.sep)
-    msg_return <- grepPkgDir(vigdir,
-        "-Ern 'BiocInstaller|biocLite|useDevel|biocinstallRepos'")
-    if (length(msg_return)) {
-        handleWarning(" BiocInstaller code found in vignette(s)")
-        handleMessage("Found in file(s):", indent=6)
-        for (msg in msg_return)
-            handleMessage(msg, indent=8)
-    }
-}
-
-checkIsVignetteBuilt <- function(package_dir, build_output_file)
-{
-    if (!file.exists(build_output_file))
-    {
-        stop("build output file '", build_output_file, "' does not exist.")
-    }
-    lines <- readLines(build_output_file)
-    if (!any(grepl("^\\* creating vignettes \\.\\.\\.", lines)))
-    {
-        msg <- "Vignette must be built by
-        'R CMD build'. Please see the `Vignette Checks` section of
-        the BiocCheck vignette."
-        handleError(msg)
+        handleError("Use 'parallel' instead of 'multicore'. ",
+            "'multicore' is deprecated and does not work on Windows.")
     }
 }
 
@@ -666,54 +386,355 @@ checkBBScompatibility <- function(pkgdir)
     }
 }
 
-## This could maybe be more comprehensive, but
-## it's what R CMD check does to decide whether
-## to run tests.
-## OOPS - R CMD check is looking at the INSTALLED directory
-checkUnitTests <- function(pkgdir)
+checkDescriptionNamespaceConsistency <- function(pkgname)
 {
-    ## begin code stolen from tools:::.check_packages
-    dir.exists <- function(x) !is.na(isdir <- file.info(x)$isdir) &
-        isdir
-    ## ...
-    tests_dir <- file.path(pkgdir, "tests")
-    cond <- length(dir(tests_dir, pattern = "\\.(R|Rin)$"))
-    if (dir.exists(tests_dir) && (!cond))
+    dImports <- cleanupDependency(packageDescription(pkgname)$Imports)
+    deps <- cleanupDependency(packageDescription(pkgname)$Depends)
+    nImports <- names(getNamespaceImports(pkgname))
+    nImports <- nImports[which(nImports != "base")]
+
+    if(!(all(dImports %in% nImports)))
     {
-        handleError(
-            "Add a .R or .Rin file in tests/ directory or unit tests will ",
-            "not be run by R CMD check. See ",
-            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/")
-        return()
+        badones <- dImports[!dImports %in% nImports]
+        tryCatch({
+            ## FIXME: not 100% confident that the following always succeeds
+            dcolon <- .checkEnv(loadNamespace(pkgname), .colonWalker())$done()
+            badones <- setdiff(badones, dcolon)
+        }, error=function(...) NULL)
+        if (length(badones))
+            handleWarning(
+                "Import ", paste(badones, collapse=", "), " in NAMESPACE ",
+                "as well as DESCRIPTION.")
     }
-    if (!(dir.exists(tests_dir) && cond))
-    ## end stolen code
+    if (!all (nImports %in% dImports))
     {
-        msg <- paste0(
-            "Consider adding unit tests. We strongly encourage them. See",
-            "\n  ",
-            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/."
-        )
-        handleNote(msg)
+        badones <- nImports[!nImports %in% dImports]
+        if (!is.null(deps))
+        {
+            badones <- badones[!badones %in% deps]
+        }
+        if (length(badones))
+        {
+            handleWarning(
+                "Import ", paste(unique(badones), collapse=", "), " in ",
+                "DESCRIPTION as well as NAMESPACE.")
+        }
     }
 }
 
-## check if testthat contains skip_on_bioc() and throw note of it does
-checkSkipOnBioc <- function(pkgdir)
+checkImportSuggestions <- function(pkgname)
 {
-    pkgdir <- file.path(pkgdir, "tests", "testthat")
-    if (file.exists(pkgdir)) {
-        testfiles <- list.files(pkgdir, pattern = ".R$")
-        testfiles_full <- file.path(pkgdir, testfiles)
-        msg <- lapply(seq_along(testfiles), function(idx){
-            tokens <- getParseData(parse(testfiles_full[idx], keep.source=TRUE))
-            if ("skip_on_bioc" %in% unlist(tokens))
-                testfiles[idx]
-        })
-        msg <- paste(unlist(msg), collapse = " ")
-        if (msg != "") {
-            handleNote("skip_on_bioc() found in testthat files: ", msg)
+    suggestions <- NULL
+    tryCatch(suppressMessages(suppressWarnings({
+        suggestions <-
+            capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
+    })), error=function(e) {
+        suggestions <- "ERROR"
+        handleMessage("Could not get namespace suggestions.")
+    })
+
+    if(length(suggestions) && (!is.null(suggestions)) &&
+        (suggestions != "ERROR"))
+    {
+            handleMessage("Namespace import suggestions are:")
+            handleVerbatim(suggestions, indent=4, exdent=4, width=100000)
+            handleMessage("--END of namespace import suggestions.")
+    }
+
+    if ((!is.null(suggestions)) && (!length(suggestions)))
+    {
+        handleMessage("No suggestions.")
+    }
+
+    suggestions
+}
+
+checkVignetteDir <- function(pkgdir, checkingDir)
+{
+    vigdir <- file.path(pkgdir, "vignettes")
+
+    res <- checkVigDirExists(pkgdir, vigdir)
+    if (!res)
+        return()
+
+    vigdircontents <- getVigSources(vigdir)
+    if (length(vigdircontents)==0)
+    {
+        handleError("No vignette sources in vignettes/ directory.")
+        return()
+    }
+
+    checkInstContents(pkgdir, checkingDir)
+
+    checkVigFiles(vigdir, vigdircontents)
+    #
+    # This appears to never get run because of pkgdir as character
+    # tools::pkgVignettes
+    # 'pkgVignettes' returns an object of class '"pkgVignettes"' if a
+    #  vignette directory is found, otherwise 'NULL'.
+    #  what is this doing?
+    #
+    res <- checkToolsVig(pkgdir)
+    if (!res)
+        return()
+
+    desc <- file.path(pkgdir, "DESCRIPTION")
+    if (file.exists(desc))
+        builder <- getVigBuilder(desc)
+    else
+        builder <- NULL
+
+    if (!is.null(builder)){
+        checkVigBuilder(builder, vigdircontents)
+    }
+
+    checkVigEngine(builder, vigdircontents)
+
+    checkVigTemplate(vigdircontents)
+
+    checkVigChunkEval(vigdircontents)
+
+    checkVigBiocInst(pkgdir)
+
+    msg_eval <- checkVigEvalAllFalse(pkgdir)
+    if(length(msg_eval) > 0) {
+        handleWarning(" Vignette set global option 'eval=FALSE'")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_eval)
+            handleMessage(msg, indent=8)
+    }
+
+}
+
+checkVigDirExists <- function(pkgdir, vigdir)
+{
+    if (!file.exists(vigdir))
+    {
+        if (isInfrastructurePackage(pkgdir))
+        {
+            .msg("  Infrastructure package, vignette not required.",
+                indent=2)
+            return(FALSE)
         }
+        handleError("No 'vignettes' directory.")
+        return(FALSE)
+    } else {
+        return(TRUE)
+    }
+}
+
+checkInstContents <- function(pkgdir, checkingDir)
+{
+    instdocdir <- file.path(pkgdir, "inst", "doc")
+    instdocdircontents <- getVigSources(instdocdir)
+    if (length(instdocdircontents) > 0)
+    {
+        if (checkingDir)
+        {
+                handleWarning(
+                "Remove vignette sources from inst/doc; ",
+                "they belong in vignettes/.")
+        }
+    }
+}
+
+checkVigFiles <- function(vigdir, vigdircontents){
+    vigs <- tolower(basename(vigdircontents))
+    allvigfiles <- setdiff(tolower(dir(vigdir, all.files=TRUE, ignore.case=TRUE,
+                               recursive=TRUE)), vigs)
+
+    if (length(allvigfiles) != 0){
+        badFiles <- unlist(lapply(vigs,
+                           FUN = function(x, allvigfiles){
+                               vl <- tools::file_path_sans_ext(x)
+                               badext <- c(".tex", ".html", ".pdf",
+                                           ".aux", ".log")
+                               ext <- paste0(vl, badext)
+                               fnd <- intersect(allvigfiles, ext)
+                               fnd
+                           },
+                           allvigfiles = allvigfiles))
+        if (length(badFiles) != 0){
+            handleNote("Potential intermediate files found:")
+            for (msg in badFiles)
+                handleMessage(paste0("vignettes/", msg), indent=8)
+        }
+    }
+}
+
+checkToolsVig <- function(pkgdir)
+{
+    if (file.exists(file.path("pkgdir", "DESCRIPTION")))
+    {
+        vigns <- tools::pkgVignettes(dir=pkgdir, check=TRUE)
+        if (is.null(vigns))
+        {
+            handleError("No vignette found.")
+            return(FALSE)
+        }
+        if (length(vigns$msg))
+        {
+            handleError(paste0(vigns$msg, collapse="\n"))
+            return(FALSE)
+        }
+    } else {
+        return(TRUE)
+    }
+}
+
+checkVigBuilder <- function(builder, vigdircontents)
+{
+# check DESCRIPTION is in at least one vignette
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    badBuilder <- character(0)
+    for (desc in builder){
+        res <- vapply(vigdircontents, vigHelper, logical(1), builder = desc)
+        if(!any(res, na.rm=TRUE)){
+            if (!(desc == "Sweave" && any(vigExt == "rnw"))){
+                badBuilder <- c(badBuilder, desc)
+            }
+        }
+    }
+    if (length(badBuilder) != 0L){
+        handleError("VignetteBuilder listed in DESCRIPTION but not ",
+                    "found as VignetteEngine in any vignettes:")
+        handleMessage(badBuilder, indent=6)
+    }
+}
+
+checkVigEngine <- function(builder, vigdircontents)
+{
+# check Engines are in DESCRIPTION
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    dx <- which(vigExt != "rnw")
+
+    # check for very rare case that mulitple build
+    # engines specified in vignette
+    builderRes <- grepPkgDir(file.path(dirname(vigdircontents[1]),
+                                       .Platform$file.sep),
+                             "-rn 'VignetteEngine{'")
+    filenames <- vapply(builderRes,
+                        FUN=function(x){strsplit(x,
+                            split=" ")[[1]][1]},
+                        character(1))
+    inval <- names(which(table(filenames) > 1))
+    if (length(inval) > 0){
+        handleError("More than one VignetteEngine specified.")
+        handleMessage("Found in vignette/ files:", indent=6)
+        for (msg in inval)
+            handleMessage(msg, indent=8)
+
+        dx <- dx[!(basename(vigdircontents[dx]) %in% inval)]
+    }
+    if (length(dx) != 0) {
+        res <-
+            vapply(vigdircontents[dx], vigHelper, logical(1), builder=builder)
+        if (length(which(!res)) != 0L){
+            handleError(
+                "VignetteEngine specified but not in DESCRIPTION. ",
+                "Add the VignetteEngine from the following files to ",
+                "DESCRIPTION:"
+            )
+            handleMessage(basename(names(which(!res))), indent=6)
+        }
+        nadx <- which(is.na(res))
+        if (length(nadx) != 0L && is.null(builder)){
+            handleError(
+                "No VignetteEngine specified in vignette or DESCRIPTION. ",
+                "Add VignetteEngine to the following files or add a default ",
+                "VignetteBuilder in DESCRIPTION: ")
+            files = res[nadx]
+            handleMessage(basename(names(files)), indent=6)
+        }
+    }
+}
+
+checkVigTemplate <- function(vigdircontents)
+{
+    badVig <- character(0)
+    for (file in vigdircontents) {
+        lines <- readLines(file, n=100L, warn=FALSE)
+        idx <- grep(lines, pattern="VignetteIndexEntry")
+        if (length(idx) != 0L){
+            title <- tolower(gsub(".*\\{|\\}.*", "", lines[idx]))
+            if (title == "vignette title"){
+                badVig = c(badVig, basename(file))
+            }
+        }
+    }
+    if (length(badVig) != 0L){
+        handleWarning(
+            "Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
+            "Update the following files from using template values:"
+        )
+        handleMessage(badVig, indent=6)
+    }
+}
+
+checkVigChunkEval <- function(vigdircontents)
+{
+    chunks <- 0
+    efs <- 0
+    for (file in vigdircontents)
+    {
+        lines <- readLines(file, warn=FALSE)
+        vignetteType <- knitr:::detect_pattern(lines, tools::file_ext(file))
+        if (is.null(vignetteType)) {
+            chunklines <- character(0)
+        } else {
+            chunkPattern <- knitr::all_patterns[[vignetteType]]$chunk.begin
+            chunklines <- lines[grep(chunkPattern, lines)]
+        }
+        chunks <- chunks + length(chunklines)
+
+        efs <- efs +
+            length(grep("eval\\s?=\\s?FALSE", chunklines))
+    }
+
+    percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
+
+    handleMessage(sprintf(
+        "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
+        chunks, efs,  as.integer(percent)))
+    if (percent >= 50)
+        handleWarning("Evaluate more vignette chunks.")
+}
+
+checkVigEvalAllFalse <- function(pkgdir){
+
+    pkgdir <- file.path(pkgdir, "vignettes")
+    Vigdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
+    msg_eval <- grepPkgDir(Vigdir,
+                           "-rn 'knitr::opts_chunk\\$set(.*eval\\s*=\\s*F'")
+    msg_eval
+}
+
+checkVigBiocInst <- function(pkgdir) {
+    vigdir <- file.path(pkgdir, "vignettes")
+    vigdir <- sprintf("%s%s", vigdir, .Platform$file.sep)
+    msg_return <- grepPkgDir(vigdir,
+        "-Ern 'BiocInstaller|biocLite|useDevel|biocinstallRepos'")
+    if (length(msg_return)) {
+        handleWarning(" BiocInstaller code found in vignette(s)")
+        handleMessage("Found in file(s):", indent=6)
+        for (msg in msg_return)
+            handleMessage(msg, indent=8)
+    }
+}
+
+checkIsVignetteBuilt <- function(package_dir, build_output_file)
+{
+    if (!file.exists(build_output_file))
+    {
+        stop("build output file '", build_output_file, "' does not exist.")
+    }
+    lines <- readLines(build_output_file)
+    if (!any(grepl("^\\* creating vignettes \\.\\.\\.", lines)))
+    {
+        msg <- "Vignette must be built by
+        'R CMD build'. Please see the `Vignette Checks` section of
+        the BiocCheck vignette."
+        handleError(msg)
     }
 }
 
@@ -739,24 +760,75 @@ checkLibraryCalls <- function(pkgdir)
     }
 }
 
-checkCodingPractice <- function(pkgdir)
+checkForLibraryMe <- function(pkgname, parsedCode)
+{
+    badfiles <- c()
+    for (filename in names(parsedCode))
+    {
+        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
+            next
+        df <- parsedCode[[filename]]
+        if (nrow(df))
+        {
+            res <- doesFileLoadPackage(df, pkgname)
+            if (length(res))
+            {
+                badfiles <- append(badfiles, mungeName(filename, pkgname))
+            }
+        }
+    }
+    if (length(badfiles))
+    {
+        msg <- sprintf("The following files call library or require on %s.
+            This is not necessary.\n%s", pkgname,
+            paste(badfiles, collapse=", "))
+        handleWarning(msg)
+    }
+
+}
+
+checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
+{
+    symbols <-  c(".C", ".Call", ".Fortran", ".External")
+    res <- lapply(symbols, function(x) {
+        findSymbolInParsedCode(parsedCode, pkgname, x, "SYMBOL_FUNCTION_CALL",
+            TRUE)
+    })
+
+    if (!any(res > 0))
+        return()
+    d <- getLoadedDLLs()
+    if (!pkgname %in% names(d))
+        return()
+    r <- getDLLRegisteredRoutines(pkgname)
+    if (sum(lengths(r)) != 0)
+        return()
+    handleWarning(
+        "Register native routines; see ",
+        "http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines")
+}
+
+
+checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 {
     Rdir <- file.path(pkgdir, "R")
 
     # sapply
     msg_sapply <- checkSapply(Rdir)
     if (length(msg_sapply) > 0) {
-        handleNote("Avoid sapply(); use vapply() found in files:")
+        handleNote(" Avoid sapply(); use vapply()")
+        handleMessage("Found in files:", indent=6)
         for (msg in msg_sapply)
-            handleMessage(msg, indent=6)
+            handleMessage(msg, indent=8)
     }
 
     # 1:...
     msg_seq <- check1toN(Rdir)
     if (length(msg_seq) > 0) {
-        handleNote(" Avoid 1:...; use seq_len() or seq_along() found in files:")
+        handleNote(" Avoid 1:...; use seq_len() or seq_along()")
+        handleMessage("Found in files:", indent=6)
         for (msg in msg_seq)
-            handleMessage(msg, indent=6)
+            handleMessage(msg, indent=8)
     }
 
     # T/F
@@ -764,7 +836,7 @@ checkCodingPractice <- function(pkgdir)
     pkgname <- basename(pkgdir)
     res2 <- findLogicalRdir(pkgname, c("T","F"))
     if (length(c(res,res2)) > 0 ){
-        handleWarning("Use TRUE/FALSE instead of T/F")
+        handleWarning(" Use TRUE/FALSE instead of T/F")
         if (length(res2) > 0){
             handleMessage("Found in R/ directory functions:", indent=6)
             for (msg in res2)
@@ -798,11 +870,37 @@ checkCodingPractice <- function(pkgdir)
     # set.seed
     res <- findLogicalRdir(pkgname, "set.seed")
     if (length(res) > 0){
-        handleWarning("Remove set.seed usage in R code")
+        handleWarning(" Remove set.seed usage in R code")
         handleMessage("Found in R/ directory functions:", indent=6)
         for (msg in res)
             handleMessage(msg, indent=8)
     }
+    
+    handleCheck("Checking parsed R code in R directory, examples, vignettes...")
+    
+    # direct slot access
+    checkForDirectSlotAccess(parsedCode, package_name)
+
+    # browser() calls
+    res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
+                                  "SYMBOL_FUNCTION_CALL")
+    if (length(res) > 0){
+        handleWarning(" Remove browser() statements") 
+        handleMessage("Found in files:", indent=6)
+        for (msg in res)
+            handleMessage(msg, indent=8)        
+    }
+
+    # <<-
+    res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
+                                  "LEFT_ASSIGN")
+    if (length(res) > 0){
+        handleNote("Avoid '<<-' if possible")
+        handleMessage("Found in files:", indent=6)
+        for (msg in res)
+            handleMessage(msg, indent=8)        
+    }
+    
 
 }
 
@@ -853,62 +951,6 @@ checkSystemCall <- function(pkgdir){
     msg_sys <- grepPkgDir(pkgdir, "-rn '^system(.*'")
 }
 
-checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
-{
-    symbols <-  c(".C", ".Call", ".Fortran", ".External")
-    res <- lapply(symbols, function(x) {
-        findSymbolInParsedCode(parsedCode, pkgname, x, "SYMBOL_FUNCTION_CALL",
-            TRUE)
-    })
-
-    if (!any(res > 0))
-        return()
-    d <- getLoadedDLLs()
-    if (!pkgname %in% names(d))
-        return()
-    r <- getDLLRegisteredRoutines(pkgname)
-    if (sum(lengths(r)) != 0)
-        return()
-    handleWarning(
-        "Register native routines; see ",
-        "http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines")
-}
-
-checkImportSuggestions <- function(pkgname)
-{
-    suggestions <- NULL
-    tryCatch(suppressMessages(suppressWarnings({
-        suggestions <-
-            capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
-    })), error=function(e) {
-        suggestions <- "ERROR"
-        handleMessage("Could not get namespace suggestions.")
-    })
-
-    if(length(suggestions) && (!is.null(suggestions)) &&
-        (suggestions != "ERROR"))
-    {
-            handleMessage("Namespace import suggestions are:")
-            handleVerbatim(suggestions, indent=4, exdent=4, width=100000)
-            handleMessage("--END of namespace import suggestions.")
-    }
-
-    if ((!is.null(suggestions)) && (!length(suggestions)))
-    {
-        handleMessage("No suggestions.")
-    }
-
-    suggestions
-}
-
-checkDeprecatedPackages <- function(pkgdir)
-{
-    if ("multicore" %in% getAllDependencies(pkgdir))
-    {
-        handleError("Use 'parallel' instead of 'multicore'. ",
-            "'multicore' is deprecated and does not work on Windows.")
-    }
-}
 
 checkForDirectSlotAccess <- function(parsedCode, package_name)
 {
@@ -923,68 +965,7 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
     }
 }
 
-checkForLibraryMe <- function(pkgname, parsedCode)
-{
-    badfiles <- c()
-    for (filename in names(parsedCode))
-    {
-        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
-            next
-        df <- parsedCode[[filename]]
-        if (nrow(df))
-        {
-            res <- doesFileLoadPackage(df, pkgname)
-            if (length(res))
-            {
-                badfiles <- append(badfiles, mungeName(filename, pkgname))
-            }
-        }
-    }
-    if (length(badfiles))
-    {
-        msg <- sprintf("The following files call library or require on %s.
-            This is not necessary.\n%s", pkgname,
-            paste(badfiles, collapse=", "))
-        handleWarning(msg)
-    }
 
-}
-
-checkDescriptionNamespaceConsistency <- function(pkgname)
-{
-    dImports <- cleanupDependency(packageDescription(pkgname)$Imports)
-    deps <- cleanupDependency(packageDescription(pkgname)$Depends)
-    nImports <- names(getNamespaceImports(pkgname))
-    nImports <- nImports[which(nImports != "base")]
-
-    if(!(all(dImports %in% nImports)))
-    {
-        badones <- dImports[!dImports %in% nImports]
-        tryCatch({
-            ## FIXME: not 100% confident that the following always succeeds
-            dcolon <- .checkEnv(loadNamespace(pkgname), .colonWalker())$done()
-            badones <- setdiff(badones, dcolon)
-        }, error=function(...) NULL)
-        if (length(badones))
-            handleWarning(
-                "Import ", paste(badones, collapse=", "), " in NAMESPACE ",
-                "as well as DESCRIPTION.")
-    }
-    if (!all (nImports %in% dImports))
-    {
-        badones <- nImports[!nImports %in% dImports]
-        if (!is.null(deps))
-        {
-            badones <- badones[!badones %in% deps]
-        }
-        if (length(badones))
-        {
-            handleWarning(
-                "Import ", paste(unique(badones), collapse=", "), " in ",
-                "DESCRIPTION as well as NAMESPACE.")
-        }
-    }
-}
 
 checkFunctionLengths <- function(parsedCode, pkgname)
 {
@@ -1038,6 +1019,18 @@ checkFunctionLengths <- function(parsedCode, pkgname)
             }
         }
     }
+}
+
+checkManDocumentation <- function(package_dir, package_name)
+{
+    # non empty value section exists
+    checkForValueSection(package_dir)
+
+    # exports are documented and 80% runnable
+    checkExportsAreDocumented(package_dir, package_name)
+
+    # canned man prompts
+    checkForPromptComments(package_dir)    
 }
 
 checkForValueSection <- function(pkgdir)
@@ -1128,6 +1121,26 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     badManPages # for testing
 }
 
+checkForPromptComments <- function(pkgdir)
+{
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+
+    bad <- c()
+    for (manpage in manpages)
+    {
+        lines <- readLines(manpage, warn=FALSE)
+        if (any(grepl("^%% ~", lines)))
+            bad <- append(bad, basename(manpage))
+    }
+    if (length(bad) > 0)
+    {
+        handleNote(
+            "Remove generated comments from man pages ",
+            paste(bad, collapse=", "))
+    }
+}
+
 checkNEWS <- function(pkgdir)
 {
     newsloc <- file.path(pkgdir, c("inst", "inst", "."),
@@ -1158,6 +1171,57 @@ checkNEWS <- function(pkgdir)
             "Fix formatting of ", basename(news), ". Malformed package NEWS ",
             "will not be included in Bioconductor release announcements.")
     })
+}
+
+## This could maybe be more comprehensive, but
+## it's what R CMD check does to decide whether
+## to run tests.
+## OOPS - R CMD check is looking at the INSTALLED directory
+checkUnitTests <- function(pkgdir)
+{
+    ## begin code stolen from tools:::.check_packages
+    dir.exists <- function(x) !is.na(isdir <- file.info(x)$isdir) &
+        isdir
+    ## ...
+    tests_dir <- file.path(pkgdir, "tests")
+    cond <- length(dir(tests_dir, pattern = "\\.(R|Rin)$"))
+    if (dir.exists(tests_dir) && (!cond))
+    {
+        handleError(
+            "Add a .R or .Rin file in tests/ directory or unit tests will ",
+            "not be run by R CMD check. See ",
+            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/")
+        return()
+    }
+    if (!(dir.exists(tests_dir) && cond))
+    ## end stolen code
+    {
+        msg <- paste0(
+            "Consider adding unit tests. We strongly encourage them. See",
+            "\n  ",
+            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/."
+        )
+        handleNote(msg)
+    }
+}
+
+## check if testthat contains skip_on_bioc() and throw note of it does
+checkSkipOnBioc <- function(pkgdir)
+{
+    pkgdir <- file.path(pkgdir, "tests", "testthat")
+    if (file.exists(pkgdir)) {
+        testfiles <- list.files(pkgdir, pattern = ".R$")
+        testfiles_full <- file.path(pkgdir, testfiles)
+        msg <- lapply(seq_along(testfiles), function(idx){
+            tokens <- getParseData(parse(testfiles_full[idx], keep.source=TRUE))
+            if ("skip_on_bioc" %in% unlist(tokens))
+                testfiles[idx]
+        })
+        msg <- paste(unlist(msg), collapse = " ")
+        if (msg != "") {
+            handleNote("skip_on_bioc() found in testthat files: ", msg)
+        }
+    }
 }
 
 checkFormatting <- function(pkgdir, nlines=6)
@@ -1235,26 +1299,6 @@ checkFormatting <- function(pkgdir, nlines=6)
     {
         handleMessage(
             "See http://bioconductor.org/developers/how-to/coding-style/")
-    }
-}
-
-checkForPromptComments <- function(pkgdir)
-{
-    manpages <- dir(file.path(pkgdir, "man"),
-        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
-
-    bad <- c()
-    for (manpage in manpages)
-    {
-        lines <- readLines(manpage, warn=FALSE)
-        if (any(grepl("^%% ~", lines)))
-            bad <- append(bad, basename(manpage))
-    }
-    if (length(bad) > 0)
-    {
-        handleNote(
-            "Remove generated comments from man pages ",
-            paste(bad, collapse=", "))
     }
 }
 
@@ -1347,8 +1391,6 @@ checkForSupportSiteRegistration <- function(package_dir)
             "visit https://support.bioconductor.org/accounts/signup/ .")
     }
 }
-
-
 
 #######################################
 #
