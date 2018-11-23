@@ -1,14 +1,48 @@
 getOptionList <- function()
 {
     list(
-        make_option("--no-check-vignettes", action="store_true",
-            help="disable vignette checks"),
         make_option("--new-package", action="store_true",
             help="enable checks specific to new packages"),
-        make_option("--no-check-CRAN", action="store_true",
-            help="disable check for if package exists in CRAN"),
+        make_option("--no-check-dependencies", action="store_true",
+            help="disable check for bad dependencies"),
+        make_option("--no-check-deprecated", action="store_true",
+            help="disable check for usage of deprecated packages"),
+        make_option("--no-check-version-num", action="store_true",
+            help="disable check for valid version number"),
+        make_option("--no-check-R-ver", action="store_true",
+            help="disable check for valid R version"),
+        make_option("--no-check-pkg-size", action="store_true",
+            help="disable check for package tarball size"),
+        make_option("--no-check-file-size", action="store_true",
+            help="disable check for individual file size"),
         make_option("--no-check-bioc-views", action="store_true",
             help="disable biocViews-specific checks (for non-BioC packages)"),
+        make_option("--no-check-bbs", action="store_true",
+            help="disable BBS-specific checks (for non-BioC packages). Valid DESCRIPTION"),
+        make_option("--no-check-namespace", action="store_true",
+            help="disable namespace checks"),
+        make_option("--no-check-vignettes", action="store_true",
+            help="disable vignette checks"),
+        make_option("--no-check-library-calls", action="store_true",
+            help="disable check usage of functions that install or update packages"),
+        make_option("--no-check-install-self", action="store_true",
+            help="disable check for require or library of itself"),
+        make_option("--no-check-coding-practices", action="store_true",
+            help="disable check for some common best coding practices"),
+        make_option("--no-check-function-len", action="store_true",
+            help="disable check for function length"),
+        make_option("--no-check-man-doc", action="store_true",
+            help="disable checks for man page documentation"),
+        make_option("--no-check-news", action="store_true",
+            help="disable checks for NEWS file"),
+        make_option("--no-check-unit-tests", action="store_true",
+            help="disable checks for unit tests"),
+        make_option("--no-check-skip-bioc-tests", action="store_true",
+            help="disable check for tests that skip when on bioc"),
+        make_option("--no-check-formatting", action="store_true",
+            help="disable checks for file formatting"),
+        make_option("--no-check-CRAN", action="store_true",
+            help="disable check for if package exists in CRAN"),
         make_option("--no-check-bioc-help", action="store_true",
             help="disable check for registration on Bioconductor mailing list and support site"),
         make_option("--build-output-file", type="character",
@@ -83,36 +117,48 @@ BiocCheck <- function(package=".", ...)
         checkForVersionNumberMismatch(package, package_dir)
     }
 
-    handleCheck("Checking Package Dependencies...")
-    checkForBadDepends(file.path(tempdir(), "lib", package_name))
-
-    handleCheck("Checking for deprecated package usage...")
-    checkDeprecatedPackages(package_dir)
-
-    handleCheck("Checking version number...")
-    if (!is.null(dots[["new-package"]]))
-    {
-        handleCheck("Checking new package version number...")
-        checkNewPackageVersionNumber(package_dir)
-    } else {
-        handleMessage("Checking version number validity...")
-        checkVersionNumber(package_dir)
+    if (is.null(dots[["no-check-dependencies"]])){
+        handleCheck("Checking Package Dependencies...")
+        checkForBadDepends(file.path(tempdir(), "lib", package_name))
     }
 
-    handleCheck("Checking R Version dependency...")
-    checkRVersionDependency(package_dir)
+    if (is.null(dots[["no-check-deprecated"]])){
+        handleCheck("Checking for deprecated package usage...")
+        checkDeprecatedPackages(package_dir)
+    }
+
+    if (is.null(dots[["no-check-version-num"]])){
+        handleCheck("Checking version number...")
+        if (!is.null(dots[["new-package"]]))
+            {
+                handleCheck("Checking new package version number...")
+                checkNewPackageVersionNumber(package_dir)
+            } else {
+                handleMessage("Checking version number validity...")
+                checkVersionNumber(package_dir)
+            }
+    }
+
+    if (is.null(dots[["no-check-R-ver"]])){
+        handleCheck("Checking R Version dependency...")
+        checkRVersionDependency(package_dir)
+    }
 
     source_tarball <- grepl("\\.tar\\.gz$", package)
-    handleCheck("Checking package size...")
-    if (source_tarball){
-        checkPackageSize(package, package_dir, size=5)
-    } else {
-        handleMessage("Skipped... only checked on source tarball",
-                      indent=8)
+    if (is.null(dots[["no-check-pkg-size"]])){
+        handleCheck("Checking package size...")
+        if (source_tarball){
+            checkPackageSize(package, package_dir, size=5)
+        } else {
+            handleMessage("Skipped... only checked on source tarball",
+                          indent=8)
+        }
     }
 
-    handleCheck("Checking individual file sizes...")
-    checkIndivFileSizes(package_dir)
+    if (is.null(dots[["no-check-file-size"]])){
+        handleCheck("Checking individual file sizes...")
+        checkIndivFileSizes(package_dir)
+    }
 
     if (is.null(dots[["no-check-bioc-views"]]))
     {
@@ -124,17 +170,21 @@ BiocCheck <- function(package=".", ...)
         }
     }
 
-    handleCheck("Checking build system compatibility...")
-    checkBBScompatibility(package_dir)
+    if (is.null(dots[["no-check-bbs"]])){
+        handleCheck("Checking build system compatibility...")
+        checkBBScompatibility(package_dir)
+    }
 
-    handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
-    checkDescriptionNamespaceConsistency(package_name)
+    if (is.null(dots[["no-check-namespace"]])){
+        handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
+        checkDescriptionNamespaceConsistency(package_name)
 
-    if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
-        quietly=TRUE))))
-    {
-        handleCheck("Checking for namespace import suggestions...")
-        checkImportSuggestions(package_name)
+        if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
+                                                               quietly=TRUE))))
+            {
+                handleCheck("Checking for namespace import suggestions...")
+                checkImportSuggestions(package_name)
+            }
     }
 
     if (is.null(dots[["no-check-vignettes"]]))
@@ -160,37 +210,55 @@ BiocCheck <- function(package=".", ...)
         }
     }
 
-    handleCheck("Checking library calls...")
-    checkLibraryCalls(package_dir)
+    if (is.null(dots[["no-check-library-calls"]])){
+        handleCheck("Checking library calls...")
+        checkLibraryCalls(package_dir)
+    }
 
     parsedCode <- parseFiles(package_dir)
 
-    handleCheck(sprintf("Checking for library/require of %s...",
-        package_name))
-    checkForLibraryMe(package_name, parsedCode)
+    if (is.null(dots[["no-check-install-self"]])){
+        handleCheck(sprintf("Checking for library/require of %s...",
+                            package_name))
+        checkForLibraryMe(package_name, parsedCode)
+    }
 
-   handleCheck("Checking coding practice...")
-    checkCodingPractice(package_dir, parsedCode, package_name)
+    if (is.null(dots[["no-check-coding-practices"]])){
+        handleCheck("Checking coding practice...")
+        checkCodingPractice(package_dir, parsedCode, package_name)
+    }
 
-    handleCheck("Checking function lengths", appendLF=FALSE)
-    checkFunctionLengths(parsedCode, package_name)
+    if (is.null(dots[["no-check-function-len"]])){
+        handleCheck("Checking function lengths", appendLF=FALSE)
+        checkFunctionLengths(parsedCode, package_name)
+    }
 
-    handleCheck("Checking man page documentation...")
-    checkManDocumentation(package_dir, package_name)
-     
-    handleCheck("Checking package NEWS...")
-    checkNEWS(package_dir)
+    if (is.null(dots[["no-check-man-doc"]])){
+        handleCheck("Checking man page documentation...")
+        checkManDocumentation(package_dir, package_name)
+    }
 
-    handleCheck("Checking unit tests...")
-    checkUnitTests(package_dir)
+    if (is.null(dots[["no-check-news"]])){
+        handleCheck("Checking package NEWS...")
+        checkNEWS(package_dir)
+    }
 
-    handleCheck("Checking skip_on_bioc() in tests...")
-    checkSkipOnBioc(package_dir)
+    if (is.null(dots[["no-check-unit-tests"]])){
+        handleCheck("Checking unit tests...")
+        checkUnitTests(package_dir)
+    }
 
-    handleCheck(
-        "Checking formatting of DESCRIPTION, NAMESPACE, ",
-        "man pages, R source, and vignette source...")
-    checkFormatting(package_dir)
+    if (is.null(dots[["no-check-skip-bioc-tests"]])){
+        handleCheck("Checking skip_on_bioc() in tests...")
+        checkSkipOnBioc(package_dir)
+    }
+
+    if (is.null(dots[["no-check-formatting"]])){
+        handleCheck(
+            "Checking formatting of DESCRIPTION, NAMESPACE, ",
+            "man pages, R source, and vignette source...")
+        checkFormatting(package_dir)
+    }
 
     if (is.null(dots[["no-check-CRAN"]]))
     {

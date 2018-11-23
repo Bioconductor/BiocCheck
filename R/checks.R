@@ -862,23 +862,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     # browser() calls
     res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
                                   "SYMBOL_FUNCTION_CALL")
-    if (length(res) > 0){
-        handleWarning(" Remove browser() statements") 
-        handleMessage("Found in files:", indent=6)
-        for (msg in res)
-            handleMessage(msg, indent=8)        
-    }
+    if (res > 0)
+        handleWarning("Remove browser() statements (found in ", res, " files)")
+
 
     # <<-
     res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
                                   "LEFT_ASSIGN")
-    if (length(res) > 0){
-        handleNote("Avoid '<<-' if possible")
-        handleMessage("Found in files:", indent=6)
-        for (msg in res)
-            handleMessage(msg, indent=8)        
-    }
-    
+    if (res > 0)
+        handleNote("Avoid '<<-' if possible (found in ", res, " files)")
 
 }
 
