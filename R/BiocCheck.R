@@ -169,10 +169,7 @@ BiocCheck <- function(package=".", ...)
         package_name))
     checkForLibraryMe(package_name, parsedCode)
 
-    handleCheck("Checking native routine registration...")
-    checkRegistrationOfEntryPoints(package_name, parsedCode)
-
-    handleCheck("Checking coding practice...")
+   handleCheck("Checking coding practice...")
     checkCodingPractice(package_dir, parsedCode, package_name)
 
     handleCheck("Checking function lengths", appendLF=FALSE)

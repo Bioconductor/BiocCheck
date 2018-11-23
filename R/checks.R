@@ -787,28 +787,6 @@ checkForLibraryMe <- function(pkgname, parsedCode)
 
 }
 
-checkRegistrationOfEntryPoints <- function(pkgname, parsedCode)
-{
-    symbols <-  c(".C", ".Call", ".Fortran", ".External")
-    res <- lapply(symbols, function(x) {
-        findSymbolInParsedCode(parsedCode, pkgname, x, "SYMBOL_FUNCTION_CALL",
-            TRUE)
-    })
-
-    if (!any(res > 0))
-        return()
-    d <- getLoadedDLLs()
-    if (!pkgname %in% names(d))
-        return()
-    r <- getDLLRegisteredRoutines(pkgname)
-    if (sum(lengths(r)) != 0)
-        return()
-    handleWarning(
-        "Register native routines; see ",
-        "http://cran.r-project.org/doc/manuals/R-exts.html#Registering-native-routines")
-}
-
-
 checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 {
     Rdir <- file.path(pkgdir, "R")
