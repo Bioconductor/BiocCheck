@@ -35,7 +35,7 @@ create_test_package <- function(pkgpath, description=list(),
     path <- file.path(tempdir(), pkgpath)
     unlink(path, recursive=TRUE)
     capture.output({
-        suppressMessages(devtools::create(path, canned, rstudio=FALSE))
+        suppressMessages(usethis::create_package(path, canned, rstudio=FALSE))
     })
 
     cat("#", file=file.path(path, "NAMESPACE"))
@@ -348,18 +348,6 @@ test_installAndLoad <- function()
         "testpkg is not installed!")
 }
 
-test_checkRegistrationOfEntryPoints <- function()
-{
-    pkg <- "testpkg1"
-    on.exit(tryCatch(unloadNamespace(pkg), error=invisible))
-    pkgdir <- system.file("testpackages", pkg, package="BiocCheck")
-    parsedCode1 <- BiocCheck:::parseFiles(pkgdir)
-    BiocCheck:::installAndLoad(pkgdir)
-
-    BiocCheck:::checkRegistrationOfEntryPoints(pkg, parsedCode1)
-    checkTrue(.warning$getNum() == 1, "unregistered code not flagged!")
-}
-
 test_checkDeprecatedPackages <- function()
 {
      cat(sprintf("Depends: multicore", UNIT_TEST_PKG),
@@ -419,9 +407,9 @@ test_checkDescriptionNamespaceConsistency <- function()
     .zeroCounters()
 
     pkgpath <- create_test_package(
-        testpkg, list(Imports="devtools"),
+        testpkg, list(Imports="usethis"),
         extraActions=function(path) {
-            cat("f = function() devtools::create()\n",
+            cat("f = function() usethis::create_package()\n",
                 file=file.path(path, "R", "f.R"))
         })
     BiocCheck:::installAndLoad(pkgpath)
@@ -431,9 +419,9 @@ test_checkDescriptionNamespaceConsistency <- function()
     .zeroCounters()
 
     pkgpath <- create_test_package(
-        testpkg, list(Imports="devtools, BiocCheck"),
+        testpkg, list(Imports="usethis, BiocCheck"),
         extraActions=function(path) {
-            cat("f = function() devtools::create()\n",
+            cat("f = function() usethis::create_package()\n",
                 file=file.path(path, "R", "f.R"))
         })
     BiocCheck:::installAndLoad(pkgpath)
