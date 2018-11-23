@@ -379,7 +379,7 @@ checkBBScompatibility <- function(pkgdir)
     match <- regexec(regex, maintainer)[[1]]
     match.length <- attr(match, "match.length")
     #if (!  (all(match)  > 0) && (all(match.length) > 0) )
-    if (match == -1 && match.length == -1)
+    if (all(match == -1) && all(match.length == -1))
     {
         handleError("Maintainer field in DESCRIPTION file is malformed.")
         return()
