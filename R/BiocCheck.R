@@ -3,6 +3,8 @@ getOptionList <- function()
     list(
         make_option("--new-package", action="store_true",
             help="enable checks specific to new packages"),
+        make_option("--no-check-ver-mismatch", action="store_true",
+            help="disable check for tarball and DESCRIPTION version match"),
         make_option("--no-check-dependencies", action="store_true",
             help="disable check for bad dependencies"),
         make_option("--no-check-deprecated", action="store_true",
@@ -73,7 +75,9 @@ usage <- function()
 .BiocCheckFromCommandLine <- function()
 {
     parser <- getArgParser()
-    arguments <- parse_args(parser, positional_arguments = 1)
+    tryCatch({
+        arguments <- parse_args(parser, positional_arguments = 1)
+    }, error = function(err) { stop("Bad Command Line Option\n","See 'R CMD BiocCheck --help'")})
     opt <- arguments$options
     file <- arguments$args
 
@@ -111,10 +115,11 @@ BiocCheck <- function(package=".", ...)
     installAndLoad(package)
 
     ## checks
-
-    if (!checkingDir) {
-        handleCheck("Checking for version number mismatch...")
-        checkForVersionNumberMismatch(package, package_dir)
+    if (is.null(dots[["no-check-ver-mismatch"]])){
+        if (!checkingDir) {
+            handleCheck("Checking for version number mismatch...")
+            checkForVersionNumberMismatch(package, package_dir)
+        }
     }
 
     if (is.null(dots[["no-check-dependencies"]])){
