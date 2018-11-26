@@ -117,6 +117,10 @@ Actual `BiocCheck` output is shown below in **bold**.
 
 ## Dependency Checks
 
+**Checking Package Dependencies...**
+
+Can be disabled with `--no-check-dependencies`.
+
 **Checking if other packages can import this one...**
 
 * Checks to make sure that there will be no import problems if another
@@ -124,7 +128,163 @@ Actual `BiocCheck` output is shown below in **bold**.
 
 **Checking to see if we understand object initialization....**
 
-Reports if it can't figure out how objects were initialized (`NOTE`).
+* Reports if it can't figure out how objects were initialized (`NOTE`).
+
+## Deprecated Package Checks
+
+**Checking for deprecated package usage...**
+
+Can be disabled with `--no-check-deprecated`.
+
+At present, this looks to see whether your package has a dependency on
+the `multicore` package (`ERROR`).
+
+Our recommendation is to use [BiocParallel][7.1]. Note that 'fork'
+clusters do not rpovide any gain from parallelizing code on
+Windows. Socket clusters work on all operating systems.
+
+[7.1]: https://bioconductor.org/packages/BiocParallel
+
+## Version Checks
+
+Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
+
+**Checking version number...**
+
+* **Checking for version number mismatch...**
+  Checks that the package version specified in your package tarball
+  (if you are checking a tarball) matches the value of the `Version:`
+  field in your `DESCRIPTION` file.  If it doesn't, it usually means
+  you did not build the tarball with `R CMD build`. (`ERROR`)
+* **Checking new package version number...**
+  Checks that the version number is valid for a new _Bioconductor_
+  package. This is only done if the `--new-package` option is
+  supplied (`ERROR`).
+* **Checking version number validity...**
+  Checks for a valid version, that format is correct and that version
+  number is appropriate for this version of _Bioconductor_ (`ERROR`).
+* **Checking R Version dependency...**
+  If you specify an R version in the `Depends:` field of your
+  `DESCRIPTION` file, `BiocCheck` checks to make sure that the R
+  version specified matches the version currently used by
+  _Bioconductor_. This prevents the package from being used in earlier
+  versions of R, which is not recommended and is a frequent cause of
+  user confusion (`WARNING`).
+
+For more information on package versions, see the
+[Version Numbering HOWTO][3].
+
+[3]: http://www.bioconductor.org/developers/how-to/version-numbering/
+
+## Package and File Size Check
+
+Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
+
+* **Checking package size**
+  Checks that the package size meets _Bioconductor_ requirements. The current
+  package size limit is 5 MB for Software packages. Experiment Data and
+  Annotation packages are excluded from this check. This check is only run if
+  checking a source tarball. (ERROR)
+
+* **Checking individual file sizes**
+  The current size limit for all individual files is 5 MB. (WARNING)
+
+## biocViews Checks
+
+These can be disabled with the `--no-check-bioc-views` option, which
+might be useful when checking non-_Bioconductor_ packages (since
+biocViews is a concept unique to _Bioconductor_).
+
+**Checking biocViews...**
+
+Can be disabled with `--no-check-bioc-views`
+
+* **Checking that biocViews are present...**
+  Checks that a `biocViews` field is present in the DESCRIPTION file
+  (`ERROR`).
+* **Checking package type based on biocViews**
+  Gives an indication if the package is identified as a Software, Annotation,
+  Experiment, or Workflow package.
+* **Checking for non-trivial biocViews...**
+  Checks that biocViews are more specific than the top-level terms
+  Software, AnnotationData, or ExperimentData (`ERROR`).
+* **Checking biocViews validity...**
+  Checks for valid views and displays invalid ones. Note that
+  biocViews are case-sensitive (`WARNING`).
+* **Checking that biocViews come from the same category...**
+  Checks that all views come from the same parent (one of Software,
+  AnnotationData, ExperimentData) (`WARNING`).
+* **Checking for recommended biocViews...**
+  Uses the `recommendBiocViews()` function from `biocViews` to
+  automatically suggest some biocViews for your package.
+
+More information about biocViews is available in the
+[Using biocViews HOWTO][4].
+
+[4]: http://www.bioconductor.org/developers/how-to/biocViews/
+
+## Build System Compatibility Checks
+
+The _Bioconductor_ Build System (BBS) is our nightly build system and
+it has certain requirements. Packages which don't meet these
+requirements can be silently skipped by BBS, so it's important to make
+sure that every package meets the requirements.
+
+Can be disabled with `--no-check-bbs`
+
+**Checking build system compatibility...**
+
+* **Checking for blank lines in DESCRIPTION...**
+  Checks to make sure there are no blank lines in the DESCRIPTION
+  file (`ERROR`).
+* **Checking for whitespace in DESCRIPTION field names...**
+  Checks to make sure there is no whitespace in DESCRIPTION file field
+  names (`ERROR`).
+* **Checking that Package field matches dir/tarball name...**
+  Checks to make sure that `Package` field of DESCRIPTION file matches
+  directory or tarball name (`ERROR`).
+* **Checking for Version field...**
+  Checks to make sure a `Version` field is present in the DESCRIPTION
+  file (`ERROR`).
+* **Checking for valid maintainer...**
+  Checks to make sure the DESCRIPTION file has either a `Maintainer`
+  field, or a valid `Authors@R` field which resolves to a valid
+  `Maintainer` (`ERROR`).
+
+  A valid `Authors@R` field consists of:
+    * A valid R object of class `person`.
+    * Only one person with the `cre` (creator) role.
+    * That person must have a syntactically valid email address.
+    * That person must have either `family` or `given` name defined.
+
+<!--* **Checking for valid development URL in DESCRIPTION...**
+  Checks to make sure the DESCRIPTION file has a valid github
+  `DevelopmentURL` field, if missing resolves to an (`ERROR`) -->
+
+##  NAMESPACE checks
+
+Can be disabled with `--no-check-namespace`
+
+**Checking DESCRIPTION/NAMESPACE consistency...**
+
+`BiocCheck` detects packages that are imported in NAMESPACE but not
+DESCRIPTION, or vice versa, and provides an explanation of how to fix
+this (`ERROR`).
+
+
+**Checking for namespace import suggestions...**
+
+If the package `codetoolsBioC` is installed, `BiocCheck` will run it
+to see if it has suggestions for the "Imports" section of your package
+NAMESPACE.
+
+`codetoolsBioC` is an experimental package that is not presently
+available via `BiocManager::install()`. It is available from our
+[Subversion repository][7] with the credentials readonly/readonly.
+Output of codetoolsBioC is printed to the screen but `BiocCheck` does
+not label it ERROR, WARNING, or NOTE.
+
+[7]: https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/codetoolsBioC
 
 ## Vignette Checks
 
@@ -136,6 +296,7 @@ Only run if your package is a software package (as determined by your
 [biocViews](#biocViews_Checks)), or if package type cannot be
 determined.
 
+* Checks package type based on biocViews in DESCRIPTION.
 * Checks that the `vignettes` directory exists (`ERROR`).
 * Checks that the `vignettes` directory only contains vignette sources
   *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
@@ -174,126 +335,23 @@ information.
 [1]: http://yihui.name/knitr/demo/vignette/
 [2]: https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Non_002dSweave-vignettes
 
-## Version Checks
 
-* **Checking new package version number...**
-  Checks that the version number is valid for a new _Bioconductor_
-  package. This is only done if the `--new-package` option is
-  supplied (`ERROR`).
-* **Checking version number validity...**
-  Checks for a valid version, that format is correct and that version
-  number is appropriate for this version of _Bioconductor_ (`ERROR`).
-* **Checking R Version dependency...**
-  If you specify an R version in the `Depends:` field of your
-  `DESCRIPTION` file, `BiocCheck` checks to make sure that the R
-  version specified matches the version currently used by
-  _Bioconductor_. This prevents the package from being used in earlier
-  versions of R, which is not recommended and is a frequent cause of
-  user confusion (`WARNING`).
-* **Checking for version number mismatch...**
-  Checks that the package version specified in your package tarball
-  (if you are checking a tarball) matches the value of the `Version:`
-  field in your `DESCRIPTION` file.  If it doesn't, it usually means
-  you did not build the tarball with `R CMD build`. (`ERROR`)
+## Checking Install or Update Package Calls in R code
 
-For more information on package versions, see the
-[Version Numbering HOWTO][3].
+Can be disabled with `--no-check-library-calls` and `--no-check-install-self`.
 
-[3]: http://www.bioconductor.org/developers/how-to/version-numbering/
-
-## Package and File Size Check
-
-* **Checking package size**
-  Checks that the package size meets _Bioconductor_ requirements. The current
-  package size limit is 4 MB for Software packages. Experiment Data and
-  Annotation packages are excluded from this check. This check is only run if
-  checking a source tarball. (ERROR)
-
-* **Checking individual file sizes**
-  The current size limit for all individual files is 5 MB. (WARNING)
-
-## biocViews Checks
-
-These can be disabled with the `--no-check-bioc-views` option, which
-might be useful when checking non-_Bioconductor_ packages (since
-biocViews is a concept unique to _Bioconductor_).
-
-**Checking biocViews...**
-
-* **Checking that biocViews are present...**
-  Checks that a `biocViews` field is present in the DESCRIPTION file
-  (`ERROR`).
-* **Checking package type based on biocViews**
-  Gives an indication if the package is identified as a Software, Annotation,
-  Experiment, or Workflow package.
-* **Checking for non-trivial biocViews...**
-  Checks that biocViews are more specific than the top-level terms
-  Software, AnnotationData, or ExperimentData (`ERROR`).
-* **Checking biocViews validity...**
-  Checks for valid views and displays invalid ones. Note that
-  biocViews are case-sensitive (`WARNING`).
-* **Checking that biocViews come from the same category...**
-  Checks that all views come from the same parent (one of Software,
-  AnnotationData, ExperimentData) (`WARNING`).
-* **Checking for recommended biocViews...**
-  Uses the `recommendBiocViews()` function from `biocViews` to
-  automatically suggest some biocViews for your package.
-
-More information about biocViews is available in the
-[Using biocViews HOWTO][4].
-
-[4]: http://www.bioconductor.org/developers/how-to/biocViews/
-
-## Build System Compatibility Checks
-
-The _Bioconductor_ Build System (BBS) is our nightly build system and
-it has certain requirements. Packages which don't meet these
-requirements can be silently skipped by BBS, so it's important to make
-sure that every package meets the requirements.
-
-**Checking build system compatibility...**
-
-* **Checking for blank lines in DESCRIPTION...**
-  Checks to make sure there are no blank lines in the DESCRIPTION
-  file (`ERROR`).
-* **Checking for whitespace in DESCRIPTION field names...**
-  Checks to make sure there is no whitespace in DESCRIPTION file field
-  names (`ERROR`).
-* **Checking that Package field matches dir/tarball name...**
-  Checks to make sure that `Package` field of DESCRIPTION file matches
-  directory or tarball name (`ERROR`).
-* **Checking for Version field...**
-  Checks to make sure a `Version` field is present in the DESCRIPTION
-  file (`ERROR`).
-* **Checking for valid maintainer...**
-  Checks to make sure the DESCRIPTION file has either a `Maintainer`
-  field, or a valid `Authors@R` field which resolves to a valid
-  `Maintainer` (`ERROR`).
-
-  A valid `Authors@R` field consists of:
-    * A valid R object of class `person`.
-    * Only one person with the `cre` (creator) role.
-    * That person must have a syntactically valid email address.
-    * That person must have either `family` or `given` name defined.
-
-<!--* **Checking for valid development URL in DESCRIPTION...**
-  Checks to make sure the DESCRIPTION file has a valid github
-  `DevelopmentURL` field, if missing resolves to an (`ERROR`) -->
-
-## Unit Test Checks
-
-**Checking unit tests...**
-
-We strongly recommend unit tests, though we do not at present require
-them. For more on what unit tests are, why they are helpful, and how
-to implement them, read our [Unit Testing HOWTO][5].
-
-[5]: http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/
-
-At present we just check to see whether unit tests are present, and if not,
-urge you to add them (`NOTE`).
+* **Checking library calls...** (`NOTE`)
+  Check for use of functions that install or update packages. This list
+  currently includes the use of `install`, `install.packages`, `update.packages`
+  or `biocLite`.
+* **Checking for library/require of *(your package name)*...** (`ERROR`)
+  It is not necessary to call `library()` or `require()` on your own
+  package within code in the R directory or in man page examples. In
+  these contexts, your package is already loaded.
 
 ## Coding Practices Checks
+
+Can be disabled with `--no-check-coding-practices`.
 
 **Checking coding practices...**
 
@@ -323,51 +381,11 @@ directory.
   R functions directly. The user should always have the option for
   the set.seed and know when it is being invoked. (`WARNING`)
 
-## Native Routine Registration Checks
-
-**Checking native routine registration...**
-
-Calls to native (C or Fortran) code entry points should be registered
-with R; see [Writing R Extensions][6] (`ERROR`).
-
-[6]: http://cran.r-project.org/doc/manuals/r-release/R-exts.html#Registering-native-routines
-
-## Namespace Import Suggestion Checks
-
-**Checking for namespace import suggestions...**
-
-If the package `codetoolsBioC` is installed, `BiocCheck` will run it
-to see if it has suggestions for the "Imports" section of your package
-NAMESPACE.
-
-`codetoolsBioC` is an experimental package that is not presently
-available via `BiocManager::install()`. It is available from our
-[Subversion repository][7] with the credentials readonly/readonly.
-Output of codetoolsBioC is printed to the screen but `BiocCheck` does
-not label it ERROR, WARNING, or NOTE.
-
-[7]: https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/codetoolsBioC
-
-## Deprecated Package Checks
-
-**Checking for deprecated package usage...**
-
-At present, this looks to see whether your package has a dependency on
-the `multicore` package (`ERROR`).
-
-Our recommendation is to use [BiocParallel][7.1]. Note that 'fork'
-clusters do not rpovide any gain from parallelizing code on
-Windows. Socket clusters work on all operating systems.
-
-[7.1]: https://bioconductor.org/packages/BiocParallel
-
-## Code Parsing Checks
+**Checking parsed R code in R directory, examples, vignettes...**
 
 `BiocCheck` parses the code in your package's R directory, and in
 evaluated man page and vignette examples to look for various symbols,
 which result in issues of varying severity.
-
-**Checking parsed R code in R directory, examples, vignettes...**
 
 * **Checking for browser()...**
   `browser()` causes the command-line R debugger to be invoked, and
@@ -378,10 +396,6 @@ which result in issues of varying severity.
   Non-local assignment using `<<-` is bad practice. It can over-write
   user-defined symbols, and introduces non-linear paths of evaluation
   that are difficult to debug (`NOTE`).
-* **Checking for library/require of *(your package name)*...** (`ERROR`)
-  It is not necessary to call `library()` or `require()` on your own
-  package within code in the R directory or in man page examples. In
-  these contexts, your package is already loaded.
 * **Checking for direct slot access...**
   `BiocCheck` checks for direct slot access (via `@` or `slot()`) to
   S4 objects in vignette and example code. This code should **always**
@@ -392,15 +406,9 @@ which result in issues of varying severity.
   them (instead of direct slot access) in all vignette and example
   code (`NOTE`).
 
-## DESCRIPTION/NAMESPACE consistency checks
-
-**Checking DESCRIPTION/NAMESPACE consistency...**
-
-`BiocCheck` detects packages that are imported in NAMESPACE but not
-DESCRIPTION, or vice versa, and provides an explanation of how to fix
-this (`ERROR`).
-
 ## Function length checking
+
+Can be disabled with `--no-check-function-len`.
 
 **Checking function lengths**
 
@@ -415,11 +423,11 @@ read, debug, test, reuse, and maintain.
 
 ## man page checking
 
-**Checking man pages...**
+Can be disabled with `--no-check-man-doc`.
 
-Every man page must have a non-empty `\value` section. (`ERROR`)
+**Checking man page documentation...**
 
-## Runnable Examples Checking
+* Every man page must have a non-empty `\value` section. (`ERROR`)
 
 **Checking exported objects have runnable examples...**
 
@@ -434,7 +442,18 @@ programming and help ensure that your code does what you say it does.
   examples, but some are still missing, `BiocCheck` lists the missing
   ones and asks you to add runnable examples to them (`NOTE`).
 
+**Checking for canned comments in man pages...**
+
+It can be handy to generate man page skeletons with `prompt()` and/or
+RStudio. These skeletons contain comments that look like this:
+
+    %%  ~~ A concise (1-5 lines) description of the dataset. ~~
+
+`BiocCheck` asks you to remove such comments (`NOTE`).
+
 ## NEWS checks
+
+Can be disabled with `--no-check-news`.
 
 **Checking package NEWS...**
 
@@ -448,11 +467,35 @@ in _Bioconductor_ release announcements to tell users what has changed
 in your package in the last release. In order for this to happen, your
 NEWS file must be formatted in a specific way; you may want to
 consider using an `inst/NEWS.Rd` file instead as the format is more
-well-defined.
+well-defined. Malformatted NEWS file outputs `WARNING`.
 
 More information on NEWS files is available in the help topic `?news`.
 
+
+## Unit Test Checks
+
+Can be disabled with `--no-check-unit-tests`.
+
+**Checking unit tests...**
+
+We strongly recommend unit tests, though we do not at present require
+them. For more on what unit tests are, why they are helpful, and how
+to implement them, read our [Unit Testing HOWTO][5].
+
+[5]: http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/
+
+At present we just check to see whether unit tests are present, and if not,
+urge you to add them (`NOTE`).
+
+**Checking skip_on_bioc() in tests...**
+
+Can be disabled with `--no-check-skip-bioc-tests`.
+
+Finds flag for skipping tests in the bioconductor environment (`NOTE`)
+
 ## Formatting checks
+
+Can be disabled with `--no-check-formatting`.
 
 **Checking formatting of DESCRIPTION, NAMESPACE, man pages, R source,
   and vignette source...**
@@ -475,17 +518,6 @@ of these files allow long lines to be broken up.
 The output of this check includes the first 6 offending lines of code;
 see more with `BiocCheck:::checkFormatting("path/to/YourPackage",
 nlines=Inf)`.
-
-## Canned Comments check
-
-**Checking for canned comments in man pages...**
-
-It can be handy to generate man page skeletons with `prompt()` and/or
-RStudio. These skeletons contain comments that look like this:
-
-    %%  ~~ A concise (1-5 lines) description of the dataset. ~~
-
-`BiocCheck` asks you to remove such comments (`NOTE`).
 
 ## Duplication checks
 

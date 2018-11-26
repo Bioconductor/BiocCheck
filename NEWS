@@ -3,8 +3,26 @@ CHANGES IN VERSION 1.19
 
 NEW FEATURES
 
+    o (1.19.7) More helpful ERROR when using a non valid command line option.
+    o (1.19.4) All checks module. Ability to turn on/off with flag options. See
+    'R CMD BiocCheck --help'
     o (1.19.1) New Check options to turn off if in CRAN (--no-check-CRAN) and
     Bioconductor mailing list and support site (--no-check-bioc-help)
+
+USER SIGNIFICANT CHANGES
+
+    o (1.19.8) Updated Documentation in vignette for flag/option controls and
+    reorganization of code/checks. Grouped similar checks together and changed
+    order of checks.
+    o (1.19.3) Remove Native Routine Registrations (use flag in R CMD check
+    instead _R_CHECK_NATIVE_ROUTINE_REGISTRATION_)
+    o (1.19.2) Match CRAN standards of package size <= 5MB (updated from 4MB)
+
+BUG FIXES
+
+    o (1.19.6) Replace use of devtools::create with usethis::create_package as
+    function was deprecated.
+    o (1.19.5) Fix length > 1 logical comparison in if statement
 
 CHANGES IN VERSION 1.17
 -----------------------
