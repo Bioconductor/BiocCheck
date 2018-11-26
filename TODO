@@ -1,18 +1,38 @@
++ BBS compatibily
+  - recheck whitespace and blank line checks 
+  - check if can't parse
+  - new lines in description field?
+  - git conflict code
 
-- check that knitr is in suggests if it is being used to build vignettes
++ description namespace consistency  (??? look at FIXME in code ???) 
 
-- unit test coverage
++ Vignettes
+  o checkVignetteDir
+      - ??? (broken) checkTooksVig  ???
+      - vignette builder (description specified in 1 vignette) (?? reported issue)
+      - vingette engine/check that knitr is in suggests if it is being used to build vignettes
+      - double check eval=FALSE check?
 
-- Make sure every (non-trivial) class has a show() method.
-   or at least display the #/% of classes that don't.
 
-- dontrun / dontcheck/ / eval=FALSE
-    warnings - note percent 
++ Coding Practice
+   - print(), cat() usage outside show and print method
+   - message(), warning(), error() not with paste except collapse
+   - if/while () & vs &&, | vs || ? (if/while/etc...  should be || / &&  not single) 
+   - ??Make sure every (non-trivial) class has a show() method or at least display the #/% of classes that don't.
 
-- print() cat() message() warning() error() (mis)use?
++ function lengths  (?? refine) display output >50
 
-- if /while ()  & vs &&, | vs || ?
++ man page checks
+   - check usage/% of dontrun/dontcheck (NOTE)
 
-- related - organize and revamp codetoolsBioC?
++ NEWS 
+   o formatting  (??? needs work ???)
 
-- NEWS properly formatted?
++ unit test coverage amount? 
+
++ Formatting   (??? suggest formatR ??? also on website)
+
+
+
+
+** related - organize and revamp codetoolsBioC **

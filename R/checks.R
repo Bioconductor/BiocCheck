@@ -90,10 +90,19 @@ checkForBadDepends <- function(pkgdir)
 
 checkDeprecatedPackages <- function(pkgdir)
 {
-    if ("multicore" %in% getAllDependencies(pkgdir))
+    allDepends <- getAllDependencies(pkgdir)
+    allDeprecated <- getAllDeprecatedPkgs()
+    if ("multicore" %in% allDepends)
     {
-        handleError("Use 'parallel' instead of 'multicore'. ",
+        handleError("Use 'BiocParallel' instead of 'multicore'. ",
             "'multicore' is deprecated and does not work on Windows.")
+    }
+    logVec <- allDeprecated %in% allDepends
+    if (any(logVec)){
+        handleError("Package dependency in the DESCRIPTION is 'Deprecated'. ",
+                    "Update your package to not rely on the following:")
+        for(i in allDeprecated[logVec])
+            handleMessage(i, indent=8)
     }
 }
 
