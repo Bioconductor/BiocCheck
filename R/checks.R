@@ -28,16 +28,29 @@ checkForBadDepends <- function(pkgdir)
     depends <- append(depends,
         cleanupDependency(packageDescription(pkgname)$Imports))
     output <- getBadDeps(pkgdir)
-    if (is.null(output))
+    if (is.null(output)){
+        # put these here to be consistent output messaging
+        handleCheck("Checking if other packages can import this one...")
+        handleCheck("Checking to see if we understand object initialization...")
         return()
+    }
 
     output <- unique(unlist(strsplit(output, "\n")))
     output <- output[grep("no visible", output)]
-    if (length(output) == 0) return()
+    if (length(output) == 0){
+        # put these here to be consistent output messaging
+        handleCheck("Checking if other packages can import this one...")
+        handleCheck("Checking to see if we understand object initialization...")
+        return()
+    }
     res <- regexpr("'[^']*'", output)
     fns <- regexpr("^[^:]*:", output)
-    if (all(res == -1L))
+    if (all(res == -1L)){
+        # put these here to be consistent output messaging
+        handleCheck("Checking if other packages can import this one...")
+        handleCheck("Checking to see if we understand object initialization...")
         return()
+    }
 
     res <- gsub("'", "", regmatches(output, res))
     fns <- sub(":$", "", regmatches(output, fns))
@@ -853,9 +866,9 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
         for (msg in res)
             handleMessage(msg, indent=8)
     }
-    
+
     handleCheck("Checking parsed R code in R directory, examples, vignettes...")
-    
+
     # direct slot access
     checkForDirectSlotAccess(parsedCode, package_name)
 
@@ -1000,7 +1013,7 @@ checkManDocumentation <- function(package_dir, package_name)
     checkExportsAreDocumented(package_dir, package_name)
 
     # canned man prompts
-    checkForPromptComments(package_dir)    
+    checkForPromptComments(package_dir)
 }
 
 checkForValueSection <- function(pkgdir)

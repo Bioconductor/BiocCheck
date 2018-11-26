@@ -3,8 +3,6 @@ getOptionList <- function()
     list(
         make_option("--new-package", action="store_true",
             help="enable checks specific to new packages"),
-        make_option("--no-check-ver-mismatch", action="store_true",
-            help="disable check for tarball and DESCRIPTION version match"),
         make_option("--no-check-dependencies", action="store_true",
             help="disable check for bad dependencies"),
         make_option("--no-check-deprecated", action="store_true",
@@ -115,13 +113,6 @@ BiocCheck <- function(package=".", ...)
     installAndLoad(package)
 
     ## checks
-    if (is.null(dots[["no-check-ver-mismatch"]])){
-        if (!checkingDir) {
-            handleCheck("Checking for version number mismatch...")
-            checkForVersionNumberMismatch(package, package_dir)
-        }
-    }
-
     if (is.null(dots[["no-check-dependencies"]])){
         handleCheck("Checking Package Dependencies...")
         checkForBadDepends(file.path(tempdir(), "lib", package_name))
@@ -134,12 +125,17 @@ BiocCheck <- function(package=".", ...)
 
     if (is.null(dots[["no-check-version-num"]])){
         handleCheck("Checking version number...")
+        if (!checkingDir) {
+            handleCheck("Checking for version number mismatch...")
+            checkForVersionNumberMismatch(package, package_dir)
+        }
+
         if (!is.null(dots[["new-package"]]))
             {
                 handleCheck("Checking new package version number...")
                 checkNewPackageVersionNumber(package_dir)
             } else {
-                handleMessage("Checking version number validity...")
+                handleCheck("Checking version number validity...")
                 checkVersionNumber(package_dir)
             }
     }
