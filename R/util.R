@@ -147,6 +147,26 @@ getAllDependencies <- function(pkgdir)
     out
 }
 
+getAllDeprecatedPkgs <- function()
+{
+    # our best guess at deprecated packages
+    # doesn't currently catch packages that haven't built once per cycle
+    # hopefully write_VIEWS will be updated to handle this?
+    con <- url("https://bioconductor.org/packages/release/bioc/VIEWS")
+    views_release <- read.dcf(con, all=TRUE)
+    close(con)
+    con <- url("https://bioconductor.org/packages/devel/bioc/VIEWS")
+    views_devel <- read.dcf(con, all=TRUE)
+    close(con)
+    pkgs <- unique(c(
+        views_release[["Package"]][which(views_release[["PackageStatus"]]
+                                         == "Deprecated")],
+        views_devel[["Package"]][which(views_devel[["PackageStatus"]]
+                                       == "Deprecated")]
+        ))
+    pkgs
+}
+
 parseFile <- function(infile, pkgdir)
 {
     # FIXME - use purl to parse RMD and RRST

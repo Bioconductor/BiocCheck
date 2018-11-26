@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.19
 
 NEW FEATURES
 
+    o (1.19.9) Update deprecated check to check for Bioconductor release and
+    devel deprecated packages as specified in biocViews
     o (1.19.7) More helpful ERROR when using a non valid command line option.
     o (1.19.4) All checks module. Ability to turn on/off with flag options. See
     'R CMD BiocCheck --help'
