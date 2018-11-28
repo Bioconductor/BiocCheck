@@ -1301,6 +1301,8 @@ checkFormatting <- function(pkgdir, nlines=6)
     {
         handleMessage(
             "See http://bioconductor.org/developers/how-to/coding-style/")
+        handleMessage(
+            "See FormatR package: https://cran.r-project.org/web/packages/formatR/index.html")
     }
 }
 
