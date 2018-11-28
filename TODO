@@ -1,9 +1,3 @@
-+ BBS compatibily
-  - recheck whitespace and blank line checks 
-  - check if can't parse
-  - new lines in description field?
-  - git conflict code
-
 + description namespace consistency  (??? look at FIXME in code ???) 
 
 + Vignettes

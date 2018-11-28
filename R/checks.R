@@ -323,8 +323,16 @@ checkBBScompatibility <- function(pkgdir)
         handleError("Remove blank lines from DESCRIPTION.")
         return()
     }
+    handleCheck("Checking if DESCRIPTION is well formatted...")
+    dcf <- tryCatch({
+        read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    }, error = function(err) {
+        handleError("DESCRIPTION is malformed.")
+        handleMessage(conditionMessage(err))
+        return()
+    })
+
     handleCheck("Checking for whitespace in DESCRIPTION field names...")
-    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if (any(grepl("\\s", colnames(dcf))))
     {
         handleError("Remove whitespace from DESCRIPTION field names.")
