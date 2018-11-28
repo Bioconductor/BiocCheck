@@ -983,18 +983,20 @@ checkFunctionLengths <- function(parsedCode, pkgname)
         }
     }
     message("")
-
     colnames <- c("filename","functionName","length","startLine","endLine")
     if (ncol(df) == length(colnames))
     {
         colnames(df) <- colnames
         df <- df[with(df, order(-length)),]
-        h <- head(df, n=5)
+        h <- df[df$length > 50,]
         if (nrow(h))
         {
-            handleMessage(
-                "The longest function is ", max(h$length) , " lines long")
-            handleMessage("The longest ", nrow(h), " functions are:")
+            handleNote("Recommended function length <= 50 lines.")
+            handleMessage("There are ", nrow(h), " functions > 50 lines.",
+                          indent=6)
+            h = head(df, n=5)
+            handleMessage("The longest ", nrow(h), " functions are:",
+                          indent=6)
             for (i in seq_len(nrow(h)))
             {
                 row <- df[i,]
@@ -1002,11 +1004,11 @@ checkFunctionLengths <- function(parsedCode, pkgname)
                 {
                     handleMessage(sprintf(
                         "%s() (%s, line %s): %s lines", row$functionName,
-                        row$filename, row$startLine, row$length))
+                        row$filename, row$startLine, row$length), indent=8)
                 } else {
                     handleMessage(sprintf(
                         "%s() (%s): %s lines", row$functionName, row$filename,
-                        row$length))
+                        row$length), indent=8)
                 }
             }
         }

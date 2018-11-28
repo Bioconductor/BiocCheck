@@ -13,14 +13,11 @@
       - vingette engine/check that knitr is in suggests if it is being used to build vignettes
       - double check eval=FALSE check?
 
-
 + Coding Practice
    - print(), cat() usage outside show and print method
    - message(), warning(), error() not with paste except collapse
    - if/while () & vs &&, | vs || ? (if/while/etc...  should be || / &&  not single) 
    - ??Make sure every (non-trivial) class has a show() method or at least display the #/% of classes that don't.
-
-+ function lengths  (?? refine) display output >50
 
 + man page checks
    - check usage/% of dontrun/dontcheck (NOTE)
@@ -31,7 +28,6 @@
 + unit test coverage amount? 
 
 + Formatting   (??? suggest formatR ??? also on website)
-
 
 
 

@@ -150,8 +150,11 @@ getAllDependencies <- function(pkgdir)
 getAllDeprecatedPkgs <- function()
 {
     # our best guess at deprecated packages
-    # doesn't currently catch packages that haven't built once per cycle
-    # hopefully write_VIEWS will be updated to handle this?
+    # if write_views wasn't updated to manual add missing package info
+    # a more complete would be to scrap the build report
+    # html = htmlParse("http://bioconductor.org/checkResults/devel/bioc-LATEST/")
+    # depdevel = xpathSApply(html, "//s", xmlValue)
+
     con <- url("https://bioconductor.org/packages/release/bioc/VIEWS")
     views_release <- read.dcf(con, all=TRUE)
     close(con)
