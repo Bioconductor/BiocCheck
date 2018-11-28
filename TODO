@@ -2,7 +2,6 @@
 
 + Vignettes
   o checkVignetteDir
-      - ??? (broken) checkTooksVig  ???
       - vignette builder (description specified in 1 vignette) (?? reported issue)
       - vingette engine/check that knitr is in suggests if it is being used to build vignettes
       - double check eval=FALSE check?

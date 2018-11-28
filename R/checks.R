@@ -497,16 +497,6 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     checkInstContents(pkgdir, checkingDir)
 
     checkVigFiles(vigdir, vigdircontents)
-    #
-    # This appears to never get run because of pkgdir as character
-    # tools::pkgVignettes
-    # 'pkgVignettes' returns an object of class '"pkgVignettes"' if a
-    #  vignette directory is found, otherwise 'NULL'.
-    #  what is this doing?
-    #
-    res <- checkToolsVig(pkgdir)
-    if (!res)
-        return()
 
     desc <- file.path(pkgdir, "DESCRIPTION")
     if (file.exists(desc))
@@ -592,25 +582,6 @@ checkVigFiles <- function(vigdir, vigdircontents){
     }
 }
 
-checkToolsVig <- function(pkgdir)
-{
-    if (file.exists(file.path("pkgdir", "DESCRIPTION")))
-    {
-        vigns <- tools::pkgVignettes(dir=pkgdir, check=TRUE)
-        if (is.null(vigns))
-        {
-            handleError("No vignette found.")
-            return(FALSE)
-        }
-        if (length(vigns$msg))
-        {
-            handleError(paste0(vigns$msg, collapse="\n"))
-            return(FALSE)
-        }
-    } else {
-        return(TRUE)
-    }
-}
 
 checkVigBuilder <- function(builder, vigdircontents)
 {
