@@ -22,6 +22,7 @@ USER SIGNIFICANT CHANGES
 
 BUG FIXES
 
+    o (1.19.14) Fix ERROR when more than one VignetteEngine found 
     o (1.19.10) Add suggestion of FormatR package to formatting notes
     o (1.19.10) Fix function lengths to be a NOTE and only display if functions
     are greater than 50 lines long. 

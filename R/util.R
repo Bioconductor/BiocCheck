@@ -493,7 +493,7 @@ vigHelper <- function(vignetteFile, builder){
     idx <- grep(lines, pattern="VignetteEngine")
     if (length(idx) != 0){
         eng <- gsub("::.*", "", gsub(".*\\{|\\}.*", "", lines[idx]))
-        return(eng %in% builder)
+        return(all(eng %in% builder))
     } else {
         return(NA)
     }
