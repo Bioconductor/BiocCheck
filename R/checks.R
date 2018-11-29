@@ -510,6 +510,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigEngine(builder, vigdircontents)
 
+    checkVigSuggests(builder, vigdircontents, pkgdir)
+
     checkVigTemplate(vigdircontents)
 
     checkVigChunkEval(vigdircontents)
@@ -647,6 +649,23 @@ checkVigEngine <- function(builder, vigdircontents)
             files = res[nadx]
             handleMessage(basename(names(files)), indent=6)
         }
+    }
+}
+
+checkVigSuggests <- function(builder, vigdircontents, pkgdir)
+{
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    res <- sapply(vigdircontents, getVigEngine)
+    lst <- unique(c(unlist(unname(res)), builder))
+    if (any(is.na(lst)))
+        lst <- lst[-is.na(lst)]
+    dep <- getAllDependencies(pkgdir)
+    if (!all(lst %in% dep)){
+        handleWarning("Package listed as VignetteEngine or VignetteBuilder ",
+                      "but not currently Suggested. ",
+                      "Add the following to Suggests in DESCRIPTION:")
+        for(i in lst[!(lst %in% dep)])
+            handleMessage(i, indent=8)
     }
 }
 

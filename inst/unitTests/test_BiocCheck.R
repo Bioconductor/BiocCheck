@@ -100,6 +100,7 @@ test_vignettes0 <- function()
 
     # vig dir w/ source file  OK
     cat("nothing", file=file.path(vigdir, "test.Rnw"))
+    cat("Title: unitTestTempDir", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0
         && .warning$getNum() == 0
@@ -125,13 +126,17 @@ test_vignettes0 <- function()
     BiocCheck:::checkInstContents(pkgdir, TRUE)
     checkTrue(.warning$getNum() == 1,
         "Rmd file not seen as valid vignette source")
+    unlink(file.path(instdoc, "test.Rmd"))
     .zeroCounters()
+
 
     # check vigbuilder ERROR
     # in Description but not any vignette
+    # also checks if builder listed but not in DESCRIPTION import,depend,suggest
     cat("VignetteBuilder: knitr", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 1)
+    checkTrue(.warning$getNum() == 1)
     .zeroCounters()
 
     # check vignette builder default
@@ -151,10 +156,10 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEquals(2, .warning$getNum())
+    checkEquals(3, .warning$getNum())
     checkEquals("Evaluate more vignette chunks.",
-        .warning$get()[2])
-    checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[1]))
+        .warning$get()[3])
+    checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[2]))
     .zeroCounters()
 
     # check vignette style of example package

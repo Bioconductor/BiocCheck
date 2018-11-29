@@ -1,10 +1,5 @@
 + description namespace consistency  (??? look at FIXME in code ???) 
 
-+ Vignettes
-  o checkVignetteDir
-      - vingette engine/check that knitr is in suggests if it is being used to build vignettes
-      - double check eval=FALSE check?
-
 + Coding Practice
    - print(), cat() usage outside show and print method
    - message(), warning(), error() not with paste except collapse

@@ -488,14 +488,23 @@ getVigBuilder <- function(desc)
     return(builder)
 }
 
-vigHelper <- function(vignetteFile, builder){
+getVigEngine <- function(vignetteFile){
     lines <- readLines(vignetteFile, n=100L, warn=FALSE)
     idx <- grep(lines, pattern="VignetteEngine")
     if (length(idx) != 0){
         eng <- gsub("::.*", "", gsub(".*\\{|\\}.*", "", lines[idx]))
-        return(all(eng %in% builder))
+        return(eng)
     } else {
         return(NA)
+    }
+}
+
+vigHelper <- function(vignetteFile, builder){
+    eng <- getVigEngine(vignetteFile)
+    if (all(is.na(eng))){
+        return(NA)
+    } else {
+        return(all(eng %in% builder))
     }
 }
 
