@@ -3,6 +3,7 @@ CHANGES IN VERSION 1.19
 
 NEW FEATURES
 
+    o (1.19.9) Check usage of donttest and dontrun in man page documentation
     o (1.19.9) Update deprecated check to check for Bioconductor release and
     devel deprecated packages as specified in biocViews
     o (1.19.7) More helpful ERROR when using a non valid command line option.

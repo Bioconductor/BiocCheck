@@ -682,7 +682,7 @@ doesManPageHaveRunnableExample <- function(rd)
 
     ex <- character()
     tc <- textConnection("ex", "w", local=TRUE)
-    Rd2ex(rd, commentDonttest = TRUE, out = tc)
+    Rd2ex(rd, commentDontrun = TRUE, commentDonttest = TRUE, out = tc)
     close(tc)
 
     if(!length(ex))

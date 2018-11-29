@@ -1015,14 +1015,37 @@ checkFunctionLengths <- function(parsedCode, pkgname)
 
 checkManDocumentation <- function(package_dir, package_name)
 {
+    # canned man prompts
+    checkForPromptComments(package_dir)
+
     # non empty value section exists
     checkForValueSection(package_dir)
 
     # exports are documented and 80% runnable
     checkExportsAreDocumented(package_dir, package_name)
 
-    # canned man prompts
-    checkForPromptComments(package_dir)
+    # usage of donttest and dontrun
+    checkUsageOfDont(package_dir)
+}
+
+checkForPromptComments <- function(pkgdir)
+{
+    manpages <- dir(file.path(pkgdir, "man"),
+        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+
+    bad <- c()
+    for (manpage in manpages)
+    {
+        lines <- readLines(manpage, warn=FALSE)
+        if (any(grepl("^%% ~", lines)))
+            bad <- append(bad, basename(manpage))
+    }
+    if (length(bad) > 0)
+    {
+        handleNote(
+            "Remove generated comments from man pages ",
+            paste(bad, collapse=", "))
+    }
 }
 
 checkForValueSection <- function(pkgdir)
@@ -1113,23 +1136,40 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
     badManPages # for testing
 }
 
-checkForPromptComments <- function(pkgdir)
+checkUsageOfDont <- function(pkgdir)
 {
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
 
-    bad <- c()
-    for (manpage in manpages)
+    hasBad <- rep(FALSE, length(manpages))
+    for (dx in seq_along(manpages))
     {
-        lines <- readLines(manpage, warn=FALSE)
-        if (any(grepl("^%% ~", lines)))
-            bad <- append(bad, basename(manpage))
+        manpage <- manpages[dx]
+        rd <- parse_Rd(manpage)
+        example <- unlist(lapply(rd,
+            function(x) attr(x, "Rd_tag") == "\\examples"))
+        hasExamples <- any(example)
+        if (hasExamples){
+            rdCode <- as.character(rd)
+            exampleCode <- rdCode[which(rdCode == "\\examples"):length(rdCode)]
+            donttestVec <- vapply(exampleCode, grepl, logical(1),
+                                  pattern="\\\\donttest", perl=TRUE,
+                                  USE.NAMES=FALSE)
+            dontrunVec <- vapply(exampleCode, grepl, logical(1),
+                                  pattern="\\\\dontrun", perl=TRUE,
+                                  USE.NAMES=FALSE)
+            if (any(donttestVec | dontrunVec))
+                hasBad[dx] = TRUE
+        }
     }
-    if (length(bad) > 0)
-    {
-        handleNote(
-            "Remove generated comments from man pages ",
-            paste(bad, collapse=", "))
+    if (any(hasBad)){
+        perVl <- as.character(round(length(which(hasBad))/length(hasBad)*100))
+        handleNote("Usage of dontrun{} / donttest{} found in man page examples.")
+        handleMessage(perVl, "% of man pages use one of these cases.", indent=6)
+        handleMessage("Found in the following files:", indent=6)
+        for(f in basename(manpages)[hasBad]){
+            handleMessage(f, indent=8)
+        }
     }
 }
 
