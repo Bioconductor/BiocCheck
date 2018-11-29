@@ -6,9 +6,6 @@
    - if/while () & vs &&, | vs || ? (if/while/etc...  should be || / &&  not single) 
    - ??Make sure every (non-trivial) class has a show() method or at least display the #/% of classes that don't.
 
-+ man page checks
-   - check usage/% of dontrun/dontcheck (NOTE)
-
 + NEWS 
    o formatting  (??? needs work ???)
 
