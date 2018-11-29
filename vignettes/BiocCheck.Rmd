@@ -240,6 +240,8 @@ Can be disabled with `--no-check-bbs`
 * **Checking for blank lines in DESCRIPTION...**
   Checks to make sure there are no blank lines in the DESCRIPTION
   file (`ERROR`).
+* **Checking if DESCRIPTION is well formatted...**
+   Checks if the DESCRIPTION can be parsed with read.dcf
 * **Checking for whitespace in DESCRIPTION field names...**
   Checks to make sure there is no whitespace in DESCRIPTION file field
   names (`ERROR`).
@@ -305,6 +307,8 @@ determined.
   *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
 * Checks whether, while checking a directory (not a tarball), vignette
   sources exist in inst/doc (`ERROR`).
+* Checks that vignetteBuidler/vignetteEngine are listed in, minimally, Suggests
+  field of DESCRIPTION file (`WARNING`)
 * Checks that vignetteBuilder in DESCRIPTION and VignetteEngine in vignette
   are compatible (`ERROR`)
 * Checks whether vignette title is still using template value (`WARNING`)
@@ -413,14 +417,14 @@ which result in issues of varying severity.
 
 Can be disabled with `--no-check-function-len`.
 
-**Checking function lengths**
+**Checking function lengths...**
 
 `BiocCheck` prints an informative message about the length (in lines)
 of your five longest functions (this includes functions in your R
 directory and in evaluated man page and vignette examples).
 
-`BiocCheck` does not assign severity to long functions, but you may
-want to consider breaking up long functions into smaller ones. This is
+If there are functions longer than 50 lines, `BiocCheck` outputs (`NOTE`).
+You may want to consider breaking up long functions into smaller ones. This is
 a basic refactoring technique that results in code that's easier to
 read, debug, test, reuse, and maintain.
 
@@ -430,7 +434,18 @@ Can be disabled with `--no-check-man-doc`.
 
 **Checking man page documentation...**
 
+* Checking for canned comments in man pages
+
+It can be handy to generate man page skeletons with `prompt()` and/or
+RStudio. These skeletons contain comments that look like this:
+
+    %%  ~~ A concise (1-5 lines) description of the dataset. ~~
+
+`BiocCheck` asks you to remove such comments (`NOTE`).
+
 * Every man page must have a non-empty `\value` section. (`ERROR`)
+
+* man page examples examples
 
 **Checking exported objects have runnable examples...**
 
@@ -444,15 +459,9 @@ programming and help ensure that your code does what you say it does.
 * Checks that, if more than 80% of the man pages have runnable
   examples, but some are still missing, `BiocCheck` lists the missing
   ones and asks you to add runnable examples to them (`NOTE`).
+* Check the usage of `dontrun` or `donttest`. Use of these functions is not
+  recommended and shoud be justified (`NOTE`).
 
-**Checking for canned comments in man pages...**
-
-It can be handy to generate man page skeletons with `prompt()` and/or
-RStudio. These skeletons contain comments that look like this:
-
-    %%  ~~ A concise (1-5 lines) description of the dataset. ~~
-
-`BiocCheck` asks you to remove such comments (`NOTE`).
 
 ## NEWS checks
 
@@ -521,6 +530,11 @@ of these files allow long lines to be broken up.
 The output of this check includes the first 6 offending lines of code;
 see more with `BiocCheck:::checkFormatting("path/to/YourPackage",
 nlines=Inf)`.
+
+There is a helpful package [formatR][formatR] that can be used for formatting of
+R code to particular coding standards.
+
+[formatR]: https://cran.r-project.org/web/packages/formatR/index.html
 
 ## Duplication checks
 

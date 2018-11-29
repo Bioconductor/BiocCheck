@@ -524,6 +524,8 @@ test_checkExportsAreDocumented <- function()
     BiocCheck:::installAndLoad(pkgdir)
     res <- BiocCheck:::checkExportsAreDocumented(pkgdir, "testpkg0")
     checkEquals(1, .error$getNum())
+    res <- BiocCheck:::checkUsageOfDont(pkgdir)
+    checkEquals(1, .note$getNum())
 }
 
 test_checkNEWS <- function()
