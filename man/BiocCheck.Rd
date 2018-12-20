@@ -13,7 +13,7 @@ command line (via \code{R CMD BiocCheck}; see the vignette). Not meant
 to replace \code{R CMD check}, which should always be run first.
 }
 \usage{
-BiocCheck(package, ...)
+BiocCheck(package = ".", ...)
 usage()
 }
 \arguments{
