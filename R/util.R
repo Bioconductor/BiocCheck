@@ -356,36 +356,42 @@ findLogicalFile <- function(fl) {
       }
     }
     globals <- eapply(env, safeFindGlobals)
-    if (length(globals) != 0){
-       names(which(unlist(lapply(globals,
-                                 FUN=function(x){
-                                     any(c("T","F") %in% x)
-                                 }))))
-    }else{
+    if (length(globals) != 0) {
+        names(which(unlist(lapply(globals, function(x) {
+            any(c("T","F") %in% x)
+        }))))
+    } else {
       character()
     }
 }
 
-safeFindGlobals <- function(env, ...){ tryCatch(findGlobals(env, ...), error = warning)}
+safeFindGlobals <- function(env, ...) {
+    tryCatch({
+        findGlobals(env, ...)
+    }, error = warning)
+}
 
 findLogicalRdir <- function(pkgname, symbol){
 
     env <- getNamespace(pkgname)
     objs <- ls(env, all.names=TRUE)
     objs <- objs[grep("^.__[CTM]__", objs, invert=TRUE)]
-    globals <- lapply(objs,
-        FUN= function(obj) {
-            value = env[[obj]];
-            if (is.function(value)) findGlobals(value) else character(0)
-        })
+    globals <- lapply(objs, function(obj) {
+        value = env[[obj]];
+        if (identical(typeof(value), "closure")) {
+            findGlobals(value)
+        } else character(0)
+    })
     names(globals) <- objs
-    if (length(globals) != 0){
-        funName <-names(which(unlist(lapply(globals,
-                                            FUN=function(x){
-                                                any(symbol %in% x)
-                                            }))))
-        if (length(funName) > 0 )  paste0(funName, "()") else character()
-    }else{
+    if (length(globals) != 0) {
+        found <- vapply(
+            globals, function(x, symbol) any(symbol %in% x), logical(1), symbol
+        )
+        funName <- names(globals)[found]
+        if (length(funName) > 0) {
+            paste0(funName, "()")
+        } else character()
+    } else {
       character()
     }
 }
