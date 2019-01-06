@@ -380,6 +380,25 @@ test_checkForBrowser <- function()
     checkTrue(res == 1)
 }
 
+test_checkClassEqUsage <- function()
+{
+    dir.create(dir <- tempfile())
+    fl <- tempfile(tmpdir=dir)
+    cat(
+        paste(
+            ## good
+            "class(a)=='foo'", "class(a)!='foo'", "class(a) ==",
+            "if(class(a) ==", "class ( a ) ==",
+            ## bad
+            "aclass(a) ==", "classy(a) ==",
+            sep="\n"),
+        "\n", file = fl
+    )
+    match <- BiocCheck:::checkClassEqUsage(dir)
+    lines <- sub(".* (\\d)\\)$", "\\1", match)
+    checkIdentical(1:5, as.integer(lines))
+}
+
 test_checkDescriptionNamespaceConsistency <- function()
 {
     run_check <- function(pkg)

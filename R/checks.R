@@ -850,7 +850,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     # class() ==
     msg_class <- checkClassEqUsage(pkgdir)
     if (length(msg_class) > 0) {
-        handleWarning(" Avoid class()== or class()!= ; use is() or !is()")
+        handleWarning(" Avoid class() == or class() != ; use is() or !is()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_class)
             handleMessage(msg, indent=8)
@@ -926,13 +926,12 @@ check1toN <- function(Rdir){
     msg_seq <- unlist(msg_seq)
 }
 
+
 checkClassEqUsage <- function(pkgdir){
 
+    regex <- "\\bclass\\s*(.*)\\s*[!=]="
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    fnd <- grepPkgDir(pkgdir, "-rn 'class(.*)\\s*=='")
-    fnd2 <-grepPkgDir(pkgdir, "-rn 'class(.*)\\s*!='")
-    msg_class <- sort(c(fnd, fnd2))
-    msg_class
+    grepPkgDir(pkgdir, paste0('-rn "', regex, '"'))
 }
 
 checkSystemCall <- function(pkgdir){

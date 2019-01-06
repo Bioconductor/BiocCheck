@@ -379,7 +379,7 @@ directory.
   altered, leading to unexpected results, whereas the value of `TRUE`
   and `FALSE` cannot be changed  (`WARNING`).
 
-* Avoid `class()==` and `class()!=` instead use `is()`. (`WARNING`)
+* Avoid `class() ==` and `class() !=` instead use `is()`. (`WARNING`)
 
 * Use `system2()` over `system()`. 'system2' is a more portable and
   flexible interface than 'system'.(`NOTE`)
