@@ -35,7 +35,7 @@ create_test_package <- function(pkgpath, description=list(),
     path <- file.path(tempdir(), pkgpath)
     unlink(path, recursive=TRUE)
     capture.output({
-        suppressMessages(usethis::create_package(path, canned, rstudio=FALSE))
+        suppressMessages(usethis::create_package(path, canned, rstudio=FALSE, open = FALSE))
     })
 
     cat("#", file=file.path(path, "NAMESPACE"))
@@ -248,7 +248,8 @@ test_checkBiocViews <- function()
 
 test_badFiles <- function(){
     pkgdir <- UNIT_TEST_TEMPDIR
-    dir.create(pkgdir)
+    if (!dir.exists(pkgdir))
+        dir.create(pkgdir)
     badfile <- file.path(pkgdir, "something.Rproj")
     file.create(badfile)
     BiocCheck:::checkBadFiles(pkgdir)
