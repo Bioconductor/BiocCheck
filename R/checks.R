@@ -615,7 +615,7 @@ checkVigEngine <- function(builder, vigdircontents)
     # engines specified in vignette
     builderRes <- grepPkgDir(file.path(dirname(vigdircontents[1]),
                                        .Platform$file.sep),
-                             "-rn 'VignetteEngine{'")
+                             "-rHn 'VignetteEngine{'")
     filenames <- vapply(builderRes,
                         FUN=function(x){strsplit(x,
                             split=" ")[[1]][1]},
@@ -725,7 +725,7 @@ checkVigEvalAllFalse <- function(pkgdir){
     pkgdir <- file.path(pkgdir, "vignettes")
     Vigdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
     msg_eval <- grepPkgDir(Vigdir,
-                           "-rn 'knitr::opts_chunk\\$set(.*eval\\s*=\\s*F'")
+                           "-rHn 'knitr::opts_chunk\\$set(.*eval\\s*=\\s*F'")
     msg_eval
 }
 
@@ -733,7 +733,7 @@ checkVigBiocInst <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes")
     vigdir <- sprintf("%s%s", vigdir, .Platform$file.sep)
     msg_return <- grepPkgDir(vigdir,
-        "-Ern 'BiocInstaller|biocLite|useDevel|biocinstallRepos'")
+        "-EHrn 'BiocInstaller|biocLite|useDevel|biocinstallRepos'")
     if (length(msg_return)) {
         handleWarning(" BiocInstaller code found in vignette(s)")
         handleMessage("Found in file(s):", indent=6)
@@ -931,13 +931,13 @@ checkClassEqUsage <- function(pkgdir){
 
     regex <- "\\bclass\\s*(.*)\\s*[!=]="
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    grepPkgDir(pkgdir, paste0('-rn "', regex, '"'))
+    grepPkgDir(pkgdir, paste0('-rHn "', regex, '"'))
 }
 
 checkSystemCall <- function(pkgdir){
 
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    msg_sys <- grepPkgDir(pkgdir, "-rn '^system(.*'")
+    msg_sys <- grepPkgDir(pkgdir, "-rHn '^system(.*'")
 }
 
 
