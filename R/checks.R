@@ -232,10 +232,15 @@ checkBiocViews <- function(pkgdir)
     handleMessage(type)
     handleCheck("Checking for non-trivial biocViews...")
     toplevel <- c("Software", "AnnotationData", "ExperimentData", "Workflow")
-    if (all(views %in% toplevel)) {
-        handleError(
-            "Add biocViews other than ", paste(unique(views), collapse=", "))
+    if (length(views) == 0){
+        handleError("No biocViews terms found.")
         return(TRUE)
+    }else{
+        if (all(views %in% toplevel)) {
+            handleError(
+                "Add biocViews other than ", paste(unique(views), collapse=", "))
+            return(TRUE)
+        }
     }
 
     parents <-
