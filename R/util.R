@@ -75,13 +75,9 @@ installAndLoad <- function(pkg)
     r_libs_user <- paste(.libPaths(), collapse=.Platform$path.sep)
     Sys.setenv(R_LIBS_USER=r_libs_user)
 
-    libdir <- file.path(tempdir(), "lib")
-    unlink(libdir, recursive=TRUE)
-    if (!dir.create(libdir, showWarnings=FALSE))
-        stop("'dir.create' failed")
-    stderr <- file.path(tempdir(), "install.stderr")
-    if (!file.create(stderr))
-        stop("'file.create' stderr failed")
+    dir.create(install_dir <- tempfile())
+    dir.create(libdir <- file.path(install_dir, "lib"))
+    file.create(stderr <- file.path(install_dir, "install.stderr"))
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
                     libdir, shQuote(pkg))
@@ -101,6 +97,7 @@ installAndLoad <- function(pkg)
         suppressWarnings(unloadNamespace(pkgname))
 
     suppressPackageStartupMessages(do.call(library, args))
+    install_dir
 }
 
 # Takes as input the value of an Imports, Depends,
@@ -172,8 +169,9 @@ getAllDeprecatedPkgs <- function()
 
 parseFile <- function(infile, pkgdir)
 {
-    # FIXME - use purl to parse RMD and RRST
-    # regardless of VignetteBuilder value
+    ## FIXME - use purl to parse RMD and RRST
+    ## regardless of VignetteBuilder value
+    dir.create(parse_dir <- tempfile())
     if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE))
     {
         outfile <- NULL
@@ -185,10 +183,10 @@ parseFile <- function(infile, pkgdir)
             if (!requireNamespace("knitr")) {
                 stop("'knitr' package required to check knitr-based vignettes")
             }
-            outfile <- file.path(tempdir(), "parseFile.tmp")
+            outfile <- file.path(parse_dir, "parseFile.tmp")
             # copy file to work around https://github.com/yihui/knitr/issues/970
             # which is actually fixed but not in CRAN yet (3/16/15)
-            tmpin <- file.path(tempdir(), basename(infile))
+            tmpin <- file.path(parse_dir, basename(infile))
             file.copy(infile, tmpin)
             suppressWarnings(suppressMessages(capture.output({
                 knitr::purl(input=tmpin, output=outfile, documentation=0L)
@@ -196,7 +194,7 @@ parseFile <- function(infile, pkgdir)
             file.remove(tmpin)
         } else {
             full.infile <- normalizePath(infile)
-            oof <- file.path(tempdir(), basename(infile))
+            oof <- file.path(parse_dir, basename(infile))
             oof <- vapply(strsplit(oof, "\\."),
                 function(x) paste(x[seq_len(length(x)-1)], collapse="."),
                 character(1))
@@ -204,7 +202,7 @@ parseFile <- function(infile, pkgdir)
             suppressWarnings(suppressMessages(capture.output({
                     oldwd <- getwd()
                     on.exit(setwd(oldwd))
-                    setwd(tempdir())
+                    setwd(parse_dir)
                     Stangle(full.infile)
                     badname <- paste0(basename(infile), ".R")
                     if (file.exists(badname))
@@ -215,7 +213,7 @@ parseFile <- function(infile, pkgdir)
     } else if (grepl("\\.Rd$", infile, TRUE))
     {
         rd <- parse_Rd(infile)
-        outfile <- file.path(tempdir(), "parseFile.tmp")
+        outfile <- file.path(parse_dir, "parseFile.tmp")
         code <- capture.output(Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
     } else if (grepl("\\.R$", infile, TRUE)) {
@@ -398,7 +396,8 @@ findLogicalRdir <- function(pkgname, symbol){
 
 makeTempRFile <- function(infile){
     ext <- tolower(tools::file_ext(infile))
-    outfile <- file.path(tempdir(), paste0(basename(infile), ".R"))
+    dir.create(tempr_dir <- tempfile())
+    outfile <- file.path(tempr_dir, paste0(basename(infile), ".R"))
     if(ext == 'rnw' & isTRUE(vigHelper(infile, "knitr")[1])){
         ext <- 'rmd'
     }
