@@ -110,12 +110,12 @@ BiocCheck <- function(package=".", ...)
         "This is BiocCheck version ", packageVersion("BiocCheck"), ". ",
         "BiocCheck is a work in progress. Output and severity of issues may ",
         "change. Installing package...", indent=0, exdent=0)
-    installAndLoad(package)
+    package_install_dir <- installAndLoad(package)
 
     ## checks
     if (is.null(dots[["no-check-dependencies"]])){
         handleCheck("Checking Package Dependencies...")
-        checkForBadDepends(file.path(tempdir(), "lib", package_name))
+        checkForBadDepends(file.path(package_install_dir, "lib", package_name))
     }
 
     if (is.null(dots[["no-check-deprecated"]])){
@@ -326,19 +326,18 @@ BiocCheck <- function(package=".", ...)
 {
     if (!file.exists(pkgname))
     {
-        stop(.printf("'%s' does not exist!", pkgname))
+        .stop("'%s' does not exist!", pkgname)
     }
     if (file.info(pkgname)$isdir)
         return(pkgname)
 
     if(!grepl("\\.tar\\.gz$", pkgname))
     {
-        stop(.printf("'%s' is not a directory or package source tarball.",
-            pkgname))
+        .stop("'%s' is not a directory or package source tarball.", pkgname)
     }
 
     expectedPackageName <- strsplit(basename(pkgname), "_")[[1]][1]
-    t = tempdir()
+    dir.create(t <- tempfile())
     untar(pkgname, exdir=t)
     file.path(t, expectedPackageName)
 }
