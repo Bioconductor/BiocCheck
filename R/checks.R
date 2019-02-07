@@ -106,6 +106,13 @@ checkDeprecatedPackages <- function(pkgdir)
     }
 }
 
+checkRemotesUsage <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if ("Remotes" %in% colnames(dcf))
+        handleError("Package dependencies must be on CRAN or Bioconductor. Remove 'Remotes:' from DESCRIPTION")
+}
+
 checkNewPackageVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))

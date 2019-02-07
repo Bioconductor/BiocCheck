@@ -497,6 +497,19 @@ test_checkForBadDepends <- function()
     checkTrue(grepl("how 3 object", BiocCheck:::.note$get()[1]))
 }
 
+test_remotesUsage <- function()
+{
+    pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    BiocCheck:::.zeroCounters()
+    BiocCheck:::checkRemotesUsage(pkg)
+    checkEquals(1, BiocCheck:::.error$getNum())
+    checkTrue(grepl("Remotes:", BiocCheck:::.error$get()[1]))
+    BiocCheck:::.zeroCounters()
+    pkg <- system.file("testpackages", "testpkg1", package="BiocCheck")
+    BiocCheck:::checkRemotesUsage(pkg)
+    checkEquals(0, BiocCheck:::.error$getNum())
+}
+
 test_doesFileLoadPackage <- function()
 {
     df <- getParseData(parse(system.file("testpackages", "testpkg0",

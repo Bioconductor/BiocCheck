@@ -148,6 +148,16 @@ versions of Bioconductor (`ERROR`).
 
 [7.1]: https://bioconductor.org/packages/BiocParallel
 
+## Remotes Usage Check
+
+**Checking for remote package usage...**
+
+Can be disabled with `--no-check-remotes`
+
+Bioconductor only allows dependencies that are hosted on CRAN or
+Bioconductor. The use of `Remotes:` in the DESCRIPTION to specify a unique
+remote location is not allowed.
+
 ## Version Checks
 
 Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.

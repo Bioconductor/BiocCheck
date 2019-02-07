@@ -7,6 +7,8 @@ getOptionList <- function()
             help="disable check for bad dependencies"),
         make_option("--no-check-deprecated", action="store_true",
             help="disable check for usage of deprecated packages"),
+        make_option("--no-check-remotes", action="store_true",
+            help="disable check for usage of remote packages other than those hosted on CRAN or Bioconductor"),
         make_option("--no-check-version-num", action="store_true",
             help="disable check for valid version number"),
         make_option("--no-check-R-ver", action="store_true",
@@ -121,6 +123,11 @@ BiocCheck <- function(package=".", ...)
     if (is.null(dots[["no-check-deprecated"]])){
         handleCheck("Checking for deprecated package usage...")
         checkDeprecatedPackages(package_dir)
+    }
+
+    if (is.null(dots[["no-check-remotes"]])){
+        handleCheck("Checking for remote package usage...")
+        checkRemotesUsage(package_dir)
     }
 
     if (is.null(dots[["no-check-version-num"]])){
