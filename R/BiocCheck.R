@@ -278,6 +278,9 @@ BiocCheck <- function(package=".", ...)
     {
         handleCheck("Checking if new package already exists in Bioconductor...")
         checkIsPackageAlreadyInRepo(package_name, "BioCsoft")
+        checkIsPackageAlreadyInRepo(package_name, "BioCann")
+        checkIsPackageAlreadyInRepo(package_name, "BioCexp")
+        checkIsPackageAlreadyInRepo(package_name, "BioCworkflows")
     }
 
     if (is.null(dots[["no-check-bioc-help"]]))

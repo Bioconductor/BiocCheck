@@ -736,3 +736,26 @@ test_doesManPageHaveRunnableExample <- function()
 
     checkEquals(BiocCheck:::doesManPageHaveRunnableExample(bad), FALSE)
 }
+
+test_packageAlreadyExists <- function()
+{
+    .zeroCounters()
+    BiocCheck:::checkIsPackageAlreadyInRepo("GenomicRanges", "CRAN")
+    checkEquals(.error$getNum(),0)
+    BiocCheck:::checkIsPackageAlreadyInRepo("devtools", "CRAN")
+    checkEquals(.error$getNum(),1)
+    BiocCheck:::checkIsPackageAlreadyInRepo("GenomicRanges", "BioCsoft")
+    checkEquals(.error$getNum(),2)
+    BiocCheck:::checkIsPackageAlreadyInRepo("GO.db", "BioCann")
+    checkEquals(.error$getNum(),3)
+    BiocCheck:::checkIsPackageAlreadyInRepo("TENxBrainData", "BioCexp")
+    checkEquals(.error$getNum(),4)
+    BiocCheck:::checkIsPackageAlreadyInRepo("annotation", "BioCworkflows")
+    checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("GenomicRanges", "BioCexp")
+    checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("GenomicRanges", "BioCann")
+    checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("GenomicRanges", "BioCworkflows")
+    checkEquals(.error$getNum(),5)
+}

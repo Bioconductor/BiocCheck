@@ -1347,7 +1347,8 @@ checkFormatting <- function(pkgdir, nlines=6)
     }
 }
 
-checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft"))
+checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft",
+                                                     "BioCann", "BioCexp", "BioCworkflows"))
 {
     repo <- match.arg(repo)
     repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
