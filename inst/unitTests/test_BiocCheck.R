@@ -88,6 +88,8 @@ test_vignettes0 <- function()
 {
     pkgdir <- UNIT_TEST_TEMPDIR
     vigdir <- file.path(pkgdir, "vignettes")
+    if (!dir.exists(pkgdir))
+        dir.create(pkgdir)
 
     ## no vignettes dir ERROR
     BiocCheck:::checkVigDirExists(pkgdir, vigdir)
@@ -98,15 +100,25 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkError("Empty vignettes")
 
-    # vig dir w/ source file  OK
+    # vig dir w/ source file  WARNING
     cat("nothing", file=file.path(vigdir, "test.Rnw"))
     cat("Title: unitTestTempDir", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0
+        && .warning$getNum() == 1
+        && .note$getNum() == 0,
+        "expected 1 warnings")
+    .zeroCounters()
+
+    # test OK
+    cat("% \\VignetteIndexEntry{header} \n% \\VignetteEngine{knitr} \nnothing", file=file.path(vigdir, "test.Rnw"))
+    cat("Title: unitTestTempDir\nSuggests: knitr", file=file.path(pkgdir, "DESCRIPTION"))
+    BiocCheck:::checkVignetteDir(pkgdir, TRUE)
+    checkTrue(.error$getNum() == 0
         && .warning$getNum() == 0
         && .note$getNum() == 0,
-        "expected no errors/warnings/notes")
-    .zeroCounters()
+        "expected no notes/error/warning")
+
 
     # check rnw file in inst/doc  WARNING
     instdoc <- file.path(pkgdir, "inst", "doc")
@@ -134,6 +146,7 @@ test_vignettes0 <- function()
     # in Description but not any vignette
     # also checks if builder listed but not in DESCRIPTION import,depend,suggest
     cat("VignetteBuilder: knitr", file=file.path(pkgdir, "DESCRIPTION"))
+    cat("% \\VignetteIndexEntry{header} \nnnothing", file=file.path(vigdir, "test.Rnw"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 1)
     checkTrue(.warning$getNum() == 1)
@@ -156,10 +169,10 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEquals(3, .warning$getNum())
+    checkEquals(4, .warning$getNum())
     checkEquals("Evaluate more vignette chunks.",
-        .warning$get()[3])
-    checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[2]))
+        .warning$get()[4])
+    checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[3]))
     .zeroCounters()
 
     # check vignette style of example package

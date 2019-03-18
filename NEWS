@@ -3,6 +3,12 @@ CHANGES IN VERSION 1.19
 
 NEW FEATURES
 
+    o (1.19.25) Check that vignette metadata set correctly
+    o (1.19.25) Check for Author@R or Author/Maintainer but not both
+    o (1.19.25) Check for use of remotes: in Description
+    o (1.19.18) Check for use of dontrun/donttest
+    o (1.19.15) Check vignetteEngine/vignetteBuilder minimially declared in
+    Suggests
     o (1.19.9) Check usage of donttest and dontrun in man page documentation
     o (1.19.9) Update deprecated check to check for Bioconductor release and
     devel deprecated packages as specified in biocViews
@@ -23,10 +29,14 @@ USER SIGNIFICANT CHANGES
 
 BUG FIXES
 
-    o (1.19.14) Fix ERROR when more than one VignetteEngine found 
+    o (1.19.26) Check all repos for existing package not just software
+    o (1.19.23) Informative message if no biocViews term found
+    o (1.19.22) Fix output of system2 usage check
+    o (1.19.19) Test only closures for T/F
+    o (1.19.14) Fix ERROR when more than one VignetteEngine found
     o (1.19.10) Add suggestion of FormatR package to formatting notes
     o (1.19.10) Fix function lengths to be a NOTE and only display if functions
-    are greater than 50 lines long. 
+    are greater than 50 lines long.
     o (1.19.6) Replace use of devtools::create with usethis::create_package as
     function was deprecated.
     o (1.19.5) Fix length > 1 logical comparison in if statement

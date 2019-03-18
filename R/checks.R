@@ -523,6 +523,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
         checkVigBuilder(builder, vigdircontents)
     }
 
+    checkVigMetadata(vigdircontents)
+
     checkVigEngine(builder, vigdircontents)
 
     checkVigSuggests(builder, vigdircontents, pkgdir)
@@ -616,7 +618,29 @@ checkVigBuilder <- function(builder, vigdircontents)
     if (length(badBuilder) != 0L){
         handleError("VignetteBuilder listed in DESCRIPTION but not ",
                     "found as VignetteEngine in any vignettes:")
-        handleMessage(badBuilder, indent=6)
+        handleMessage(badBuilder, indent=8)
+    }
+}
+
+checkVigMetadata <- function(vigdircontents)
+{
+    badVig <- character(0)
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    dx <- which(vigExt != "rnw")
+    vigdircontents = vigdircontents[dx]
+    for (file in vigdircontents) {
+        lines <- readLines(file, n=100L, warn=FALSE)
+        idx <- grep(lines, pattern="vignette:")
+        if (length(idx) == 0L)
+            badVig = c(badVig, basename(file))
+    }
+     if (length(badVig) != 0L){
+        handleWarning(
+            "Vignette[s] missing Vignette metadata. See ",
+            "http://r-pkgs.had.co.nz/vignettes.html ;",
+            " Update the following files:"
+        )
+        handleMessage(badVig, indent=8)
     }
 }
 
@@ -653,16 +677,18 @@ checkVigEngine <- function(builder, vigdircontents)
                 "Add the VignetteEngine from the following files to ",
                 "DESCRIPTION:"
             )
-            handleMessage(basename(names(which(!res))), indent=6)
+            handleMessage(basename(names(which(!res))), indent=8)
         }
         nadx <- which(is.na(res))
-        if (length(nadx) != 0L && is.null(builder)){
+        if (length(nadx) != 0L || is.null(builder)){
             handleError(
                 "No VignetteEngine specified in vignette or DESCRIPTION. ",
                 "Add VignetteEngine to the following files or add a default ",
                 "VignetteBuilder in DESCRIPTION: ")
             files = res[nadx]
-            handleMessage(basename(names(files)), indent=6)
+            if (is.null(builder))
+                files = c(files, "DESCRIPTION")
+            handleMessage(basename(names(files)), indent=8)
         }
     }
 }
@@ -673,7 +699,7 @@ checkVigSuggests <- function(builder, vigdircontents, pkgdir)
     res <- sapply(vigdircontents, getVigEngine)
     lst <- unique(c(unlist(unname(res)), builder))
     if (any(is.na(lst)))
-        lst <- lst[-is.na(lst)]
+        lst <- lst[!is.na(lst)]
     dep <- getAllDependencies(pkgdir)
     if (!all(lst %in% dep)){
         handleWarning("Package listed as VignetteEngine or VignetteBuilder ",
@@ -687,6 +713,7 @@ checkVigSuggests <- function(builder, vigdircontents, pkgdir)
 checkVigTemplate <- function(vigdircontents)
 {
     badVig <- character(0)
+    badVig2 <- character(0)
     for (file in vigdircontents) {
         lines <- readLines(file, n=100L, warn=FALSE)
         idx <- grep(lines, pattern="VignetteIndexEntry")
@@ -696,13 +723,23 @@ checkVigTemplate <- function(vigdircontents)
                 badVig = c(badVig, basename(file))
             }
         }
+        if (length(idx) == 0L){
+            badVig2 = c(badVig2, basename(file))
+        }
     }
     if (length(badVig) != 0L){
         handleWarning(
             "Vignette[s] still using 'VignetteIndexEntry{Vignette Title}' ",
             "Update the following files from using template values:"
         )
-        handleMessage(badVig, indent=6)
+        handleMessage(badVig, indent=8)
+    }
+    if (length(badVig2) != 0L){
+        handleWarning(
+            "Vignette[s] missing '\\%VignetteIndexEntry{Vignette Title}'. ",
+            "Update the following files:"
+        )
+        handleMessage(badVig2, indent=8)
     }
 }
 
