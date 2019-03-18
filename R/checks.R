@@ -367,6 +367,9 @@ checkBBScompatibility <- function(pkgdir)
         return()
     }
     handleCheck("Checking for valid maintainer...")
+    if (("Authors@R" %in% colnames(dcf)) &
+        any((c("Author","Maintainer") %in% colnames(dcf))))
+        handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
     maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf))
     {
@@ -413,7 +416,7 @@ checkBBScompatibility <- function(pkgdir)
     } else if ("Maintainer" %in% colnames(dcf)) {
         maintainer <- dcf[,"Maintainer"]
     } else {
-        handleError("No Maintainer or Authors@R field in DESCRIPTION file.")
+        handleError("No Maintainer or Authors@R [cre] field in DESCRIPTION file.")
         return()
     }
     # now need to make sure that regexes work, a la python/BBS

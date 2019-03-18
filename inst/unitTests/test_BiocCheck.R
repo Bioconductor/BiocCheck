@@ -278,10 +278,6 @@ test_checkBBScompatibility <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Missing Version doesn't cause error!")
-    #cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: syntax error", UNIT_TEST_PKG),
-    #    file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    #BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
-    #checkError("Syntax error in Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     .zeroCounters()
@@ -300,6 +296,13 @@ test_checkBBScompatibility <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Missing email in Maintainer doesn't cause error!")
+    .zeroCounters()
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
+                UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    checkTrue(.warning$getNum() == 1L)
+    checkTrue(.error$getNum() == 0L)
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
         UNIT_TEST_PKG),
