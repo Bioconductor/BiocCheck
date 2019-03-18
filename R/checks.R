@@ -747,29 +747,46 @@ checkVigChunkEval <- function(vigdircontents)
 {
     chunks <- 0
     efs <- 0
+    noneval <- 0
     for (file in vigdircontents)
     {
         lines <- readLines(file, warn=FALSE)
         vignetteType <- knitr:::detect_pattern(lines, tools::file_ext(file))
         if (is.null(vignetteType)) {
             chunklines <- character(0)
+            nonEvalChunk <- character(0)
         } else {
             chunkPattern <- knitr::all_patterns[[vignetteType]]$chunk.begin
             chunklines <- lines[grep(chunkPattern, lines)]
+
+            # find non evaluated code chunks (```, ```r, ```R, etc.)
+            # assumes every other one for start and stop of code chunk
+            nonEvalChunk <- lines[grep("^[\t >]*```+\\s*",
+                                          lines)][c(TRUE,FALSE)]
+            indx <- grep("^[\t >]*```+\\s*\\{([a-zA-Z0-9_]+.*)\\}\\s*$",
+                         nonEvalChunk)
+            if (length(indx) > 0L)
+                nonEvalChunk <- nonEvalChunk[-indx]
+
         }
-        chunks <- chunks + length(chunklines)
+        chunks <- chunks + length(chunklines) + length(nonEvalChunk)
 
         efs <- efs +
             length(grep("eval\\s?=\\s?FALSE", chunklines))
+
+        noneval <- noneval + length(nonEvalChunk)
     }
 
-    percent <- ifelse(chunks == 0 && efs == 0, 0, (efs/chunks) * (100/1))
+    percent <- ifelse(chunks == 0 && (efs+noneval) == 0, 0, ((efs+noneval)/chunks) * (100/1))
 
-    handleMessage(sprintf(
-        "# of chunks: %s, # of eval=FALSE: %s (%i%%)",
-        chunks, efs,  as.integer(percent)))
-    if (percent >= 50)
+    if (percent >= 50){
         handleWarning("Evaluate more vignette chunks.")
+        handleMessage(sprintf("# of code chunks: %s", chunks), indent=8)
+        handleMessage(sprintf("# of eval=FALSE: %s", efs), indent=8)
+        handleMessage(sprintf("# of nonexecutable code chunks by syntax: %s", noneval), indent=8)
+        handleMessage(sprintf("# total unevaluated %s (%i%%)",(efs+noneval), as.integer(percent)), indent=8)
+
+    }
 }
 
 checkVigEvalAllFalse <- function(pkgdir){

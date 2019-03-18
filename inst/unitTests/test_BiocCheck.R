@@ -181,6 +181,10 @@ test_vignettes0 <- function()
     checkEquals(2, .error$getNum())
     checkTrue(grepl(pattern="VignetteBuilder",  .error$get()[1]))
     checkTrue(grepl(pattern="VignetteEngine",  .error$get()[2]))
+    checkEquals(3, .warning$getNum())
+    checkTrue(grepl(pattern="missing Vignette metadata",  .warning$get()[1]))
+    checkTrue(grepl(pattern="not currently Suggested",  .warning$get()[2]))
+    checkTrue(grepl(pattern="Evaluate more vignette chunks",  .warning$get()[3]))
     .zeroCounters()
 
     # check vignette 'intermediate' files

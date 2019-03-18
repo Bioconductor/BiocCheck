@@ -3,8 +3,11 @@ CHANGES IN VERSION 1.19
 
 NEW FEATURES
 
-    o (1.19.25) Check that vignette metadata set correctly
-    o (1.19.25) Check for Author@R or Author/Maintainer but not both
+    o (1.19.29) Add non evaluated code chunks that have not been executed
+    because of invalid syntax (```, ```R, ```r). Valid syntax for an evaluated
+    code chunk takes the form ```{r} or ```{R}.
+    o (1.19.28) Check that vignette metadata set correctly
+    o (1.19.27) Check for Author@R or Author/Maintainer but not both
     o (1.19.25) Check for use of remotes: in Description
     o (1.19.18) Check for use of dontrun/donttest
     o (1.19.15) Check vignetteEngine/vignetteBuilder minimially declared in
