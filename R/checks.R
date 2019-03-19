@@ -367,9 +367,6 @@ checkBBScompatibility <- function(pkgdir)
         return()
     }
     handleCheck("Checking for valid maintainer...")
-    if (("Authors@R" %in% colnames(dcf)) &
-        any((c("Author","Maintainer") %in% colnames(dcf))))
-        handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
     maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf))
     {
