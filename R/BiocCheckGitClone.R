@@ -70,6 +70,9 @@ BiocCheckGitClone <- function(package=".", ...){
     handleCheck("Checking valid files...")
     checkBadFiles(package_dir)
 
+    handleCheck("Checking DESCRIPTION...")
+    checkDescription(package_dir)
+    
     ## Summary
     .msg("\n\nSummary:")
     .msg("ERROR count: %d", .error$getNum())

@@ -320,7 +320,9 @@ test_checkBBScompatibility <- function()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
                 UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkDescription(UNIT_TEST_TEMPDIR)
+    checkTrue(.warning$getNum() == 1L)
+    checkTrue(.error$getNum() == 0L)
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
         UNIT_TEST_PKG),
