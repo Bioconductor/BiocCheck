@@ -277,6 +277,9 @@ test_badFiles <- function(){
 
 test_checkBBScompatibility <- function()
 {
+    pkgdir <- UNIT_TEST_TEMPDIR
+    if (!dir.exists(pkgdir))
+        dir.create(pkgdir)
     cat("Package : foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
     checkError("Space in DESCRIPTION field name doesn't cause error")
@@ -318,8 +321,6 @@ test_checkBBScompatibility <- function()
                 UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() == 1L)
-    checkTrue(.error$getNum() == 0L)
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
         UNIT_TEST_PKG),
