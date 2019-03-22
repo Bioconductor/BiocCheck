@@ -1240,25 +1240,40 @@ checkUsageOfDont <- function(pkgdir)
 
 checkNEWS <- function(pkgdir)
 {
-    newsloc <- file.path(pkgdir, c("inst", "inst", "."),
-            c("NEWS.Rd", "NEWS", "NEWS"))
-    news <- head(newsloc[file.exists(newsloc)], 1)
-    if (0L == length(news))
-    {
+    newsloc <- file.path(pkgdir, c("inst", ".",".", "inst"),
+            c("NEWS.Rd", "NEWS.md", "NEWS", "NEWS"))
+    newsFnd <- newsloc[file.exists(newsloc)]
+    if (0L == length(newsFnd)){
         handleNote(
             "Consider adding a NEWS file, so your package news will be ",
             "included in Bioconductor release announcements.")
         return()
     }
+    if (length(newsFnd) > 1L){
+        handleNote(
+            "More than 1  NEWS file found.",
+            "\nSee ?news for recognition ordering.",
+            "\nPlease remove one of the following: ")
+        handleMessage(gsub(pattern=pkgdir, replacement="", newsFnd),
+                      indent=8)
+    }
+    news <- head(newsFnd, 1)
     .build_news_db_from_package_NEWS_Rd <-
         get(".build_news_db_from_package_NEWS_Rd", getNamespace("tools"))
+    .build_news_db_from_package_NEWS_md <-
+        get(".build_news_db_from_package_NEWS_md", getNamespace("tools"))
     .news_reader_default <-
         get(".news_reader_default", getNamespace("tools"))
     tryCatch({
         suppressWarnings({
-            db <- if (grepl("Rd$", news))
-                .build_news_db_from_package_NEWS_Rd(news)
-            else .news_reader_default(news)
+            db <-
+                if (grepl("Rd$", news)){
+                    tools:::.build_news_db_from_package_NEWS_Rd(news)
+                } else if (grepl("md$", news)){
+                    tools:::.build_news_db_from_package_NEWS_md(news)
+                } else {
+                    tools:::.news_reader_default(news)
+                }
         })
     }, error=function(e){
         ## FIXME find a good reference to creating well-formed NEWS, and

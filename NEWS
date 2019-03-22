@@ -32,6 +32,7 @@ USER SIGNIFICANT CHANGES
 
 BUG FIXES
 
+    o (1.19.26) Fix NEWS check to recognize NEWS.md
     o (1.19.26) Check all repos for existing package not just software
     o (1.19.23) Informative message if no biocViews term found
     o (1.19.22) Fix output of system2 usage check
