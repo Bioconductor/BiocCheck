@@ -326,7 +326,7 @@ checkBiocViews <- function(pkgdir)
     return(dirty)
 }
 
-checkBBScompatibility <- function(pkgdir)
+checkBBScompatibility <- function(pkgdir, source_tarball)
 {
     lines <- readLines(file.path(pkgdir, "DESCRIPTION"), warn=FALSE)
     handleCheck("Checking for blank lines in DESCRIPTION...")
@@ -367,6 +367,12 @@ checkBBScompatibility <- function(pkgdir)
         return()
     }
     handleCheck("Checking for valid maintainer...")
+    if (!source_tarball){
+        if (("Authors@R" %in% colnames(dcf)) &
+            any((c("Author","Maintainer") %in% colnames(dcf))))
+            handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
+    }
+
     maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf))
     {
@@ -1543,4 +1549,21 @@ checkBadFiles <- function(package_dir){
         for(msg in badFiles)
             handleMessage(msg, indent=8)
     }
+}
+
+
+checkDescription <- function(package_dir){
+
+    handleCheck("Checking if DESCRIPTION is well formatted...")
+    dcf <- tryCatch({
+        read.dcf(file.path(package_dir, "DESCRIPTION"))
+    }, error = function(err) {
+        handleError("DESCRIPTION is malformed.")
+        handleMessage(conditionMessage(err))
+        return()
+    })
+    handleCheck("Checking for valid maintainer...")
+    if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf))))
+        handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
+
 }

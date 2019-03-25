@@ -281,57 +281,59 @@ test_checkBBScompatibility <- function()
     if (!dir.exists(pkgdir))
         dir.create(pkgdir)
     cat("Package : foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Space in DESCRIPTION field name doesn't cause error")
     .zeroCounters()
 
     cat("Package: foo\n\nImports: bar", file=file.path(UNIT_TEST_TEMPDIR,
         "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Blank line in DESCRIPTION doesn't cause error")
     .zeroCounters()
 
     cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Package name which doesn't match dir name does not cause error!")
     cat(sprintf("Package: ", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Version doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     .zeroCounters()
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Wrong class in Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing cre role in Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Maintainer and Authors@R doesn't cause error!")
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing email in Maintainer doesn't cause error!")
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
                 UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkDescription(UNIT_TEST_TEMPDIR)
+    checkTrue(.warning$getNum() == 1L)
+    checkTrue(.error$getNum() == 0L)
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(stillZero())
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
-    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR)
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(stillZero())
 
 }
