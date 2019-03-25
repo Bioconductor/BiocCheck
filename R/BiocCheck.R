@@ -180,7 +180,7 @@ BiocCheck <- function(package=".", ...)
 
     if (is.null(dots[["no-check-bbs"]])){
         handleCheck("Checking build system compatibility...")
-        checkBBScompatibility(package_dir)
+        checkBBScompatibility(package_dir, source_tarball)
     }
 
     if (is.null(dots[["no-check-namespace"]])){
