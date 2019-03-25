@@ -3,6 +3,7 @@ CHANGES IN VERSION 1.19
 
 NEW FEATURES
 
+    o (1.19.33) Add Authors@R vs Author/Maintainer check
     o (1.19.29) Add non evaluated code chunks that have not been executed
     because of invalid syntax (```, ```R, ```r). Valid syntax for an evaluated
     code chunk takes the form ```{r} or ```{R}.
