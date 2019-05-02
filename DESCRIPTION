@@ -1,5 +1,5 @@
 Package: BiocCheck
-Version: 1.20.0
+Version: 1.21.0
 Title: Bioconductor-specific package checks
 Description: Executes Bioconductor-specific package checks.
 Authors@R: c(
