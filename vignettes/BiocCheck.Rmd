@@ -479,9 +479,18 @@ Can be disabled with `--no-check-news`.
 
 **Checking package NEWS...**
 
-`BiocCheck` looks to see if there is a valid NEWS file (NEWS or
-NEWS.Rd) either in the 'inst' directory or in the top-level directory
-of your package, and checks whether it is properly formatted (`NOTE`).
+`BiocCheck` looks to see if there is a valid NEWS file either in the 'inst'
+directory or in the top-level directory of your package, and checks whether it
+is properly formatted (`NOTE`).
+
+The location and format of the NEWS file must be consistent with
+`?news`. Meaning the file can be one of the following four options:
+
+* `inst/NEWS.Rd`
+* `./NEWS.md`
+* `./NEWS`
+* `inst/NEWS`
+
 
 NEWS files are a good way to keep users up-to-date on changes to your
 package. Excerpts from properly formatted NEWS files will be included
