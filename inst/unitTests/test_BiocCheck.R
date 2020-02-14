@@ -407,7 +407,22 @@ test_checkForBrowser <- function()
 test_checkClassEqUsage <- function()
 {
     dir.create(dir <- tempfile())
-    fl <- tempfile(tmpdir=dir)
+    dir.create(Rdir <- sprintf("%s%s%s", dir, .Platform$file.sep, "R"))
+    fl <- tempfile(tmpdir=Rdir)
+    cat(
+        paste(
+            ## good
+            "class(a)=='foo'", "class(a)!='foo'", "class(a) ==",
+            "if(class(a) ==", "class ( a ) ==",
+            ## bad
+            "aclass(a) ==", "classy(a) ==",
+            sep="\n"),
+        "\n", file = fl
+    )
+    # create directory that should not be checked
+    # only R and vignettes checked
+    dir.create(Instdir <- sprintf("%s%s%s", dir, .Platform$file.sep, "inst"))
+    fl <- tempfile(tmpdir=Instdir)
     cat(
         paste(
             ## good

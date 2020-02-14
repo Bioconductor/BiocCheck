@@ -436,7 +436,7 @@ makeTempRFile <- function(infile){
     }
 }
 
-grepPkgDir <- function(pkgdir, greparg){
+grepPkgDir <- function(pkgdir, greparg, full_path=FALSE){
     args <- sprintf("%s %s*", greparg, pkgdir)
     fnd <- tryCatch(
         system2("grep", args, stdout=TRUE),
@@ -445,13 +445,24 @@ grepPkgDir <- function(pkgdir, greparg){
     msg_files <- vapply(fnd,
                         FUN=function(x, pkgdir){
                             vl = strsplit(x, split=":")
-                            filename = sub(vl[[1]][1], pattern=pkgdir,
-                                replacement="", fixed=TRUE)
+                            filename =
+                                if(full_path){
+                                    vl[[1]][1]
+                                } else {
+                                    sub(vl[[1]][1], pattern=pkgdir,
+                                        replacement="", fixed=TRUE)
+                                }
                             lineNum = vl[[1]][2]
                             if (tolower(.Platform$OS.type) == "windows"){
-                                filename = sub(
-                                    paste(vl[[1]][1], vl[[1]][2], sep=":"),
-                                    pattern=pkgdir, replacement="", fixed=TRUE)
+                                filename =
+                                    if(full_path){
+                                        paste(vl[[1]][1], vl[[1]][2], sep=":")
+                                    }else {
+                                        sub(
+                                            paste(vl[[1]][1], vl[[1]][2], sep=":"),
+                                            pattern=pkgdir, replacement="",
+                                            fixed=TRUE)
+                                    }
                                 lineNum = vl[[1]][3]
                             }
                             sprintf("%s (line %s)", filename, lineNum)},

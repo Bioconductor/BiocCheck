@@ -1003,7 +1003,20 @@ checkClassEqUsage <- function(pkgdir){
 
     regex <- "\\bclass\\s*(.*)\\s*[!=]="
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    grepPkgDir(pkgdir, paste0('-rHn "', regex, '"'))
+    # Limit to R files and vignette source files
+    Rdir <- sprintf("%s%s%s", pkgdir, "R", .Platform$file.sep)
+    fnd1 <-
+        if(dir.exists(Rdir)){
+            grepPkgDir(Rdir, paste0('-rHn "', regex, '"'),
+                       full_path=TRUE)
+        } else {
+            character(0)
+        }
+    VigFiles <- getVigSources(sprintf("%s%s", pkgdir,"vignettes"))
+    fnd2 <- unlist(lapply(VigFiles,
+                          FUN=grepPkgDir, paste0('-rHn "', regex, '"'),
+                          full_path=TRUE))
+    msg_sys <- sub(c(fnd1, fnd2), pattern=pkgdir, replacement="", fixed=TRUE)
 }
 
 checkSystemCall <- function(pkgdir){
