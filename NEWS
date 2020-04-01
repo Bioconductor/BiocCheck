@@ -1,3 +1,14 @@
+CHANGES IN VERSION 1.23
+-----------------------
+
+USER SIGNIFICANT CHANGES
+
+    o (1.23.2) Change wording for R dependency check.
+
+BUG FIXES
+
+    o (1.23.1) Fix false positive class == check
+
 CHANGES IN VERSION 1.19
 -----------------------
 
