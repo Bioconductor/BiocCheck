@@ -163,8 +163,21 @@ checkRVersionDependency <- function(package_dir)
         res <- cleanupDependency(dcf[, "Depends"], FALSE)
         if ("R" %in% res)
         {
-            handleWarning(
-                "Unless package includes compressed data, remove  R version dependency.")
+            ind <- which(res == "R")
+            verStr <- names(res)[ind]
+            if (nchar(verStr))
+            {
+                ver <- as.package_version(verStr)
+                bv <- package_version(sprintf("%s.%s",
+                    getRversion()$major,
+                    getRversion()$minor))
+                if (ver < bv)
+                {
+                    handleWarning(
+                        "Update R version dependency from ", ver, " to ", bv,
+                        ".")
+                }
+            }
         }
     }
 }

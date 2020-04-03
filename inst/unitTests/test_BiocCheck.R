@@ -754,7 +754,7 @@ test_checkRVersionDependency <- function()
 
     cat("Depends: R", file=desc)
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.warning$getNum(), 1)
+    checkEquals(.warning$getNum(), 0)
     .zeroCounters()
 
     cat("Imports: foobar)", file=desc)
@@ -764,7 +764,7 @@ test_checkRVersionDependency <- function()
 
     cat("Depends: R (>= 10000.0.0)", file=desc) # this test might fail some day!
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.warning$getNum(), 1)
+    checkEquals(.warning$getNum(), 0)
     .zeroCounters()
 
     unlink(desc)
