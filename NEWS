@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.23
+-----------------------
+
+BUG FIX
+
+    o (1.23.4) Update locations for NEWS
+    o (1.23.1) Fix False Positive class == check
+
 CHANGES IN VERSION 1.19
 -----------------------
 
