@@ -1259,7 +1259,7 @@ checkUsageOfDont <- function(pkgdir)
 
 checkNEWS <- function(pkgdir)
 {
-    newsloc <- file.path(pkgdir, pkg, c("inst", "inst", "inst", ".","."),
+    newsloc <- file.path(pkgdir, c("inst", "inst", "inst", ".","."),
                          c("NEWS.Rd", "NEWS", "NEWS.md", "NEWS.md", "NEWS"))
     newsFnd <- newsloc[file.exists(newsloc)]
     if (0L == length(newsFnd)){
