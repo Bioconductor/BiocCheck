@@ -883,19 +883,19 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 {
     Rdir <- file.path(pkgdir, "R")
 
-    # sapply
+    # sapply warning
     msg_sapply <- checkSapply(Rdir)
     if (length(msg_sapply) > 0) {
-        handleNote(" Avoid sapply(); use vapply()")
+        handleWarning(" Avoid sapply(); use vapply()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_sapply)
             handleMessage(msg, indent=8)
     }
 
-    # 1:...
+    # 1:... warning
     msg_seq <- check1toN(Rdir)
     if (length(msg_seq) > 0) {
-        handleNote(" Avoid 1:...; use seq_len() or seq_along()")
+        handleWarning(" Avoid 1:...; use seq_len() or seq_along()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_seq)
             handleMessage(msg, indent=8)

@@ -377,11 +377,11 @@ directory.
 
 * We recommend that `vapply()` be used instead of `sapply()`. Problems
   arise when the `X` argument to `sapply()` has length 0; the return
-  type is then a `list()` rather than a vector or array. (`NOTE`)
+  type is then a `list()` rather than a vector or array. (`WARNING`)
 
 * We recommend that `seq_len()` or `seq_along()` be used instead of
   `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
-  which may be an unexpected or unwanted result (`NOTE`).
+  which may be an unexpected or unwanted result (`WARNING`).
 
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This

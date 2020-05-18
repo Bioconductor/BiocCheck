@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.25
+-----------------------
+
+NOTE changes to WARNING
+
+    o 'sapply' and '1:N' NOTE tags become WARNINGS.
+
 CHANGES IN VERSION 1.23
 -----------------------
 
