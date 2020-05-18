@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.25
+-----------------------
+
+NEW FEATURES
+
+    o (1.25.1) Check for warning/notes on too-brief a Description: field,
+    BiocCheck-a-thon issue #65
+
 CHANGES IN VERSION 1.23
 -----------------------
 

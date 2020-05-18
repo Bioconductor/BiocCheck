@@ -1,5 +1,5 @@
 Package: BiocCheck
-Version: 1.25.0
+Version: 1.25.1
 Title: Bioconductor-specific package checks
 Description: Executes Bioconductor-specific package checks.
 Authors@R: c(
@@ -8,7 +8,8 @@ Authors@R: c(
 	role=c("aut", "cre")),
     person("Lori", "Shepherd", role="ctb"),
     person("Daniel", "von Twisk", role="ctb"),
-    person("Kevin", "Rue", role="ctb"))
+    person("Kevin", "Rue", role="ctb"),
+    person("Federico", "Marini", role="ctb"))
 Depends: R (>= 3.5.0)
 License: Artistic-2.0
 LazyData: true
