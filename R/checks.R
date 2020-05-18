@@ -343,6 +343,22 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         handleMessage(conditionMessage(err))
         return()
     })
+    
+    handleCheck("Checking for proper Description: field...")
+    desc_field <- dcf[, "Description"]
+    desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
+    
+    if (nchar(desc_field) < 50 | desc_words < 6) # values chosen sensibly in a data-driven manner
+        handleError("Description field in the DESCRIPTION file is too concise")
+    
+    desc_sentences <- length(gregexpr("[[:alnum:] ][.!?]", desc_field)[[1]])
+    if(desc_sentences < 3) {
+        msg <-
+            "The Description field in the DESCRIPTION is made up by less 
+            than 3 sentences. Please consider expanding this field, and 
+            structure it as a full paragraph"
+        handleNote(paste(strwrap(msg), collapse="\n"))
+    }
 
     handleCheck("Checking for whitespace in DESCRIPTION field names...")
     if (any(grepl("\\s", colnames(dcf))))
@@ -1578,20 +1594,4 @@ checkDescription <- function(package_dir){
     handleCheck("Checking for valid maintainer...")
     if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf))))
         handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
-    
-    handleCheck("Checking for proper Description: field...")
-    desc_field <- dcf[, "Description"]
-    desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
-    
-    if (nchar(desc_field) < 50 | desc_words < 6) # values chosen sensibly in a data-driven manner
-        handleError("Description field in the DESCRIPTION file is too concise")
-    
-    desc_sentences <- length(gregexpr("[[:alnum:] ][.!?]", desc_field)[[1]])
-    if(desc_sentences < 3) {
-        msg <-
-            "The Description field in the DESCRIPTION is made up by less 
-            than 3 sentences. Please consider expanding this field, and 
-            structure it as a full paragraph"
-        handleNote(paste(strwrap(msg), collapse="\n"))
-    }
 }
