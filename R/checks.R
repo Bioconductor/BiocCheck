@@ -1578,5 +1578,12 @@ checkDescription <- function(package_dir){
     handleCheck("Checking for valid maintainer...")
     if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf))))
         handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
+    
+    handleCheck("Checking for proper Description: field...")
+    desc_field <- dcf[, "Description"]
+    desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
+    
+    if (nchar(desc_field) < 50 | desc_words < 6) # values chosen sensibly in a data-driven manner
+        handleError("Description field in the DESCRIPTION file is too concise")
 
 }
