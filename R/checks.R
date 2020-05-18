@@ -348,7 +348,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     desc_field <- dcf[, "Description"]
     desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
     
-    if (nchar(desc_field) < 50 | desc_words < 6) # values chosen sensibly in a data-driven manner
+    if (nchar(desc_field) < 50 | desc_words < 20) # values chosen sensibly in a data-driven manner
         handleError("Description field in the DESCRIPTION file is too concise")
     
     desc_sentences <- length(gregexpr("[[:alnum:] ][.!?]", desc_field)[[1]])
