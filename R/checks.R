@@ -345,21 +345,23 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     })
     
     handleCheck("Checking for proper Description: field...")
-    desc_field <- dcf[, "Description"]
-    desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
-    
-    if (nchar(desc_field) < 50 | desc_words < 20) # values chosen sensibly in a data-driven manner
-        handleWarning("Description field in the DESCRIPTION file is too concise")
-    
-    desc_sentences <- length(gregexpr("[[:alnum:] ][.!?]", desc_field)[[1]])
-    if(desc_sentences < 3) {
-        msg <-
-            "The Description field in the DESCRIPTION is made up by less 
-            than 3 sentences. Please consider expanding this field, and 
-            structure it as a full paragraph"
-        handleNote(paste(strwrap(msg), collapse="\n"))
+    if ("Description" %in% colnames(dcf)) {
+        desc_field <- dcf[, "Description"]
+        desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
+        
+        if (nchar(desc_field) < 50 | desc_words < 20) # values chosen sensibly in a data-driven manner
+            handleWarning("Description field in the DESCRIPTION file is too concise")
+        
+        desc_sentences <- length(gregexpr("[[:alnum:] ][.!?]", desc_field)[[1]])
+        if(desc_sentences < 3) {
+            msg <-
+                "The Description field in the DESCRIPTION is made up by less 
+                than 3 sentences. Please consider expanding this field, and 
+                structure it as a full paragraph"
+            handleNote(paste(strwrap(msg), collapse="\n"))
+        }
     }
-
+    
     handleCheck("Checking for whitespace in DESCRIPTION field names...")
     if (any(grepl("\\s", colnames(dcf))))
     {
