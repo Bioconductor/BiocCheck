@@ -3,7 +3,8 @@ CHANGES IN VERSION 1.25
 
 USER SIGNIFICANT CHANGES
 
-    o (1.25.1) Suggest styler over formatR for automatic code re-formatting.
+    o Resolve <https://github.com/Bioconductor/BiocCheck/issues/57>: Suggest
+    styler over formatR for automatic code re-formatting.
 
 CHANGES IN VERSION 1.23
 -----------------------

@@ -1431,11 +1431,8 @@ checkFormatting <- function(pkgdir, nlines=6)
         handleMessage(
             "See http://bioconductor.org/developers/how-to/coding-style/")
         handleMessage(
-            "See styler package: https://styler.r-lib.org/ ",
+            "See styler package: https://cran.r-project.org/package=styler ",
             "as described in the BiocCheck vignette.")
-        handleMessage(
-            "See also biocthis: ",
-            "https://lcolladotor.github.io/biocthis/reference/bioc_style.html")
     }
 }
 
