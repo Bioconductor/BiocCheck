@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.25
+-----------------------
+
+USER SIGNIFICANT CHANGES
+
+    o (Resolve https://github.com/Bioconductor/BiocCheck/issues/86): Add a
+    GitHub Pull Request template file.
+
 CHANGES IN VERSION 1.23
 -----------------------
 
