@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.25
+-----------------------
+
+BUG FIXES
+
+    o Usage of donttest and dontrun in manual pages tagged with the keyword 
+    'internal' will no longer trigger a NOTE (#59)
+
 CHANGES IN VERSION 1.23
 -----------------------
 
