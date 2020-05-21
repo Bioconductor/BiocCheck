@@ -901,6 +901,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # pkg:fun...
+    msg_sc <- checkSingleColon(Rdir)
+    if (length(msg_sc)) {
+        handleError(" Single colon use found in PKG:FUN; use double colon '::'")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_sc)
+            handleMessage(msg, indent=8)
+    }
+
     # T/F
     res <- checkLogicalUseFiles(pkgdir)
     pkgname <- basename(pkgdir)
@@ -998,6 +1007,30 @@ check1toN <- function(Rdir){
     msg_seq <- unlist(msg_seq)
 }
 
+checkSingleColon <- function(Rdir) {
+
+    rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    rfiles <- setNames(rfiles, basename(rfiles))
+    colon_pres <- lapply(rfiles, function(rfile) {
+        tokens <- getParseData(parse(rfile, keep.source = TRUE))
+        tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
+        colons <- which(tokens[,"text"] == ":") - 1
+        colons <- colons[tokens[colons, "text"] != c("1", "2")]
+        tokens[colons, , drop = FALSE]
+    })
+    colon_pres <- Filter(nrow, colon_pres)
+    if (length(colon_pres))
+        availpkgs <- BiocManager::available()
+    msg_sc <- lapply(names(colon_pres), function(rfile, framelist) {
+        tokens <- framelist[[rfile]]
+        tokens <- tokens[tokens[, "text"] %in% availpkgs, , drop = FALSE]
+        sprintf(
+            "%s (line %d, column %d)",
+            rfile, tokens[, "line1"], tokens[, "col1"]
+        )
+    }, framelist = colon_pres)
+    msg_sc <- unlist(msg_sc)
+}
 
 checkClassEqUsage <- function(pkgdir){
 

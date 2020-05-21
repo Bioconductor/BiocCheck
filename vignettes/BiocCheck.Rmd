@@ -383,6 +383,9 @@ directory.
   `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
   which may be an unexpected or unwanted result (`NOTE`).
 
+* Single colon typos are checked for when a user inputs 'package:function'
+  instead of using double colons ('::') to import a function (`ERROR`).
+
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
   is because `T` and `F` are ordinary variables whose value can be
