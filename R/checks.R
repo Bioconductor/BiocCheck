@@ -1019,8 +1019,11 @@ checkSingleColon <- function(Rdir) {
         tokens[colons, , drop = FALSE]
     })
     colon_pres <- Filter(nrow, colon_pres)
-    if (length(colon_pres))
-        availpkgs <- BiocManager::available()
+    availpkgs <-
+        if (length(colon_pres))
+            BiocManager::available()
+        else
+            character(0L)
     msg_sc <- lapply(names(colon_pres), function(rfile, framelist) {
         tokens <- framelist[[rfile]]
         tokens <- tokens[tokens[, "text"] %in% availpkgs, , drop = FALSE]
