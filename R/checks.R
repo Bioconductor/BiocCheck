@@ -1245,7 +1245,7 @@ checkUsageOfDont <- function(pkgdir)
             ## check for the 'internal' keyword - this will be a false positive
             keyword <- unlist(lapply(rd,
                 function(x) attr(x, "Rd_tag") == "\\keyword"))
-            if(any(keyword)) {
+            if (any(keyword)) {
                 internalVec <- vapply(as.character(rd[keyword]), grepl, logical(1),
                                      pattern="internal", USE.NAMES=FALSE)
             } else {
