@@ -383,6 +383,9 @@ directory.
   `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
   which may be an unexpected or unwanted result (`NOTE`).
 
+* Single colon typos are checked for when a user inputs 'package:function'
+  instead of using double colons ('::') to import a function (`ERROR`).
+
 * Users should not download data from external hosting platforms. This
   means avoiding references to major platforms such as GitHub, GitLab,
   and BitBucket. For the same reason we do not import GitHub packages,
