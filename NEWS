@@ -3,7 +3,7 @@ CHANGES IN VERSION 1.25
 
 NEW FEATURES
 
-    o Check for single colon typos when using qualified imports pkg::foo()
+    o (1.25.1) Check for single colon typos when using qualified imports pkg::foo()
 
 CHANGES IN VERSION 1.23
 -----------------------
