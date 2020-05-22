@@ -9,4 +9,8 @@ bad_fun <- function(){
     sapply(letters, function(x) x)
 }
 
+invalid_ref <- function() {
 
+    bcheck <- BiocCheck:BiocCheck
+
+}
