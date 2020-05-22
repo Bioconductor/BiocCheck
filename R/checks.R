@@ -263,7 +263,6 @@ checkBiocViews <- function(pkgdir)
     branch <- unique(parents)
 
 
-#    biocViewsVocab <- NULL ## to keep R CMD check happy
     if (interactive())
         env <- environment()
     else
@@ -552,7 +551,7 @@ checkVigDirExists <- function(pkgdir, vigdir)
 {
     if (!file.exists(vigdir))
     {
-        if (isInfrastructurePackage(pkgdir))
+        if (isPackageType(pkgdir, type = "Infrastructure"))
         {
             .msg("  Infrastructure package, vignette not required.",
                 indent=2)

@@ -289,20 +289,6 @@ mungeName <- function(name, pkgname)
     substr(name, pos+1+nchar(pkgname), nchar(name))
 }
 
-isInfrastructurePackage <- function(pkgDir)
-{
-    if (!file.exists(file.path(pkgDir, "DESCRIPTION")))
-        return(FALSE)
-    dcf <- read.dcf(file.path(pkgDir, "DESCRIPTION"))
-    if (!"biocViews" %in% colnames(dcf))
-    {
-        return(FALSE)
-    }
-    biocViews <- dcf[, "biocViews"]
-    views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
-    "Infrastructure" %in% views
-}
-
 getMaintainerEmail <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
@@ -524,17 +510,22 @@ vigHelper <- function(vignetteFile, builder){
     }
 }
 
+.getViews <- function(pkgdir, pattern = "\\s") {
+    if (!file.exists(file.path(pkgDir, "DESCRIPTION")))
+        return(FALSE)
+    dcf <- read.dcf(file.path(pkgDir, "DESCRIPTION"))
+    if (!"biocViews" %in% colnames(dcf))
+        return(FALSE)
+    biocViews <- dcf[, "biocViews"]
+    strsplit(gsub(pattern, "", biocViews), ",")[[1]]
+}
+
 getPkgType <- function(pkgdir)
 {
-    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
-    if (!"biocViews" %in% colnames(dcf))
-    {
-        return(NA)
-    }
-    biocViews <- dcf[, "biocViews"]
-    views <- strsplit(gsub("\\s", "", biocViews), ",")[[1]]
-    biocViewsVocab <- NULL ## to keep R CMD check happy
-    data("biocViewsVocab", package="biocViews", envir=environment())
+    views <- .getViews(pkgdir)
+    env <- new.env(parent = emptyenv())
+    data("biocViewsVocab", package="biocViews", envir=env)
+    biocViewsVocab <- env[["biocViewsVocab"]]
     if (any(!views %in% nodes(biocViewsVocab)))
         return(NA)
     parents <- c()
@@ -544,6 +535,13 @@ getPkgType <- function(pkgdir)
     }
     u <- unique(parents)
     if (length(u)==1) return(u) else return(NA)
+}
+
+isPackageType <- function(pkgDir, type = "Infrastructure")
+{
+    stopifnot(is.character(type), length(type) == 1L)
+    views <- .getViews(pkgDir)
+    type %in% views
 }
 
 getParent <- function(view, biocViewsVocab)
