@@ -383,6 +383,13 @@ directory.
   `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
   which may be an unexpected or unwanted result (`NOTE`).
 
+* Users should not download data from external hosting platforms. This
+  means avoiding references to major platforms such as GitHub, GitLab,
+  and BitBucket. For the same reason we do not import GitHub packages,
+  external data can be unstable and not well maintained. Maintainers
+  should re-use data already available in Bioconductor or contribute
+  an ExperimentHub, AnnotationHub or similar package (`ERROR`).
+
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
   is because `T` and `F` are ordinary variables whose value can be
