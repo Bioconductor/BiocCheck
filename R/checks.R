@@ -1010,7 +1010,7 @@ check1toN <- function(Rdir){
 checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 
     rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
-    rfiles <- setNames(rfiles, basename(rfiles))
+    names(rfiles) <- basename(rfiles)
     colon_pres <- lapply(rfiles, function(rfile) {
         tokens <- getParseData(parse(rfile, keep.source = TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
