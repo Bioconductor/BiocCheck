@@ -1242,7 +1242,16 @@ checkUsageOfDont <- function(pkgdir)
             dontrunVec <- vapply(exampleCode, grepl, logical(1),
                                   pattern="\\\\dontrun", perl=TRUE,
                                   USE.NAMES=FALSE)
-            if (any(donttestVec | dontrunVec))
+            ## check for the 'internal' keyword - this will be a false positive
+            keyword <- unlist(lapply(rd,
+                function(x) attr(x, "Rd_tag") == "\\keyword"))
+            if (any(keyword)) {
+                internalVec <- vapply(as.character(rd[keyword]), grepl, logical(1),
+                                     pattern="internal", USE.NAMES=FALSE)
+            } else {
+                internalVec <- FALSE
+            }
+            if (any(donttestVec | dontrunVec) & !any(internalVec))
                 hasBad[dx] = TRUE
         }
     }
