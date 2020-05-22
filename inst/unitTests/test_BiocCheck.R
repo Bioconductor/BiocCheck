@@ -534,7 +534,7 @@ test_checkForBadDepends <- function()
     checkEquals(1, BiocCheck:::.error$getNum())
     checkEquals(1, BiocCheck:::.note$getNum())
     checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
-    checkTrue(grepl("how 3 object", BiocCheck:::.note$get()[1]))
+    checkTrue(grepl("how 4 object", BiocCheck:::.note$get()[1]))
 }
 
 test_remotesUsage <- function()
