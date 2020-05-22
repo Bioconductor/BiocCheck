@@ -809,3 +809,24 @@ test_packageAlreadyExists <- function()
     BiocCheck:::checkIsPackageAlreadyInRepo("GenomicRanges", "BioCworkflows")
     checkEquals(.error$getNum(),5)
 }
+
+test_checkUsageOfDont <- function()
+{
+    ## testpkg0 should trigger this note for 2 out of 3 man pages
+    pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    BiocCheck:::installAndLoad(pkgdir)
+    notemsg <- capture.output(BiocCheck:::checkUsageOfDont(pkgdir),
+                              type = "message")
+    checkEquals(1, .note$getNum())
+    # here we verify the correct number of pages were detected
+    checkTrue( any(grepl("67%", notemsg)) )
+    .zeroCounters()
+
+    ## testpkg1 contains a man page with keyword 'internal'
+    ## this shouldn't trigger the note
+    pkgdir <- system.file("testpackages", "testpkg1", package="BiocCheck")
+    BiocCheck:::installAndLoad(pkgdir)
+    BiocCheck:::checkUsageOfDont(pkgdir)
+    checkEquals(0, .note$getNum())
+    .zeroCounters()
+}
