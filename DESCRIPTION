@@ -9,7 +9,8 @@ Authors@R: c(
     person("Lori", "Shepherd", role="aut"),
     person("Daniel", "von Twisk", role="ctb"),
     person("Kevin", "Rue", role="ctb"),
-    person("Marcel", "Ramos", role="ctb"))
+    person("Marcel", "Ramos", role="ctb"),
+    person("Federico", "Marini", role="ctb"))
 Depends: R (>= 3.5.0)
 License: Artistic-2.0
 LazyData: true
