@@ -2,3 +2,4 @@
 ^\.Rproj\.user$
 inst/testpackages/testpkg1/src/testpkg1.so
 inst/testpackages/testpkg1/src/testpkg1.o
+^\.github$
