@@ -669,3 +669,8 @@ The current list of files checked is as follows:
 
 These files may be included in your personal directories but should be added to
 a `.gitignore` file so they are not git tracked.
+
+# Expanding `BiocCheck`
+
+Contributions to `BiocCheck` are welcome and encouraged through pull requests.
+Please adhere to the Pull Request template when submitting your contributions.
