@@ -700,3 +700,9 @@ a `.gitignore` file so they are not git tracked.
 
 Contributions to `BiocCheck` are welcome and encouraged through pull requests.
 Please adhere to the Pull Request template when submitting your contributions.
+
+# SessionInfo {-}
+
+```{r sessionInfo}
+sessionInfo()
+```
