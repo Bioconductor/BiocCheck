@@ -254,8 +254,8 @@ Can be disabled with `--no-check-bbs`
    Checks if the DESCRIPTION can be parsed with read.dcf
 * **Checking Description: field length...**
   Checks that the Description field in the DESCRIPTION file has a minimum
-  * number of characters (`NOTE` if less than 50)
-  * number of words (`NOTE` if less than 20)
+  * number of characters (`WARNING` if less than 50)
+  * number of words (`WARNING` if less than 20)
   * number of sentences (`NOTE` if less than 3)
 * **Checking for whitespace in DESCRIPTION field names...**
   Checks to make sure there is no whitespace in DESCRIPTION file field
