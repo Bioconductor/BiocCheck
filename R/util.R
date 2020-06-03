@@ -511,9 +511,9 @@ vigHelper <- function(vignetteFile, builder){
 }
 
 .getViews <- function(pkgdir, pattern = "\\s") {
-    if (!file.exists(file.path(pkgDir, "DESCRIPTION")))
+    if (!file.exists(file.path(pkgdir, "DESCRIPTION")))
         return(FALSE)
-    dcf <- read.dcf(file.path(pkgDir, "DESCRIPTION"))
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if (!"biocViews" %in% colnames(dcf))
         return(FALSE)
     biocViews <- dcf[, "biocViews"]
@@ -537,10 +537,10 @@ getPkgType <- function(pkgdir)
     if (length(u)==1) return(u) else return(NA)
 }
 
-isPackageType <- function(pkgDir, type = "Infrastructure")
+isPackageType <- function(pkgdir, type = "Infrastructure")
 {
     stopifnot(is.character(type), length(type) == 1L)
-    views <- .getViews(pkgDir)
+    views <- .getViews(pkgdir)
     type %in% views
 }
 
