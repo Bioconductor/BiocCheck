@@ -12,6 +12,12 @@ BUG FIXES
     o Usage of donttest and dontrun in manual pages tagged with the keyword 
     'internal' will no longer trigger a NOTE (@grimbough, #59)
 
+USER SIGNIFICANT CHANGES
+
+    o (1.25.2) Resolve <https://github.com/Bioconductor/BiocCheck/issues/57>: Suggest
+    styler over formatR for automatic code re-formatting.
+
+
 CHANGES IN VERSION 1.23
 -----------------------
 
