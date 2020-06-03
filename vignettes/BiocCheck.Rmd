@@ -252,6 +252,11 @@ Can be disabled with `--no-check-bbs`
   file (`ERROR`).
 * **Checking if DESCRIPTION is well formatted...**
    Checks if the DESCRIPTION can be parsed with read.dcf
+* **Checking Description: field length...**
+  Checks that the Description field in the DESCRIPTION file has a minimum
+  * number of characters (`WARNING` if less than 50)
+  * number of words (`WARNING` if less than 20)
+  * number of sentences (`NOTE` if less than 3)
 * **Checking for whitespace in DESCRIPTION field names...**
   Checks to make sure there is no whitespace in DESCRIPTION file field
   names (`ERROR`).
@@ -560,10 +565,36 @@ The output of this check includes the first 6 offending lines of code;
 see more with `BiocCheck:::checkFormatting("path/to/YourPackage",
 nlines=Inf)`.
 
-There is a helpful package [formatR][formatR] that can be used for formatting of
-R code to particular coding standards.
+There are several helpful packages that can be used for formatting of
+R code to particular coding standards such as  [formatR][formatR] and
+[styler][styler] as well as the "Reformat code" button in
+[RStudio Desktop][RStudio]. Each solution has its advantages, though 
+[styler][styler] works with `roxygen2` examples and is actively
+maintained. You can re-format your code using [styler][styler] as shown
+below:
 
-[formatR]: https://cran.r-project.org/web/packages/formatR/index.html
+```{r reformat_code, eval = FALSE}
+## Install styler if necessary
+if (!requireNamespace("styler", quietly = TRUE)) {
+    install.packages("styler")
+}
+## Automatically re-format the R code in your package
+styler::style_pkg(transformers = styler::tidyverse_style(indent_by = 4))
+```
+
+If you are
+working with [RStudio Desktop][RStudio] use also the "Reformat code"
+button which will help you break long lines of code. Alternatively,
+use [formatR][formatR], though beware that it can break valid R code
+involving both types of quotation marks (`"` and `'`) and does not
+support re-formatting `roxygen2` examples. In general,
+it is best to version control your code before applying any
+automatic re-formatting solutions and implement unit tests to
+verify that your code runs as intended after you re-format your code.
+
+[formatR]: https://cran.r-project.org/package=formatR
+[styler]: https://cran.r-project.org/package=styler
+[RStudio]: https://rstudio.com/products/rstudio/download/
 
 ## Duplication checks
 
@@ -676,3 +707,8 @@ The current list of files checked is as follows:
 
 These files may be included in your personal directories but should be added to
 a `.gitignore` file so they are not git tracked.
+
+# Expanding `BiocCheck`
+
+Contributions to `BiocCheck` are welcome and encouraged through pull requests.
+Please adhere to the Pull Request template when submitting your contributions.

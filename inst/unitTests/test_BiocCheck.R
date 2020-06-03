@@ -59,6 +59,22 @@ checkError <- function(msg)
     .zeroCounters()
 }
 
+checkCounter <- function(msg, type = "Error") {
+    if (missing(msg))
+        stop("<internal> Provide message input")
+    res <- as.integer(c("Note", "Warning", "Error") %in% type)
+    checkTrue(
+        all(
+            mapply(
+                all.equal,
+                c(.note$getNum(), .warning$getNum(), .error$getNum()), res
+            )
+        ),
+        msg
+    )
+    .zeroCounters()
+}
+
 stillZero <- function()
 {
     .note$getNum() == 0 &&
@@ -290,6 +306,29 @@ test_checkBBScompatibility <- function()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Blank line in DESCRIPTION doesn't cause error")
     .zeroCounters()
+
+
+    desc <- system.file(
+        "testpackages", "testpkg0", "DESCRIPTION", package="BiocCheck"
+    )
+    BiocCheck:::.checkDescription(desc)
+    checkCounter(
+        "Description field in the DESCRIPTION file is too concise",
+        "Warning"
+    )
+
+    cat("Package: Foo",
+        "Description: This is a test description field in the Foo package.",
+        "  The field should contain two sentences and it should trigger a",
+        "  NOTE in the check.",
+        sep = "\n",
+        file = file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
+    )
+    BiocCheck:::.checkDescription(file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    checkCounter(
+        "The Description field in the DESCRIPTION is less than two sentences",
+        "Note"
+    )
 
     cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
