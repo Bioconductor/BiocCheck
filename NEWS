@@ -14,6 +14,8 @@ BUG FIXES
 
 USER SIGNIFICANT CHANGES
 
+    o (1.25.3) Require Aurhors@R format over Author/Maintainer fields in the
+    DESCRIPTION file. This has been upgraded to an ERROR.
     o (1.25.2) Resolve <https://github.com/Bioconductor/BiocCheck/issues/57>: Suggest
     styler over formatR for automatic code re-formatting.
 
