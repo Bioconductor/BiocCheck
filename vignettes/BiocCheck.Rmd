@@ -251,7 +251,7 @@ Can be disabled with `--no-check-bbs`
   Checks to make sure there are no blank lines in the DESCRIPTION
   file (`ERROR`).
 * **Checking if DESCRIPTION is well formatted...**
-   Checks if the DESCRIPTION can be parsed with read.dcf
+   Checks if the DESCRIPTION can be parsed with read.dcf (`ERROR`)
 * **Checking Description: field length...**
   Checks that the Description field in the DESCRIPTION file has a minimum
   * number of characters (`WARNING` if less than 50)
@@ -267,19 +267,14 @@ Can be disabled with `--no-check-bbs`
   Checks to make sure a `Version` field is present in the DESCRIPTION
   file (`ERROR`).
 * **Checking for valid maintainer...**
-  Checks to make sure the DESCRIPTION file has either a `Maintainer`
-  field, or a valid `Authors@R` field which resolves to a valid
-  `Maintainer` (`ERROR`).
+  Checks to make sure the DESCRIPTION file has a valid `Authors@R` field which
+  resolves to a valid `Maintainer` (`ERROR`).
 
   A valid `Authors@R` field consists of:
     * A valid R object of class `person`.
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
     * That person must have either `family` or `given` name defined.
-
-<!--* **Checking for valid development URL in DESCRIPTION...**
-  Checks to make sure the DESCRIPTION file has a valid github
-  `DevelopmentURL` field, if missing resolves to an (`ERROR`) -->
 
 ##  NAMESPACE checks
 
@@ -700,6 +695,29 @@ The current list of files checked is as follows:
 
 These files may be included in your personal directories but should be added to
 a `.gitignore` file so they are not git tracked.
+
+## Description Check
+
+**Checking DESCRIPTION**
+
+Default R CMD build behavior will format the DESCRIPTION file; After this occurs,
+it is hard to determine certain aspects of the original DESCRIPTION file. An
+example would be how the Authors and Maintainers are specified. The DESCRIPTION
+file is therefore checked in its raw original form.
+
+*  **Checking if DESCRIPTION is well formatted**
+   The DESCRIPTION file must be properly formatted and able to be read in with
+   `read.dcf()` in order to function properly on the Bioconductor build
+   machines. This check attempts to `read.dcf("DESCRIPTION")` and throws an ERROR
+   if mal-formatted. (`ERROR`)
+
+*  **Checking for valid maintainer**
+   While in the past using the Author and Maintainer fields were acceptable, R
+   has moved towards using the `Authors@R` standard for listing package
+   contributors. This checks that Authors@R is utilized and that there are no
+   instances of Author or Maintainer in the DESCRIPTION (`ERROR`)  
+
+
 
 # Expanding `BiocCheck`
 

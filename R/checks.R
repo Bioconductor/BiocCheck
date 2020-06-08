@@ -391,9 +391,12 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     }
     handleCheck("Checking for valid maintainer...")
     if (!source_tarball){
-        if (("Authors@R" %in% colnames(dcf)) &
-            any((c("Author","Maintainer") %in% colnames(dcf))))
-            handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
+        if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf)))){
+            handleError("Use Authors@R field not Author/Maintainer fields. Do not use both.")
+        } else {
+            if (any((c("Author","Maintainer") %in% colnames(dcf))))
+                handleError("Do not use Author/Maintainer fields. Use Authors@R.")
+        }
     }
 
     maintainer <- NULL
@@ -412,6 +415,11 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         {
             handleError("Authors@R must evaluate to 'person' object.")
             return()
+        }
+        fnd <- vapply(people, FUN.VALUE=logical(1), USE.NAMES=FALSE,
+                      FUN=function(person){ "cre" %in% person$role})
+        if (length(which(fnd)) > 1L){
+            handleError("Designated only one maintainer with Authors@R [cre].") 
         }
         for (person in people)
         {
@@ -440,16 +448,17 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
             return()
         }
     } else if ("Maintainer" %in% colnames(dcf)) {
-        maintainer <- dcf[,"Maintainer"]
+        handleError("Remove Maintainer field. Use Authors@R [cre] designation.")
+        return()
     } else {
-        handleError("No Maintainer or Authors@R [cre] field in DESCRIPTION file.")
+        handleError("No Authors@R [cre] field in DESCRIPTION file.")
         return()
     }
     # now need to make sure that regexes work, a la python/BBS
+    # I think R CMD check now does this already but can't hurt to keep
     regex = '(.*\\S)\\s*<(.*)>\\s*'
     match <- regexec(regex, maintainer)[[1]]
     match.length <- attr(match, "match.length")
-    #if (!  (all(match)  > 0) && (all(match.length) > 0) )
     if (all(match == -1) && all(match.length == -1))
     {
         handleError("Maintainer field in DESCRIPTION file is malformed.")
@@ -1642,6 +1651,10 @@ checkDescription <- function(package_dir){
         return()
     })
     handleCheck("Checking for valid maintainer...")
-    if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf))))
-        handleWarning("Use Authors@R (preferred) or Author/Maintainer fields not both.")
+    if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf)))){
+        handleError("Use Authors@R field not Author/Maintainer fields. Do not use both.")
+    } else {
+        if (any((c("Author","Maintainer") %in% colnames(dcf))))
+            handleError("Do not use Author/Maintainer fields. Use Authors@R.")
+    }
 }

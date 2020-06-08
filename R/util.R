@@ -305,6 +305,11 @@ isInfrastructurePackage <- function(pkgDir)
 
 getMaintainerEmail <- function(pkgdir)
 {
+    # Eventually update this to just look at Authors@R
+    # Since the intention is to possible start running
+    # this on the daily builder, leave Maintainer field
+    # check. This is used to check for mailing list registration
+
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if ("Maintainer" %in% colnames(dcf))
     {
