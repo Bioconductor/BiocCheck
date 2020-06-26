@@ -1047,7 +1047,7 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
         tokens <- getParseData(parse(rfile, keep.source = TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
         colons <- which(tokens[,"text"] == ":") - 1
-        colons <- colons[tokens[colons, "text"] != c("1", "2")]
+        colons <- colons[grepl("[[:alpha:]]", tokens[colons, "text"])]
         tokens[colons, , drop = FALSE]
     })
     colon_pres <- Filter(nrow, colon_pres)
