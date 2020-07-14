@@ -379,6 +379,14 @@ test_checkBBScompatibility <- function()
     checkTrue(.warning$getNum() == 0L, "Using Maintainer and Authors@R causes warning!")
     checkTrue(.error$getNum() == 1L, "Using Maintainer and Author@R doesn't cause error!")
 
+    .zeroCounters()
+    cat(sprintf(
+        "Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', comment = c(ORCID = '0000-0000-000-0000'), role=c('aut', 'cre')))",
+                UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
+    checkTrue(.warning$getNum() == 1L, "An invalid ORCID ID causes a warning!")
+
 
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
@@ -386,7 +394,7 @@ test_checkBBScompatibility <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(.error$getNum() > 0L,"Utilize Maintainer instead of Authors@R doesn't cause error!")
- 
+
 
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')), person('Joe', 'Blow', email='joe@blow.com', role='cre'))",
