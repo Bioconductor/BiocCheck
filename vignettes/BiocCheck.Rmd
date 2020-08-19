@@ -202,6 +202,11 @@ Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
 * **Checking individual file sizes**
   The current size limit for all individual files is 5 MB. (WARNING)
 
+It may be necessary to remove large files from your git history; see
+[Remove Large Data Files and Clean Git Tree][3.1]
+
+[3.1]: http://bioconductor.org/developers/how-to/git/remove-large-data/
+
 ## biocViews Checks
 
 These can be disabled with the `--no-check-bioc-views` option, which
