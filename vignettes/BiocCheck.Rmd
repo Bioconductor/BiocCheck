@@ -170,9 +170,12 @@ Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
   field in your `DESCRIPTION` file.  If it doesn't, it usually means
   you did not build the tarball with `R CMD build`. (`ERROR`)
 * **Checking new package version number...**
-  Checks that the version number is valid for a new _Bioconductor_
-  package. This is only done if the `--new-package` option is
-  supplied (`ERROR`).
+  Checks that the pre-release version for an potential _Bioconductor_
+  package uses a `99` 'y' version in the `x.y.z` versioning scheme
+  (`ERROR`). Package versions starting with a non-zero value will
+  get flagged with a warning. Typical new package submissions
+  start with a zero 'x' version (e.g., `0.99.*`; `WARNING`). This
+  is only done if the `--new-package` option is supplied. 
 * **Checking version number validity...**
   Checks for a valid version, that format is correct and that version
   number is appropriate for this version of _Bioconductor_ (`ERROR`).

@@ -18,6 +18,8 @@ USER SIGNIFICANT CHANGES
     DESCRIPTION file. This has been upgraded to an ERROR.
     o (1.25.2) Resolve <https://github.com/Bioconductor/BiocCheck/issues/57>: Suggest
     styler over formatR for automatic code re-formatting.
+    o (1.25.5) Add warning to new package versions with non-zero x version
+    (@mtmorgan, #101)
 
 
 CHANGES IN VERSION 1.23

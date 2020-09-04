@@ -235,9 +235,24 @@ test_checkVersionNumber <- function()
 
 test_checkNewPackageVersionNumber <- function()
 {
-    setVersion("1.2.3")
+    setVersion("1.99.3")
     BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
-    checkError("new package with wrong version number didn't throw error!")
+    checkCounter(
+        "New package x version non-zero",
+        "Warning"
+    )
+    
+    setVersion("00.99.3")
+    BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
+    
+    setVersion("0.2.3")
+    BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
+    checkCounter(
+        "New package y version not 99",
+        "Error"
+    )
+    
     setVersion("0.99.1")
     BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
     checkTrue(stillZero())
