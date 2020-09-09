@@ -11,7 +11,7 @@ BUG FIXES
 
     o Usage of donttest and dontrun in manual pages tagged with the keyword 
     'internal' will no longer trigger a NOTE (@grimbough, #59)
-    o Adding the sessionInfo at the end of the vignette (@llrs, #76)
+    o (1.25.7) Adding the sessionInfo at the end of the vignette (@llrs)
 
 USER SIGNIFICANT CHANGES
 
