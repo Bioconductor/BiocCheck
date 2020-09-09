@@ -423,10 +423,19 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         fnd <- vapply(people, FUN.VALUE=logical(1), USE.NAMES=FALSE,
                       FUN=function(person){ "cre" %in% person$role})
         if (length(which(fnd)) > 1L){
-            handleError("Designated only one maintainer with Authors@R [cre].") 
+            handleError("Designated only one maintainer with Authors@R [cre].")
         }
         for (person in people)
         {
+            if ("ORCID" %in% names(person$comment)) {
+                orcid <- person$comment[["ORCID"]]
+                validID <- grepl("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}", orcid)
+                if (!validID)
+                    handleNote(
+                        "Invalid ORCID ID for ",
+                        person$given, " ", person$family
+                    )
+            }
             if ("cre" %in% person$role)
             {
                 email <- person$email

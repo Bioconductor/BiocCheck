@@ -285,6 +285,7 @@ Can be disabled with `--no-check-bbs`
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
     * That person must have either `family` or `given` name defined.
+    * (optional) A syntactically valid ORCID ID, results in note if not.
 
 ##  NAMESPACE checks
 
@@ -566,7 +567,7 @@ nlines=Inf)`.
 There are several helpful packages that can be used for formatting of
 R code to particular coding standards such as  [formatR][formatR] and
 [styler][styler] as well as the "Reformat code" button in
-[RStudio Desktop][RStudio]. Each solution has its advantages, though 
+[RStudio Desktop][RStudio]. Each solution has its advantages, though
 [styler][styler] works with `roxygen2` examples and is actively
 maintained. You can re-format your code using [styler][styler] as shown
 below:
@@ -725,7 +726,7 @@ file is therefore checked in its raw original form.
    While in the past using the Author and Maintainer fields were acceptable, R
    has moved towards using the `Authors@R` standard for listing package
    contributors. This checks that Authors@R is utilized and that there are no
-   instances of Author or Maintainer in the DESCRIPTION (`ERROR`)  
+   instances of Author or Maintainer in the DESCRIPTION (`ERROR`)
 
 
 
