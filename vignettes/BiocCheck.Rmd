@@ -175,7 +175,9 @@ Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
   (`ERROR`). Package versions starting with a non-zero value will
   get flagged with a warning. Typical new package submissions
   start with a zero 'x' version (e.g., `0.99.*`; `WARNING`). This
-  is only done if the `--new-package` option is supplied. 
+  is only done if the `--new-package` option is supplied. An 'x' nonzero will
+  only be accepted if the package was pre-released or published under such a
+  case.
 * **Checking version number validity...**
   Checks for a valid version, that format is correct and that version
   number is appropriate for this version of _Bioconductor_ (`ERROR`).
