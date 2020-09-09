@@ -170,9 +170,14 @@ Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
   field in your `DESCRIPTION` file.  If it doesn't, it usually means
   you did not build the tarball with `R CMD build`. (`ERROR`)
 * **Checking new package version number...**
-  Checks that the version number is valid for a new _Bioconductor_
-  package. This is only done if the `--new-package` option is
-  supplied (`ERROR`).
+  Checks that the pre-release version for an potential _Bioconductor_
+  package uses a `99` 'y' version in the `x.y.z` versioning scheme
+  (`ERROR`). Package versions starting with a non-zero value will
+  get flagged with a warning. Typical new package submissions
+  start with a zero 'x' version (e.g., `0.99.*`; `WARNING`). This
+  is only done if the `--new-package` option is supplied. An 'x' nonzero will
+  only be accepted if the package was pre-released or published under such a
+  case.
 * **Checking version number validity...**
   Checks for a valid version, that format is correct and that version
   number is appropriate for this version of _Bioconductor_ (`ERROR`).
@@ -201,6 +206,11 @@ Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
 
 * **Checking individual file sizes**
   The current size limit for all individual files is 5 MB. (WARNING)
+
+It may be necessary to remove large files from your git history; see
+[Remove Large Data Files and Clean Git Tree][3.1]
+
+[3.1]: http://bioconductor.org/developers/how-to/git/remove-large-data/
 
 ## biocViews Checks
 
