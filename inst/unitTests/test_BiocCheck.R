@@ -400,7 +400,7 @@ test_checkBBScompatibility <- function()
                 UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkTrue(.warning$getNum() == 1L, "An invalid ORCID ID causes a warning!")
+    checkTrue(.note$getNum() == 1L, "An invalid ORCID ID causes a note!")
 
 
     .zeroCounters()
