@@ -733,3 +733,9 @@ file is therefore checked in its raw original form.
 
 Contributions to `BiocCheck` are welcome and encouraged through pull requests.
 Please adhere to the Pull Request template when submitting your contributions.
+
+# SessionInfo {-}
+
+```{r sessionInfo}
+sessionInfo()
+```
