@@ -117,10 +117,14 @@ checkNewPackageVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     version <- dcf[, "Version"]
-        if(!grepl("^0[-.]99[-.][0-9]+$", version))
+        if (!grepl("^0+[-.][0-9]+[-.][0-9]+$", version))
+            handleWarning(
+                "New package x version starting with non-zero value ",
+                "(e.g., 1.y.z, 2.y.z); got ", sQuote(version), ".")
+        if(!grepl("^[0-9]+[-.]99[-.][0-9]+$", version))
             handleError(
-                "New package version starting with 0.99.* (e.g., 0.99.0, ",
-                "0.99.1, ...); got ",sQuote(version), ".")
+                "New package y version not 99 (e.g., x.99.z, ",
+                "x.99.z, ...); got ",sQuote(version), ".")
 }
 
 checkVersionNumber <- function(pkgdir)
