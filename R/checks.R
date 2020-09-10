@@ -597,12 +597,6 @@ checkVigDirExists <- function(pkgdir, vigdir)
 {
     if (!file.exists(vigdir))
     {
-        if (isInfrastructurePackage(pkgdir))
-        {
-            .msg("  Infrastructure package, vignette not required.",
-                indent=2)
-            return(FALSE)
-        }
         handleError("No 'vignettes' directory.")
         return(FALSE)
     } else {

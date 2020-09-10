@@ -11,6 +11,7 @@ NEW FEATURES
 
 BUG FIXES
 
+    o (1.25.9) All packages including infrastructure require a vignette 
     o Usage of donttest and dontrun in manual pages tagged with the keyword 
     'internal' will no longer trigger a NOTE (@grimbough, #59)
     o (1.25.7) Adding the sessionInfo at the end of the vignette (@llrs)
