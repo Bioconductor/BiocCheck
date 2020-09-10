@@ -3,11 +3,12 @@ CHANGES IN VERSION 1.25
 
 NEW FEATURES
 
-    o (1.25.1) Check for single colon typos when using qualified imports pkg::foo()
+    o (1.25.4) Check for single colon typos when using qualified imports pkg::foo()
     o (1.25.1) Check for warning/notes on too-brief a Description: field 
     (@federicomarini, #65)
     o (1.25.8) Validate ORCID IDs (if any) in the DESCRIPTION file
     (@LiNk-NY, #97)
+    o (1.25.10) Add check for properly formatted CITATION file
 
 BUG FIXES
 

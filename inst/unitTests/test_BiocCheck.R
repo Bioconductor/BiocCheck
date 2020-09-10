@@ -425,6 +425,18 @@ test_checkBBScompatibility <- function()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(stillZero())
 
+    .zeroCounters()
+    dir.create(file.path(UNIT_TEST_TEMPDIR,"inst"))
+    cat("citEntry(entry='article', title='test', author=personList(as.person('Lori Kern')), year=2020, journal='Loris Best', volume='4', issue='12', textVersion='Shepherd, Lori (2020) test. Loris Best. 4(12)')",file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION"))
+    BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
+
+    cat("citEntry(entry='article', title='test', author=personList(as.person('Lori Kern')), year=2020, journal='Loris Best', volume='4', issue='12')",file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION"),
+    append=FALSE)
+    BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
+    checkTrue(.note$getNum()==1, "citation produces note")
+
+    .zeroCounters()
 }
 
 test_checkUnitTests <- function()

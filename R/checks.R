@@ -1665,3 +1665,14 @@ checkDescription <- function(package_dir){
             handleError("Do not use Author/Maintainer fields. Use Authors@R.")
     }
 }
+
+checkForCitationFile <- function(package_dir) {
+    citfile_location <- file.path(package_dir, "inst", "CITATION")
+    if(file.exists(citfile_location)) {
+        handleCheck("Checking that provided CITATION file is correctly formatted...")
+        cit <- tryCatch(
+            readCitationFile(citfile_location),
+            error = function(e)
+                handleNote("CITATION file might be not correctly formatted"))
+    }
+}
