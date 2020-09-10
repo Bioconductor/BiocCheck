@@ -75,7 +75,7 @@ BiocCheckGitClone <- function(package=".", ...){
 
     handleCheck("Checking CITATION...")
     checkForCitationFile(package_dir)
-    
+
     ## Summary
     .msg("\n\nSummary:")
     .msg("ERROR count: %d", .error$getNum())

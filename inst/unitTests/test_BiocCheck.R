@@ -437,7 +437,6 @@ test_checkBBScompatibility <- function()
     checkTrue(.note$getNum()==1, "citation produces note")
 
     .zeroCounters()
-    
 }
 
 test_checkUnitTests <- function()

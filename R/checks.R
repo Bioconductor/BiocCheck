@@ -1672,7 +1672,7 @@ checkForCitationFile <- function(package_dir) {
         handleCheck("Checking that provided CITATION file is correctly formatted...")
         cit <- tryCatch(
             readCitationFile(citfile_location),
-            error = function(e) 
+            error = function(e)
                 handleNote("CITATION file might be not correctly formatted"))
     }
 }

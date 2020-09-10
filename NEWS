@@ -9,7 +9,7 @@ NEW FEATURES
     o (1.25.8) Validate ORCID IDs (if any) in the DESCRIPTION file
     (@LiNk-NY, #97)
     o (1.25.10) Add check for properly formatted CITATION file
-    
+
 BUG FIXES
 
     o (1.25.9) All packages including infrastructure require a vignette 

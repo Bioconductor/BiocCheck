@@ -182,7 +182,7 @@ BiocCheck <- function(package=".", ...)
         handleCheck("Checking build system compatibility...")
         checkBBScompatibility(package_dir, source_tarball)
     }
-    
+
     if (is.null(dots[["no-check-namespace"]])){
         handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
         checkDescriptionNamespaceConsistency(package_name)
