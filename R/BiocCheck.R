@@ -21,8 +21,6 @@ getOptionList <- function()
             help="disable biocViews-specific checks (for non-BioC packages)"),
         make_option("--no-check-bbs", action="store_true",
             help="disable BBS-specific checks (for non-BioC packages). Valid DESCRIPTION"),
-        make_option("--no-check-citation", action="store_true",
-                    help="disable check for custom CITATION"),
         make_option("--no-check-namespace", action="store_true",
             help="disable namespace checks"),
         make_option("--no-check-vignettes", action="store_true",
@@ -185,11 +183,6 @@ BiocCheck <- function(package=".", ...)
         checkBBScompatibility(package_dir, source_tarball)
     }
     
-    if (is.null(dots[["no-check-citation"]])){
-        handleCheck("Checking custom CITATION file...")
-        checkForCitationFile(package_dir)
-    }
-
     if (is.null(dots[["no-check-namespace"]])){
         handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
         checkDescriptionNamespaceConsistency(package_name)
