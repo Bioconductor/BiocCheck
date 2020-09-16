@@ -117,10 +117,14 @@ checkNewPackageVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     version <- dcf[, "Version"]
-        if(!grepl("^0[-.]99[-.][0-9]+$", version))
+        if (!grepl("^0+[-.][0-9]+[-.][0-9]+$", version))
+            handleWarning(
+                "New package x version starting with non-zero value ",
+                "(e.g., 1.y.z, 2.y.z); got ", sQuote(version), ".")
+        if(!grepl("^[0-9]+[-.]99[-.][0-9]+$", version))
             handleError(
-                "New package version starting with 0.99.* (e.g., 0.99.0, ",
-                "0.99.1, ...); got ",sQuote(version), ".")
+                "New package y version not 99 (e.g., x.99.z, ",
+                "x.99.z, ...); got ",sQuote(version), ".")
 }
 
 checkVersionNumber <- function(pkgdir)
@@ -263,6 +267,7 @@ checkBiocViews <- function(pkgdir)
     branch <- unique(parents)
 
 
+#    biocViewsVocab <- NULL ## to keep R CMD check happy
     if (interactive())
         env <- environment()
     else
@@ -574,7 +579,7 @@ checkVigDirExists <- function(pkgdir, vigdir)
 {
     if (!file.exists(vigdir))
     {
-        if (isPackageType(pkgdir, type = "Infrastructure"))
+        if (isInfrastructurePackage(pkgdir))
         {
             .msg("  Infrastructure package, vignette not required.",
                 indent=2)
@@ -968,15 +973,6 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
-    # external data
-    msg_eda <- checkExternalData(pkgdir)
-    if (length(msg_eda)) {
-        handleError(" Avoid references to external hosting platforms")
-        handleMessage("Found in files:", indent=6)
-        for (msg in msg_eda)
-            handleMessage(msg, indent=8)
-    }
-
     # set.seed
     res <- findLogicalRdir(pkgname, "set.seed")
     if (length(res) > 0){
@@ -1087,34 +1083,6 @@ checkSystemCall <- function(pkgdir){
 
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
     msg_sys <- grepPkgDir(pkgdir, "-rHn '^system(.*'")
-}
-
-checkExternalData <- function(Rdir) {
-
-    rfiles <- dir(Rdir, pattern="\\.[Rr]$", full.names=TRUE)
-    msg_eda <- lapply(rfiles, function(rfile) {
-        tokens <- getParseData(parse(rfile, keep.source=TRUE))
-        tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
-
-        keywords <- c(
-            raw = "raw", platform = "githubusercontent|gitlab|bitbucket"
-        )
-
-        hits <- lapply(keywords, function(word) {
-            grepl(word, tokens[, "text"], ignore.case = TRUE)
-        })
-        allhits <- all(vapply(hits, any, logical(1L)))
-        if (allhits)
-            tokens <- tokens[hits[["platform"]], , drop = FALSE]
-        else
-            tokens <- tokens[FALSE, , drop = FALSE]
-
-        sprintf(
-            "%s (line %d, column %d)",
-            basename(rfile), tokens[,"line1"], tokens[,"col1"]
-        )
-    })
-    msg_eda <- unlist(msg_eda)
 }
 
 

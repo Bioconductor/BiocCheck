@@ -235,9 +235,24 @@ test_checkVersionNumber <- function()
 
 test_checkNewPackageVersionNumber <- function()
 {
-    setVersion("1.2.3")
+    setVersion("1.99.3")
     BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
-    checkError("new package with wrong version number didn't throw error!")
+    checkCounter(
+        "New package x version non-zero",
+        "Warning"
+    )
+
+    setVersion("00.99.3")
+    BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
+
+    setVersion("0.2.3")
+    BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
+    checkCounter(
+        "New package y version not 99",
+        "Error"
+    )
+
     setVersion("0.99.1")
     BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
     checkTrue(stillZero())
@@ -296,17 +311,19 @@ test_checkBBScompatibility <- function()
     pkgdir <- UNIT_TEST_TEMPDIR
     if (!dir.exists(pkgdir))
         dir.create(pkgdir)
+
+
     cat("Package : foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Space in DESCRIPTION field name doesn't cause error")
     .zeroCounters()
+
 
     cat("Package: foo\n\nImports: bar", file=file.path(UNIT_TEST_TEMPDIR,
         "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Blank line in DESCRIPTION doesn't cause error")
     .zeroCounters()
-
 
     desc <- system.file(
         "testpackages", "testpkg0", "DESCRIPTION", package="BiocCheck"
@@ -316,6 +333,7 @@ test_checkBBScompatibility <- function()
         "Description field in the DESCRIPTION file is too concise",
         "Warning"
     )
+
 
     cat("Package: Foo",
         "Description: This is a test description field in the Foo package.",
@@ -333,41 +351,73 @@ test_checkBBScompatibility <- function()
     cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Package name which doesn't match dir name does not cause error!")
+
+
     cat(sprintf("Package: ", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Version doesn't cause error!")
+
+
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     .zeroCounters()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Wrong class in Authors@R doesn't cause error!")
+
+
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    .zeroCounters()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing cre role in Authors@R doesn't cause error!")
+
+
     cat(sprintf("Package: %s\nVersion: 0.99.0", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Maintainer and Authors@R doesn't cause error!")
+
+
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkError("Missing email in Maintainer doesn't cause error!")
+    checkTrue(.error$getNum() > 0L, "Missing email in Maintainer doesn't cause error!")
+
+
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
                 UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkDescription(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() == 1L)
-    checkTrue(.error$getNum() == 0L)
+    checkTrue(.warning$getNum() == 0L, "Using Maintainer and Authors@R causes warning!")
+    checkTrue(.error$getNum() == 1L, "Using Maintainer and Author@R doesn't cause error!")
+
+    .zeroCounters()
+    cat(sprintf(
+        "Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', comment = c(ORCID = '0000-0000-000-0000'), role=c('aut', 'cre')))",
+                UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
+    checkTrue(.note$getNum() == 1L, "An invalid ORCID ID causes a note!")
+
+
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
         UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkTrue(stillZero())
+    checkTrue(.error$getNum() > 0L,"Utilize Maintainer instead of Authors@R doesn't cause error!")
+
+
+    .zeroCounters()
+    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')), person('Joe', 'Blow', email='joe@blow.com', role='cre'))",
+        UNIT_TEST_PKG),
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
+    checkError("More than one maintainer doesn't cause error!")
+
     .zeroCounters()
     cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
         UNIT_TEST_PKG),
@@ -375,6 +425,18 @@ test_checkBBScompatibility <- function()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(stillZero())
 
+    .zeroCounters()
+    dir.create(file.path(UNIT_TEST_TEMPDIR,"inst"))
+    cat("citEntry(entry='article', title='test', author=personList(as.person('Lori Kern')), year=2020, journal='Loris Best', volume='4', issue='12', textVersion='Shepherd, Lori (2020) test. Loris Best. 4(12)')",file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION"))
+    BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
+    checkTrue(stillZero())
+
+    cat("citEntry(entry='article', title='test', author=personList(as.person('Lori Kern')), year=2020, journal='Loris Best', volume='4', issue='12')",file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION"),
+    append=FALSE)
+    BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
+    checkTrue(.note$getNum()==1, "citation produces note")
+
+    .zeroCounters()
 }
 
 test_checkUnitTests <- function()

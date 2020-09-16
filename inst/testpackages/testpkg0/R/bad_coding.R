@@ -12,6 +12,9 @@ bad_fun <- function(){
 invalid_ref <- function() {
 
     bcheck <- BiocCheck:BiocCheck
+    red <- 1
+    xbluex <- 3
+    bcheck <- xbluex:red
 
 }
 
