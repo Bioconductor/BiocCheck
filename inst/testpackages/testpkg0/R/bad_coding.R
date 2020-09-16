@@ -17,3 +17,14 @@ invalid_ref <- function() {
     bcheck <- xbluex:red
 
 }
+
+bad_dl <- function() {
+
+    dataurl <- "https://raw.githubusercontent.com/file"
+    githurl <- "https://github.com/tree/master/"
+    githurl <- "https://dropbox.com/data?dl=1"
+    laburl <- "https://gitlab.com/raw/master/data"
+    bucketurl <- "https://bitbucket.org/test/raw/file"
+    download.file(dataurl, destfile = tempfile())
+
+}
