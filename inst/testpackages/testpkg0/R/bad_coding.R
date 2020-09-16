@@ -20,9 +20,11 @@ invalid_ref <- function() {
 
 bad_dl <- function() {
 
-    dataurl <- paste0("https://", "raw", ".githubusercontent", ".com")
-    laburl <- paste0("https://", "gitlab.com/", "raw", "/master")
-    bucketurl <- paste0("https://", "bitbucket.org", "/test/", "raw", "/file")
+    dataurl <- "https://raw.githubusercontent.com/file"
+    githurl <- "https://github.com/tree/master/"
+    githurl <- "https://dropbox.com/data?dl=1"
+    laburl <- "https://gitlab.com/raw/master/data"
+    bucketurl <- "https://bitbucket.org/test/raw/file"
     download.file(dataurl, destfile = tempfile())
 
 }
