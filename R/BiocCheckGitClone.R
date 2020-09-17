@@ -25,6 +25,7 @@ usage2 <- function()
 
 .BiocCheckGitCloneFromCommandLine <- function()
 {
+    .Deprecated(msg="\nDEPRECATED: R CMD BiocCheckGitClone\n  Running BiocCheckGitClone from command line is deprecated in 3.12 and will be removed in 3.13.\n  Please run from within R as\n `BiocCheckGitClone(<pkg>)`")
     parser <- getArgParser2()
     arguments <- parse_args(parser, positional_arguments = 1)
     opt <- arguments$options

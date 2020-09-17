@@ -74,6 +74,7 @@ usage <- function()
 
 .BiocCheckFromCommandLine <- function()
 {
+    .Deprecated(msg="\nDEPRECATED: R CMD BiocCheck\n  Running BiocCheck from command line is deprecated in 3.12 and will be removed in 3.13.\n  Please run from within R as\n `BiocCheck(<pkg>)` or `BiocCheck(<pkg.tar.gz>)`")
     parser <- getArgParser()
     tryCatch({
         arguments <- parse_args(parser, positional_arguments = 1)
