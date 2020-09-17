@@ -1298,6 +1298,7 @@ checkUsageOfDont <- function(pkgdir)
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
 
     hasBad <- rep(FALSE, length(manpages))
+    hasdontrun <- rep(FALSE, length(manpages))
     for (dx in seq_along(manpages))
     {
         manpage <- manpages[dx]
@@ -1325,6 +1326,9 @@ checkUsageOfDont <- function(pkgdir)
             }
             if (any(donttestVec | dontrunVec) & !any(internalVec))
                 hasBad[dx] = TRUE
+
+            if (any(dontrunVec) & !any(internalVec))
+                hasdontrun[dx] = TRUE
         }
     }
     if (any(hasBad)){
@@ -1336,6 +1340,14 @@ checkUsageOfDont <- function(pkgdir)
             handleMessage(f, indent=8)
         }
     }
+    if (any(hasdontrun)){
+        handleNote("Use donttest{} instead of dontrun{}.")
+        handleMessage("Found in the following files:", indent=6)
+        for(f in basename(manpages)[hasdontrun]){
+            handleMessage(f, indent=8)
+        }
+     }
+
 }
 
 checkNEWS <- function(pkgdir)

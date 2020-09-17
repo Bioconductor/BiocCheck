@@ -699,7 +699,8 @@ test_checkExportsAreDocumented <- function()
     res <- BiocCheck:::checkExportsAreDocumented(pkgdir, "testpkg0")
     checkEquals(1, .error$getNum())
     res <- BiocCheck:::checkUsageOfDont(pkgdir)
-    checkEquals(1, .note$getNum())
+    checkEquals(2, .note$getNum())
+    .zeroCounters()
 }
 
 test_checkNEWS <- function()
@@ -916,7 +917,7 @@ test_checkUsageOfDont <- function()
     BiocCheck:::installAndLoad(pkgdir)
     notemsg <- capture.output(BiocCheck:::checkUsageOfDont(pkgdir),
                               type = "message")
-    checkEquals(1, .note$getNum())
+    checkEquals(2, .note$getNum())
     # here we verify the correct number of pages were detected
     checkTrue( any(grepl("67%", notemsg)) )
     .zeroCounters()

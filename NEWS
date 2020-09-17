@@ -14,6 +14,7 @@ NEW FEATURES
     o (1.25.8) Validate ORCID IDs (if any) in the DESCRIPTION file
     (@LiNk-NY, #97)
     o (1.25.10) Add check for properly formatted CITATION file
+    o (1.25.12) Add NOTE to change dontrun to donttest
 
 BUG FIXES
 

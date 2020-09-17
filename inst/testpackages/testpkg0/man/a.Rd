@@ -46,8 +46,9 @@ a(x)
     ##---- Should be DIRECTLY executable !! ----
 ##-- ==>  Define data, use random,
 ##--	or do  help(data=index)  for the standard data sets.
-\dontrun{
-    this is  a syntax error!
+\donttest{
+    #valid syntax
+    d2 = 2
     }
 
 
