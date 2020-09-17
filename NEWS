@@ -1,6 +1,11 @@
 CHANGES IN VERSION 1.25
 -----------------------
 
+DEPRECATION ANNOUNCEMENT
+
+    o (1.25.11) R CMD BiocCheck and R CMD BiocCheckGitClone are deprecated. The
+    recommended way to run the functions is within R.
+
 NEW FEATURES
 
     o (1.25.4) Check for single colon typos when using qualified imports pkg::foo()
