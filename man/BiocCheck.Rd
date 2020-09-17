@@ -8,9 +8,7 @@ Check a package for compliance with Bioconductor package guidelines
 Analyzes \code{R} packages for compliance with Bioconductor package guidelines
 and best practices. Divides output into three categories: 
 ERROR, WARNING, and NOTE.
-This function is mostly meant to be called from the operating system's
-command line (via \code{R CMD BiocCheck}; see the vignette). Not meant
-to replace \code{R CMD check}, which should always be run first.
+See the vignette for more details. Not meant to replace \code{R CMD check}, which should always be run first.
 }
 \usage{
 BiocCheck(package = ".", ...)
@@ -36,10 +34,9 @@ see the vignette and pages in the \code{references} section.
 \code{usage()} displays the options that can be passed
 to \code{BiocCheck()}.
 
-\code{BiocCheck} is typically called from the operating system's
-command line, as
+\code{BiocCheck} is called within R with
 
-\verb{R CMD BiocCheck package}
+\verb{BiocCheck(<package>)}
 
 where \code{package} is a directory or .tar.gz file containing
 an \code{R} source package.
@@ -47,10 +44,6 @@ an \code{R} source package.
 \code{BiocCheck} is not meant as a replacement for 
 \code{R CMD check}, which should always be run first
 for best results.
-
-Installing \code{BiocCheck} will attempt to install
-the \code{BiocCheck} script, which could fail; details
-in the vignette.
 
 See the vignette for detailed explanations of all
 the checks performed by \code{BiocCheck}.
@@ -75,14 +68,11 @@ can be accepted into Bioconductor.}
 \url{http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/}
 }
 \author{
-Dan Tenenbaum
+Dan Tenenbaum and Lori Shepherd
 }
 
 \examples{
 packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")
 BiocCheck(packageDir, `quit-with-status`=FALSE)
-
-## or from the operating system's command line as:
-## R CMD BiocCheck myPackage
 
 }

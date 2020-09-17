@@ -30,15 +30,8 @@ issues:
 
 # Using `BiocCheck`
 
-Most commonly you will use BiocCheck from your operating system command line,
-as
-
-    R CMD BiocCheck package
-
-Where `package` is either a directory containing an R package, or a source
-tarball (`.tar.gz` file).
-
-`BiocCheck` can also be run interactively:
+`BiocCheck` is meant to run within R on a directory containing an R package, or a source
+tarball (`.tar.gz` file):
 
 
 ```{r eval=FALSE}
@@ -46,9 +39,7 @@ library(BiocCheck)
 BiocCheck("packageDirOrTarball")
 ```
 
-`R CMD BiocCheck` takes options which can be seen by running
-
-    R CMD BiocCheck --help
+`BiocCheck` takes options which can be seen by:
 
 ```{r echo=FALSE}
 suppressPackageStartupMessages(library(BiocCheck))
@@ -484,8 +475,9 @@ programming and help ensure that your code does what you say it does.
   examples, but some are still missing, `BiocCheck` lists the missing
   ones and asks you to add runnable examples to them (`NOTE`).
 * Check the usage of `dontrun` or `donttest`. Use of these functions is not
-  recommended and shoud be justified (`NOTE`).
-
+  recommended and shoud be justified (`NOTE`). If exception is made the
+  recommended usage is to use donttest over dontrun (`NOTE`) as donttest
+  requires valid R code.
 
 ## NEWS checks
 
@@ -658,14 +650,7 @@ tarball. Reporting similarly in three categories as discussed above:
 
 # Using `BiocCheckGitClone`
 
-Most commonly you will use BiocCheckGitClone from your operating system command
-line, as
-
-    R CMD BiocCheckGitClone package
-
-Where `package` is a directory containing an R package.
-
-`BiocCheckGitClone` can also be run interactively:
+`BiocCheckGitClone` is meant to run within R on a directory containing an R package:
 
 
 ```{r eval=FALSE}

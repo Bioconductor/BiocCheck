@@ -8,9 +8,7 @@ Additional checks for a package for compliance with Bioconductor package guideli
 Analyzes \code{R} packages for compliance with Bioconductor package guidelines
 and best practices. Divides output into three categories:
 ERROR, WARNING, and NOTE.
-This function is mostly meant to be called from the operating system's
-command line (via \code{R CMD BiocCheckGitClone}). Not meant
-to replace \code{R CMD check} or \code{R CMD BiocCheck}, which should always be run first.
+This function is not meant to replace \code{R CMD check} or \code{BiocCheck}.
 }
 \usage{
 BiocCheckGitClone(package=".", ...)
@@ -30,20 +28,14 @@ usage2()
 Bioconductor package guidelines and best practices. This function should
 only be run on a open source directory not a tarball.
 
-\code{BiocCheckGitClone} is typically called from the operating system's
-command line, as
+\code{BiocCheckGitClone} is called within R with, as
 
-\verb{R CMD BiocCheckGitClone package}
+\verb{BiocCheckGitClone(<package>)}
 
 where \code{package} is a directory containing an \code{R} source package.
 
 \code{BiocCheckGitClone} is not meant as a replacement for
-\code{R CMD check} or \code{R CMD BiocCheck}, which should always be run first
-for best results.
-
-Installing \code{BiocCheck} will attempt to install
-the \code{BiocCheckGitClone} script, which could fail; details
-in the vignette.
+\code{R CMD check} or \code{BiocCheck}.
 
 See the vignette for detailed explanations of all
 the checks performed by \code{BiocCheckGitClone}.
@@ -74,8 +66,5 @@ Lori Shepherd
 \examples{
 packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")
 BiocCheckGitClone(packageDir, `quit-with-status`=FALSE)
-
-## or from the operating system's command line as:
-## R CMD BiocCheckGitClone myPackage
 
 }
