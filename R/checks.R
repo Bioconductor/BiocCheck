@@ -986,7 +986,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 
     # external data
-    msg_eda <- checkExternalData(pkgdir)
+    msg_eda <- checkExternalData(Rdir)
     if (length(msg_eda)) {
         handleError(" Avoid references to external hosting platforms")
         handleMessage("Found in files:", indent=6)
@@ -1126,7 +1126,7 @@ checkExternalData <- function(Rdir) {
             basename(rfile), tokens[,"line1"], tokens[,"col1"]
         )
     })
-    msg_eda <- unlist(msg_eda)
+    unlist(msg_eda)
 }
 
 
