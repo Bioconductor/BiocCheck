@@ -725,6 +725,9 @@ occur when trying to use helper functions like packageVersion() or packageDate()
 instead of using meta$Version or meta$Date. See [R documentation](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#CITATION-files) for more
 information.
 
+## Compatibility with the `r BiocStyle::CRANpkg("renv")` package
+
+Files in the `renv` sub-directory are ignored, as those can crash `BiocCheck`.
 
 # Expanding `BiocCheck`
 

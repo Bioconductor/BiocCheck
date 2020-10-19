@@ -8,3 +8,6 @@ vignettes/*.html
 vignettes/sync.sh
 *.so
 *.o
+.Rprofile
+renv
+renv.lock
