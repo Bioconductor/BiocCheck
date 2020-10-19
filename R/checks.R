@@ -429,7 +429,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         {
             if ("ORCID" %in% names(person$comment)) {
                 orcid <- person$comment[["ORCID"]]
-                validID <- grepl("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}", orcid)
+                validID <- grepl("^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9X]{4}$", orcid)
                 if (!validID)
                     handleNote(
                         "Invalid ORCID ID for ",
