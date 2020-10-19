@@ -447,6 +447,7 @@ grepPkgDir <- function(pkgdir, greparg, full_path=FALSE){
         system2("grep", args, stdout=TRUE),
         warning=function(w){character()},
         error=function(e){character(0)})
+    fnd <- dropRenvFiles(fnd, pkgdir, .addFS = FALSE)
     msg_files <- vapply(fnd,
                         FUN=function(x, pkgdir){
                             vl = strsplit(x, split=":")
@@ -715,20 +716,31 @@ doesManPageHaveRunnableExample <- function(rd)
     length(parsed) && !inherits(parsed, "try-error")
 }
 
+dropRenvFiles <- function(files, pkgdir, .addFS = TRUE) {
+  sep <- ifelse(.addFS, .Platform$file.sep, "")
+  renvDir <- sprintf("%s%s%s", pkgdir, sep, "renv")
+  files <- files[!startsWith(files, renvDir)]
+  files <- files[!startsWith(files, "renv/")]
+  files
+}
 
 checkLogicalUseFiles <- function(pkgdir) {
     Rdir <- file.path(pkgdir, "R")
     Rfiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[rR]$",
                   full.names = TRUE)
+    Rfiles <- dropRenvFiles(Rfiles, pkgdir)
     dx <- startsWith(Rfiles, Rdir)
     RdirFiles <- Rfiles[dx]
     Rother <- Rfiles[!dx]
     manFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Dd]$",
         full.names = TRUE)
+    manFiles <- dropRenvFiles(manFiles, pkgdir)
     RNWFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Nn][wW]$",
         full.names = TRUE)
+    RNWFiles <- dropRenvFiles(RNWFiles, pkgdir)
     RMDFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Mm][Dd]$",
         full.names = TRUE)
+    RMDFiles <- dropRenvFiles(RMDFiles, pkgdir)
 
     allFiles <- c(Rother, RMDFiles, RNWFiles, manFiles)
     fileNames1 <- character()
