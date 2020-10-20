@@ -47,6 +47,8 @@ getOptionList <- function()
             help="disable check for if package exists in CRAN"),
         make_option("--no-check-bioc-help", action="store_true",
             help="disable check for registration on Bioconductor mailing list and support site"),
+        make_option("--no-check-renv", action="store_true",
+            help="disable check for renv files"),
         make_option("--build-output-file", type="character",
             help="file containing R CMD build output, for additional analysis",
             metavar="build-output-file"),
@@ -116,6 +118,11 @@ BiocCheck <- function(package=".", ...)
     package_install_dir <- installAndLoad(package)
 
     ## checks
+    if (is.null(dots[["no-check-renv"]])){
+        handleCheck("Checking for renv files")
+        checkForRenvFiles(package_dir)
+    }
+
     if (is.null(dots[["no-check-dependencies"]])){
         handleCheck("Checking Package Dependencies...")
         checkForBadDepends(file.path(package_install_dir, "lib", package_name))
