@@ -173,7 +173,7 @@ BiocCheck <- function(package=".", ...)
 
     if (is.null(dots[["no-check-file-size"]])){
         handleCheck("Checking individual file sizes...")
-        checkIndivFileSizes(package_dir)
+        checkIndivFileSizes(package_dir, !is.null(dots[["no-check-renv"]]))
     }
 
     if (is.null(dots[["no-check-bioc-views"]]))

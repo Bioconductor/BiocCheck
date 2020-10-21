@@ -228,14 +228,16 @@ checkPackageSize <- function(pkg, pkgdir, size=5){
     }
 }
 
-checkIndivFileSizes <- function(pkgdir)
+checkIndivFileSizes <- function(pkgdir, skip.renv = FALSE)
 {
     pkgType <- getPkgType(pkgdir)
     if (is.na(pkgType) ||  pkgType == "Software") {
         maxSize <- 5*10^6 ## 5MB
         allFiles <- list.files(pkgdir, all.files=TRUE, recursive=TRUE)
         allFilesFullName <- file.path(pkgdir, allFiles)
-        allFilesFullName <- dropRenvFiles(allFilesFullName, pkgdir)
+        if (skip.renv) {
+            allFilesFullName <- dropRenvFiles(allFilesFullName, pkgdir)
+        }
         sizes <- file.size(allFilesFullName)
         largeFiles <- paste(allFiles[sizes > maxSize], collapse=" ")
         if (any(sizes > maxSize)) {
