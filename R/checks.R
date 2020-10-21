@@ -37,6 +37,10 @@ checkForRenvFiles <- function(pkgdir) {
                     "If this error appears on the Bioconductor Build System, use `git rm --cached` to stop tracking the following directories and files in the Bioconductor repository:")
         for (i in removeItems)
             handleMessage(i, indent=8)
+        handleMessage("Then add the following entries to the package `.gitignore` file:")
+        for (i in c(".Rprofile", "renv", "renv.lock"))
+            handleMessage(i, indent=8)
+
     }
 }
 
@@ -1113,9 +1117,8 @@ checkClassEqUsage <- function(pkgdir){
 }
 
 checkSystemCall <- function(pkgdir){
-
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    msg_sys <- grepPkgDir(pkgdir, "-rHn '^system(.*'")
+    msg_sys <- grepPkgDir(pkgdir, "-rHn '^system(.*'", skip.renv = TRUE)
 }
 
 
@@ -1663,7 +1666,8 @@ checkBadFiles <- function(package_dir){
                        ".dropbox", ".exrc", ".gdb.history",
                        ".gitattributes", ".gitmodules",
                        ".hgtags",
-                       ".project", ".seed", ".settings", ".tm_properties")
+                       ".project", ".seed", ".settings", ".tm_properties",
+                       "renv", "renv.lock")
 
     fls <- dir(package_dir, ignore.case=TRUE, recursive=TRUE, all.files=TRUE)
     dx <- unlist(lapply(hidden_file_ext,

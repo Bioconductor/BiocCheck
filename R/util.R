@@ -441,13 +441,15 @@ makeTempRFile <- function(infile){
     }
 }
 
-grepPkgDir <- function(pkgdir, greparg, full_path=FALSE){
+grepPkgDir <- function(pkgdir, greparg, full_path=FALSE, skip.renv = FALSE){
     args <- sprintf("%s %s*", greparg, pkgdir)
     fnd <- tryCatch(
         system2("grep", args, stdout=TRUE),
         warning=function(w){character()},
         error=function(e){character(0)})
-    fnd <- dropRenvFiles(fnd, pkgdir, .addFS = FALSE)
+    if (skip.renv) {
+        fnd <- dropRenvFiles(fnd, pkgdir, .addFS = FALSE)
+    }
     msg_files <- vapply(fnd,
                         FUN=function(x, pkgdir){
                             vl = strsplit(x, split=":")
