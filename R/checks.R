@@ -951,7 +951,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # message(paste(...))
     msg_mp <- checkPasteInSignaler(Rdir)
-    if (length(msg_sc)) {
+    if (length(msg_mp)) {
         handleNote(" Avoid the use of 'paste' in condition signalers")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_mp)
@@ -1080,27 +1080,28 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     msg_sc <- unlist(msg_sc)
 }
 
+.findPasteInSignaler <- function(rfile) {
+    tokens <- getParseData(parse(rfile, keep.source = TRUE))
+    tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
+    txt <- tokens[, "text"]
+    signalers <- which(txt %in% c("message", "warning", "stop"))
+    opar <- which(txt == "(")
+    startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
+    parnum <- tokens[startSig, "parent"]
+    endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+    paste_ind <- vapply(Map(seq, startSig, endSig), function(x) {
+        x[tokens[x, "text"] %in% c("paste0", "paste")]
+    }, numeric(1L))
+    tokens <- tokens[paste_ind, , drop = FALSE]
+    sprintf(
+        "%s (line %d, column %d)",
+        rfile, tokens[, "line1"], tokens[, "col1"]
+    )
+}
+
 checkPasteInSignaler <- function(Rdir) {
     rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
-    names(rfiles) <- basename(rfiles)
-    paste_sig <- lapply(rfiles, function(rfile) {
-        tokens <- getParseData(parse(rfile, keep.source = TRUE))
-        tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
-        txt <- tokens[, "text"]
-        signalers <- which(txt %in% c("message", "warning", "stop"))
-        opar <- which(txt == "(")
-        startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
-        parnum <- tokens[startSig, "parent"]
-        endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
-        paste_ind <- vapply(Map(seq, startSig, endSig), function(x) {
-            x[tokens[x, "text"] %in% c("paste0", "paste")]
-        }, numeric(1L))
-        tokens <- tokens[paste_ind, , drop = FALSE]
-        sprintf(
-            "%s (line %d, column %d)",
-            rfile, tokens[, "line1"], tokens[, "col1"]
-        )
-    })
+    paste_sig <- lapply(rfiles, .findPasteInSignaler)
     paste_sig  <- unlist(paste_sig)
 }
 
