@@ -15,6 +15,8 @@ NEW FEATURES
     (@LiNk-NY, #97)
     o (1.25.10) Add check for properly formatted CITATION file
     o (1.25.12) Add NOTE to change dontrun to donttest
+    o Check for 'paste' / 'paste0' in signaler functions, `message`,
+    'warning', and 'stop' (@LiNk-NY, #64)
 
 BUG FIXES
 
