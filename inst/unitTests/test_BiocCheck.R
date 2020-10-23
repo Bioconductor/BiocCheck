@@ -930,3 +930,17 @@ test_checkUsageOfDont <- function()
     checkEquals(0, .note$getNum())
     .zeroCounters()
 }
+
+test_IsOrcidIdValid = function()
+{
+    orcid <- c(
+        "0000-0001-6197-3471",
+        "0000-0001-6197-347X",
+        "0000-0001-6197-34XX",
+        "0000-0001-6197-3471-0000",
+        "",
+        NA_character_
+    )
+    valid <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)
+    checkIdentical(valid, BiocCheck:::.checkORCID(orcid))
+}

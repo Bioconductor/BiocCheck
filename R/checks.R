@@ -349,6 +349,13 @@ checkBiocViews <- function(pkgdir)
     }
 }
 
+.checkORCID <- function(orcid) 
+{
+    re <- "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$"
+    grepl(re, orcid)
+}
+
+
 checkBBScompatibility <- function(pkgdir, source_tarball)
 {
     lines <- readLines(file.path(pkgdir, "DESCRIPTION"), warn=FALSE)
@@ -429,7 +436,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         {
             if ("ORCID" %in% names(person$comment)) {
                 orcid <- person$comment[["ORCID"]]
-                validID <- grepl("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}", orcid)
+                validID <- .checkORCID(orcid)
                 if (!validID)
                     handleNote(
                         "Invalid ORCID ID for ",
