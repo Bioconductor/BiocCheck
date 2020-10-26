@@ -475,6 +475,19 @@ test_checkUnitTests <- function()
     checkTrue(length(res) == 1)
 }
 
+test_findPasteInSignaler <- function() {
+    rfile <- tempfile()
+    writeLines(c(
+        "message(paste('foo', 'bar'))",
+        "message(paste('foo', x))",
+        "message(paste(x, collapse = '\t'))",
+        "message('foo', paste(x, collapse = 't'))"
+    ), rfile)
+    checkTrue(
+        length(.findPasteInSignaler(rfile)) == 2L
+    )
+}
+
 test_installAndLoad <- function()
 {
     BiocCheck:::installAndLoad(create_test_package('testpkg'))

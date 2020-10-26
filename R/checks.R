@@ -1080,6 +1080,14 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     msg_sc <- unlist(msg_sc)
 }
 
+.filtTokens <- function(ind, tokens){
+    txt <- tokens[ind, "text"]
+    filt <- txt %in% c("paste0", "paste")
+    if (any(filt) && "collapse" %in% txt)
+        filt <- FALSE
+    ind[filt]
+}
+
 .findPasteInSignaler <- function(rfile) {
     tokens <- getParseData(parse(rfile, keep.source = TRUE))
     tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
@@ -1089,10 +1097,9 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
     parnum <- tokens[startSig, "parent"]
     endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
-    paste_ind <- vapply(Map(seq, startSig, endSig), function(x) {
-        x[tokens[x, "text"] %in% c("paste0", "paste")]
-    }, numeric(1L))
-    tokens <- tokens[paste_ind, , drop = FALSE]
+    sigRanges <- Map(seq, startSig, endSig)
+    pasteInd <- lapply(sigRanges, .filtTokens, tokens = tokens)
+    tokens <- tokens[unlist(pasteInd), , drop = FALSE]
     sprintf(
         "%s (line %d, column %d)",
         rfile, tokens[, "line1"], tokens[, "col1"]
@@ -1101,8 +1108,8 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 
 checkPasteInSignaler <- function(Rdir) {
     rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
-    paste_sig <- lapply(rfiles, .findPasteInSignaler)
-    paste_sig  <- unlist(paste_sig)
+    pasteSig <- lapply(rfiles, .findPasteInSignaler)
+    pasteSig <- unlist(pasteSig)
 }
 
 checkClassEqUsage <- function(pkgdir){
