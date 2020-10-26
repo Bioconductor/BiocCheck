@@ -390,7 +390,7 @@ directory.
 
 * `paste` and `paste0` function calls within signaling functions such as
   `message`, `warning`, and `stop` are redundant and should be avoided
-  (`NOTE`).
+  (`NOTE`). `paste` calls with the `collapse` argument are ignored.
 
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This

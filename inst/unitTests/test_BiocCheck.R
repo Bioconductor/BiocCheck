@@ -484,7 +484,7 @@ test_findPasteInSignaler <- function() {
         "message('foo', paste(x, collapse = 't'))"
     ), rfile)
     checkTrue(
-        length(.findPasteInSignaler(rfile)) == 2L
+        length(BiocCheck:::.findPasteInSignaler(rfile)) == 2L
     )
 }
 
