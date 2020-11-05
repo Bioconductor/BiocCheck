@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.27
+-----------------------
+
+NEW FEATURES
+
+    o (1.27.1) Check that licenses do not exclude classes of users,
+    e.g., non-academic users.
+
 CHANGES IN VERSION 1.25
 -----------------------
 
