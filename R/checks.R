@@ -1613,17 +1613,49 @@ checkForSupportSiteRegistration <- function(package_dir)
         handleMessage("Maintainer email is ok.")
         return()
     }
+    accountExists <- checkSupportReg(email)
+
+    if (accountExists){
+        pkgname <- tolower(basename(package_dir))
+        checkWatchedTag(email, pkgname)
+    }
+}
+
+checkSupportReg <- function(email){
+
     url <- paste0("https://support.bioconductor.org/api/email/", email, "/")
     response <- tryCatch(GET(url), error=identity)
     if (inherits(response, "error")) {
         handleMessage(
             "Unable to connect to support site:",
             "\n  ", conditionMessage(response))
+        FALSE
     } else if (suppressMessages(content(response))) {
         handleMessage("Maintainer is registered at support site.")
+        TRUE
     } else {
         handleError("Maintainer must register at the support site; ",
-            "visit https://support.bioconductor.org/accounts/signup/ .")
+                    "visit https://support.bioconductor.org/accounts/signup/ .")
+        FALSE
+    }
+}
+
+checkWatchedTag <- function(email, pkgname){
+
+    url <- paste0("https://support.bioconductor.org/api/watched/tags/", email, "/")
+    response <- tryCatch(GET(url), error=identity)
+    if (inherits(response, "error")) {
+        handleMessage(
+            "Unable to connect to support site:",
+            "\n  ", conditionMessage(response))
+    } else {
+        tags<-tolower(trimws(unlist(strsplit(content(response)$watched_tags, split=","))))
+        if (pkgname %in% tags){
+            handleMessage("Package name is in support site watched tags.")
+        }else{
+            handleError("Maintainer must add package name to Watched Tags on the support site; ",
+                        "Edit your Support Site User Profile to add Watched Tags.")
+        }
     }
 }
 
