@@ -278,6 +278,16 @@ Can be disabled with `--no-check-bbs`
     * That person must have either `family` or `given` name defined.
     * (optional) A syntactically valid ORCID ID, results in note if not.
 
+## DESCRIPTION checks
+
+* **Checking License: for restrictive use...**
+  Checks to make sure that the License: in the DESCRIPTION file does
+  not restrict use, e.g., to academic-use only (`ERROR`). Licenses are
+  compared to the database provided at `R.home(file.path("share",
+  "licenses", "license.db"))`.  Licenses not listed in the database
+  are flagged with a `NOTE` indicating that restrictive use status
+  cannot be determined.
+
 ##  NAMESPACE checks
 
 Can be disabled with `--no-check-namespace`

@@ -1665,6 +1665,36 @@ checkBadFiles <- function(package_dir){
     }
 }
 
+.checkLicenseForRestrictiveUse <- function(license) {
+    handleCheck("Checking License: for restrictive use...")
+
+    if (length(license) != 1L || is.na(license)) {
+        handleNote("malformed 'License:' field '", license, "'")
+        return(invisible())
+    }
+    ldb_file <- R.home(file.path("share", "licenses", "license.db"))
+    licenses <- read.dcf(ldb_file)
+    sss <- licenses[, "SSS"]
+    abbrev <- licenses[, "Abbrev"]
+    abbrev[!is.na(sss)] <- sss[!is.na(sss)]
+    restrict <- licenses[, "Restricts_use"]
+    idx <- (restrict == "yes") & !is.na(restrict) & !is.na(abbrev)
+
+    ## PCAN/DESCRIPTION:License: CC BY-NC-ND 4.0
+    ## QUBIC/DESCRIPTION:License: CC BY-NC-ND 4.0 + file LICENSE
+    test0 <- any(vapply(abbrev[idx], grepl, logical(1), license, fixed = TRUE))
+    test1 <-
+        !any(vapply(
+             abbrev[!is.na(abbrev)], grepl, logical(1), license, fixed = TRUE
+         ))
+    if (test0) {
+        handleError("License '", license, "' restricts use")
+    } else if (test1) {
+        handleNote(
+            "License '", license, "' unknown; licenses cannot restrict use"
+        )
+    }
+}
 
 checkDescription <- function(package_dir){
 
@@ -1683,6 +1713,12 @@ checkDescription <- function(package_dir){
         if (any((c("Author","Maintainer") %in% colnames(dcf))))
             handleError("Do not use Author/Maintainer fields. Use Authors@R.")
     }
+}
+
+checkDESCRIPTIONFile <- function(package_dir) {
+    dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
+
+    .checkLicenseForRestrictiveUse(dcf[,"License"])
 }
 
 checkForCitationFile <- function(package_dir) {
