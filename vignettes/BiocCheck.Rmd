@@ -635,15 +635,15 @@ with the `--no-check-bioc-help` option.
   This can be disabled with the `--no-check-bioc-help` option.
 
   The main place people ask questions about _Bioconductor_ packages is
-  the support site.  Please [register][11] and then optionally include
-  your (lowercased) package name in the list of [watched tags][12].
+  the support site.  Please [register][11] and then include
+  your package name in the list of watched tags.
   When a question is asked and tagged with your package name, you'll
-  get an email. (If you don't add your package to the list of watched
-  tags, this will be automatically done for you).
+  get an email.
+
+* Package name is in support site watched tags is now a requirement.  
 
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/
-[12]: https://support.bioconductor.org/profile/#div_id_watched_tags
 
 # `BiocCheckGitClone`
 
