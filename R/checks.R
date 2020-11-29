@@ -1672,7 +1672,9 @@ checkBadFiles <- function(package_dir){
         handleNote("malformed 'License:' field '", license, "'")
         return(invisible())
     }
-    ldb_file <- R.home(file.path("share", "licenses", "license.db"))
+    ldb_file <- file.path(R.home("share"), "licenses", "license.db")
+    if ( ! file.exists(ldb_file))
+        handleError("R license database cannot be found at ", ldb_file, ".")
     licenses <- read.dcf(ldb_file)
     sss <- licenses[, "SSS"]
     abbrev <- licenses[, "Abbrev"]
