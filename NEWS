@@ -1,3 +1,7 @@
+BUG FIX
+
+    o Correct path to R license database file by calling R.home('share').
+
 CHANGES IN VERSION 1.27
 -----------------------
 
