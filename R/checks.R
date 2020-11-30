@@ -1673,32 +1673,34 @@ checkBadFiles <- function(package_dir){
         return(invisible())
     }
     ldb_file <- file.path(R.home("share"), "licenses", "license.db")
-    if ( ! file.exists(ldb_file))
-        handleNote('License restrictive use could not be determined for license "',
-                   license, '". Reason: R license database cannot be found at "',
-                   ldb_file, '".')
-    else {
-        licenses <- read.dcf(ldb_file)
-        sss <- licenses[, "SSS"]
-        abbrev <- licenses[, "Abbrev"]
-        abbrev[!is.na(sss)] <- sss[!is.na(sss)]
-        restrict <- licenses[, "Restricts_use"]
-        idx <- (restrict == "yes") & !is.na(restrict) & !is.na(abbrev)
+    if (!file.exists(ldb_file)) {
+        handleNote(
+            "license database not found. ",
+            "Expected location: '", ldb_file, "'. ",
+            "License: '", license, "'"
+        )
+        return(invisible())
+    }
+    licenses <- read.dcf(ldb_file)
+    sss <- licenses[, "SSS"]
+    abbrev <- licenses[, "Abbrev"]
+    abbrev[!is.na(sss)] <- sss[!is.na(sss)]
+    restrict <- licenses[, "Restricts_use"]
+    idx <- (restrict == "yes") & !is.na(restrict) & !is.na(abbrev)
 
-        ## PCAN/DESCRIPTION:License: CC BY-NC-ND 4.0
-        ## QUBIC/DESCRIPTION:License: CC BY-NC-ND 4.0 + file LICENSE
-        test0 <- any(vapply(abbrev[idx], grepl, logical(1), license, fixed = TRUE))
-        test1 <-
-            !any(vapply(
-                 abbrev[!is.na(abbrev)], grepl, logical(1), license, fixed = TRUE
-             ))
-        if (test0) {
-            handleError("License '", license, "' restricts use")
-        } else if (test1) {
-            handleNote(
-                "License '", license, "' unknown; licenses cannot restrict use"
-            )
-        }
+    ## PCAN/DESCRIPTION:License: CC BY-NC-ND 4.0
+    ## QUBIC/DESCRIPTION:License: CC BY-NC-ND 4.0 + file LICENSE
+    test0 <- any(vapply(abbrev[idx], grepl, logical(1), license, fixed = TRUE))
+    test1 <-
+        !any(vapply(
+             abbrev[!is.na(abbrev)], grepl, logical(1), license, fixed = TRUE
+         ))
+    if (test0) {
+        handleError("License '", license, "' restricts use")
+    } else if (test1) {
+        handleNote(
+            "License '", license, "' unknown; licenses cannot restrict use"
+        )
     }
 }
 
