@@ -1540,7 +1540,21 @@ checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft",
                                                      "BioCann", "BioCexp", "BioCworkflows"))
 {
     repo <- match.arg(repo)
-    repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
+
+    if (repo == "CRAN"){
+        repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
+    }else{
+        repo.url <- switch(repo,
+                           BiocSoft = "http://bioconductor.org/packages/devel/bioc/VIEWS",
+                           BioCann =
+                               "http://bioconductor.org/packages/devel/data/annotation/VIEWS",
+                           BioCexp =
+                               "http://bioconductor.org/packages/devel/data/experiment/VIEWS",
+                           BioCworkflows =
+                               "http://bioconductor.org/packages/devel/workflows/VIEWS",
+                           "http://bioconductor.org/packages/devel/bioc/VIEWS")
+    }
+    
     conn <- url(repo.url)
     dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
     close(conn)
