@@ -1,9 +1,12 @@
-BUG FIX
-
-    o Correct path to R license database file by calling R.home('share').
-
 CHANGES IN VERSION 1.27
 -----------------------
+
+BUG FIX
+
+    o (1.27.2) Correct path to R license database file by calling R.home('share').
+    o (1.27.3) Correct check for if package already exists in CRAN/Bioc
+    o (1.27.3) Correct check for single colon use
+
 
 NEW FEATURES
 
@@ -21,7 +24,7 @@ DEPRECATION ANNOUNCEMENT
 NEW FEATURES
 
     o (1.25.4) Check for single colon typos when using qualified imports pkg::foo()
-    o (1.25.1) Check for warning/notes on too-brief a Description: field 
+    o (1.25.1) Check for warning/notes on too-brief a Description: field
     (@federicomarini, #65)
     o (1.25.8) Validate ORCID IDs (if any) in the DESCRIPTION file
     (@LiNk-NY, #97)
@@ -31,8 +34,8 @@ NEW FEATURES
 BUG FIXES
 
     o (1.25.14) The ORCID ID check now accepts IDs with a X at the end.
-    o (1.25.9) All packages including infrastructure require a vignette 
-    o Usage of donttest and dontrun in manual pages tagged with the keyword 
+    o (1.25.9) All packages including infrastructure require a vignette
+    o Usage of donttest and dontrun in manual pages tagged with the keyword
     'internal' will no longer trigger a NOTE (@grimbough, #59)
     o (1.25.7) Adding the sessionInfo at the end of the vignette (@llrs)
 
