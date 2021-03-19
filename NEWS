@@ -6,6 +6,7 @@ BUG FIX
     o (1.27.2) Correct path to R license database file by calling R.home('share').
     o (1.27.3) Correct check for if package already exists in CRAN/Bioc
     o (1.27.3) Correct check for single colon use
+    o (1.27.4) Allow portability of child Rmd documents via parseFile
 
 
 NEW FEATURES
