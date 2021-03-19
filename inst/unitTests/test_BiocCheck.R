@@ -185,9 +185,9 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEquals(4, .warning$getNum())
+    checkEquals(5, .warning$getNum())
     checkEquals("Evaluate more vignette chunks.",
-        .warning$get()[4])
+        .warning$get()[5])
     checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[3]))
     .zeroCounters()
 
@@ -575,6 +575,12 @@ test_parseFile <- function()
     cat("1 + 1", file=testFile)
     df <- BiocCheck:::parseFile(testFile, "BiocCheck")
     checkTrue(all(dim(df) == c(6,9)))
+    ## test that  testpkg0_child.Rmd is read in using `child =` chunk
+    ## in testpkg0.Rmd
+    pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    testFile <- file.path(pkgdir, "vignettes", "testpkg0.Rmd")
+    incl <- BiocCheck:::parseFile(testFile, pkgdir)
+    checkTrue(all(c("2", "+", "1") %in% incl[, "text"]))
 }
 
 test_checkForBrowser <- function()

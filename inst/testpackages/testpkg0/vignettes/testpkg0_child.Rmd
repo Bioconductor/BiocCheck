@@ -1,0 +1,5 @@
+Hi, I'm a child Rmd.
+
+```{r}
+2 + 1
+```

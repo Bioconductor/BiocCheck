@@ -5,3 +5,12 @@
 
 ```{r eval=FALSE}
 ```
+
+```{r eval=FALSE}
+```
+
+```{r eval=FALSE}
+```
+
+```{r, child = "testpkg0_child.Rmd"}
+```
