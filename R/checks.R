@@ -223,6 +223,24 @@ checkIndivFileSizes <- function(pkgdir)
     }
 }
 
+.testRbuildignore <- function(text) {
+    entries <- Filter(nchar,
+        grep("^#", trimws(text), value = TRUE, invert = TRUE)
+    )
+    grepl("test.*$", entries)
+}
+
+checkRbuildignore <- function(pkgdir) {
+    rbuild <- readLines(file.path(pkgdir, ".Rbuildignore"))
+    if (length(rbuild)) {
+        testIgnore <- .testRbuildignore(rbuild)
+        if (any(testIgnore))
+            handleError(
+                ".Rbuildignore file includes the 'tests' folder."
+            )
+    }
+}
+
 checkBiocViews <- function(pkgdir)
 {
     dirty <- FALSE

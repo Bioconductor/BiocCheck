@@ -258,6 +258,20 @@ test_checkNewPackageVersionNumber <- function()
     checkTrue(stillZero())
 }
 
+test_checkRbuildignore <- function()
+{
+    rbuildfile <- file.path(UNIT_TEST_TEMPDIR, ".Rbuildignore")
+    cat("tests/", "test/*", "tests", "^tests$", "test", ".*/testthat",
+        sep = "\n", file = rbuildfile
+    )
+    checkTrue(
+        identical(
+            sum(.testRbuildignore(readLines(rbuildfile))),
+            6L
+        )
+    )
+}
+
 test_checkBiocViews <- function()
 {
     .zeroCounters()
