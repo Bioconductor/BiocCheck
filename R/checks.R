@@ -1113,7 +1113,7 @@ checkExternalData <- function(Rdir) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
 
-        platforms <- "githubusercontent|gitlab|bitbucket|dropbox"
+        platforms <- "githubusercontent|github|gitlab|bitbucket|dropbox"
 
         hits <- grepl(platforms, tokens[, "text"], ignore.case = TRUE)
         if (any(hits))
