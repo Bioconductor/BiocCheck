@@ -902,14 +902,16 @@ test_checkForBiocDevelSubscription <- function()
 
 test_checkForSupportSiteRegistration <- function()
 {
-    connect <- suppressWarnings(tryCatch({
-        readBin("https://support.bioconductor.org", n=1L, what="raw")
-        TRUE
-    }, error = function(...){
-        FALSE
-    }))
+    connect <- suppressWarnings(
+        tryCatch({
+            readBin("https://support.bioconductor.org", n=1L, what="raw")
+            TRUE
+        }, error = function(...) {
+            FALSE
+        })
+    )
 
-    if(connect){
+    if (connect) {
 
         # Email registration
         .zeroCounters()
@@ -922,7 +924,7 @@ test_checkForSupportSiteRegistration <- function()
         # tags
         BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "biocfilecache")
         checkTrue(stillZero())
-        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "idonthaveapackage")
+        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "unwatchedpackage")
         checkEquals(.error$getNum(), 1)
         .zeroCounters()
 
