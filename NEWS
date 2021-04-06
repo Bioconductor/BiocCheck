@@ -11,12 +11,16 @@ BUG FIX
 
 NEW FEATURES
 
+    o (1.27.7) Removed BiocCheck and BiocCheckGitClone installation scripts;
+    recommended usage is `BiocCheck()`
     o (1.27.6) Check that a user has the package name in watched tags of
     support site
+    o (1.27.5) Check for 'paste' / 'paste0' in signaler functions, `message`,
+    'warning', and 'stop' (@LiNk-NY, #64)
+    o (1.27.4) Check for downloads from external resources (github, gitlab,
+    bitbucket, dropbox; @LiNk-NY, #75)
     o (1.27.1) Check that licenses do not exclude classes of users,
     e.g., non-academic users.
-    o (1.27.x) Removed BiocCheck and BiocCheckGitClone installation scripts;
-    recommended usage is `BiocCheck()`
 
 CHANGES IN VERSION 1.25
 -----------------------
@@ -28,18 +32,14 @@ DEPRECATION ANNOUNCEMENT
 
 NEW FEATURES
 
-    o Check for downloads from external resources (github, gitlab, bitbucket,
-    dropbox; @LiNk-NY, #75)
-    o (1.25.4) Check for single colon typos when using qualified imports
-    pkg::foo()
     o (1.25.1) Check for warning/notes on too-brief a Description: field
     (@federicomarini, #65)
+    o (1.25.4) Check for single colon typos when using qualified imports
+    pkg::foo()
     o (1.25.8) Validate ORCID IDs (if any) in the DESCRIPTION file
     (@LiNk-NY, #97)
     o (1.25.10) Add check for properly formatted CITATION file
     o (1.25.12) Add NOTE to change dontrun to donttest
-    o Check for 'paste' / 'paste0' in signaler functions, `message`,
-    'warning', and 'stop' (@LiNk-NY, #64)
 
 BUG FIXES
 
