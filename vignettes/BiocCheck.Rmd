@@ -278,6 +278,17 @@ Can be disabled with `--no-check-bbs`
     * That person must have either `family` or `given` name defined.
     * (optional) A syntactically valid ORCID ID, results in note if not.
 
+## DESCRIPTION checks
+
+* **Checking License: for restrictive use...** Checks to make sure
+  that the License: in the DESCRIPTION file does not restrict use,
+  e.g., to academic-use only (`ERROR`). Licenses are compared to the
+  database provided at `file.path(R.home("share)", "licenses",
+  "license.db"))`.  Licenses not listed in the database are flagged
+  with a `NOTE` indicating that restrictive use status cannot be
+  determined. A `NOTE` is also generated if the `License:` field is
+  malformed, or the database cannot be located.
+
 ##  NAMESPACE checks
 
 Can be disabled with `--no-check-namespace`
@@ -387,6 +398,13 @@ directory.
 
 * Single colon typos are checked for when a user inputs 'package:function'
   instead of using double colons ('::') to import a function (`ERROR`).
+
+* Users should not download data from external hosting platforms. This
+  means avoiding references to major platforms such as GitHub, GitLab,
+  and BitBucket. For the same reason we do not import GitHub packages,
+  external data can be unstable and not well maintained. Maintainers
+  should re-use data already available in Bioconductor or contribute
+  an ExperimentHub, AnnotationHub or similar package (`ERROR`).
 
 * `paste` and `paste0` function calls within signaling functions such as
   `message`, `warning`, and `stop` are redundant and should be avoided

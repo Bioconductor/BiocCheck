@@ -349,6 +349,13 @@ checkBiocViews <- function(pkgdir)
     }
 }
 
+.checkORCID <- function(orcid) 
+{
+    re <- "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$"
+    grepl(re, orcid)
+}
+
+
 checkBBScompatibility <- function(pkgdir, source_tarball)
 {
     lines <- readLines(file.path(pkgdir, "DESCRIPTION"), warn=FALSE)
@@ -429,7 +436,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         {
             if ("ORCID" %in% names(person$comment)) {
                 orcid <- person$comment[["ORCID"]]
-                validID <- grepl("[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{4}", orcid)
+                validID <- .checkORCID(orcid)
                 if (!validID)
                     handleNote(
                         "Invalid ORCID ID for ",
@@ -994,6 +1001,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # external data
+    msg_eda <- checkExternalData(Rdir)
+    if (length(msg_eda)) {
+        handleError(" Avoid references to external hosting platforms")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_eda)
+            handleMessage(msg, indent=8)
+    }
+
     # set.seed
     res <- findLogicalRdir(pkgname, "set.seed")
     if (length(res) > 0){
@@ -1136,6 +1152,29 @@ checkSystemCall <- function(pkgdir){
 
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
     msg_sys <- grepPkgDir(pkgdir, "-rHn '^system(.*'")
+}
+
+checkExternalData <- function(Rdir) {
+
+    rfiles <- dir(Rdir, pattern="\\.[Rr]$", full.names=TRUE)
+    msg_eda <- lapply(rfiles, function(rfile) {
+        tokens <- getParseData(parse(rfile, keep.source=TRUE))
+        tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
+
+        platforms <- "githubusercontent|github|gitlab|bitbucket|dropbox"
+
+        hits <- grepl(platforms, tokens[, "text"], ignore.case = TRUE)
+        if (any(hits))
+            tokens <- tokens[hits, , drop = FALSE]
+        else
+            tokens <- tokens[FALSE, , drop = FALSE]
+
+        sprintf(
+            "%s (line %d, column %d)",
+            basename(rfile), tokens[,"line1"], tokens[,"col1"]
+        )
+    })
+    unlist(msg_eda)
 }
 
 
@@ -1574,7 +1613,21 @@ checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft",
                                                      "BioCann", "BioCexp", "BioCworkflows"))
 {
     repo <- match.arg(repo)
-    repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
+
+    if (repo == "CRAN"){
+        repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
+    }else{
+        repo.url <- switch(repo,
+                           BiocSoft = "http://bioconductor.org/packages/devel/bioc/VIEWS",
+                           BioCann =
+                               "http://bioconductor.org/packages/devel/data/annotation/VIEWS",
+                           BioCexp =
+                               "http://bioconductor.org/packages/devel/data/experiment/VIEWS",
+                           BioCworkflows =
+                               "http://bioconductor.org/packages/devel/workflows/VIEWS",
+                           "http://bioconductor.org/packages/devel/bioc/VIEWS")
+    }
+    
     conn <- url(repo.url)
     dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
     close(conn)
@@ -1699,6 +1752,44 @@ checkBadFiles <- function(package_dir){
     }
 }
 
+.checkLicenseForRestrictiveUse <- function(license) {
+    handleCheck("Checking License: for restrictive use...")
+
+    if (length(license) != 1L || is.na(license)) {
+        handleNote("malformed 'License:' field '", license, "'")
+        return(invisible())
+    }
+    ldb_file <- file.path(R.home("share"), "licenses", "license.db")
+    if (!file.exists(ldb_file)) {
+        handleNote(
+            "license database not found. ",
+            "Expected location: '", ldb_file, "'. ",
+            "License: '", license, "'"
+        )
+        return(invisible())
+    }
+    licenses <- read.dcf(ldb_file)
+    sss <- licenses[, "SSS"]
+    abbrev <- licenses[, "Abbrev"]
+    abbrev[!is.na(sss)] <- sss[!is.na(sss)]
+    restrict <- licenses[, "Restricts_use"]
+    idx <- (restrict == "yes") & !is.na(restrict) & !is.na(abbrev)
+
+    ## PCAN/DESCRIPTION:License: CC BY-NC-ND 4.0
+    ## QUBIC/DESCRIPTION:License: CC BY-NC-ND 4.0 + file LICENSE
+    test0 <- any(vapply(abbrev[idx], grepl, logical(1), license, fixed = TRUE))
+    test1 <-
+        !any(vapply(
+             abbrev[!is.na(abbrev)], grepl, logical(1), license, fixed = TRUE
+         ))
+    if (test0) {
+        handleError("License '", license, "' restricts use")
+    } else if (test1) {
+        handleNote(
+            "License '", license, "' unknown; licenses cannot restrict use"
+        )
+    }
+}
 
 checkDescription <- function(package_dir){
 
@@ -1717,6 +1808,12 @@ checkDescription <- function(package_dir){
         if (any((c("Author","Maintainer") %in% colnames(dcf))))
             handleError("Do not use Author/Maintainer fields. Use Authors@R.")
     }
+}
+
+checkDESCRIPTIONFile <- function(package_dir) {
+    dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
+
+    .checkLicenseForRestrictiveUse(dcf[,"License"])
 }
 
 checkForCitationFile <- function(package_dir) {

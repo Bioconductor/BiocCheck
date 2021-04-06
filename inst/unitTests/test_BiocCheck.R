@@ -306,6 +306,28 @@ test_badFiles <- function(){
     unlink(pkgdir)
 }
 
+test_checkLicenseForRestrictiveUse <- function() {
+    .zeroCounters()
+    BiocCheck:::.checkLicenseForRestrictiveUse("GPL-3.0")
+    stillZero()
+
+    .zeroCounters()
+    BiocCheck:::.checkLicenseForRestrictiveUse("CC BY-NC-ND 4.0")
+    checkEquals(1, .error$getNum())
+
+    .zeroCounters()
+    BiocCheck:::.checkLicenseForRestrictiveUse("CC BY-NC-ND 4.0 + file LICENSE")
+    checkEquals(1, .error$getNum())
+
+    .zeroCounters()
+    BiocCheck:::.checkLicenseForRestrictiveUse("UNKNOWN")
+    checkEquals(1, .note$getNum())
+
+    .zeroCounters()
+    BiocCheck:::.checkLicenseForRestrictiveUse(NA_character_)
+    checkEquals(1, .note$getNum())
+}
+
 test_checkBBScompatibility <- function()
 {
     pkgdir <- UNIT_TEST_TEMPDIR
@@ -313,14 +335,23 @@ test_checkBBScompatibility <- function()
         dir.create(pkgdir)
 
 
-    cat("Package : foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    cat("Package : foo",
+        "License: GPL-2",
+        sep = "\n",
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
+    )
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Space in DESCRIPTION field name doesn't cause error")
     .zeroCounters()
 
 
-    cat("Package: foo\n\nImports: bar", file=file.path(UNIT_TEST_TEMPDIR,
-        "DESCRIPTION"))
+    cat("Package: foo",
+        "",
+        "Imports: bar",
+        "License: GPL-2",
+        sep = "\n",
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
+    )
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Blank line in DESCRIPTION doesn't cause error")
     .zeroCounters()
@@ -339,6 +370,7 @@ test_checkBBScompatibility <- function()
         "Description: This is a test description field in the Foo package.",
         "  The field should contain two sentences and it should trigger a",
         "  NOTE in the check.",
+        "License: GPL-2",
         sep = "\n",
         file = file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
     )
@@ -348,79 +380,125 @@ test_checkBBScompatibility <- function()
         "Note"
     )
 
-    cat("Package: Foo", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+    cat("Package: Foo",
+        "License: GPL-2",
+        sep = "\n",
+        file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
+    )
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Package name which doesn't match dir name does not cause error!")
 
 
-    cat(sprintf("Package: ", UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Version doesn't cause error!")
 
 
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: 1", UNIT_TEST_PKG),
+    cat(paste("Package: ", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Authors@R: 1",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     .zeroCounters()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Wrong class in Authors@R doesn't cause error!")
 
 
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))", UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Authors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     .zeroCounters()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing cre role in Authors@R doesn't cause error!")
 
 
-    cat(sprintf("Package: %s\nVersion: 0.99.0", UNIT_TEST_PKG),
+    cat(sprintf("Package: ", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Maintainer and Authors@R doesn't cause error!")
 
 
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow",
-        UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Maintainer: Joe Blow",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(.error$getNum() > 0L, "Missing email in Maintainer doesn't cause error!")
 
 
     .zeroCounters()
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
-                UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Maintainer: Joe Blow <joe@blow.com>",
+        "Authors@R: c(person('Bioconductor Package Maintainer',",
+        "    email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkDescription(UNIT_TEST_TEMPDIR)
     checkTrue(.warning$getNum() == 0L, "Using Maintainer and Authors@R causes warning!")
     checkTrue(.error$getNum() == 1L, "Using Maintainer and Author@R doesn't cause error!")
 
     .zeroCounters()
-    cat(sprintf(
-        "Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', comment = c(ORCID = '0000-0000-000-0000'), role=c('aut', 'cre')))",
-                UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Authors@R: c(person('Bioconductor', 'Package Maintainer',",
+        "    email='maintainer@bioconductor.org',",
+        "    comment = c(ORCID = '0000-0000-000-0000'),",
+        "    role=c('aut', 'cre')))",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(.note$getNum() == 1L, "An invalid ORCID ID causes a note!")
 
 
     .zeroCounters()
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nMaintainer: Joe Blow <joe@blow.com>",
-        UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Maintainer: Joe Blow <joe@blow.com>",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(.error$getNum() > 0L,"Utilize Maintainer instead of Authors@R doesn't cause error!")
 
 
     .zeroCounters()
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')), person('Joe', 'Blow', email='joe@blow.com', role='cre'))",
-        UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Authors@R: c(",
+        "  person('Bioconductor Package Maintainer',",
+        "    email='maintainer@bioconductor.org',",
+        "    role=c('aut', 'cre')),",
+        "  person('Joe', 'Blow', email='joe@blow.com', role='cre'))",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("More than one maintainer doesn't cause error!")
 
     .zeroCounters()
-    cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Bioconductor', \n  'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut', 'cre')))",
-        UNIT_TEST_PKG),
+    cat(paste("Package:", UNIT_TEST_PKG),
+        "Version: 0.99.0",
+        "Authors@R: c(",
+        "  person('Bioconductor Package Maintainer',",
+        "    email='maintainer@bioconductor.org',",
+        "    role=c('aut', 'cre')))",
+        "License: GPL-2",
+        sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(stillZero())
@@ -443,7 +521,7 @@ test_checkUnitTests <- function()
 {
     BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
     checkTrue(.note$getNum() == 1)
-    dir.create(file.path(UNIT_TEST_TEMPDIR, "tests"))
+    dir.create(file.path(UNIT_TEST_TEMPDIR, "tests"),recursive=TRUE)
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "tests",
         "foo.R"))
     .zeroCounters()
@@ -466,10 +544,12 @@ test_checkUnitTests <- function()
     checkTrue(length(msg_sapply) == 1)
     msg_seq <- BiocCheck:::check1toN(Rdir)
     checkTrue(length(msg_seq) == 1)
-    msg_sc <- BiocCheck:::checkSingleColon(Rdir)
-    checkTrue(length(msg_sc) == 1)
-    msg_mp <- BiocCheck:::checkPasteInSignaler(Rdir)
-    checkTrue(length(msg_mp) == 6)
+    msg_eda <- BiocCheck:::checkExternalData(Rdir)
+    checkTrue(length(msg_eda) == 5)
+    avail_pkgs <- BiocManager::available()
+    msg_sc <- BiocCheck:::checkSingleColon(Rdir, avail_pkgs)
+    testval <- ifelse("BiocCheck" %in% avail_pkgs, 1, 0)
+    checkTrue(length(msg_sc) == testval)
     pkgdir = system.file("testpackages", "testpkg2", package="BiocCheck")
     res <- BiocCheck:::checkLogicalUseFiles(pkgdir)
     checkTrue(length(res) == 1)
@@ -650,7 +730,7 @@ test_checkForBadDepends <- function()
     checkEquals(1, BiocCheck:::.error$getNum())
     checkEquals(1, BiocCheck:::.note$getNum())
     checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
-    checkTrue(grepl("how 4 object", BiocCheck:::.note$get()[1]))
+    checkTrue(grepl("how 5 object", BiocCheck:::.note$get()[1]))
 }
 
 test_remotesUsage <- function()
@@ -923,6 +1003,17 @@ test_packageAlreadyExists <- function()
     checkEquals(.error$getNum(),5)
     BiocCheck:::checkIsPackageAlreadyInRepo("GenomicRanges", "BioCworkflows")
     checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("ImNotFound", "BioCexp")
+    checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("ImNotFound", "BioCann")
+    checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("ImNotFound", "BioCworkflows")
+    checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("ImNotFound", "CRAN")
+    checkEquals(.error$getNum(),5)
+    BiocCheck:::checkIsPackageAlreadyInRepo("ImNotFound", "BioCsoft")
+    checkEquals(.error$getNum(),5)
+    .zeroCounters()
 }
 
 test_checkUsageOfDont <- function()
@@ -944,4 +1035,18 @@ test_checkUsageOfDont <- function()
     BiocCheck:::checkUsageOfDont(pkgdir)
     checkEquals(0, .note$getNum())
     .zeroCounters()
+}
+
+test_IsOrcidIdValid = function()
+{
+    orcid <- c(
+        "0000-0001-6197-3471",
+        "0000-0001-6197-347X",
+        "0000-0001-6197-34XX",
+        "0000-0001-6197-3471-0000",
+        "",
+        NA_character_
+    )
+    valid <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)
+    checkIdentical(valid, BiocCheck:::.checkORCID(orcid))
 }
