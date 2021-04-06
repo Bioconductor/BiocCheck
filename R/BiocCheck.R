@@ -204,6 +204,10 @@ BiocCheck <- function(package=".", ...)
             }
     }
 
+    handleCheck("Checking .Rbuildignore...")
+    checkRbuildignore(package_dir)
+
+
     if (is.null(dots[["no-check-vignettes"]]))
     {
         pkgType <- getPkgType(package_dir)

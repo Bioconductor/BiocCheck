@@ -21,6 +21,7 @@ NEW FEATURES
     bitbucket, dropbox; @LiNk-NY, #75)
     o (1.27.1) Check that licenses do not exclude classes of users,
     e.g., non-academic users.
+    o (1.27.x) Check for 'tests' entry in '.Rbuildignore'
 
 CHANGES IN VERSION 1.25
 -----------------------
