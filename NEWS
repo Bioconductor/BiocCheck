@@ -10,6 +10,7 @@ BUG FIX
 
 NEW FEATURES
 
+    o (1.27.x) Check that a user has the package name in watched tags of support site 
     o (1.27.1) Check that licenses do not exclude classes of users,
     e.g., non-academic users.
 
