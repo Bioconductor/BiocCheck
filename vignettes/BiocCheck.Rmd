@@ -374,6 +374,17 @@ directory.
 * Single colon typos are checked for when a user inputs 'package:function'
   instead of using double colons ('::') to import a function (`ERROR`).
 
+* Users should not download data from external hosting platforms. This
+  means avoiding references to major platforms such as GitHub, GitLab,
+  and BitBucket. For the same reason we do not import GitHub packages,
+  external data can be unstable and not well maintained. Maintainers
+  should re-use data already available in Bioconductor or contribute
+  an ExperimentHub, AnnotationHub or similar package (`ERROR`).
+
+* `paste` and `paste0` function calls within signaling functions such as
+  `message`, `warning`, and `stop` are redundant and should be avoided
+  (`NOTE`). `paste` calls with the `collapse` argument are ignored.
+
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
   is because `T` and `F` are ordinary variables whose value can be
@@ -611,15 +622,15 @@ with the `--no-check-bioc-help` option.
   This can be disabled with the `--no-check-bioc-help` option.
 
   The main place people ask questions about _Bioconductor_ packages is
-  the support site.  Please [register][11] and then optionally include
-  your (lowercased) package name in the list of [watched tags][12].
+  the support site.  Please [register][11] and then include
+  your package name in the list of watched tags.
   When a question is asked and tagged with your package name, you'll
-  get an email. (If you don't add your package to the list of watched
-  tags, this will be automatically done for you).
+  get an email.
+
+* Package name is in support site watched tags is now a requirement.  
 
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/
-[12]: https://support.bioconductor.org/profile/#div_id_watched_tags
 
 # `BiocCheckGitClone`
 

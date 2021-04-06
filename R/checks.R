@@ -956,6 +956,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # message(paste(...))
+    msg_mp <- checkPasteInSignaler(Rdir)
+    if (length(msg_mp)) {
+        handleNote(" Avoid the use of 'paste' in condition signalers")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_mp)
+            handleMessage(msg, indent=8)
+    }
+
     # T/F
     res <- checkLogicalUseFiles(pkgdir)
     pkgname <- basename(pkgdir)
@@ -989,6 +998,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
         handleNote(" Avoid system() ; use system2()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_sys)
+            handleMessage(msg, indent=8)
+    }
+
+    # external data
+    msg_eda <- checkExternalData(Rdir)
+    if (length(msg_eda)) {
+        handleError(" Avoid references to external hosting platforms")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_eda)
             handleMessage(msg, indent=8)
     }
 
@@ -1078,6 +1096,38 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     msg_sc <- unlist(msg_sc)
 }
 
+.filtTokens <- function(ind, tokens){
+    txt <- tokens[ind, "text"]
+    filt <- txt %in% c("paste0", "paste")
+    if (any(filt) && "collapse" %in% txt)
+        filt <- FALSE
+    ind[filt]
+}
+
+.findPasteInSignaler <- function(rfile) {
+    tokens <- getParseData(parse(rfile, keep.source = TRUE))
+    tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
+    txt <- tokens[, "text"]
+    signalers <- which(txt %in% c("message", "warning", "stop"))
+    opar <- which(txt == "(")
+    startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
+    parnum <- tokens[startSig, "parent"]
+    endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+    sigRanges <- Map(seq, startSig, endSig)
+    pasteInd <- lapply(sigRanges, .filtTokens, tokens = tokens)
+    tokens <- tokens[unlist(pasteInd), , drop = FALSE]
+    sprintf(
+        "%s (line %d, column %d)",
+        rfile, tokens[, "line1"], tokens[, "col1"]
+    )
+}
+
+checkPasteInSignaler <- function(Rdir) {
+    rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    pasteSig <- lapply(rfiles, .findPasteInSignaler)
+    pasteSig <- unlist(pasteSig)
+}
+
 checkClassEqUsage <- function(pkgdir){
 
     regex <- "\\bclass\\s*(.*)\\s*[!=]="
@@ -1102,6 +1152,29 @@ checkSystemCall <- function(pkgdir){
 
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
     msg_sys <- grepPkgDir(pkgdir, "-rHn '^system(.*'")
+}
+
+checkExternalData <- function(Rdir) {
+
+    rfiles <- dir(Rdir, pattern="\\.[Rr]$", full.names=TRUE)
+    msg_eda <- lapply(rfiles, function(rfile) {
+        tokens <- getParseData(parse(rfile, keep.source=TRUE))
+        tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
+
+        platforms <- "githubusercontent|github|gitlab|bitbucket|dropbox"
+
+        hits <- grepl(platforms, tokens[, "text"], ignore.case = TRUE)
+        if (any(hits))
+            tokens <- tokens[hits, , drop = FALSE]
+        else
+            tokens <- tokens[FALSE, , drop = FALSE]
+
+        sprintf(
+            "%s (line %d, column %d)",
+            basename(rfile), tokens[,"line1"], tokens[,"col1"]
+        )
+    })
+    unlist(msg_eda)
 }
 
 
@@ -1627,17 +1700,49 @@ checkForSupportSiteRegistration <- function(package_dir)
         handleMessage("Maintainer email is ok.")
         return()
     }
+    accountExists <- checkSupportReg(email)
+
+    if (accountExists){
+        pkgname <- tolower(basename(package_dir))
+        checkWatchedTag(email, pkgname)
+    }
+}
+
+checkSupportReg <- function(email){
+
     url <- paste0("https://support.bioconductor.org/api/email/", email, "/")
     response <- tryCatch(GET(url), error=identity)
     if (inherits(response, "error")) {
         handleMessage(
             "Unable to connect to support site:",
             "\n  ", conditionMessage(response))
+        FALSE
     } else if (suppressMessages(content(response))) {
         handleMessage("Maintainer is registered at support site.")
+        TRUE
     } else {
         handleError("Maintainer must register at the support site; ",
-            "visit https://support.bioconductor.org/accounts/signup/ .")
+                    "visit https://support.bioconductor.org/accounts/signup/ .")
+        FALSE
+    }
+}
+
+checkWatchedTag <- function(email, pkgname){
+
+    url <- paste0("https://support.bioconductor.org/api/watched/tags/", email, "/")
+    response <- tryCatch(GET(url), error=identity)
+    if (inherits(response, "error")) {
+        handleMessage(
+            "Unable to connect to support site:",
+            "\n  ", conditionMessage(response))
+    } else {
+        tags<-tolower(trimws(unlist(strsplit(content(response)$watched_tags, split=","))))
+        if (pkgname %in% tags){
+            handleMessage("Package name is in support site watched tags.")
+        }else{
+            handleError("Maintainer must add package name to Watched Tags on the support site; ",
+                        "Edit your Support Site User Profile to add Watched Tags.")
+        }
     }
 }
 

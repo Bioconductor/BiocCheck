@@ -544,6 +544,8 @@ test_checkUnitTests <- function()
     checkTrue(length(msg_sapply) == 1)
     msg_seq <- BiocCheck:::check1toN(Rdir)
     checkTrue(length(msg_seq) == 1)
+    msg_eda <- BiocCheck:::checkExternalData(Rdir)
+    checkTrue(length(msg_eda) == 5)
     avail_pkgs <- BiocManager::available()
     msg_sc <- BiocCheck:::checkSingleColon(Rdir, avail_pkgs)
     testval <- ifelse("BiocCheck" %in% avail_pkgs, 1, 0)
@@ -551,6 +553,19 @@ test_checkUnitTests <- function()
     pkgdir = system.file("testpackages", "testpkg2", package="BiocCheck")
     res <- BiocCheck:::checkLogicalUseFiles(pkgdir)
     checkTrue(length(res) == 1)
+}
+
+test_findPasteInSignaler <- function() {
+    rfile <- tempfile()
+    writeLines(c(
+        "message(paste('foo', 'bar'))",
+        "message(paste('foo', x))",
+        "message(paste(x, collapse = '\t'))",
+        "message('foo', paste(x, collapse = 't'))"
+    ), rfile)
+    checkTrue(
+        length(BiocCheck:::.findPasteInSignaler(rfile)) == 2L
+    )
 }
 
 test_installAndLoad <- function()
@@ -715,7 +730,7 @@ test_checkForBadDepends <- function()
     checkEquals(1, BiocCheck:::.error$getNum())
     checkEquals(1, BiocCheck:::.note$getNum())
     checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
-    checkTrue(grepl("how 4 object", BiocCheck:::.note$get()[1]))
+    checkTrue(grepl("how 5 object", BiocCheck:::.note$get()[1]))
 }
 
 test_remotesUsage <- function()
@@ -883,6 +898,37 @@ test_checkForBiocDevelSubscription <- function()
 
     }
 
+}
+
+test_checkForSupportSiteRegistration <- function()
+{
+    connect <- suppressWarnings(
+        tryCatch({
+            readBin("https://support.bioconductor.org", n=1L, what="raw")
+            TRUE
+        }, error = function(...) {
+            FALSE
+        })
+    )
+
+    if (connect) {
+
+        # Email registration
+        .zeroCounters()
+        BiocCheck:::checkSupportReg("lori.shepherd@roswellpark.org")
+        checkTrue(stillZero())
+        BiocCheck:::checkSupportReg("foo@bar.com")
+        checkEquals(.error$getNum(), 1)
+        .zeroCounters()
+
+        # tags
+        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "biocfilecache")
+        checkTrue(stillZero())
+        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "unwatchedpackage")
+        checkEquals(.error$getNum(), 1)
+        .zeroCounters()
+
+    }
 }
 
 test_checkForVersionNumberMismatch <- function()
