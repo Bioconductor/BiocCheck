@@ -3,14 +3,16 @@ CHANGES IN VERSION 1.27
 
 BUG FIX
 
-    o (1.27.2) Correct path to R license database file by calling R.home('share').
+    o (1.27.2) Correct path to R license database file by calling
+    R.home('share').
     o (1.27.3) Correct check for if package already exists in CRAN/Bioc
     o (1.27.3) Correct check for single colon use
 
 
 NEW FEATURES
 
-    o (1.27.x) Check that a user has the package name in watched tags of support site 
+    o (1.27.6) Check that a user has the package name in watched tags of
+    support site
     o (1.27.1) Check that licenses do not exclude classes of users,
     e.g., non-academic users.
 
@@ -26,7 +28,8 @@ NEW FEATURES
 
     o Check for downloads from external resources (github, gitlab, bitbucket,
     dropbox; @LiNk-NY, #75)
-    o (1.25.4) Check for single colon typos when using qualified imports pkg::foo()
+    o (1.25.4) Check for single colon typos when using qualified imports
+    pkg::foo()
     o (1.25.1) Check for warning/notes on too-brief a Description: field
     (@federicomarini, #65)
     o (1.25.8) Validate ORCID IDs (if any) in the DESCRIPTION file
@@ -48,8 +51,8 @@ USER SIGNIFICANT CHANGES
 
     o (1.25.3) Require Aurhors@R format over Author/Maintainer fields in the
     DESCRIPTION file. This has been upgraded to an ERROR.
-    o (1.25.2) Resolve <https://github.com/Bioconductor/BiocCheck/issues/57>: Suggest
-    styler over formatR for automatic code re-formatting.
+    o (1.25.2) Suggest styler over formatR for automatic code re-formatting
+    (@lcolladotor, #57).
     o (1.25.5) Add warning to new package versions with non-zero x version
     (@mtmorgan, #101)
 
