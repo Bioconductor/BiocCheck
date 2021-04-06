@@ -11,6 +11,7 @@ BUG FIX
 
 NEW FEATURES
 
+    o (1.27.8) Check for 'tests' entry in '.Rbuildignore'
     o (1.27.7) Removed BiocCheck and BiocCheckGitClone installation scripts;
     recommended usage is `BiocCheck()`
     o (1.27.6) Check that a user has the package name in watched tags of
@@ -21,7 +22,6 @@ NEW FEATURES
     bitbucket, dropbox; @LiNk-NY, #75)
     o (1.27.1) Check that licenses do not exclude classes of users,
     e.g., non-academic users.
-    o (1.27.x) Check for 'tests' entry in '.Rbuildignore'
 
 CHANGES IN VERSION 1.25
 -----------------------
