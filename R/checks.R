@@ -992,6 +992,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # external data
+    msg_eda <- checkExternalData(Rdir)
+    if (length(msg_eda)) {
+        handleError(" Avoid references to external hosting platforms")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_eda)
+            handleMessage(msg, indent=8)
+    }
+
     # set.seed
     res <- findLogicalRdir(pkgname, "set.seed")
     if (length(res) > 0){
@@ -1102,6 +1111,29 @@ checkSystemCall <- function(pkgdir){
 
     pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
     msg_sys <- grepPkgDir(pkgdir, "-rHn '^system(.*'")
+}
+
+checkExternalData <- function(Rdir) {
+
+    rfiles <- dir(Rdir, pattern="\\.[Rr]$", full.names=TRUE)
+    msg_eda <- lapply(rfiles, function(rfile) {
+        tokens <- getParseData(parse(rfile, keep.source=TRUE))
+        tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
+
+        platforms <- "githubusercontent|github|gitlab|bitbucket|dropbox"
+
+        hits <- grepl(platforms, tokens[, "text"], ignore.case = TRUE)
+        if (any(hits))
+            tokens <- tokens[hits, , drop = FALSE]
+        else
+            tokens <- tokens[FALSE, , drop = FALSE]
+
+        sprintf(
+            "%s (line %d, column %d)",
+            basename(rfile), tokens[,"line1"], tokens[,"col1"]
+        )
+    })
+    unlist(msg_eda)
 }
 
 
