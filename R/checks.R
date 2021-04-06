@@ -956,6 +956,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # message(paste(...))
+    msg_mp <- checkPasteInSignaler(Rdir)
+    if (length(msg_mp)) {
+        handleNote(" Avoid the use of 'paste' in condition signalers")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_mp)
+            handleMessage(msg, indent=8)
+    }
+
     # T/F
     res <- checkLogicalUseFiles(pkgdir)
     pkgname <- basename(pkgdir)
@@ -1085,6 +1094,38 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
         )
     }, framelist = colon_pres)
     msg_sc <- unlist(msg_sc)
+}
+
+.filtTokens <- function(ind, tokens){
+    txt <- tokens[ind, "text"]
+    filt <- txt %in% c("paste0", "paste")
+    if (any(filt) && "collapse" %in% txt)
+        filt <- FALSE
+    ind[filt]
+}
+
+.findPasteInSignaler <- function(rfile) {
+    tokens <- getParseData(parse(rfile, keep.source = TRUE))
+    tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
+    txt <- tokens[, "text"]
+    signalers <- which(txt %in% c("message", "warning", "stop"))
+    opar <- which(txt == "(")
+    startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
+    parnum <- tokens[startSig, "parent"]
+    endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+    sigRanges <- Map(seq, startSig, endSig)
+    pasteInd <- lapply(sigRanges, .filtTokens, tokens = tokens)
+    tokens <- tokens[unlist(pasteInd), , drop = FALSE]
+    sprintf(
+        "%s (line %d, column %d)",
+        rfile, tokens[, "line1"], tokens[, "col1"]
+    )
+}
+
+checkPasteInSignaler <- function(Rdir) {
+    rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    pasteSig <- lapply(rfiles, .findPasteInSignaler)
+    pasteSig <- unlist(pasteSig)
 }
 
 checkClassEqUsage <- function(pkgdir){

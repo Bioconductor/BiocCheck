@@ -406,6 +406,10 @@ directory.
   should re-use data already available in Bioconductor or contribute
   an ExperimentHub, AnnotationHub or similar package (`ERROR`).
 
+* `paste` and `paste0` function calls within signaling functions such as
+  `message`, `warning`, and `stop` are redundant and should be avoided
+  (`NOTE`). `paste` calls with the `collapse` argument are ignored.
+
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
   is because `T` and `F` are ordinary variables whose value can be
