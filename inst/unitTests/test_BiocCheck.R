@@ -900,6 +900,37 @@ test_checkForBiocDevelSubscription <- function()
 
 }
 
+test_checkForSupportSiteRegistration <- function()
+{
+    connect <- suppressWarnings(
+        tryCatch({
+            readBin("https://support.bioconductor.org", n=1L, what="raw")
+            TRUE
+        }, error = function(...) {
+            FALSE
+        })
+    )
+
+    if (connect) {
+
+        # Email registration
+        .zeroCounters()
+        BiocCheck:::checkSupportReg("lori.shepherd@roswellpark.org")
+        checkTrue(stillZero())
+        BiocCheck:::checkSupportReg("foo@bar.com")
+        checkEquals(.error$getNum(), 1)
+        .zeroCounters()
+
+        # tags
+        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "biocfilecache")
+        checkTrue(stillZero())
+        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "unwatchedpackage")
+        checkEquals(.error$getNum(), 1)
+        .zeroCounters()
+
+    }
+}
+
 test_checkForVersionNumberMismatch <- function()
 {
     pkgpath <- create_test_package('badpkg', list(Version="0.0.1"))
