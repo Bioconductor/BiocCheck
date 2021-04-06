@@ -1,8 +1,0 @@
-#!/bin/sh
-
-R_SCRIPT="suppressPackageStartupMessages(library(methods))"
-R_SCRIPT="$R_SCRIPT; suppressPackageStartupMessages(library(BiocCheck))"
-R_SCRIPT="$R_SCRIPT; BiocCheck:::.BiocCheckGitCloneFromCommandLine()"
-
-echo "$R_SCRIPT" | $R_HOME/bin/R --vanilla --slave --args $*
-
