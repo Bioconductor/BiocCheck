@@ -184,14 +184,9 @@ parseFile <- function(infile, pkgdir)
                 stop("'knitr' package required to check knitr-based vignettes")
             }
             outfile <- file.path(parse_dir, "parseFile.tmp")
-            # copy file to work around https://github.com/yihui/knitr/issues/970
-            # which is actually fixed but not in CRAN yet (3/16/15)
-            tmpin <- file.path(parse_dir, basename(infile))
-            file.copy(infile, tmpin)
             suppressWarnings(suppressMessages(capture.output({
-                knitr::purl(input=tmpin, output=outfile, documentation=0L)
+                knitr::purl(input=infile, output=outfile, documentation=0L)
             })))
-            file.remove(tmpin)
         } else {
             full.infile <- normalizePath(infile)
             oof <- file.path(parse_dir, basename(infile))
