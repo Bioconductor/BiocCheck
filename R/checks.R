@@ -231,8 +231,9 @@ checkIndivFileSizes <- function(pkgdir)
 }
 
 checkRbuildignore <- function(pkgdir) {
-    rbuild <- readLines(file.path(pkgdir, ".Rbuildignore"))
-    if (length(rbuild)) {
+    rbuildfile <- file.path(pkgdir, ".Rbuildignore")
+    if (file.exists(rbuildfile)) {
+        rbuild <- readLines(rbuildfile)
         testIgnore <- .testRbuildignore(rbuild)
         if (any(testIgnore))
             handleError(
@@ -367,7 +368,7 @@ checkBiocViews <- function(pkgdir)
     }
 }
 
-.checkORCID <- function(orcid) 
+.checkORCID <- function(orcid)
 {
     re <- "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$"
     grepl(re, orcid)
@@ -1645,7 +1646,7 @@ checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft",
                                "http://bioconductor.org/packages/devel/workflows/VIEWS",
                            "http://bioconductor.org/packages/devel/bioc/VIEWS")
     }
-    
+
     conn <- url(repo.url)
     dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
     close(conn)

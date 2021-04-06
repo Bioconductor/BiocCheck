@@ -266,7 +266,7 @@ test_checkRbuildignore <- function()
     )
     checkTrue(
         identical(
-            sum(.testRbuildignore(readLines(rbuildfile))),
+            sum(BiocCheck:::.testRbuildignore(readLines(rbuildfile))),
             6L
         )
     )
