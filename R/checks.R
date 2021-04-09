@@ -1190,7 +1190,7 @@ checkPasteInSignaler <- function(Rdir) {
 checkSignalerInSignaler <- function(Rdir) {
     rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
     sisig <- lapply(rfiles, .findSignalerInSignaler)
-    sisig <- unlist(pasteSig)
+    sisig <- unlist(sisig)
 }
 
 checkClassEqUsage <- function(pkgdir){
