@@ -12,12 +12,14 @@ BUG FIX
 
 NEW FEATURES
 
+    o (1.27.10) Check for 'error' and other keywords in signaler functions,
+    'message', 'warning', and 'stop' etc. (@hpages, #125)
     o (1.27.8) Check for 'tests' entry in '.Rbuildignore'
     o (1.27.7) Removed BiocCheck and BiocCheckGitClone installation scripts;
     recommended usage is `BiocCheck()`
     o (1.27.6) Check that a user has the package name in watched tags of
     support site
-    o (1.27.5) Check for 'paste' / 'paste0' in signaler functions, `message`,
+    o (1.27.5) Check for 'paste' / 'paste0' in signaler functions, 'message',
     'warning', and 'stop' (@LiNk-NY, #64)
     o (1.27.4) Check for downloads from external resources (github, gitlab,
     bitbucket, dropbox; @LiNk-NY, #75)

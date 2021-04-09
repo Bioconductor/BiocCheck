@@ -390,6 +390,10 @@ directory.
   `message`, `warning`, and `stop` are redundant and should be avoided
   (`NOTE`). `paste` calls with the `collapse` argument are ignored.
 
+* `message`, `warning`, and `error` keywords should not be included in
+  signaling functions `message`, `warning`, and `stop`. This is
+  redundant and should be avoided (`NOTE`).
+
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
   is because `T` and `F` are ordinary variables whose value can be
@@ -632,7 +636,7 @@ with the `--no-check-bioc-help` option.
   When a question is asked and tagged with your package name, you'll
   get an email.
 
-* Package name is in support site watched tags is now a requirement.  
+* Package name is in support site watched tags is now a requirement.
 
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/
