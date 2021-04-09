@@ -984,6 +984,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # stop("Error: ")
+    msg_ss <- checkSignalerInSignaler(Rdir)
+    if (length(msg_ss)) {
+        handleNote(" Avoid redundancy in signalers")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_ss)
+            handleMessage(msg, indent=8)
+    }
+
     # T/F
     res <- checkLogicalUseFiles(pkgdir)
     pkgname <- basename(pkgdir)
@@ -1115,25 +1124,36 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     msg_sc <- unlist(msg_sc)
 }
 
-.filtTokens <- function(ind, tokens){
+.filtTokens <-
+    function(ind, tokens, keywords = c("paste0", "paste"))
+{
     txt <- tokens[ind, "text"]
-    filt <- txt %in% c("paste0", "paste")
+    filt <- tolower(txt) %in% keywords
+    #filt <- grepl(txt, keywords, ignore.case = ignore.case)
     if (any(filt) && "collapse" %in% txt)
         filt <- FALSE
     ind[filt]
 }
 
-.findPasteInSignaler <- function(rfile) {
+.getTokens <- function(rfile) {
     tokens <- getParseData(parse(rfile, keep.source = TRUE))
-    tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
+    tokens[tokens[,"token"] != "expr", ,drop=FALSE]
+}
+
+.findSignalerRanges <- function(rfile, tokens) {
     txt <- tokens[, "text"]
     signalers <- which(txt %in% c("message", "warning", "stop"))
     opar <- which(txt == "(")
     startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
     parnum <- tokens[startSig, "parent"]
     endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
-    sigRanges <- Map(seq, startSig, endSig)
-    pasteInd <- lapply(sigRanges, .filtTokens, tokens = tokens)
+    Map(seq, startSig, endSig)
+}
+
+.findInSignaler <- function(rfile, FUN, ...) {
+    tokens <- .getTokens(rfile)
+    sigRanges <- .findSignalerRanges(rfile, tokens)
+    pasteInd <- lapply(sigRanges, FUN, tokens = tokens, ...)
     tokens <- tokens[unlist(pasteInd), , drop = FALSE]
     sprintf(
         "%s (line %d, column %d)",
@@ -1141,10 +1161,36 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     )
 }
 
+.findPasteInSignaler <- function(rfile) {
+    .findInSignaler(rfile, .filtTokens)
+}
+
+.grepTokens <-
+    function(ind, tokens, keywords = c("message", "warning", "error"))
+{
+    txt <- tokens[ind, , drop = FALSE]
+    strs <- txt$token == "STR_CONST"
+    ind <- ind[strs]
+    txt <- txt[strs, "text"]
+    filt <- grepl(paste0(keywords, collapse = "|"), txt, ignore.case = TRUE)
+    ind[filt]
+}
+
+.findSignalerInSignaler <- function(rfile) {
+    .findInSignaler(rfile, .grepTokens,
+        keywords = c("message", "warning", "error"))
+}
+
 checkPasteInSignaler <- function(Rdir) {
     rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
     pasteSig <- lapply(rfiles, .findPasteInSignaler)
     pasteSig <- unlist(pasteSig)
+}
+
+checkSignalerInSignaler <- function(Rdir) {
+    rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    sisig <- lapply(rfiles, .findSignalerInSignaler)
+    sisig <- unlist(pasteSig)
 }
 
 checkClassEqUsage <- function(pkgdir){

@@ -582,6 +582,19 @@ test_findPasteInSignaler <- function() {
     )
 }
 
+test_findSignalerInSignaler <- function() {
+    rfile <- tempfile()
+    writeLines(c(
+        "message('warning: see here')",
+        "warning('error here')",
+        "stop('ErrOR: see here')",
+        "stop('message here')"
+    ), rfile)
+    checkTrue(
+        length(BiocCheck:::.findSignalerInSignaler(rfile)) == 4L
+    )
+}
+
 test_installAndLoad <- function()
 {
     BiocCheck:::installAndLoad(create_test_package('testpkg'))
