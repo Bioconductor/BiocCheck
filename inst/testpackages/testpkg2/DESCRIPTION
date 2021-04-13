@@ -6,6 +6,6 @@ Author: Joe Blow
 Maintainer: Joe Blow <joe@blow.com>
 Depends: R (>= 3.1.0), RJSONIO
 License: GPL-2
-LazyData: true
+LazyData: false
 Imports: devtools, tools
 VignetteBuilder: FailBuilder

@@ -113,6 +113,14 @@ checkRemotesUsage <- function(pkgdir)
         handleError("Package dependencies must be on CRAN or Bioconductor. Remove 'Remotes:' from DESCRIPTION")
 }
 
+checkLazyDataUsage <- function(pkgdir)
+{
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    if ("LazyData" %in% colnames(dcf) &&
+        tools:::str_parse_logic(dcf[, "LazyData"]))
+        handleNote("'LazyData:' in the 'DESCRIPTION' should be set to false or removed")
+}
+
 checkNewPackageVersionNumber <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))

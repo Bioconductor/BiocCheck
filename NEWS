@@ -12,6 +12,7 @@ BUG FIX
 
 NEW FEATURES
 
+    o (1.27.12) Check for `LazyData: TRUE` in the DESCRIPTION (@lshep, #128)
     o (1.27.8) Check for 'tests' entry in '.Rbuildignore'
     o (1.27.7) Removed BiocCheck and BiocCheckGitClone installation scripts;
     recommended usage is `BiocCheck()`

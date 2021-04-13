@@ -124,6 +124,14 @@ Bioconductor only allows dependencies that are hosted on CRAN or
 Bioconductor. The use of `Remotes:` in the DESCRIPTION to specify a unique
 remote location is not allowed.
 
+## LazyData Usage Check
+
+**Checking for 'LazyData: true' usage...**
+
+For packages that include data, we recommend not including `LazyData: TRUE`.
+This rarely proves to be a good thing. In our experience it only slows down
+the loading of packages with large data (`NOTE`).
+
 ## Version Checks
 
 Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
@@ -632,7 +640,7 @@ with the `--no-check-bioc-help` option.
   When a question is asked and tagged with your package name, you'll
   get an email.
 
-* Package name is in support site watched tags is now a requirement.  
+* Package name is in support site watched tags is now a requirement.
 
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/
