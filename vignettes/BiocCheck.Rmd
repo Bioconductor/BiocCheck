@@ -150,10 +150,10 @@ Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
 * **Checking R Version dependency...**
   If you specify an R version in the `Depends:` field of your
   `DESCRIPTION` file, `BiocCheck` checks to make sure that the R
-  version specified matches the version currently used by
-  _Bioconductor_. This prevents the package from being used in earlier
-  versions of R, which is not recommended and is a frequent cause of
-  user confusion (`WARNING`).
+  version specified matches the version currently used in
+  _Bioconductor_. This helps to prevent mixing of Bioconductor release and
+  devel versions (esp. when R versions differ) which is a frequent source of
+  confusion and errors (`NOTE`).
 
 For more information on package versions, see the
 [Version Numbering HOWTO][3].
@@ -632,7 +632,7 @@ with the `--no-check-bioc-help` option.
   When a question is asked and tagged with your package name, you'll
   get an email.
 
-* Package name is in support site watched tags is now a requirement.  
+* Package name is in support site watched tags is now a requirement.
 
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/

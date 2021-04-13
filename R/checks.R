@@ -158,6 +158,13 @@ checkVersionNumber <- function(pkgdir)
     }, error=function(e) handleError("Invalid package version"))
 }
 
+.compareVersions <- function(pkgVer, RVer = getRversion()[, 1:2]) {
+    if (pkgVer < RVer)
+        handleNote(
+            sprintf("Update R version dependency from %s to %s.", pkgVer, RVer)
+        )
+}
+
 checkRVersionDependency <- function(package_dir)
 {
     desc <- file.path(package_dir, "DESCRIPTION")
@@ -172,15 +179,7 @@ checkRVersionDependency <- function(package_dir)
             if (nchar(verStr))
             {
                 ver <- as.package_version(verStr)
-                bv <- package_version(sprintf("%s.%s",
-                    getRversion()$major,
-                    getRversion()$minor))
-                if (ver < bv)
-                {
-                    handleWarning(
-                        "Update R version dependency from ", ver, " to ", bv,
-                        ".")
-                }
+                .compareVersions(ver)
             }
         }
     }
