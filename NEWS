@@ -12,6 +12,8 @@ BUG FIX
 
 NEW FEATURES
 
+    o (1.27.11) R version dependency check in the 'DESCRIPTION' is now a
+    'NOTE' (@lshep, #126)
     o (1.27.10) Check for 'error' and other keywords in signaler functions,
     'message', 'warning', and 'stop' etc. (@hpages, #125)
     o (1.27.8) Check for 'tests' entry in '.Rbuildignore'

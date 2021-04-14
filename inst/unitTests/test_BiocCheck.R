@@ -231,6 +231,9 @@ test_checkVersionNumber <- function()
     }
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
     checkTrue(.warning$getNum() ==1)
+    .zeroCounters()
+    .compareVersions(as.package_version("4.0"), as.package_version("4.1"))
+    checkTrue(.note$getNum() ==1)
 }
 
 test_checkNewPackageVersionNumber <- function()
