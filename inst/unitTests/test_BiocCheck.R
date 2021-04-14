@@ -232,7 +232,9 @@ test_checkVersionNumber <- function()
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
     checkTrue(.warning$getNum() ==1)
     .zeroCounters()
-    .compareVersions(as.package_version("4.0"), as.package_version("4.1"))
+    BiocCheck:::.compareVersions(
+        as.package_version("4.0"), as.package_version("4.1")
+    )
     checkTrue(.note$getNum() ==1)
 }
 
@@ -1021,15 +1023,16 @@ test_checkForDirectSlotAccess <- function()
 
 test_checkRVersionDependency <- function()
 {
+    .zeroCounters()
     desc <- file.path(tempdir(), "DESCRIPTION")
     cat("Depends: R (>= 1.0.0)", file=desc)
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.warning$getNum(), 1)
+    checkEquals(.note$getNum(), 1)
     .zeroCounters()
 
     cat("Depends: R", file=desc)
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.warning$getNum(), 0)
+    checkEquals(.note$getNum(), 0)
     .zeroCounters()
 
     cat("Imports: foobar)", file=desc)
@@ -1039,7 +1042,7 @@ test_checkRVersionDependency <- function()
 
     cat("Depends: R (>= 10000.0.0)", file=desc) # this test might fail some day!
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.warning$getNum(), 0)
+    checkEquals(.note$getNum(), 0)
     .zeroCounters()
 
     unlink(desc)
