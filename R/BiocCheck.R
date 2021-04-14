@@ -133,6 +133,9 @@ BiocCheck <- function(package=".", ...)
         checkRemotesUsage(package_dir)
     }
 
+    handleCheck("Checking for 'LazyData: true' usage...")
+    checkLazyDataUsage(package_dir)
+
     if (is.null(dots[["no-check-version-num"]])){
         handleCheck("Checking version number...")
         if (!checkingDir) {

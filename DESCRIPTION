@@ -14,7 +14,7 @@ Authors@R: c(
     person("Federico", "Marini", role="ctb"))
 Depends: R (>= 3.5.0)
 License: Artistic-2.0
-LazyData: true
+LazyData: false
 VignetteBuilder: knitr
 Imports: biocViews (>= 1.33.7), BiocManager, stringdist, graph, httr, tools,
     optparse, codetools, methods, utils, knitr

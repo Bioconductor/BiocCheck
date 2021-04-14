@@ -782,6 +782,15 @@ test_remotesUsage <- function()
     checkEquals(0, BiocCheck:::.error$getNum())
 }
 
+test_LazyDataUsage <- function()
+{
+    pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    BiocCheck:::.zeroCounters()
+    BiocCheck:::checkLazyDataUsage(pkg)
+    checkEquals(1, BiocCheck:::.note$getNum())
+}
+
+
 test_doesFileLoadPackage <- function()
 {
     df <- getParseData(parse(system.file("testpackages", "testpkg0",
