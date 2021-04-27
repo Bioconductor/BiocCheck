@@ -1149,7 +1149,10 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 
 .findSignalerRanges <- function(rfile, tokens) {
     txt <- tokens[, "text"]
-    signalers <- which(txt %in% c("message", "warning", "stop"))
+    signalers <- which(
+        txt %in% c("message", "warning", "stop") &
+        tokens[, "token"] == "SYMBOL_FUNCTION_CALL"
+    )
     opar <- which(txt == "(")
     startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
     parnum <- tokens[startSig, "parent"]
