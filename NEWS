@@ -14,6 +14,7 @@ BUG FIX
 
 NEW FEATURES
 
+    o (1.27.16) Check vignettes for all package types (@lshep, #136)
     o (1.27.12) Check for `LazyData: TRUE` in the DESCRIPTION (@lshep, #128)
     o (1.27.11) R version dependency check in the 'DESCRIPTION' is now a
     'NOTE' (@lshep, #126)

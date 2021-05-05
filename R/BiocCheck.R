@@ -210,27 +210,14 @@ BiocCheck <- function(package=".", ...)
     handleCheck("Checking .Rbuildignore...")
     checkRbuildignore(package_dir)
 
-
-    if (is.null(dots[["no-check-vignettes"]]))
-    {
+    if (is.null(dots[["no-check-vignettes"]])) {
         handleCheck("Checking vignette directory...")
-        pkgType <- getPkgType(package_dir)
-        if ((is.na(pkgType)) || pkgType == "Software")
-        {
-            msg <- sprintf(
-                "This is a%s package",
-                if (is.na(pkgType)) "n unknown type of" else " software")
-            handleMessage(msg)
-            checkVignetteDir(package_dir, checkingDir)
-            if ("build-output-file" %in% names(dots))
-            {
-                handleCheck(
-                    "Checking whether vignette is built with 'R CMD build'...")
-                checkIsVignetteBuilt(package_dir, dots[["build-output-file"]])
-            }
-        } else {
-            handleMessage(
-                "This is not a software package, skipping vignette checks...")
+        checkVignetteDir(package_dir, checkingDir)
+        if ("build-output-file" %in% names(dots)) {
+            handleCheck(
+                "Checking whether vignette is built with 'R CMD build'..."
+            )
+            checkIsVignetteBuilt(package_dir, dots[["build-output-file"]])
         }
     }
 

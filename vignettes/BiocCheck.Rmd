@@ -308,11 +308,6 @@ Can be disabled with `--no-check-vignettes`.
 
 **Checking vignette directory...**
 
-Only run if your package is a software package (as determined by your
-[biocViews](#biocViews_Checks)), or if package type cannot be
-determined.
-
-* Checks package type based on biocViews in DESCRIPTION.
 * Checks that the `vignettes` directory exists (`ERROR`).
 * Checks that the `vignettes` directory only contains vignette sources
   *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
