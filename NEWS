@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.27
 
 BUG FIX
 
+    o (1.27.15) Reporting checking of vignette despite package type
+    (@lshep, #136) 
     o (1.27.9) Allow portability of child Rmd documents via parseFile
     o (1.27.3) Correct check for if package already exists in CRAN/Bioc
     o (1.27.3) Correct check for single colon use
