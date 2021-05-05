@@ -213,10 +213,10 @@ BiocCheck <- function(package=".", ...)
 
     if (is.null(dots[["no-check-vignettes"]]))
     {
+        handleCheck("Checking vignette directory...")
         pkgType <- getPkgType(package_dir)
         if ((is.na(pkgType)) || pkgType == "Software")
         {
-            handleCheck("Checking vignette directory...")
             msg <- sprintf(
                 "This is a%s package",
                 if (is.na(pkgType)) "n unknown type of" else " software")
