@@ -3,6 +3,7 @@ CHANGES IN VERSION 1.27
 
 BUG FIX
 
+    o (1.27.17) Update support site watched tags. tags are case insensitive
     o (1.27.15) Reporting checking of vignette despite package type
     (@lshep, #136) 
     o (1.27.9) Allow portability of child Rmd documents via parseFile

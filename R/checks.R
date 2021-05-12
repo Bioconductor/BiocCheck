@@ -1812,7 +1812,7 @@ checkWatchedTag <- function(email, pkgname){
             "\n  ", conditionMessage(response))
     } else {
         tags<-tolower(trimws(unlist(strsplit(content(response)$watched_tags, split=","))))
-        if (pkgname %in% tags){
+        if (tolower(pkgname) %in% tags){
             handleMessage("Package name is in support site watched tags.")
         }else{
             handleError("Maintainer must add package name to Watched Tags on the support site; ",

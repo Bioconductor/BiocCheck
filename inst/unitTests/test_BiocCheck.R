@@ -967,6 +967,10 @@ test_checkForSupportSiteRegistration <- function()
         BiocCheck:::checkSupportReg("foo@bar.com")
         checkEquals(.error$getNum(), 1)
         .zeroCounters()
+        ## api is case insensitivy
+        BiocCheck:::checkSupportReg("lori.shePhErd@roswellpark.org")
+        checkTrue(stillZero())
+
 
         # tags
         BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "biocfilecache")
@@ -974,6 +978,12 @@ test_checkForSupportSiteRegistration <- function()
         BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "unwatchedpackage")
         checkEquals(.error$getNum(), 1)
         .zeroCounters()
+        ## email is case insensitive
+        BiocCheck:::checkWatchedTag("lori.shePherd@rosWellpark.org", "biocfilecache")
+        checkTrue(stillZero())
+        ## check tag is case insenstive
+        BiocCheck:::checkWatchedTag("lori.shepherd@rosWellpark.org", "bioCfiLecache")
+        checkTrue(stillZero())
 
     }
 }
