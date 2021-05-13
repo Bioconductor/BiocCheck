@@ -393,8 +393,8 @@ directory.
   `message`, `warning`, and `stop` are redundant and should be avoided
   (`NOTE`). `paste` calls with the `collapse` argument are ignored.
 
-* `message`, `warning`, and `error` keywords should not be included in
-  signaling functions `message`, `warning`, and `stop`. This is
+* `message`, `warn*`, and `error` keywords should not be included in
+  signal condition functions: `message`, `warning`, and `stop`. This is
   redundant and should be avoided (`NOTE`).
 
 * **Checking for T...** **Checking for F...**

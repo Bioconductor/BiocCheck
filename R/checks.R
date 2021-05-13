@@ -985,7 +985,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     # message(paste(...))
     msg_mp <- checkPasteInSignaler(Rdir)
     if (length(msg_mp)) {
-        handleNote(" Avoid the use of 'paste' in condition signalers")
+        handleNote(" Avoid the use of 'paste' in condition signals")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_mp)
             handleMessage(msg, indent=8)
@@ -994,7 +994,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     # stop("Error: ")
     msg_ss <- checkSignalerInSignaler(Rdir)
     if (length(msg_ss)) {
-        handleNote(" Avoid redundancy in signalers")
+        handleNote(" Avoid redundant 'stop' and 'warn*' in signal conditions")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_ss)
             handleMessage(msg, indent=8)
@@ -1176,7 +1176,7 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 }
 
 .grepTokens <-
-    function(ind, tokens, keywords = c("message", "warning", "error"))
+    function(ind, tokens, keywords)
 {
     txt <- tokens[ind, , drop = FALSE]
     strs <- txt$token == "STR_CONST"
@@ -1188,7 +1188,7 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 
 .findSignalerInSignaler <- function(rfile) {
     .findInSignaler(rfile, .grepTokens,
-        keywords = c("message", "warning", "error"))
+        keywords = c("message", "warn", "error"))
 }
 
 checkPasteInSignaler <- function(Rdir) {
