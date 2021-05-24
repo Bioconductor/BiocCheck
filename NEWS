@@ -4,6 +4,10 @@ NEW FEATURES
 
     o (1.29.1) Check for `install()` function calls in package code.
 
+BUG FIX
+
+    o (1.29.2) rename internal function from checkIsPackageAlreadyInRepo to checkIsPackageNameAlreadyInUse
+
 CHANGES IN VERSION 1.27
 -----------------------
 

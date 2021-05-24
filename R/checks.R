@@ -1690,7 +1690,7 @@ checkFormatting <- function(pkgdir, nlines=6)
     }
 }
 
-checkIsPackageAlreadyInRepo <- function(pkgName, repo=c("CRAN", "BioCsoft",
+checkIsPackageNameAlreadyInUse <- function(pkgName, repo=c("CRAN", "BioCsoft",
                                                      "BioCann", "BioCexp", "BioCworkflows"))
 {
     repo <- match.arg(repo)

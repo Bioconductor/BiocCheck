@@ -274,16 +274,16 @@ BiocCheck <- function(package=".", ...)
     if (is.null(dots[["no-check-CRAN"]]))
     {
         handleCheck("Checking if package already exists in CRAN...")
-        checkIsPackageAlreadyInRepo(package_name, "CRAN")
+        checkIsPackageNameAlreadyInUse(package_name, "CRAN")
     }
 
     if (!is.null(dots[["new-package"]]))
     {
         handleCheck("Checking if new package already exists in Bioconductor...")
-        checkIsPackageAlreadyInRepo(package_name, "BioCsoft")
-        checkIsPackageAlreadyInRepo(package_name, "BioCann")
-        checkIsPackageAlreadyInRepo(package_name, "BioCexp")
-        checkIsPackageAlreadyInRepo(package_name, "BioCworkflows")
+        checkIsPackageNameAlreadyInUse(package_name, "BioCsoft")
+        checkIsPackageNameAlreadyInUse(package_name, "BioCann")
+        checkIsPackageNameAlreadyInUse(package_name, "BioCexp")
+        checkIsPackageNameAlreadyInUse(package_name, "BioCworkflows")
     }
 
     if (is.null(dots[["no-check-bioc-help"]]))
