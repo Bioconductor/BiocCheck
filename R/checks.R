@@ -1065,6 +1065,12 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     if (res > 0)
         handleWarning("Remove browser() statements (found in ", res, " files)")
 
+    # install() calls
+    res <- findSymbolInParsedCode(parsedCode, package_name, "install",
+        "SYMBOL_FUNCTION_CALL")
+
+    if (res > 0)
+        handleError("Remove install() calls (found in ", res, " files)")
 
     # <<-
     res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",

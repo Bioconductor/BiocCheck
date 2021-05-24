@@ -423,6 +423,10 @@ which result in issues of varying severity.
   should not be used in production code (though it's OK to wrap such
   calls in a conditional that evaluates to TRUE if some debugging
   option is set)  (`WARNING`).
+* **Checking for install()...**
+  The programmatic use of `install()` calls is bad practice. A
+  separation between analysis and configuration tasks keeps code
+  modular and reproducible (`ERROR`).
 * **Checking for <<-...**
   Non-local assignment using `<<-` is bad practice. It can over-write
   user-defined symbols, and introduces non-linear paths of evaluation

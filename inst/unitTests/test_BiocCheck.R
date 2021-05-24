@@ -640,6 +640,16 @@ test_checkForBrowser <- function()
     checkTrue(res == 1)
 }
 
+test_checkForInstall <- function()
+{
+    if (is.null(parsedCode))
+        parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
+            "testpkg0", package="BiocCheck"))
+    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "install",
+        "SYMBOL_FUNCTION_CALL")
+    checkTrue(res == 1)
+}
+
 test_checkClassEqUsage <- function()
 {
     dir.create(dir <- tempfile())

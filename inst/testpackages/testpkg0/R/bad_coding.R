@@ -40,3 +40,7 @@ bad_dl <- function() {
     download.file(dataurl, destfile = tempfile())
 
 }
+
+bad_install <- function(pkg) {
+    BiocManager::install(pkg)
+}

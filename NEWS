@@ -1,3 +1,9 @@
+CHANGES IN VERSION 1.29
+
+NEW FEATURES
+
+    o (1.29.1) Check for `install()` function calls in package code.
+
 CHANGES IN VERSION 1.27
 -----------------------
 
