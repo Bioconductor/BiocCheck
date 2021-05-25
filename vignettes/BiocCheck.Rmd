@@ -322,6 +322,7 @@ Can be disabled with `--no-check-vignettes`.
   the total (`WARNING`).
 * Checks whether the global vignette code option is set to `eval=FALSE`.
   The majority of vignette code is expected to be evaluated (`WARNING`)
+* Checks for any legacy `BiocInstaller` code (`WARNING`)
 
 **Checking whether vignette is built with 'R CMD build'...**
 

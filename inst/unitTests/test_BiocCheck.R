@@ -185,7 +185,7 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEquals(5, .warning$getNum())
+    checkEquals(6, .warning$getNum())
     checkEquals("Evaluate more vignette chunks.",
         .warning$get()[5])
     checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[3]))
@@ -647,7 +647,14 @@ test_checkForInstall <- function()
             "testpkg0", package="BiocCheck"))
     res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "install",
         "SYMBOL_FUNCTION_CALL")
-    checkTrue(res == 1)
+    checkTrue(res == 2)
+}
+
+test_checkVigBiocInst <- function()
+{
+    pkgdir <- system.file("testpackages", "testpkg0", package = "BiocCheck")
+    BiocCheck:::checkVigBiocInst(pkgdir)
+    checkTrue(.warning$getNum() == 1)
 }
 
 test_checkClassEqUsage <- function()

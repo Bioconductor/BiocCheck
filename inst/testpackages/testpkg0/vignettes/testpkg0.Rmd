@@ -3,6 +3,23 @@
 ```{r echo=FALSE}
 ```
 
+
+```{r eval=FALSE}
+if (!requireNamespace("BiocCheck", quietly = TRUE))
+    BiocManager::install("BiocCheck")
+```
+
+```{r eval=TRUE}
+if (!requireNamespace("BiocCheck", quietly = TRUE))
+    BiocManager::install("BiocCheck")
+```
+
+
+```{r eval=FALSE}
+if (!requireNamespace("BiocCheck", quietly = TRUE))
+    BiocInstaller::biocLite("BiocCheck")
+```
+
 ```{r eval=FALSE}
 ```
 
