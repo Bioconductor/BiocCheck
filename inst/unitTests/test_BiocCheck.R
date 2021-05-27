@@ -644,6 +644,15 @@ test_checkInstallationCalls <- function()
     .zeroCounters()
 }
 
+test_checkVigInstalls <- function()
+{
+    BiocCheck:::checkVigInstalls(
+        system.file("testpackages", "testpkg0", package="BiocCheck", mustWork = TRUE)
+    )
+    checkTrue(.error$getNum() == 1)
+    .zeroCounters()
+}
+
 test_checkVigSessionInfo <- function()
 {
     BiocCheck:::checkVigSessionInfo(

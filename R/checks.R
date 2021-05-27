@@ -616,6 +616,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigBiocInst(pkgdir)
 
+    checkVigInstalls(vigdircontents)
+
     checkVigSessionInfo(vigdircontents)
 
     msg_eval <- checkVigEvalAllFalse(pkgdir)
@@ -885,6 +887,40 @@ checkVigBiocInst <- function(pkgdir) {
         handleMessage("Found in file(s):", indent=6)
         for (msg in msg_return)
             handleMessage(msg, indent=8)
+    }
+}
+
+.BAD_CALLS <- c("biocLite", "install.packages", "install_packages",
+    "update.packages", "install")
+
+
+checkVigInstalls <- function(pkgdir) {
+    vigdir <- file.path(pkgdir, "vignettes", "")
+    vigfiles <- getVigSources(vigdir)
+    viglist <- stats::setNames(
+        vector("list", length(vigfiles)), basename(vigfiles)
+    )
+    for (vfile in vigfiles) {
+        tempR <- tempfile(fileext=".R")
+        knitr::purl(input = vfile, output = tempR, quiet = TRUE)
+        tokens <- getParseData(parse(tempR, keep.source = TRUE))
+        isBadCall <- tokens[, "token"] == "SYMBOL_FUNCTION_CALL" &
+            tokens[, "text"] %in% .BAD_CALLS
+        tokens <- tokens[isBadCall, , drop = FALSE]
+        viglist[[basename(vfile)]] <- sprintf(
+            "%s (code line %d, column %d)",
+            basename(vfile), tokens[,"line1"], tokens[,"col1"]
+        )
+    }
+    viglist <- Filter(length, viglist)
+    if (length(viglist)) {
+        handleError("Installation calls found in vignette(s)")
+        handleMessage("Found in file(s):", indent=6)
+        invisible(lapply(viglist, function(x) {
+            for (msg in x)
+                handleMessage(msg, indent=8)
+            }
+        ))
     }
 }
 

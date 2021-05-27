@@ -325,6 +325,8 @@ Can be disabled with `--no-check-vignettes`.
 * Checks for any legacy `BiocInstaller` code (`WARNING`)
 * Checks that vignette code contains `sessionInfo()` for reproducibility
   (`NOTE`).
+* Checks that evaluated vignette code does not invoke package installation
+  functions (`ERROR`).
 
 **Checking whether vignette is built with 'R CMD build'...**
 
