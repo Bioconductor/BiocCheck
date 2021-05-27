@@ -925,13 +925,14 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
     }
 }
 
-checkLibraryCalls <- function(pkgdir)
+checkInstallationCalls <- function(pkgdir)
 {
     pkgdir <- file.path(pkgdir, "R")
     rfiles <- dir(
         pkgdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE
     )
-    badCalls <- c("biocLite", "install.packages", "update.packages", "install")
+    badCalls <- c("biocLite", "install.packages", "install_packages",
+        "update.packages", "install")
     msg_installs <- lapply(rfiles, function(rfile){
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] %in% badCalls, , drop = FALSE]

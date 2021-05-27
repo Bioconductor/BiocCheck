@@ -551,10 +551,6 @@ test_checkUnitTests <- function()
         "testpkg0", package="BiocCheck"))
     checkTrue(.note$getNum() == 1)
     .zeroCounters()
-    BiocCheck:::checkLibraryCalls(system.file("testpackages",
-        "testpkg0", package="BiocCheck"))
-    checkTrue(.note$getNum() == 1)
-    .zeroCounters()
 
     # check coding practice
     pkgdir = system.file("testpackages", "testpkg0", package="BiocCheck")
@@ -638,6 +634,14 @@ test_checkForBrowser <- function()
     res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "browser",
         "SYMBOL_FUNCTION_CALL")
     checkTrue(res == 1)
+}
+
+test_checkInstallationCalls <- function()
+{
+    BiocCheck:::checkInstallationCalls(system.file("testpackages",
+        "testpkg0", package="BiocCheck", mustWork = TRUE))
+    checkTrue(.note$getNum() == 1)
+    .zeroCounters()
 }
 
 test_checkVigSessionInfo <- function()
