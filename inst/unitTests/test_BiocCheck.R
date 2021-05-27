@@ -640,6 +640,15 @@ test_checkForBrowser <- function()
     checkTrue(res == 1)
 }
 
+test_checkVigSessionInfo <- function()
+{
+    BiocCheck:::checkVigSessionInfo(
+        system.file("testpackages", "testpkg0", package = "BiocCheck",
+            mustWork = TRUE)
+    )
+    checkTrue(.note$getNum() == 1)
+}
+
 test_checkForInstall <- function()
 {
     if (is.null(parsedCode))

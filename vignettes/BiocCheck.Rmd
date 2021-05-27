@@ -323,6 +323,8 @@ Can be disabled with `--no-check-vignettes`.
 * Checks whether the global vignette code option is set to `eval=FALSE`.
   The majority of vignette code is expected to be evaluated (`WARNING`)
 * Checks for any legacy `BiocInstaller` code (`WARNING`)
+* Checks that vignette code contains `sessionInfo()` for reproducibility
+  (`NOTE`).
 
 **Checking whether vignette is built with 'R CMD build'...**
 

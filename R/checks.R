@@ -616,6 +616,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigBiocInst(pkgdir)
 
+    checkVigSessionInfo(vigdircontents)
+
     msg_eval <- checkVigEvalAllFalse(pkgdir)
     if(length(msg_eval) > 0) {
         handleWarning(" Vignette set global option 'eval=FALSE'")
@@ -883,6 +885,27 @@ checkVigBiocInst <- function(pkgdir) {
         handleMessage("Found in file(s):", indent=6)
         for (msg in msg_return)
             handleMessage(msg, indent=8)
+    }
+}
+
+checkVigSessionInfo <- function(pkgdir) {
+    vigdir <- file.path(pkgdir, "vignettes", "")
+    vigfiles <- getVigSources(vigdir)
+    notFoundVig <- stats::setNames(
+        vector("logical", length(vigfiles)), vigfiles
+    )
+    for (vfile in vigfiles) {
+        pc <- stats::setNames(list(parseFile(vfile, pkgdir)), basename(vfile))
+        res <- findSymbolInParsedCode(pc, basename(pkgdir),
+            "sessionInfo", "SYMBOL_FUNCTION_CALL")
+        if (!res) {
+            notFoundVig[[vfile]] <- TRUE
+        }
+    }
+    if (any(notFoundVig)) {
+        handleNote(" 'sessionInfo' not found in vignette(s)")
+        handleMessage("Missing from file(s):", indent=6)
+        handleMessage(basename(vigfiles[notFoundVig]), indent=8)
     }
 }
 

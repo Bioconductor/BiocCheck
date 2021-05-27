@@ -3,6 +3,7 @@ CHANGES IN VERSION 1.29
 NEW FEATURES
 
     o (1.29.1) Check for `install()` function calls in R and vignette code.
+    o (1.29.4) Check for `sessionInfo` in vignette code.
 
 BUG FIXES
 
