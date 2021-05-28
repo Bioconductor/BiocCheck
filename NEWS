@@ -2,15 +2,16 @@ CHANGES IN VERSION 1.29
 
 NEW FEATURES
 
-    o (1.29.1) Check for `install()` function calls in R code.
-    o (1.29.4) Check for `sessionInfo` in vignette code.
     o (1.29.5) Check for installation calls in vignette code.
+    o (1.29.4) Check for `sessionInfo` in vignette code.
+    o (1.29.1) Check for `install()` function calls in R code.
 
 BUG FIXES
 
+    o (1.29.6) Use appropriate input (`pkgdir`) to internal checking functions.
+    o (1.29.3) Add unit tests for legacy function searches.
     o (1.29.2) rename internal function from checkIsPackageAlreadyInRepo to
     checkIsPackageNameAlreadyInUse
-    o (1.29.3) Add unit tests for legacy function searches.
 
 CHANGES IN VERSION 1.27
 -----------------------

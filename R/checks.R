@@ -616,9 +616,9 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigBiocInst(pkgdir)
 
-    checkVigInstalls(vigdircontents)
+    checkVigInstalls(pkgdir)
 
-    checkVigSessionInfo(vigdircontents)
+    checkVigSessionInfo(pkgdir)
 
     msg_eval <- checkVigEvalAllFalse(pkgdir)
     if(length(msg_eval) > 0) {
