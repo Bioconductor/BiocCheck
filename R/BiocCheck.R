@@ -222,8 +222,8 @@ BiocCheck <- function(package=".", ...)
     }
 
     if (is.null(dots[["no-check-library-calls"]])){
-        handleCheck("Checking installation calls in R code...")
-        checkInstallationCalls(package_dir)
+        handleCheck("Checking package installation calls in R code...")
+        checkPkgInstallCalls(package_dir)
     }
 
     parsedCode <- parseFiles(package_dir)

@@ -122,8 +122,8 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0
         && .warning$getNum() == 1
-        && .note$getNum() == 0,
-        "expected 1 warnings")
+        && .note$getNum() == 1,
+        "expected 1 warning and 1 note")
     .zeroCounters()
 
     # test OK
@@ -132,8 +132,9 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0
         && .warning$getNum() == 0
-        && .note$getNum() == 0,
-        "expected no notes/error/warning")
+        && .note$getNum() == 1,
+        "expected 1 note and 0 errors/warnings")
+    .zeroCounters()
 
 
     # check rnw file in inst/doc  WARNING
@@ -631,17 +632,19 @@ test_checkForBrowser <- function()
     if (is.null(parsedCode))
         parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
             "testpkg0", package="BiocCheck"))
-    res <- BiocCheck:::findSymbolInParsedCode(parsedCode, "testpkg0", "browser",
+    res <- BiocCheck:::findSymbolsInParsedCode(parsedCode, "browser",
         "SYMBOL_FUNCTION_CALL")
-    checkTrue(res == 1)
+    checkTrue(length(res) == 1)
 }
 
-test_checkInstallationCalls <- function()
+test_findSymbolsInRFiles <- function()
 {
-    BiocCheck:::checkInstallationCalls(system.file("testpackages",
-        "testpkg0", package="BiocCheck", mustWork = TRUE))
-    checkTrue(.note$getNum() == 1)
-    .zeroCounters()
+    pkgdir <- system.file("testpackages", "testpkg0",
+        package="BiocCheck", mustWork = TRUE)
+    msg <- BiocCheck:::findSymbolsInRFiles(
+        pkgdir, BiocCheck:::.BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
+    )
+    checkTrue(length(msg) == 2)
 }
 
 test_checkVigInstalls <- function()

@@ -961,26 +961,34 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
     }
 }
 
-checkInstallationCalls <- function(pkgdir)
+.BAD_INSTALL_CALLS <- c("biocLite", "install.packages", "install_packages",
+    "update.packages", "install")
+
+findSymbolsInRFiles <-
+    function(pkgdir, Symbols, tokenType)
 {
-    pkgdir <- file.path(pkgdir, "R")
+    rdir <- file.path(pkgdir, "R")
     rfiles <- dir(
-        pkgdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE
+        rdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE
     )
-    badCalls <- c("biocLite", "install.packages", "install_packages",
-        "update.packages", "install")
-    msg_installs <- lapply(rfiles, function(rfile){
-        tokens <- getParseData(parse(rfile, keep.source=TRUE))
-        tokens <- tokens[tokens[,"text"] %in% badCalls, , drop = FALSE]
-        sprintf("%s: %d", basename(rfile), tokens[,"line1"])
-    })
-    msg_installs <- unlist(msg_installs)
-    if (length(msg_installs) > 0) {
+    parsedCodes <- lapply(
+        stats::setNames(nm = rfiles), parseFile, pkgdir = pkgdir
+    )
+    msg_installs <- findSymbolsInParsedCode(parsedCodes, Symbols, tokenType)
+    unlist(msg_installs)
+}
+
+checkPkgInstallCalls <- function(package_dir, badCalls = .BAD_INSTALL_CALLS) {
+    msg_installs <- findSymbolsInRFiles(
+        package_dir, badCalls, "SYMBOL_FUNCTION_CALL"
+    )
+    if (length(msg_installs)) {
         handleNote(
-            "install, biocLite, install.packages, or update.packages found in R files"
+            "install, biocLite, install.packages,",
+            " or update.packages found in R files"
         )
         for (msg in msg_installs)
-            handleMessage(msg)
+            handleMessage(msg, indent = 8)
     }
 }
 
@@ -1120,23 +1128,33 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     checkForDirectSlotAccess(parsedCode, package_name)
 
     # browser() calls
-    res <- findSymbolInParsedCode(parsedCode, package_name, "browser",
-                                  "SYMBOL_FUNCTION_CALL")
-    if (res > 0)
-        handleWarning("Remove browser() statements (found in ", res, " files)")
+    msg_b <- findSymbolsInRFiles(pkgdir, "browser", "SYMBOL_FUNCTION_CALL")
+    if (length(msg_b)) {
+        handleWarning(
+            "Remove browser() statements (found ", length(msg_b), " times)")
+        for (msg in msg_b)
+            handleMessage(msg, indent = 8)
+    }
 
-    # install() calls
-    res <- findSymbolInParsedCode(parsedCode, package_name, "install",
-        "SYMBOL_FUNCTION_CALL")
-
-    if (res > 0)
-        handleError("Remove install() calls (found in ", res, " files)")
+    # install() / install.packages() calls
+    msg_inst <- findSymbolsInRFiles(
+        pkgdir, c("install", "install.packages"), "SYMBOL_FUNCTION_CALL"
+    )
+    if (length(msg_inst)) {
+        handleError(
+            "Remove install() calls (found ", length(msg_inst), " times)"
+        )
+        for (msg in msg_inst)
+            handleMessage(msg, indent = 8)
+    }
 
     # <<-
-    res <- findSymbolInParsedCode(parsedCode, package_name, "<<-",
-                                  "LEFT_ASSIGN")
-    if (res > 0)
-        handleNote("Avoid '<<-' if possible (found in ", res, " files)")
+    msg_da <- findSymbolsInRFiles(pkgdir, "<<-", "LEFT_ASSIGN")
+    if (length(msg_da)) {
+        handleNote("Avoid '<<-' if possible (found ", length(msg_da), " times)")
+        for (msg in msg_da)
+            handleMessage(msg, indent = 8)
+    }
 
 }
 

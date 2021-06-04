@@ -276,6 +276,45 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
     length(matches) # for tests
 }
 
+findSymbolsInParsedCode <- function(parsedCodeList, symbolNames, tokenTypes)
+{
+    matches <- structure(vector("list", length(parsedCodeList)),
+        .Names = names(parsedCodeList))
+    if (
+        !identical(length(tokenTypes), length(symbolNames)) &&
+        length(tokenTypes) == 1L
+    )
+        tokenTypes <- rep(tokenTypes, length(symbolNames))
+
+    for (filename in names(parsedCodeList)) {
+        df <- parsedCodeList[[filename]]
+        df[["filename"]] <- basename(filename)
+        res <- Map(function(x, y) {
+            df[df$token == x & df$text == y,
+                c("line1", "col1", "token", "text", "filename"), drop = FALSE]
+        }, x = tokenTypes, y = symbolNames)
+        res <- do.call(rbind.data.frame, res)
+        matches[[filename]] <- res
+    }
+
+    matches <- Filter(nrow, matches)
+    matches <- lapply(matches, function(dframe) {
+        dframe[["text"]] <- paste0(dframe$text,
+            ifelse(dframe$token == "SYMBOL_FUNCTION_CALL", "()", ""))
+        dframe
+    })
+
+    matches <- do.call(
+        function(...) rbind.data.frame(..., make.row.names = FALSE),
+        matches
+    )
+    apply(matches, 1L, function(minidf) {
+        sprintf("%s in %s (line %s, column %s)",
+            minidf["text"], minidf["filename"], minidf["line1"], minidf["col1"]
+        )
+    })
+}
+
 mungeName <- function(name, pkgname)
 {
     twoseps <- paste0(rep.int(.Platform$file.sep, 2), collapse="")
