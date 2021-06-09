@@ -288,19 +288,20 @@ findSymbolsInParsedCode <- function(parsedCodeList, symbolNames, tokenTypes)
 
     for (filename in names(parsedCodeList)) {
         df <- parsedCodeList[[filename]]
-        df[["filename"]] <- basename(filename)
         res <- Map(function(x, y) {
             df[df$token == x & df$text == y,
-                c("line1", "col1", "token", "text", "filename"), drop = FALSE]
+                c("line1", "col1", "token", "text"), drop = FALSE]
         }, x = tokenTypes, y = symbolNames)
         res <- do.call(rbind.data.frame, res)
         matches[[filename]] <- res
     }
 
     matches <- Filter(nrow, matches)
-    matches <- lapply(matches, function(dframe) {
+    matches <- lapply(names(matches), function(nm) {
+        dframe <- matches[[nm]]
         dframe[["text"]] <- paste0(dframe$text,
             ifelse(dframe$token == "SYMBOL_FUNCTION_CALL", "()", ""))
+        dframe[["filename"]] <- nm
         dframe
     })
 
