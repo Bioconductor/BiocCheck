@@ -897,8 +897,8 @@ checkVigBiocInst <- function(pkgdir) {
 checkVigInstalls <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
-    viglist <- stats::setNames(
-        vector("list", length(vigfiles)), basename(vigfiles)
+    viglist <- structure(
+        vector("list", length(vigfiles)), .Names = basename(vigfiles)
     )
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
@@ -927,11 +927,13 @@ checkVigInstalls <- function(pkgdir) {
 checkVigSessionInfo <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
-    notFoundVig <- stats::setNames(
-        vector("logical", length(vigfiles)), vigfiles
+    notFoundVig <- structure(
+        vector("logical", length(vigfiles)), .Names = vigfiles
     )
     for (vfile in vigfiles) {
-        pc <- stats::setNames(list(parseFile(vfile, pkgdir)), basename(vfile))
+        pc <- structure(
+            list(parseFile(vfile, pkgdir)), .Names = basename(vfile)
+        )
         res <- findSymbolInParsedCode(pc, basename(pkgdir),
             "sessionInfo", "SYMBOL_FUNCTION_CALL")
         if (!res) {
@@ -972,7 +974,7 @@ findSymbolsInRFiles <-
         rdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE
     )
     parsedCodes <- lapply(
-        stats::setNames(nm = rfiles), parseFile, pkgdir = pkgdir
+        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
     msg_installs <- findSymbolsInParsedCode(parsedCodes, Symbols, tokenType)
     unlist(msg_installs)
