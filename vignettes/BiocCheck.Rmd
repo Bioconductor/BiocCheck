@@ -323,8 +323,8 @@ Can be disabled with `--no-check-vignettes`.
 * Checks whether the global vignette code option is set to `eval=FALSE`.
   The majority of vignette code is expected to be evaluated (`WARNING`)
 * Checks for any legacy `BiocInstaller` code (`WARNING`)
-* Checks that vignette code contains `sessionInfo()` for reproducibility
-  (`NOTE`).
+* Checks that vignette code contains `sessionInfo()` or `session_info()` for
+  reproducibility (`NOTE`).
 * Checks that evaluated vignette code does not invoke package installation
   functions (`ERROR`).
 

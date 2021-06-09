@@ -934,9 +934,10 @@ checkVigSessionInfo <- function(pkgdir) {
         pc <- structure(
             list(parseFile(vfile, pkgdir)), .Names = basename(vfile)
         )
-        res <- findSymbolInParsedCode(pc, basename(pkgdir),
-            "sessionInfo", "SYMBOL_FUNCTION_CALL")
-        if (!res) {
+        res <- findSymbolsInParsedCode(
+            pc, c("sessionInfo", "session_info"), "SYMBOL_FUNCTION_CALL"
+        )
+        if (!length(res)) {
             notFoundVig[[vfile]] <- TRUE
         }
     }

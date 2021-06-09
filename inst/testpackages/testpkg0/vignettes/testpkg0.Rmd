@@ -1,6 +1,7 @@
 %\VignetteIndexEntry{Vignette Title}
 
 ```{r echo=FALSE}
+session_info()
 ```
 
 

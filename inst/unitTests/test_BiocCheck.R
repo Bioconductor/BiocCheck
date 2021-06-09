@@ -637,6 +637,13 @@ test_checkForBrowser <- function()
     checkTrue(length(res) == 1)
 }
 
+test_checkVigSessionInfo <- function()
+{
+    pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    checkVigSessionInfo(pkgdir)
+    checkTrue(.note$getNum() == 1)
+}
+
 test_findSymbolsInRFiles <- function()
 {
     pkgdir <- system.file("testpackages", "testpkg0",
