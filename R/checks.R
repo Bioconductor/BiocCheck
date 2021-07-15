@@ -167,6 +167,7 @@ checkVersionNumber <- function(pkgdir)
 }
 
 .compareVersions <- function(pkgVer, RVer = getRversion()[, 1:2]) {
+    RVer <- as.package_version(paste0(RVer, ".0"))
     if (pkgVer < RVer)
         handleNote(
             sprintf("Update R version dependency from %s to %s.", pkgVer, RVer)
