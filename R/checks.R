@@ -235,7 +235,7 @@ checkIndivFileSizes <- function(pkgdir)
     entries <- Filter(nchar,
         grep("^#", trimws(text), value = TRUE, invert = TRUE)
     )
-    grepl("test.*$", entries)
+    grepl("\\^*tests\\$*", entries)
 }
 
 checkRbuildignore <- function(pkgdir) {

@@ -267,13 +267,13 @@ test_checkNewPackageVersionNumber <- function()
 test_checkRbuildignore <- function()
 {
     rbuildfile <- file.path(UNIT_TEST_TEMPDIR, ".Rbuildignore")
-    cat("tests/", "test/*", "tests", "^tests$", "test", ".*/testthat",
+    cat("tests/", "tests", "^tests$", ".*/testthat",
         sep = "\n", file = rbuildfile
     )
     checkTrue(
         identical(
             sum(BiocCheck:::.testRbuildignore(readLines(rbuildfile))),
-            6L
+            3L
         )
     )
 }
