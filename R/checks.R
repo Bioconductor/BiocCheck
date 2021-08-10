@@ -1160,6 +1160,28 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent = 8)
     }
 
+    # Sys.setenv calls
+    msg_env <- findSymbolsInRFiles(pkgdir, "Sys.setenv", "SYMBOL_FUNCTION_CALL")
+    if (length(msg_env)) {
+        handleError("Avoid 'Sys.setenv' (found ", length(msg_env), " times)")
+        for (msg in msg_env)
+            handleMessage(msg, indent = 8)
+    }
+
+    # suppressWarnings/Messages calls
+    msg_supp <- findSymbolsInRFiles(
+        pkgdir,
+        c("suppressWarnings", "suppressMessages"),
+        "SYMBOL_FUNCTION_CALL"
+    )
+    if (length(msg_supp)) {
+        handleNote(
+            "Avoid 'suppressWarnings'/'*Messages' if possible (found ",
+            length(msg_supp), " times)"
+        )
+        for (msg in msg_supp)
+            handleMessage(msg, indent = 8)
+    }
 }
 
 checkSapply <- function(Rdir){

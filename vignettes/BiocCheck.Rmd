@@ -423,6 +423,15 @@ directory.
 evaluated man page and vignette examples to look for various symbols,
 which result in issues of varying severity.
 
+* **Checking for direct slot access...**
+  `BiocCheck` checks for direct slot access (via `@` or `slot()`) to
+  S4 objects in vignette and example code. This code should **always**
+  use accessors to interact with S4 classes. Since you may be using S4
+  classes (which don't provide accessors) from another package, the
+  severity is only `NOTE`. But if the S4 object is defined in your
+  package, it's **mandatory** to write accessors for it and to use
+  them (instead of direct slot access) in all vignette and example
+  code (`NOTE`).
 * **Checking for browser()...**
   `browser()` causes the command-line R debugger to be invoked, and
   should not be used in production code (though it's OK to wrap such
@@ -436,15 +445,13 @@ which result in issues of varying severity.
   Non-local assignment using `<<-` is bad practice. It can over-write
   user-defined symbols, and introduces non-linear paths of evaluation
   that are difficult to debug (`NOTE`).
-* **Checking for direct slot access...**
-  `BiocCheck` checks for direct slot access (via `@` or `slot()`) to
-  S4 objects in vignette and example code. This code should **always**
-  use accessors to interact with S4 classes. Since you may be using S4
-  classes (which don't provide accessors) from another package, the
-  severity is only `NOTE`. But if the S4 object is defined in your
-  package, it's **mandatory** to write accessors for it and to use
-  them (instead of direct slot access) in all vignette and example
-  code (`NOTE`).
+* **Checking for Sys.setenv calls...**
+  Packages should not modify system environment variables with the
+  `Sys.setenv` function (`ERROR`).
+* **Checking for suppressWarnings/Messages...**
+  The excessive use of `suppressWarnings` and `suppressMessages` is
+  problematic as it usually indicates a larger underlying issue with
+  the fragility of the package codebase (`NOTE`).
 
 ## Function length checking
 
