@@ -519,6 +519,10 @@ getVigSources <- function(dir)
         ignore.case=TRUE, full.names=TRUE)
 }
 
+getRSources <- function(dir) {
+    dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+}
+
 getBadDeps <- function(pkgdir)
 {
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")

@@ -1186,7 +1186,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
 checkSapply <- function(Rdir){
 
-    rfiles <- dir(Rdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE)
+    rfiles <- getRSources(Rdir)
     msg_sapply <- lapply(rfiles, function(rfile){
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"text"] == "sapply", ,drop=FALSE]
@@ -1200,7 +1200,7 @@ checkSapply <- function(Rdir){
 
 check1toN <- function(Rdir){
 
-    rfiles <- dir(Rdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE)
+    rfiles <- getRSources(Rdir)
     msg_seq <- lapply(rfiles, function(rfile) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
@@ -1218,7 +1218,7 @@ check1toN <- function(Rdir){
 
 checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 
-    rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    rfiles <- getRsources(Rdir)
     names(rfiles) <- basename(rfiles)
     colon_pres <- lapply(rfiles, function(rfile) {
         tokens <- getParseData(parse(rfile, keep.source = TRUE))
@@ -1302,13 +1302,13 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 }
 
 checkPasteInSignaler <- function(Rdir) {
-    rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    rfiles <- getRSources(Rdir)
     pasteSig <- lapply(rfiles, .findPasteInSignaler)
     pasteSig <- unlist(pasteSig)
 }
 
 checkSignalerInSignaler <- function(Rdir) {
-    rfiles <- dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    rfiles <- getRSources(Rdir)
     sisig <- lapply(rfiles, .findSignalerInSignaler)
     sisig <- unlist(sisig)
 }
@@ -1341,7 +1341,7 @@ checkSystemCall <- function(pkgdir){
 
 checkExternalData <- function(Rdir) {
 
-    rfiles <- dir(Rdir, pattern="\\.[Rr]$", full.names=TRUE)
+    rfiles <- getRSources(Rdir)
     msg_eda <- lapply(rfiles, function(rfile) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
