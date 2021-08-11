@@ -520,6 +520,8 @@ getVigSources <- function(dir)
 }
 
 getRSources <- function(Rdir) {
+    if (!identical(basename(Rdir), "R"))
+        Rdir <- file.path(Rdir, "R")
     dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
 }
 
