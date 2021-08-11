@@ -519,7 +519,7 @@ getVigSources <- function(dir)
         ignore.case=TRUE, full.names=TRUE)
 }
 
-getRSources <- function(dir) {
+getRSources <- function(Rdir) {
     dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
 }
 
