@@ -1313,6 +1313,44 @@ checkSignalerInSignaler <- function(Rdir) {
     sisig <- unlist(sisig)
 }
 
+.checkValidNEEQPattern <- function(tokens, eqnums) {
+    tokens[["rowID"]] <- seq_len(nrow(tokens))
+    unlist(lapply(eqnums, function(eq) {
+        parnum <- tokens[eq, "parent"]
+        hits <- which(tokens[, "parent"] %in% parnum)
+        if (!length(hits)) { return(NULL) }
+        startEQ <- min(hits)
+        endEQ <- max(hits)
+        EQblock <- tokens[startEQ:endEQ, ]
+        hasIS <- EQblock[, "token"] == "SYMBOL_FUNCTION_CALL" &
+            EQblock[, "text"] %in% c("is", "class")
+        if (any(hasIS) && "STR_CONST" %in% EQblock[EQblock[["rowID"]] > eq, "token"])
+            eq
+        else
+            NULL
+    }))
+}
+
+checkClassNEEQLookup <- function(pkgdir) {
+    rfiles <- getRSources(pkgdir)
+    names(rfiles) <- basename(rfiles)
+    NEEQ_pres <- lapply(rfiles, function(rfile) {
+        tokens <- getParseData(parse(rfile, keep.source = TRUE))
+        eqtoks <- which(tokens[, "token"] %in% c("NE", "EQ"))
+        eqtoks <- .checkValidNEEQPattern(tokens, eqtoks)
+        tokens[eqtoks, , drop = FALSE]
+    })
+    NEEQ_pres <- Filter(nrow, NEEQ_pres)
+    msg_neeq <- lapply(names(NEEQ_pres), function(rfile, framelist) {
+        tokens <- framelist[[rfile]]
+        sprintf(
+            "%s (line %d, column %d)",
+            rfile, tokens[, "line1"], tokens[, "col1"]
+        )
+    }, framelist = NEEQ_pres)
+    unlist(msg_neeq)
+}
+
 checkClassEqUsage <- function(pkgdir){
 
     regex <- "\\bclass\\s*(.*)\\s*[!=]="
