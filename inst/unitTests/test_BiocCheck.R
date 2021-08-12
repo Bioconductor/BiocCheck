@@ -186,7 +186,7 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEquals(6, .warning$getNum())
+    checkEquals(7, .warning$getNum())
     checkEquals("Evaluate more vignette chunks.",
         .warning$get()[5])
     checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[3]))
@@ -689,38 +689,23 @@ test_checkVigBiocInst <- function()
     checkTrue(.warning$getNum() == 1)
 }
 
-test_checkClassEqUsage <- function()
+test_checkClassNEEQLookup <- function()
 {
     dir.create(dir <- tempfile())
-    dir.create(Rdir <- sprintf("%s%s%s", dir, .Platform$file.sep, "R"))
-    fl <- tempfile(tmpdir=Rdir)
+    dir.create(Rdir <- file.path(dir, "R"))
+    fl <- tempfile(tmpdir=Rdir, fileext = ".R")
     cat(
         paste(
-            ## good
-            "class(a)=='foo'", "class(a)!='foo'", "class(a) ==",
-            "if(class(a) ==", "class ( a ) ==",
             ## bad
-            "aclass(a) ==", "classy(a) ==",
+            "class(a)=='foo'", "class(a)!='foo'",
+            "if (is(a) == 'character')", "is( a ) != 'numeric'",
+            ## ok
+            "is(a, 'List')", "is.numeric(a)",
             sep="\n"),
         "\n", file = fl
     )
-    # create directory that should not be checked
-    # only R and vignettes checked
-    dir.create(Instdir <- sprintf("%s%s%s", dir, .Platform$file.sep, "inst"))
-    fl <- tempfile(tmpdir=Instdir)
-    cat(
-        paste(
-            ## good
-            "class(a)=='foo'", "class(a)!='foo'", "class(a) ==",
-            "if(class(a) ==", "class ( a ) ==",
-            ## bad
-            "aclass(a) ==", "classy(a) ==",
-            sep="\n"),
-        "\n", file = fl
-    )
-    match <- BiocCheck:::checkClassEqUsage(dir)
-    lines <- sub(".* (\\d)\\)$", "\\1", match)
-    checkIdentical(1:5, as.integer(lines))
+    match <- BiocCheck:::checkClassNEEQLookup(dir)
+    checkIdentical(4L, length(match))
 }
 
 test_checkDescriptionNamespaceConsistency <- function()

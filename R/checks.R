@@ -619,6 +619,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigInstalls(pkgdir)
 
+    checkVigClassUsage(pkgdir)
+
     checkVigSessionInfo(pkgdir)
 
     msg_eval <- checkVigEvalAllFalse(pkgdir)
@@ -925,6 +927,36 @@ checkVigInstalls <- function(pkgdir) {
     }
 }
 
+checkVigClassUsage <- function(pkgdir) {
+    vigdir <- file.path(pkgdir, "vignettes", "")
+    vigfiles <- getVigSources(vigdir)
+    viglist <- structure(
+        vector("list", length(vigfiles)), .Names = basename(vigfiles)
+    )
+    for (vfile in vigfiles) {
+        tempR <- tempfile(fileext=".R")
+        knitr::purl(input = vfile, output = tempR, quiet = TRUE)
+        tokens <- getClassNEEQLookup(tempR)
+        viglist[[basename(vfile)]] <- sprintf(
+            "%s (code line %d, column %d)",
+            basename(vfile), tokens[,"line1"], tokens[,"col1"]
+        )
+    }
+    viglist <- Filter(length, viglist)
+    if (length(viglist)) {
+        handleWarning(
+            " Avoid class membership checks with class() / is() and == / !=",
+            "; Use is(x, 'class') for S4 classes"
+        )
+        handleMessage("Found in file(s):", indent=6)
+        invisible(lapply(viglist, function(x) {
+            for (msg in x)
+                handleMessage(msg, indent=8)
+            }
+        ))
+    }
+}
+
 checkVigSessionInfo <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
@@ -1091,9 +1123,12 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 
     # class() ==
-    msg_class <- checkClassEqUsage(pkgdir)
+    msg_class <- checkClassNEEQLookup(pkgdir)
     if (length(msg_class) > 0) {
-        handleWarning(" Avoid class() == or class() != ; use is() or !is()")
+        handleWarning(
+            " Avoid class membership checks with class() / is() and == / !=",
+            "; Use is(x, 'class') for S4 classes"
+        )
         handleMessage("Found in files:", indent=6)
         for (msg in msg_class)
             handleMessage(msg, indent=8)
@@ -1218,7 +1253,7 @@ check1toN <- function(Rdir){
 
 checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 
-    rfiles <- getRsources(Rdir)
+    rfiles <- getRSources(Rdir)
     names(rfiles) <- basename(rfiles)
     colon_pres <- lapply(rfiles, function(rfile) {
         tokens <- getParseData(parse(rfile, keep.source = TRUE))
@@ -1331,15 +1366,17 @@ checkSignalerInSignaler <- function(Rdir) {
     }))
 }
 
+getClassNEEQLookup <- function(rfile) {
+    tokens <- getParseData(parse(rfile, keep.source = TRUE))
+    eqtoks <- which(tokens[, "token"] %in% c("NE", "EQ"))
+    eqtoks <- .checkValidNEEQPattern(tokens, eqtoks)
+    tokens[eqtoks, , drop = FALSE]
+}
+
 checkClassNEEQLookup <- function(pkgdir) {
     rfiles <- getRSources(pkgdir)
     names(rfiles) <- basename(rfiles)
-    NEEQ_pres <- lapply(rfiles, function(rfile) {
-        tokens <- getParseData(parse(rfile, keep.source = TRUE))
-        eqtoks <- which(tokens[, "token"] %in% c("NE", "EQ"))
-        eqtoks <- .checkValidNEEQPattern(tokens, eqtoks)
-        tokens[eqtoks, , drop = FALSE]
-    })
+    NEEQ_pres <- lapply(rfiles, getClassNEEQLookup)
     NEEQ_pres <- Filter(nrow, NEEQ_pres)
     msg_neeq <- lapply(names(NEEQ_pres), function(rfile, framelist) {
         tokens <- framelist[[rfile]]
@@ -1349,26 +1386,6 @@ checkClassNEEQLookup <- function(pkgdir) {
         )
     }, framelist = NEEQ_pres)
     unlist(msg_neeq)
-}
-
-checkClassEqUsage <- function(pkgdir){
-
-    regex <- "\\bclass\\s*(.*)\\s*[!=]="
-    pkgdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
-    # Limit to R files and vignette source files
-    Rdir <- sprintf("%s%s%s", pkgdir, "R", .Platform$file.sep)
-    fnd1 <-
-        if(dir.exists(Rdir)){
-            grepPkgDir(Rdir, paste0('-rHn "', regex, '"'),
-                       full_path=TRUE)
-        } else {
-            character(0)
-        }
-    VigFiles <- getVigSources(sprintf("%s%s", pkgdir,"vignettes"))
-    fnd2 <- unlist(lapply(VigFiles,
-                          FUN=grepPkgDir, paste0('-rHn "', regex, '"'),
-                          full_path=TRUE))
-    msg_sys <- sub(c(fnd1, fnd2), pattern=pkgdir, replacement="", fixed=TRUE)
 }
 
 checkSystemCall <- function(pkgdir){

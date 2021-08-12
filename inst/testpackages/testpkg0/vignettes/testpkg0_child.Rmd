@@ -1,5 +1,6 @@
 Hi, I'm a child Rmd.
 
 ```{r}
-2 + 1
+a <- 2 + 1
+class(a) == "character"
 ```
