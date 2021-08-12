@@ -1752,19 +1752,20 @@ checkUnitTests <- function(pkgdir)
 ## check if testthat contains skip_on_bioc() and throw note of it does
 checkSkipOnBioc <- function(pkgdir)
 {
-    pkgdir <- file.path(pkgdir, "tests", "testthat")
-    if (file.exists(pkgdir)) {
-        testfiles <- list.files(pkgdir, pattern = ".R$")
-        testfiles_full <- file.path(pkgdir, testfiles)
-        msg <- lapply(seq_along(testfiles), function(idx){
-            tokens <- getParseData(parse(testfiles_full[idx], keep.source=TRUE))
-            if ("skip_on_bioc" %in% unlist(tokens))
-                testfiles[idx]
-        })
-        msg <- paste(unlist(msg), collapse = " ")
-        if (msg != "") {
-            handleNote("skip_on_bioc() found in testthat files: ", msg)
-        }
+    testdir <- file.path(pkgdir, "tests", "testthat")
+    if (!file.exists(testdir))
+        return()
+
+    testfiles <- dir(testdir, pattern = "\\.[Rr]$", full.names = TRUE)
+    msg <- vapply(testfiles, function(testfile){
+        tokens <- getParseData(parse(testfile, keep.source=TRUE))
+        if ("skip_on_bioc" %in% unlist(tokens)) {
+            basename(testfile)
+        } else NA_character_
+    }, character(1))
+    msg <- paste(msg[!is.na(msg)], collapse = " ")
+    if (nzchar(msg)) {
+        handleNote("skip_on_bioc() found in testthat files: ", msg)
     }
 }
 
