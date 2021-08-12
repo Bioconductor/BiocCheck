@@ -22,3 +22,4 @@ Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, rmarkdown,
 Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck/issues
+RoxygenNote: 7.1.1
