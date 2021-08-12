@@ -22,6 +22,11 @@ being summarized.}
 in which event occurs}
 
 \item{ctxt}{Object derived from Context()}
+
+\item{nlines}{numeric(1) The number of lines to provide context for.}
+
+\item{width}{numeric(1) The width of the console; defaults to the value
+given by \code{getOption("width")}}
 }
 \value{
 Context: a data.frame() with columns File, Line, and Context

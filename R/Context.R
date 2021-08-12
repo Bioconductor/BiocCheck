@@ -10,8 +10,15 @@
 #'
 #' @param lines character() vector of text lines in file
 #'
+#' @param nlines numeric(1) The number of lines to provide context for.
+#'
+#' @param width numeric(1) The width of the console; defaults to the value
+#'     given by `getOption("width")`
+#'
 #' @param idx logical() same length as \code{lines} indicating lines
 #'     in which event occurs
+#'
+#' @md
 #'
 #' @return Context: a data.frame() with columns File, Line, and Context
 Context <- function(pkg="", file="", lines=character(), idx=logical()) {
