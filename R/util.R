@@ -779,31 +779,3 @@ doesManPageHaveRunnableExample <- function(rd)
     # if code contains only comments the length with be 0
     length(parsed) && !inherits(parsed, "try-error")
 }
-
-
-checkLogicalUseFiles <- function(pkgdir) {
-    Rdir <- file.path(pkgdir, "R")
-    Rfiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[rR]$",
-                  full.names = TRUE)
-    dx <- startsWith(Rfiles, Rdir)
-    RdirFiles <- Rfiles[dx]
-    Rother <- Rfiles[!dx]
-    manFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Dd]$",
-        full.names = TRUE)
-    RNWFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Nn][wW]$",
-        full.names = TRUE)
-    RMDFiles <- dir(pkgdir, recursive=TRUE, pattern = "\\.[Rr][Mm][Dd]$",
-        full.names = TRUE)
-
-    allFiles <- c(Rother, RMDFiles, RNWFiles, manFiles)
-    fileNames1 <- character()
-    if (length(allFiles) > 0){
-        convertedFiles <- unlist(lapply(FUN=makeTempRFile, allFiles))
-        vl <- lapply(convertedFiles, findLogicalFile)
-        names(vl) <- c(Rother, RMDFiles, RNWFiles, manFiles)
-        badFiles <- Filter(length, vl)
-        fileNames1 <- names(badFiles)
-    }
-    sub(fileNames1, pattern=paste0(pkgdir,.Platform$file.sep),
-        replacement="", fixed=TRUE)
-}

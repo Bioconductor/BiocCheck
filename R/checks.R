@@ -1122,21 +1122,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 
     # T/F
-    res <- checkLogicalUseFiles(pkgdir)
-    pkgname <- basename(pkgdir)
-    res2 <- findLogicalRdir(pkgname, c("T","F"))
-    if (length(c(res,res2)) > 0 ){
-        handleWarning(" Use TRUE/FALSE instead of T/F")
-        if (length(res2) > 0){
-            handleMessage("Found in R/ directory functions:", indent=6)
-            for (msg in res2)
-                handleMessage(msg, indent=8)
-        }
-        if (length(res) > 0){
-            handleMessage("Found in files:", indent=6)
-            for (msg in res)
-                handleMessage(msg, indent=8)
-        }
+    msg_tf <- findSymbolsInRFiles(pkgdir, c("T", "F"), "SYMBOL")
+    if (length(msg_tf)) {
+        handleWarning(
+            " Avoid T/F variables; If logical, use TRUE/FALSE (found ",
+            length(msg_tf),
+            " times)"
+        )
+        for (msg in msg_tf)
+            handleMessage(msg, indent = 8)
     }
 
     # class() ==
