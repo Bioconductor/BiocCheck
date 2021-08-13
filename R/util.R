@@ -309,10 +309,12 @@ findSymbolsInParsedCode <- function(parsedCodeList, symbolNames, tokenTypes)
 
     for (filename in names(parsedCodeList)) {
         df <- parsedCodeList[[filename]]
-        res <- Map(function(x, y) {
-            df[df$token == x & df$text == y,
-                c("line1", "col1", "token", "text"), drop = FALSE]
-        }, x = tokenTypes, y = symbolNames)
+        res <- Map(
+            function(x, y) {
+                .getTokenTextCode(parsedf = df, token = x, text = y)
+            },
+            x= tokenTypes, y = symbolNames
+        )
         res <- do.call(rbind.data.frame, res)
         matches[[filename]] <- res
     }

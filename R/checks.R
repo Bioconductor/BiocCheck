@@ -1003,15 +1003,32 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
 findSymbolsInRFiles <-
     function(pkgdir, Symbols, tokenType)
 {
-    rdir <- file.path(pkgdir, "R")
-    rfiles <- dir(
-        rdir, ignore.case = TRUE, pattern="\\.R$", full.names=TRUE
-    )
+    rfiles <- getRSources(pkgdir)
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
     msg_installs <- findSymbolsInParsedCode(parsedCodes, Symbols, tokenType)
     unlist(msg_installs)
+}
+
+findSymbolsInVignettes <-
+    function(pkgdir, Symbols, tokenType)
+{
+    vigdir <- file.path(pkgdir, "vignettes", "")
+    vigfiles <- getVigSources(vigdir)
+    viglist <- structure(
+        vector("list", length(vigfiles)), .Names = vigfiles
+    )
+    for (vfile in vigfiles) {
+        tempR <- tempfile(fileext=".R")
+        knitr::purl(input = vfile, output = tempR, quiet = TRUE)
+        tokens <- .getTokenTextCode(parseFile(tempR), tokenType, Symbols)
+        viglist[[basename(vfile)]] <- sprintf(
+            "%s (code line %d, column %d)",
+           getDirFile(vfile), tokens[,"line1"], tokens[,"col1"]
+        )
+    }
+    Filter(length, viglist)
 }
 
 checkPkgInstallCalls <- function(package_dir, badCalls = .BAD_INSTALL_CALLS) {
