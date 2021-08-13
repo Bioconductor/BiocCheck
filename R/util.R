@@ -276,6 +276,27 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
     length(matches) # for tests
 }
 
+getDirFile <- function(fpath) {
+    if (length(fpath) && !is.na(fpath))
+        vapply(
+            strsplit(normalizePath(fpath), .Platform$file.sep),
+            function(pseg) {
+                paste(utils::tail(pseg, 2L), collapse = .Platform$file.sep)
+            },
+            character(1L)
+        )
+    else
+        fpath
+}
+
+.getTokenTextCode <- function(parsedf, token, text) {
+    parsedf[
+        parsedf$token == token & parsedf$text %in% text,
+        c("line1", "col1", "token", "text"),
+        drop = FALSE
+    ]
+}
+
 findSymbolsInParsedCode <- function(parsedCodeList, symbolNames, tokenTypes)
 {
     matches <- structure(vector("list", length(parsedCodeList)),
@@ -311,7 +332,8 @@ findSymbolsInParsedCode <- function(parsedCodeList, symbolNames, tokenTypes)
     )
     apply(matches, 1L, function(minidf) {
         sprintf("%s in %s (line %s, column %s)",
-            minidf["text"], minidf["filename"], minidf["line1"], minidf["col1"]
+            minidf["text"], getDirFile(minidf["filename"]),
+            minidf["line1"], minidf["col1"]
         )
     })
 }

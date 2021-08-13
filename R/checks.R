@@ -912,7 +912,7 @@ checkVigInstalls <- function(pkgdir) {
         tokens <- tokens[isBadCall, , drop = FALSE]
         viglist[[basename(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
-            basename(vfile), tokens[,"line1"], tokens[,"col1"]
+            getDirFile(vfile), tokens[,"line1"], tokens[,"col1"]
         )
     }
     viglist <- Filter(length, viglist)
@@ -977,7 +977,7 @@ checkVigSessionInfo <- function(pkgdir) {
     if (any(notFoundVig)) {
         handleNote(" 'sessionInfo' not found in vignette(s)")
         handleMessage("Missing from file(s):", indent=6)
-        handleMessage(basename(vigfiles[notFoundVig]), indent=8)
+        handleMessage(getDirFile(vigfiles[notFoundVig]), indent=8)
     }
 }
 
@@ -1430,8 +1430,6 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
             "'@' in examples/vignettes.")
     }
 }
-
-
 
 checkFunctionLengths <- function(parsedCode, pkgname)
 {
