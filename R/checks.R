@@ -621,6 +621,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigClassUsage(pkgdir)
 
+    checkTFSymbolUsage(pkgdir)
+
     checkVigSessionInfo(pkgdir)
 
     msg_eval <- checkVigEvalAllFalse(pkgdir)
@@ -957,6 +959,21 @@ checkVigClassUsage <- function(pkgdir) {
     }
 }
 
+checkTFSymbolUsage <- function(pkgdir) {
+    viglist <- findSymbolsInVignettes(pkgdir, c("T", "F"), "SYMBOL")
+    if (length(viglist)) {
+        handleWarning(
+            " Avoid T/F variables; If logical, use TRUE/FALSE"
+        )
+        handleMessage("Found in file(s):", indent=6)
+        invisible(lapply(viglist, function(x) {
+            for (msg in x)
+                handleMessage(msg, indent=8)
+            }
+        ))
+    }
+}
+
 checkVigSessionInfo <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
@@ -965,7 +982,7 @@ checkVigSessionInfo <- function(pkgdir) {
     )
     for (vfile in vigfiles) {
         pc <- structure(
-            list(parseFile(vfile, pkgdir)), .Names = basename(vfile)
+            list(parseFile(vfile, pkgdir)), .Names = vfile
         )
         res <- findSymbolsInParsedCode(
             pc, c("sessionInfo", "session_info"), "SYMBOL_FUNCTION_CALL"
