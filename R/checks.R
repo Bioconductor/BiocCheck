@@ -1181,11 +1181,12 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 
     # set.seed
-    res <- findLogicalRdir(pkgname, "set.seed")
-    if (length(res) > 0){
-        handleWarning(" Remove set.seed usage in R code")
-        handleMessage("Found in R/ directory functions:", indent=6)
-        for (msg in res)
+    msg_seed <- findSymbolsInRFiles(pkgdir, "set.seed", "SYMBOL_FUNCTION_CALL")
+    if (length(msg_seed)){
+        handleWarning(
+            " Remove set.seed usage (found ", length(msg_seed), " times)"
+        )
+        for (msg in msg_seed)
             handleMessage(msg, indent=8)
     }
 
