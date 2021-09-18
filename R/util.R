@@ -277,7 +277,7 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
 }
 
 getDirFile <- function(fpath) {
-    if (length(fpath) && !is.na(fpath))
+    if (length(fpath) && !all(is.na(fpath)))
         vapply(
             strsplit(normalizePath(fpath), .Platform$file.sep),
             function(pseg) {
