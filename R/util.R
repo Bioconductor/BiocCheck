@@ -297,7 +297,8 @@ getDirFile <- function(fpath) {
     ]
 }
 
-findSymbolsInParsedCode <- function(parsedCodeList, symbolNames, tokenTypes)
+findSymbolsInParsedCode <-
+    function(parsedCodeList, symbolNames, tokenTypes, fun = TRUE)
 {
     matches <- structure(vector("list", length(parsedCodeList)),
         .Names = names(parsedCodeList))
@@ -333,8 +334,9 @@ findSymbolsInParsedCode <- function(parsedCodeList, symbolNames, tokenTypes)
         matches
     )
     apply(matches, 1L, function(minidf) {
-        sprintf("%s in %s (line %s, column %s)",
-            minidf["text"], getDirFile(minidf["filename"]),
+        fmttxt <- "%s (line %s, column %s)"
+        formt <- if (fun) paste0(minidf["text"], " in ", fmttxt) else fmttxt
+        sprintf(formt, getDirFile(minidf["filename"]),
             minidf["line1"], minidf["col1"]
         )
     })

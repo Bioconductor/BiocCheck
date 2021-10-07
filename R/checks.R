@@ -1018,14 +1018,16 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
     "update.packages", "install")
 
 findSymbolsInRFiles <-
-    function(pkgdir, Symbols, tokenType)
+    function(pkgdir, Symbols, tokenType, fun = TRUE)
 {
     rfiles <- getRSources(pkgdir)
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
-    msg_installs <- findSymbolsInParsedCode(parsedCodes, Symbols, tokenType)
-    unlist(msg_installs)
+    msg_res <- findSymbolsInParsedCode(
+        parsedCodes, Symbols, tokenType, fun = fun
+    )
+    unlist(msg_res)
 }
 
 findSymbolsInVignettes <-
@@ -1248,18 +1250,10 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 }
 
-checkSapply <- function(Rdir){
-
-    rfiles <- getRSources(Rdir)
-    msg_sapply <- lapply(rfiles, function(rfile){
-        tokens <- getParseData(parse(rfile, keep.source=TRUE))
-        tokens <- tokens[tokens[,"text"] == "sapply", ,drop=FALSE]
-        sprintf(
-            "%s (line %d, column %d)",
-            basename(rfile), tokens[,"line1"], tokens[,"col1"]
-        )
-    })
-    msg_sapply <- unlist(msg_sapply)
+checkSapply <- function(Rdir) {
+    msg_sapply <- findSymbolsInRFiles(
+        dirname(Rdir), "sapply", "SYMBOL_FUNCTION_CALL", FALSE
+    )
 }
 
 check1toN <- function(Rdir){
@@ -1339,6 +1333,7 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     sigRanges <- .findSignalerRanges(rfile, tokens)
     pasteInd <- lapply(sigRanges, FUN, tokens = tokens, ...)
     tokens <- tokens[unlist(pasteInd), , drop = FALSE]
+    rfile <- paste0("R/", basename(rfile))
     sprintf(
         "%s (line %d, column %d)",
         rfile, tokens[, "line1"], tokens[, "col1"]
