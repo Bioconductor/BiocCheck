@@ -561,7 +561,7 @@ checkImportSuggestions <- function(pkgname)
     })
 
     if(length(suggestions) && (!is.null(suggestions)) &&
-        (suggestions != "ERROR"))
+        (suggestions[1] != "ERROR"))
     {
             handleMessage("Namespace import suggestions are:")
             handleVerbatim(suggestions, indent=4, exdent=4, width=100000)
