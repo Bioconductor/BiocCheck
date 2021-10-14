@@ -32,11 +32,11 @@ invalid_ref <- function() {
 
 bad_dl <- function() {
 
-    dataurl <- "https://raw.githubusercontent.com/file"
-    githurl <- "https://github.com/tree/master/"
+    dataurl <- "https://raw.githubusercontent.com/file.csv"
+    githurl <- "https://github.com/user/package/"
     githurl <- "https://dropbox.com/data?dl=1"
-    laburl <- "https://gitlab.com/raw/master/data"
-    bucketurl <- "https://bitbucket.org/test/raw/file"
+    laburl <- "https://gitlab.com/raw/master/data.Rda"
+    bucketurl <- "https://bitbucket.org/test/raw/file.sav"
     download.file(dataurl, destfile = tempfile())
 
 }

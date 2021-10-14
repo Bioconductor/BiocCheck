@@ -1426,12 +1426,10 @@ checkExternalData <- function(Rdir) {
         tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
 
         platforms <- "githubusercontent|github|gitlab|bitbucket|dropbox"
-
-        hits <- grepl(platforms, tokens[, "text"], ignore.case = TRUE)
-        if (any(hits))
-            tokens <- tokens[hits, , drop = FALSE]
-        else
-            tokens <- tokens[FALSE, , drop = FALSE]
+        txtkns <- tokens[, "text"]
+        hits <- grepl(platforms, txtkns, ignore.case = TRUE) &
+            grepl("dl|\\.\\w+\"$", txtkns)
+        tokens <- tokens[hits, , drop = FALSE]
 
         sprintf(
             "%s (line %d, column %d)",
