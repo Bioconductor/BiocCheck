@@ -554,8 +554,8 @@ test_checkUnitTests <- function()
     .zeroCounters()
 
     # check coding practice
-    pkgdir = system.file("testpackages", "testpkg0", package="BiocCheck")
-    Rdir = file.path(pkgdir, "R")
+    pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    Rdir <- file.path(pkgdir, "R")
     msg_sapply <- BiocCheck:::checkSapply(Rdir)
     checkTrue(length(msg_sapply) == 1)
     msg_seq <- BiocCheck:::check1toN(Rdir)
