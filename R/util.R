@@ -662,7 +662,7 @@ getFunctionLengths <- function(df)
     max <- nrow(df)
     res <- list()
     funcRows <- df[df$token == "FUNCTION",]
-    lst<-lapply(split(df, rownames(df)), as.list)
+    lst <- lapply(split(df, rownames(df)), as.list)
     if (nrow(funcRows))
     {
         for (i in seq_len(nrow(funcRows)))
@@ -715,6 +715,10 @@ getFunctionLengths <- function(df)
             }
 
         }
+    } else {
+       res <- list(as.data.frame(list(
+           length = integer(0), startLine = integer(0), endLine = integer(0)
+       )))
     }
     res
 }

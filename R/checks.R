@@ -1455,28 +1455,23 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
 
 checkFunctionLengths <- function(parsedCode, pkgname)
 {
-    df <- data.frame(stringsAsFactors=FALSE)
-    i <- 1
+    dflist <- vector("list", length(names(parsedCode)))
     for (filename in names(parsedCode))
     {
-        message(".", appendLF=FALSE)
         pc <- parsedCode[[filename]]
         filename <- mungeName(filename, pkgname)
         res <- getFunctionLengths(pc)
-        for (name in names(res)) {
-            x <- res[[name]]
-            if (length(x))
-            {
-                df[i,1] <- filename
-                df[i,2] <- name
-                df[i,3] <- x['length']
-                df[i,4] <- x['startLine']
-                df[i,5] <- x['endLine']
-            }
-            i <- i + 1
-        }
+        functionNames <- names(res)
+        mt <- do.call(rbind, res)
+        df <- cbind.data.frame(
+            filename =
+                if (is.null(functionNames)) {character(0)} else {filename},
+            functionName = functionNames, mt, row.names = NULL
+        )
+        dflist[[filename]] <- df
     }
-    message("")
+    dflist <- Filter(length, dflist)
+    df <- do.call(rbind, dflist)
     colnames <- c("filename","functionName","length","startLine","endLine")
     if (ncol(df) == length(colnames))
     {

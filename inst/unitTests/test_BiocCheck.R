@@ -865,7 +865,7 @@ test_getFunctionLengths <- function()
 test_getFunctionLengths2 <- function()
 {
     load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
-    BiocCheck:::checkFunctionLengths("IRanges", IRangesParsedCode)
+    BiocCheck:::checkFunctionLengths(IRangesParsedCode, "IRanges")
 }
 
 test_checkExportsAreDocumented <- function()
