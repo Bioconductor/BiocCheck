@@ -167,13 +167,11 @@ getAllDeprecatedPkgs <- function()
     pkgs
 }
 
-parseFile <- function(infile, pkgdir)
-{
+parseFile <- function(infile, pkgdir) {
     ## FIXME - use purl to parse RMD and RRST
     ## regardless of VignetteBuilder value
     dir.create(parse_dir <- tempfile())
-    if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE))
-    {
+    if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE)) {
         outfile <- NULL
         desc <- file.path(pkgdir, "DESCRIPTION")
         dcf <- read.dcf(desc)
@@ -187,9 +185,13 @@ parseFile <- function(infile, pkgdir)
                     stop("'knitr' required to check 'Rmd' vignettes")
                 }
                 outfile <- file.path(parse_dir, "parseFile.tmp")
-                suppressWarnings(suppressMessages(capture.output({
-                    knitr::purl(input=infile, output=outfile, documentation=0L)
-                })))
+                suppressWarnings(suppressMessages(
+                    capture.output({
+                        knitr::purl(
+                            input=infile, output=outfile, documentation=0L
+                        )
+                    })
+                ))
             }
         } else {
             full.infile <- normalizePath(infile)
@@ -208,9 +210,7 @@ parseFile <- function(infile, pkgdir)
                         file.rename(badname, outfile)
             })))
         }
-
-    } else if (grepl("\\.Rd$", infile, TRUE))
-    {
+    } else if (grepl("\\.Rd$", infile, TRUE)) {
         rd <- parse_Rd(infile)
         outfile <- file.path(parse_dir, "parseFile.tmp")
         code <- capture.output(Rd2ex(rd))
