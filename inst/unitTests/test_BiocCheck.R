@@ -779,18 +779,19 @@ test_checkDescriptionNamespaceConsistency <- function()
 
 test_checkImportSuggestions <- function()
 {
-    if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
-        quietly=TRUE))))
-    {
+    if (requireNamespace("codetoolsBioC", quietly=TRUE)) {
         suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
-        checkTrue(!is.null(suggestions)) # sometimes it works and sometimes it doesn't
-
+        checkTrue(is.character(suggestions)) # sometimes it works and sometimes it doesn't
 
         BiocCheck:::installAndLoad(create_test_package('testpkg'))
         suggestions <- BiocCheck:::checkImportSuggestions("testpkg")
-        checkTrue(length(suggestions) == 0)
-    }
+        checkTrue(is.character(suggestions))
+        checkTrue(!length(suggestions))
 
+        suggestions <- BiocCheck:::checkImportSuggestions("FakePackage")
+        checkTrue(is.character(suggestions))
+        checkTrue(inherits(suggestions, "try-error"))
+    }
 }
 
 test_checkForBadDepends <- function()

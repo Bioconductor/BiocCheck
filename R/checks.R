@@ -551,28 +551,18 @@ checkDescriptionNamespaceConsistency <- function(pkgname)
 
 checkImportSuggestions <- function(pkgname)
 {
-    suggestions <- NULL
-    tryCatch(suppressMessages(suppressWarnings({
-        suggestions <-
+    suggestions <- try(
+        suppressMessages(suppressWarnings(
             capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
-    })), error=function(e) {
-        suggestions <- "ERROR"
+        )), silent = TRUE
+    )
+    if (!length(suggestions) || inherits(suggestions, "try-error")) {
         handleMessage("Could not get namespace suggestions.")
-    })
-
-    if(length(suggestions) && (!is.null(suggestions)) &&
-        (suggestions != "ERROR"))
-    {
-            handleMessage("Namespace import suggestions are:")
-            handleVerbatim(suggestions, indent=4, exdent=4, width=100000)
-            handleMessage("--END of namespace import suggestions.")
+    } else {
+        handleMessage("Namespace import suggestions are:")
+        handleVerbatim(suggestions, indent=4, exdent=4, width=100000)
+        handleMessage("--END of namespace import suggestions.")
     }
-
-    if ((!is.null(suggestions)) && (!length(suggestions)))
-    {
-        handleMessage("No suggestions.")
-    }
-
     suggestions
 }
 
