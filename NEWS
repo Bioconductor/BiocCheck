@@ -1,4 +1,15 @@
-CHANGES IN VERSION 1.29
+CHANGES IN VERSION 1.32
+-----------------------
+
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o (1.31.3) Add `BioCbooks` repository url to
+    `checkIsPackageNameAlreadyInUse`, `VIEWS` file is pending.
+    o (1.31.2) Fix logical length > 1 error in `checkImportSuggestions`
+      (@vjcitn, #141)
+    o (1.31.1) Simplify check for function lengths; remove excessive dots.
+
+CHANGES IN VERSION 1.30
 -----------------------
 
 NEW FEATURES
