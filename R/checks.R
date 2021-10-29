@@ -984,7 +984,10 @@ checkVigSessionInfo <- function(pkgdir) {
     if (any(notFoundVig)) {
         handleNote(" 'sessionInfo' not found in vignette(s)")
         handleMessage("Missing from file(s):", indent=6)
-        handleMessage(getDirFile(vigfiles[notFoundVig]), indent=8)
+        handleMessage(
+            vapply(vigfiles[notFoundVig], getDirFile, character(1L)),
+            indent=8
+        )
     }
 }
 
