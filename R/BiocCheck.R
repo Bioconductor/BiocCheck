@@ -270,6 +270,8 @@ BiocCheck <- function(package=".", ...)
         checkIsPackageNameAlreadyInUse(package_name, "BioCann")
         checkIsPackageNameAlreadyInUse(package_name, "BioCexp")
         checkIsPackageNameAlreadyInUse(package_name, "BioCworkflows")
+        # TODO: add VIEWS files for books
+        # checkIsPackageNameAlreadyInUse(package_name, "BioCbooks")
     }
 
     if (is.null(dots[["no-check-bioc-help"]]))

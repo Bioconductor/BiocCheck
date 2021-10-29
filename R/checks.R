@@ -1855,30 +1855,39 @@ checkFormatting <- function(pkgdir, nlines=6)
     }
 }
 
-checkIsPackageNameAlreadyInUse <- function(pkgName, repo=c("CRAN", "BioCsoft",
-                                                     "BioCann", "BioCexp", "BioCworkflows"))
-{
+checkIsPackageNameAlreadyInUse <- function(pkgName,
+    repo = c("CRAN", "BioCsoft", "BioCann",
+        "BioCexp", "BioCworkflows", "BioCbooks")
+) {
     repo <- match.arg(repo)
 
-    if (repo == "CRAN"){
-        repo.url <- sprintf("%s/src/contrib/PACKAGES", BiocManager::repositories()[repo])
-    }else{
-        repo.url <- switch(repo,
-                           BiocSoft = "http://bioconductor.org/packages/devel/bioc/VIEWS",
-                           BioCann =
-                               "http://bioconductor.org/packages/devel/data/annotation/VIEWS",
-                           BioCexp =
-                               "http://bioconductor.org/packages/devel/data/experiment/VIEWS",
-                           BioCworkflows =
-                               "http://bioconductor.org/packages/devel/workflows/VIEWS",
-                           "http://bioconductor.org/packages/devel/bioc/VIEWS")
+    if (identical(repo, "CRAN")) {
+        repo.url <- sprintf(
+            "%s/src/contrib/PACKAGES", BiocManager::repositories()[repo]
+        )
+    } else {
+        repo.url <- switch(
+            repo,
+            BiocSoft = "http://bioconductor.org/packages/devel/bioc/VIEWS",
+            BioCann =
+                "http://bioconductor.org/packages/devel/data/annotation/VIEWS",
+            BioCexp =
+                "http://bioconductor.org/packages/devel/data/experiment/VIEWS",
+            BioCworkflows =
+                "http://bioconductor.org/packages/devel/workflows/VIEWS",
+            BioCbooks =
+                "https://bioconductor.org/packages/devel/books/VIEWS",
+            "http://bioconductor.org/packages/devel/bioc/VIEWS"
+        )
     }
 
     conn <- url(repo.url)
     dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
     close(conn)
     if (inherits(dcf, "error")) {
-        handleMessage("Unable to access repository ", BiocManager::repositories()[repo])
+        handleMessage(
+            "Unable to access repository ", BiocManager::repositories()[repo]
+        )
     } else if (tolower(pkgName) %in% tolower(dcf[,"Package"])) {
         if (repo == "CRAN")
             msg <- "Package must be removed from CRAN."
