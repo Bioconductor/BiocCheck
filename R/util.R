@@ -177,16 +177,20 @@ parseFile <- function(infile, pkgdir)
         outfile <- NULL
         desc <- file.path(pkgdir, "DESCRIPTION")
         dcf <- read.dcf(desc)
-        if ("VignetteBuilder" %in% colnames(dcf) &&
-            dcf[,"VignetteBuilder"] == "knitr")
-        {
-            if (!requireNamespace("knitr")) {
-                stop("'knitr' package required to check knitr-based vignettes")
+        if ("VignetteBuilder" %in% colnames(dcf)) {
+            ## parse field in case more than one
+            vigBuilder <- unlist(
+                strsplit(dcf[, "VignetteBuilder"], ", "), use.names = FALSE
+            )
+            if ("knitr" %in% vigBuilder) {
+                if (!requireNamespace("knitr")) {
+                    stop("'knitr' required to check 'Rmd' vignettes")
+                }
+                outfile <- file.path(parse_dir, "parseFile.tmp")
+                suppressWarnings(suppressMessages(capture.output({
+                    knitr::purl(input=infile, output=outfile, documentation=0L)
+                })))
             }
-            outfile <- file.path(parse_dir, "parseFile.tmp")
-            suppressWarnings(suppressMessages(capture.output({
-                knitr::purl(input=infile, output=outfile, documentation=0L)
-            })))
         } else {
             full.infile <- normalizePath(infile)
             oof <- file.path(parse_dir, basename(infile))

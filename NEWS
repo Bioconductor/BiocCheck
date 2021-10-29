@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.5) Fixed bug in the case where the `VignetteBuilder` field in the
+    a package's `DESCRIPTION` has more than one listed.
     o (1.31.3) Add `BioCbooks` repository url to
     `checkIsPackageNameAlreadyInUse`, `VIEWS` file is pending.
     o (1.31.2) Fix logical length > 1 error in `checkImportSuggestions`
