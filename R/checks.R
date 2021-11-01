@@ -570,9 +570,11 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 {
     vigdir <- file.path(pkgdir, "vignettes")
 
-    res <- checkVigDirExists(pkgdir, vigdir)
-    if (!res)
+    vde <- checkVigDirExists(vigdir)
+    if (!vde) {
+        handleError("No 'vignettes' directory.")
         return()
+    }
 
     vigdircontents <- getVigSources(vigdir)
     if (length(vigdircontents)==0)
@@ -625,16 +627,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
 }
 
-checkVigDirExists <- function(pkgdir, vigdir)
-{
-    if (!file.exists(vigdir))
-    {
-        handleError("No 'vignettes' directory.")
-        return(FALSE)
-    } else {
-        return(TRUE)
-    }
-}
+checkVigDirExists <- function(vigdir) { dir.exists(vigdir) }
 
 checkInstContents <- function(pkgdir, checkingDir)
 {
