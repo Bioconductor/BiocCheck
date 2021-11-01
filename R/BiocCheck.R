@@ -321,7 +321,7 @@ BiocCheck <- function(package=".", ...)
 .get_package_name <- function(package_dir)
 {
     read.dcf(file = file.path(package_dir,"DESCRIPTION"),
-             fields = "Package")[[1]]
+             fields = "Package")[[1]] 
 }
 
 .get_package_dir <- function(pkgname)
