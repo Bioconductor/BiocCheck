@@ -168,48 +168,30 @@ getAllDeprecatedPkgs <- function()
 }
 
 parseFile <- function(infile, pkgdir) {
-    ## FIXME - use purl to parse RMD and RRST
-    ## regardless of VignetteBuilder value
     dir.create(parse_dir <- tempfile())
     if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE)) {
         outfile <- NULL
         desc <- file.path(pkgdir, "DESCRIPTION")
         dcf <- read.dcf(desc)
-        if ("VignetteBuilder" %in% colnames(dcf)) {
+        if ("VignetteBuilder" %in% colnames(dcf) &&
+            dcf[,"VignetteBuilder"] == "knitr") {
             ## parse field in case more than one
             vigBuilder <- unlist(
                 strsplit(dcf[, "VignetteBuilder"], ", "), use.names = FALSE
             )
             if ("knitr" %in% vigBuilder) {
-                if (!requireNamespace("knitr")) {
+                if (!requireNamespace("knitr"))
                     stop("'knitr' required to check 'Rmd' vignettes")
-                }
-                outfile <- file.path(parse_dir, "parseFile.tmp")
-                suppressWarnings(suppressMessages(
-                    capture.output({
-                        knitr::purl(
-                            input=infile, output=outfile, documentation=0L
-                        )
-                    })
-                ))
             }
-        } else {
-            full.infile <- normalizePath(infile)
-            oof <- file.path(parse_dir, basename(infile))
-            oof <- vapply(strsplit(oof, "\\."),
-                function(x) paste(x[seq_len(length(x)-1)], collapse="."),
-                character(1))
-            outfile <- paste0(oof, '.R')
-            suppressWarnings(suppressMessages(capture.output({
-                    oldwd <- getwd()
-                    on.exit(setwd(oldwd))
-                    setwd(parse_dir)
-                    Stangle(full.infile)
-                    badname <- paste0(basename(infile), ".R")
-                    if (file.exists(badname))
-                        file.rename(badname, outfile)
-            })))
         }
+        outfile <- file.path(parse_dir, "parseFile.tmp")
+        suppressWarnings(suppressMessages(
+            capture.output({
+                knitr::purl(
+                    input=infile, output=outfile, documentation=0L
+                )
+            })
+        ))
     } else if (grepl("\\.Rd$", infile, TRUE)) {
         rd <- parse_Rd(infile)
         outfile <- file.path(parse_dir, "parseFile.tmp")
