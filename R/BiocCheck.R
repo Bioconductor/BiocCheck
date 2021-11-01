@@ -95,7 +95,7 @@ BiocCheck <- function(package=".", ...)
     if (length(package)==0)
         .stop("Supply a package directory or source tarball.")
     package_dir <- .get_package_dir(package)
-    package_name <- .get_package_name(package)
+    package_name <- .get_package_name(package_dir)
 
     handleMessage(
         "This is BiocCheck version ", packageVersion("BiocCheck"), ". ",
@@ -318,9 +318,10 @@ BiocCheck <- function(package=".", ...)
 
 }
 
-.get_package_name <- function(input)
+.get_package_name <- function(package_dir)
 {
-    strsplit(basename(input), "_")[[1]][1]
+    read.dcf(file = file.path(package_dir,"DESCRIPTION"),
+             fields = "Package")[[1]]
 }
 
 .get_package_dir <- function(pkgname)

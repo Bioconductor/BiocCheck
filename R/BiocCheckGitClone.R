@@ -57,7 +57,7 @@ BiocCheckGitClone <- function(package=".", ...){
     if (length(package)==0)
         .stop("Supply a package directory or source tarball.")
     package_dir <- .get_package_dir(package)
-    package_name <- .get_package_name(package)
+    package_name <- .get_package_name(package_dir)
 
     handleMessage(
         "This is BiocCheckGitClone version ", packageVersion("BiocCheck"), ". ",
