@@ -320,7 +320,8 @@ BiocCheck <- function(package=".", ...)
 
 .get_package_name <- function(input)
 {
-    strsplit(basename(input), "_")[[1]][1]
+    desc <- file.path(input, "DESCRIPTION")
+    read.dcf(desc, fields = "Package")[[1]]
 }
 
 .get_package_dir <- function(pkgname)
