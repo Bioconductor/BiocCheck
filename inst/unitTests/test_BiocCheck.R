@@ -108,13 +108,15 @@ test_vignettes0 <- function()
         dir.create(pkgdir)
 
     ## no vignettes dir ERROR
-    BiocCheck:::checkVigDirExists(pkgdir, vigdir)
-    checkError("Missing vignettes dir")
+    vde <- BiocCheck:::checkVigDirExists(vigdir)
+    checkTrue(!vde)
+    .zeroCounters()
 
     # empty vignette dir ERROR
     dir.create(vigdir, recursive=TRUE)
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkError("Empty vignettes")
+    checkError("No vignette sources in vignettes/ directory.")
+    .zeroCounters()
 
     # vig dir w/ source file  WARNING
     cat("nothing", file=file.path(vigdir, "test.Rnw"))
@@ -165,8 +167,11 @@ test_vignettes0 <- function()
     cat("VignetteBuilder: knitr", file=file.path(pkgdir, "DESCRIPTION"))
     cat("% \\VignetteIndexEntry{header} \nnnothing", file=file.path(vigdir, "test.Rnw"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.error$getNum() == 1)
-    checkTrue(.warning$getNum() == 1)
+    checkTrue(.error$getNum() == 1
+        && .warning$getNum() == 1
+        && .note$getNum() == 1,
+        "expected 1 warning, note, and error."
+    )
     .zeroCounters()
 
     # check vignette builder default
@@ -175,6 +180,7 @@ test_vignettes0 <- function()
     cat("Title: something", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkTrue(.error$getNum() == 0)
+    checkTrue(.note$getNum() == 1)
     # check defined in desc but default vig
     unlink(file.path(pkgdir, "DESCRIPTION"))
     cat("VignetteBuilder: Sweave", file=file.path(pkgdir, "DESCRIPTION"))

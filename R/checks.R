@@ -577,8 +577,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     }
 
     vigdircontents <- getVigSources(vigdir)
-    if (length(vigdircontents)==0)
-    {
+    if (!length(vigdircontents)) {
         handleError("No vignette sources in vignettes/ directory.")
         return()
     }
