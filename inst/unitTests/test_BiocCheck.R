@@ -610,6 +610,16 @@ test_installAndLoad <- function()
         "testpkg is not installed!")
 }
 
+test_findPackageName <- function()
+{
+    pkgdir <- create_test_package("testpackage")
+    dirrename <- file.path(dirname(pkgdir), "test_package")
+    file.rename(pkgdir, dirrename)
+    pkgname <- BiocCheck:::.get_package_name(dirrename)
+    checkTrue(identical(pkgname, "testpackage"))
+    unlink(dirrename, recursive = TRUE)
+}
+
 test_checkDeprecatedPackages <- function()
 {
      cat(sprintf("Depends: multicore", UNIT_TEST_PKG),
