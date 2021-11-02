@@ -320,7 +320,22 @@ BiocCheck <- function(package=".", ...)
 
 .get_package_name <- function(input)
 {
-    desc <- file.path(input, "DESCRIPTION")
+    isTar <- grepl("\\.tar\\.gz$", input)
+    if (isTar) {
+        pkg_dir <- file.path(
+            tempdir(), gsub("(\\w+)_.*", "\\1", basename(input))
+        )
+        if (!dir.exists(pkg_dir))
+            dir.create(pkg_dir)
+        on.exit(unlink(pkg_dir, recursive = TRUE))
+        suppressMessages({
+            untar(input, exdir = pkg_dir)
+        })
+        desc <- list.files(pkg_dir, pattern = "DESCRIPTION",
+            full.names = TRUE, recursive = TRUE)
+    } else {
+        desc <- file.path(input, "DESCRIPTION")
+    }
     read.dcf(desc, fields = "Package")[[1]]
 }
 

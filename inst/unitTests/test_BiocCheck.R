@@ -618,6 +618,23 @@ test_findPackageName <- function()
     pkgname <- BiocCheck:::.get_package_name(dirrename)
     checkTrue(identical(pkgname, "testpackage"))
     unlink(dirrename, recursive = TRUE)
+
+    ## test tarballs
+    pkgdir <- create_test_package("testpackage")
+    tarname <- paste0(pkgdir, "_1.0.0.tar.gz")
+    files <- list.files(pkgdir)
+    ## avoid message with tarring files with full path
+    olddir <- getwd()
+    setwd(pkgdir)
+    tar(tarname, files = files)
+    tarrename <- file.path(tempdir(), "test.package_1.0.0.tar.gz")
+    file.rename(tarname, tarrename)
+    pkgname <- BiocCheck:::.get_package_name(tarrename)
+    on.exit({
+        setwd(olddir)
+        unlink(tarrename)
+    })
+    checkTrue(identical(pkgname, "testpackage"))
 }
 
 test_checkDeprecatedPackages <- function()
