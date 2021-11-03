@@ -1065,7 +1065,7 @@ test_checkForVersionNumberMismatch <- function()
     result <- system(cmd, intern=TRUE)
 
     oldname <- "badpkg_0.0.1.tar.gz"
-    newname <- "badpkg_9.9.9.tar.gz"
+    newname <- file.path(tempdir(), "badpkg_9.9.9.tar.gz")
     if (!file.rename(oldname, newname))
         stop("'file.rename()' failed to rename badkpgk",
              "\n  oldname: ", oldname, " newname: ", newname,
@@ -1073,6 +1073,9 @@ test_checkForVersionNumberMismatch <- function()
              "\n  result:",
              "\n    ", paste(result, collapse="\n    "),
              "\n")
+    on.exit({
+        file.remove(newname)
+    })
     BiocCheck:::installAndLoad(newname)
 
     BiocCheck:::checkForVersionNumberMismatch(
