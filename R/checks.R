@@ -23,7 +23,7 @@ checkForVersionNumberMismatch <- function(package, package_dir)
 ## Make sure this is run after pkg is installed.
 checkForBadDepends <- function(pkgdir)
 {
-    pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
+    pkgname <- .get_package_name(pkgdir)
     depends <- cleanupDependency(packageDescription(pkgname)$Depends)
     depends <- append(depends,
         cleanupDependency(packageDescription(pkgname)$Imports))

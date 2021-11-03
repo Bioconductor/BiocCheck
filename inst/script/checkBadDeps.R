@@ -2,7 +2,7 @@ suppressMessages({
     suppressWarnings({
         pkgdir <- commandArgs(TRUE)
         options(useFancyQuotes=FALSE)
-        pkgname <- strsplit(basename(pkgdir), "_")[[1]][1]
+        pkgname <- BiocCheck:::.get_package_name(pkgdir)
         # if (.Platform$OS.type == "windows")
         # {
         #     libdir <- file.path(tempdir(), "libdir")

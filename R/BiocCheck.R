@@ -353,7 +353,7 @@ BiocCheck <- function(package=".", ...)
         .stop("'%s' is not a directory or package source tarball.", pkgname)
     }
 
-    expectedPackageName <- strsplit(basename(pkgname), "_")[[1]][1]
+    expectedPackageName <- .get_package_name(pkgname)
     dir.create(t <- tempfile())
     untar(pkgname, exdir=t)
     file.path(t, expectedPackageName)

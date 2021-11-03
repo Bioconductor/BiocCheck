@@ -91,7 +91,7 @@ installAndLoad <- function(pkg)
             "\n", sep="")
         handleError(pkg, " must be installable.")
     }
-    pkgname <- strsplit(basename(pkg), "_")[[1]][1]
+    pkgname <- .get_package_name(pkg)
     args <- list(package=pkgname, lib.loc=libdir)
     if (paste0("package:",pkgname) %in% search())
         suppressWarnings(unloadNamespace(pkgname))
