@@ -323,10 +323,10 @@ BiocCheck <- function(package=".", ...)
     isTar <- grepl("\\.tar\\.gz$", input)
     if (isTar) {
         pkg_dir <- file.path(
-            tempdir(), gsub("(\\w+)_.*", "\\1", basename(input))
+            tempfile(), gsub("(\\w+)_.*", "\\1", basename(input))
         )
         if (!dir.exists(pkg_dir))
-            dir.create(pkg_dir)
+            dir.create(pkg_dir, recursive = TRUE)
         on.exit(unlink(pkg_dir, recursive = TRUE))
         suppressMessages({
             untar(input, exdir = pkg_dir)
