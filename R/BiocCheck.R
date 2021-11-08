@@ -74,10 +74,13 @@ usage <- function()
     }
 }
 
+## 'package' can be a directory or tarball
 BiocCheck <- function(package=".", ...)
 {
     .zeroCounters()
     package <- normalizePath(package)
+    if (!file.exists(package))
+        stop("Package directory or tarball does not exist")
     # be careful here:
     if (.Platform$OS.type=="windows")
         package=gsub("\\\\", "/", package)
