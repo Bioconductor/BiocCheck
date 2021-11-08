@@ -82,8 +82,8 @@ BiocCheck <- function(package=".", ...)
     if (!file.exists(package))
         stop("Package directory or tarball does not exist")
     # be careful here:
-    if (.Platform$OS.type=="windows")
-        package=gsub("\\\\", "/", package)
+    if (identical(.Platform$OS.type, "windows"))
+        package <- gsub("\\\\", "/", package)
     oldwarn <- getOption("warn")
     on.exit(options(warn=oldwarn))
     options(warn=1)
@@ -101,7 +101,7 @@ BiocCheck <- function(package=".", ...)
     if (length(dots) == 1L && is.list(dots[[1]]))
         dots <- dots[[1]]               # command line args come as list
 
-    if (length(package)==0)
+    if (!length(package))
         .stop("Supply a package directory or source tarball.")
     package_name <- .get_package_name(package)
 
