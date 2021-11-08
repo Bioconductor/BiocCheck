@@ -330,17 +330,14 @@ BiocCheck <- function(package=".", ...)
 {
     isTar <- grepl("\\.tar\\.gz$", input)
     if (isTar) {
-        pkg_dir <- file.path(
-            tempfile(), gsub("(\\w+)_.*", "\\1", basename(input))
-        )
-        if (!dir.exists(pkg_dir))
-            dir.create(pkg_dir, recursive = TRUE)
-        on.exit(unlink(pkg_dir, recursive = TRUE))
-        suppressMessages({
-            untar(input, exdir = pkg_dir)
+        tmp_pkg_dir <- .get_package_dir(input)
+        on.exit({
+            unlink(dirname(tmp_pkg_dir), recursive = TRUE)
         })
-        desc <- list.files(pkg_dir, pattern = "DESCRIPTION",
-            full.names = TRUE, recursive = TRUE)
+        desc <- file.path(tmp_pkg_dir, "DESCRIPTION")
+        if (!file.exists(desc))
+            stop("The package folder is inconsistent with the tarball name.",
+                call. = FALSE)
     } else {
         desc <- file.path(input, "DESCRIPTION")
     }
@@ -349,20 +346,12 @@ BiocCheck <- function(package=".", ...)
 
 .get_package_dir <- function(pkgname)
 {
-    if (!file.exists(pkgname))
-    {
-        .stop("'%s' does not exist!", pkgname)
-    }
-    if (file.info(pkgname)$isdir)
-        return(pkgname)
-
-    if(!grepl("\\.tar\\.gz$", pkgname))
-    {
-        .stop("'%s' is not a directory or package source tarball.", pkgname)
-    }
-
-    expectedPackageName <- .get_package_name(pkgname)
-    dir.create(t <- tempfile())
-    untar(pkgname, exdir=t)
-    file.path(t, expectedPackageName)
+    tmp_dir <- tempfile()
+    pkg_name <- gsub("(\\w+)_.*", "\\1", basename(pkgname))
+    if (!dir.exists(tmp_dir))
+        dir.create(tmp_dir)
+    suppressMessages({
+        untar(pkgname, exdir = tmp_dir)
+    })
+    file.path(tmp_dir, pkg_name)
 }
