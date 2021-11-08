@@ -87,9 +87,15 @@ BiocCheck <- function(package=".", ...)
     oldwarn <- getOption("warn")
     on.exit(options(warn=oldwarn))
     options(warn=1)
-    checkingDir <- FALSE
-    if (file.exists(package) && file.info(package)$isdir)
-        checkingDir <- TRUE
+    isTar <- grepl("\\.tar\\.gz$", package)
+    checkingDir <- file.info(package)[["isdir"]]
+    if (!isTar && checkingDir) {
+        package_dir <- package
+    } else if (isTar) {
+        package_dir <- .get_package_dir(package)
+    } else {
+        .stop("'%s' is not a directory or package source tarball.", package)
+    }
 
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))
@@ -97,7 +103,6 @@ BiocCheck <- function(package=".", ...)
 
     if (length(package)==0)
         .stop("Supply a package directory or source tarball.")
-    package_dir <- .get_package_dir(package)
     package_name <- .get_package_name(package)
 
     handleMessage(
