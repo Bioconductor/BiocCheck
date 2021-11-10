@@ -625,6 +625,9 @@ test_findPackageName <- function()
     result <- system(cmd, intern=TRUE)
 
     tarname <- "testpackage_0.99.0.tar.gz"
+    file.copy(tarname, tempdir())
+    file.remove(tarname)
+    tarname <- file.path(tempdir(), tarname)
     stopifnot(file.exists(tarname))
     tarrename <- file.path(tempdir(), "test.package_0.99.0.tar.gz")
     file.rename(tarname, tarrename)
@@ -1060,6 +1063,9 @@ test_checkForVersionNumberMismatch <- function()
     result <- system(cmd, intern=TRUE)
 
     oldname <- "badpkg_0.0.1.tar.gz"
+    file.copy(oldname, tempdir())
+    file.remove(oldname)
+    oldname <- file.path(tempdir(), oldname)
     newname <- file.path(tempdir(), "badpkg_9.9.9.tar.gz")
     if (!file.rename(oldname, newname))
         stop("'file.rename()' failed to rename badkpgk",
