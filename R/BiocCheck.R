@@ -279,15 +279,24 @@ BiocCheck <- function(package=".", ...)
         checkIsPackageNameAlreadyInUse(package_name, "BioCworkflows")
         # TODO: add VIEWS files for books
         # checkIsPackageNameAlreadyInUse(package_name, "BioCbooks")
+    }
 
-        if (is.null(dots[["no-check-bioc-help"]])) {
-            handleCheck("Checking for bioc-devel mailing list subscription...")
+    if (is.null(dots[["no-check-bioc-help"]])) {
+        handleCheck("Checking for bioc-devel mailing list subscription...")
+        if (!nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
+            msg <- paste(
+                "Cannot determine whether maintainer is subscribed to the",
+                "bioc-devel mailing list (requires admin credentials).",
+                "Subscribe here:",
+                "https://stat.ethz.ch/mailman/listinfo/bioc-devel"
+            )
+            handleNote(paste(strwrap(msg), collapse="\n"))
+        } else {
             checkForBiocDevelSubscription(package_dir)
-
-            handleCheck("Checking for support site registration...")
-            checkForSupportSiteRegistration(package_dir)
         }
 
+        handleCheck("Checking for support site registration...")
+        checkForSupportSiteRegistration(package_dir)
     }
 
     ## Summary
