@@ -137,17 +137,16 @@ BiocCheck <- function(package=".", ...)
             checkForVersionNumberMismatch(package, package_dir)
         }
 
-        if (!is.null(dots[["new-package"]]))
-            {
-                handleCheck("Checking new package version number...")
-                checkNewPackageVersionNumber(package_dir)
-            } else {
-                handleCheck("Checking version number validity...")
-                checkVersionNumber(package_dir)
-            }
+        if (!is.null(dots[["new-package"]])) {
+            handleCheck("Checking new package version number...")
+            checkNewPackageVersionNumber(package_dir)
+        } else {
+            handleCheck("Checking version number validity...")
+            checkVersionNumber(package_dir)
+        }
     }
 
-    if (is.null(dots[["no-check-R-ver"]])){
+    if (is.null(dots[["no-check-R-ver"]])) {
         handleCheck("Checking R Version dependency...")
         checkRVersionDependency(package_dir)
     }
@@ -280,15 +279,15 @@ BiocCheck <- function(package=".", ...)
         checkIsPackageNameAlreadyInUse(package_name, "BioCworkflows")
         # TODO: add VIEWS files for books
         # checkIsPackageNameAlreadyInUse(package_name, "BioCbooks")
-    }
 
-    if (is.null(dots[["no-check-bioc-help"]]))
-    {
-        handleCheck("Checking for bioc-devel mailing list subscription...")
-        checkForBiocDevelSubscription(package_dir)
+        if (is.null(dots[["no-check-bioc-help"]])) {
+            handleCheck("Checking for bioc-devel mailing list subscription...")
+            checkForBiocDevelSubscription(package_dir)
 
-        handleCheck("Checking for support site registration...")
-        checkForSupportSiteRegistration(package_dir)
+            handleCheck("Checking for support site registration...")
+            checkForSupportSiteRegistration(package_dir)
+        }
+
     }
 
     ## Summary
