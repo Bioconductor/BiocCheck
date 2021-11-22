@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.12) Move Bioc-devel mailing list and support site registration
+    checks to new package checks.
     o (1.31.10) Various internal improvements to `BiocCheck` and the
     identification of the package directory and name.
     o (1.31.6) Use a more reliable approach to identify package name from the
