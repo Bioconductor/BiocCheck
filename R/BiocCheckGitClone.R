@@ -40,42 +40,35 @@ BiocCheckGitClone <- function(package=".", ...){
 
     .zeroCounters()
     package <- normalizePath(package)
+    isTar <- grepl("\\.tar\\.gz$", package)
+    if (isTar)
+        stop("BiocCheckGitClone is run on the raw git clone of package repository")
+    if (!dir.exists(package))
+        stop("Package directory does not exist")
     # be careful here:
     if (.Platform$OS.type=="windows")
         package=gsub("\\\\", "/", package)
     oldwarn <- getOption("warn")
     on.exit(options(warn=oldwarn))
     options(warn=1)
-    checkingDir <- FALSE
-    if (file.exists(package) && file.info(package)$isdir)
-        checkingDir <- TRUE
 
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))
         dots <- dots[[1]]               # command line args come as list
-
-    if (length(package)==0)
-        .stop("Supply a package directory or source tarball.")
-    package_dir <- .get_package_dir(package)
-    package_name <- .get_package_name(package)
 
     handleMessage(
         "This is BiocCheckGitClone version ", packageVersion("BiocCheck"), ". ",
         "BiocCheckGitClone is a work in progress. Output and severity of issues may ",
         "change.", indent=0, exdent=0)
 
-    source_tarball <- grepl("\\.tar\\.gz$", package)
-    if(source_tarball)
-        stop("BiocCheckGitClone is run on the raw git clone of package repository")
-
     handleCheck("Checking valid files...")
-    checkBadFiles(package_dir)
+    checkBadFiles(package)
 
     handleCheck("Checking DESCRIPTION...")
-    checkDescription(package_dir)
+    checkDescription(package)
 
     handleCheck("Checking CITATION...")
-    checkForCitationFile(package_dir)
+    checkForCitationFile(package)
 
     ## Summary
     .msg("\n\nSummary:")

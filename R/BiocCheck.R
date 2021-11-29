@@ -92,7 +92,7 @@ BiocCheck <- function(package=".", ...)
     if (!isTar && checkingDir) {
         package_dir <- package
     } else if (isTar) {
-        package_dir <- .get_package_dir(package)
+        package_dir <- .temp_package_dir_tarball(package)
     } else {
         .stop("'%s' is not a directory or package source tarball.", package)
     }
@@ -334,11 +334,12 @@ BiocCheck <- function(package=".", ...)
 
 }
 
+# input can either be tarball or pkg source dir
 .get_package_name <- function(input)
 {
     isTar <- grepl("\\.tar\\.gz$", input)
     if (isTar) {
-        tmp_pkg_dir <- .get_package_dir(input)
+        tmp_pkg_dir <- .temp_package_dir_from_tarball(input)
         on.exit({
             unlink(dirname(tmp_pkg_dir), recursive = TRUE)
         })
@@ -352,14 +353,19 @@ BiocCheck <- function(package=".", ...)
     read.dcf(desc, fields = "Package")[[1]]
 }
 
-.get_package_dir <- function(pkgname)
+.temp_package_dir_tarball <- function(pkg_tarball)
 {
     tmp_dir <- tempfile()
-    pkg_name <- gsub("(\\w+)_.*", "\\1", basename(pkgname))
+    pkg_name <- gsub("(\\w+)_.*", "\\1", basename(pkg_tarball))
     if (!dir.exists(tmp_dir))
         dir.create(tmp_dir)
     suppressMessages({
-        untar(pkgname, exdir = tmp_dir)
+        untar(pkg_tarball, exdir = tmp_dir)
     })
+    # pkg_name must match with tarred folder
     file.path(tmp_dir, pkg_name)
+}
+
+.get_package_dir <- function(input, isTar) {
+
 }
