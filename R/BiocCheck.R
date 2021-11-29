@@ -339,7 +339,7 @@ BiocCheck <- function(package=".", ...)
 {
     isTar <- grepl("\\.tar\\.gz$", input)
     if (isTar) {
-        tmp_pkg_dir <- .temp_package_dir_from_tarball(input)
+        tmp_pkg_dir <- .temp_package_dir_tarball(input)
         on.exit({
             unlink(dirname(tmp_pkg_dir), recursive = TRUE)
         })
