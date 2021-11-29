@@ -1081,7 +1081,7 @@ test_checkForVersionNumberMismatch <- function()
 
     BiocCheck:::checkForVersionNumberMismatch(
         newname,
-        BiocCheck:::.get_package_dir(newname))
+        BiocCheck:::.temp_package_dir_tarball(newname))
     checkEquals(.error$getNum(), 1)
     .zeroCounters()
 }
