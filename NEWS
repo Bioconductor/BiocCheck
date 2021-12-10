@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.15) Check for pinned package versions in the `DESCRIPTION` file
+    denoted by the use of `==`.
     o (1.31.14) Enhancements to internal helper functions and
     `BiocCheckGitClone`
     o (1.31.13) Revert move to new package checks. Update Bioc-devel mailing

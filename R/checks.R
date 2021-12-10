@@ -2086,8 +2086,14 @@ checkDescription <- function(package_dir){
 
 checkDESCRIPTIONFile <- function(package_dir) {
     dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
-
     .checkLicenseForRestrictiveUse(dcf[,"License"])
+
+    handleCheck("Checking for pinned package versions...")
+    deps <- c("Depends", "Imports", "Suggests", "Enhances", "LinkingTo")
+    validdeps <- deps[deps %in% colnames(dcf)]
+    doubleeq <- grepl("==", dcf[, validdeps], fixed = TRUE)
+    if (any(doubleeq))
+        handleError("Dependencies in the DESCRIPTION file contain '=='")
 }
 
 checkForCitationFile <- function(package_dir) {

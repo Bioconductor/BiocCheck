@@ -271,6 +271,9 @@ Can be disabled with `--no-check-bbs`
   with a `NOTE` indicating that restrictive use status cannot be
   determined. A `NOTE` is also generated if the `License:` field is
   malformed, or the database cannot be located.
+* **Checking for pinned package versions...**
+  Ensures that maintainers are not indicating a specific dependency version
+  using `==` in the `DESCRIPTION` file (`ERROR`).
 
 ##  NAMESPACE checks
 
