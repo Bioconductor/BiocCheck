@@ -401,6 +401,10 @@ directory.
   `message`, `warning`, and `stop` are redundant and should be avoided
   (`NOTE`). `paste` calls with the `collapse` argument are ignored.
 
+* When notifying users, `message` should be used. When `cat` and `print` are
+  used, users will get a note saying that these should only be used in show
+  methods for classes (`NOTE`).
+
 * `message`, `warn*`, and `error` keywords should not be included in
   signal condition functions: `message`, `warning`, and `stop`. This is
   redundant and should be avoided (`NOTE`).

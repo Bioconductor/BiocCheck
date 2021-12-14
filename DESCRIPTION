@@ -1,5 +1,5 @@
 Package: BiocCheck
-Version: 1.31.15
+Version: 1.31.16
 Title: Bioconductor-specific package checks
 Description: Executes Bioconductor-specific package checks.
 Authors@R: c(
@@ -22,4 +22,4 @@ Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, rmarkdown,
 Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck/issues
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2

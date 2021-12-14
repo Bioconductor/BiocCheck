@@ -1110,7 +1110,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     # cat() and print()
     msg_cat <- checkCatInRCode(Rdir)
     if (length(msg_cat)) {
-        handleNote(" Avoid use of cat/print outside of 'show' method")
+        handleNote(" Avoid 'cat' and 'print' outside of 'show' methods")
         handleMessage("Found in files:", indent = 6)
         for (msg in msg_cat)
             handleMessage(msg, indent=8)

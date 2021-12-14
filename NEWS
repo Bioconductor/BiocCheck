@@ -3,6 +3,7 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.16) Note the use of `cat` and `print` outside of show methods.
     o (1.31.15) Check for pinned package versions in the `DESCRIPTION` file
     denoted by the use of `==`.
     o (1.31.14) Enhancements to internal helper functions and
