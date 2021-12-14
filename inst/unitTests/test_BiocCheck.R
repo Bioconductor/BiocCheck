@@ -686,7 +686,7 @@ test_findSymbolsInRFiles <- function()
     checkTrue(length(msg) == 2)
 }
 
-test_findCatInRCode <- function()
+test_checkCatInRCode <- function()
 {
     Rdir <- system.file("testpackages", "testpkg0", "R",
         package="BiocCheck", mustWork = TRUE)
