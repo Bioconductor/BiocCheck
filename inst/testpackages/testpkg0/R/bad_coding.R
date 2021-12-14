@@ -44,3 +44,11 @@ bad_dl <- function() {
 bad_install <- function(pkg) {
     BiocManager::install(pkg)
 }
+
+bad_cat <- function() {
+    cat("There is a cat here")
+    print("Using print instead of message")
+    setMethod("show", signature = "character", function(obj) {
+        cat("Cat is allowed here")
+    })
+}

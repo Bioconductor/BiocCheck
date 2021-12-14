@@ -591,6 +591,7 @@ test_findPasteInSignaler <- function() {
 }
 
 test_findSignalerInSignaler <- function() {
+    .SIGNALERS_TXT <- c("message", "warning", "stop")
     rfile <- tempfile()
     writeLines(c(
         "message('warning: see here')",
@@ -599,7 +600,7 @@ test_findSignalerInSignaler <- function() {
         "stop('message here')"
     ), rfile)
     checkTrue(
-        length(BiocCheck:::.findSignalerInSignaler(rfile)) == 4L
+        length(BiocCheck:::.findSignalerInSignaler(rfile, .SIGNALERS_TXT)) == 4L
     )
 }
 
@@ -683,6 +684,16 @@ test_findSymbolsInRFiles <- function()
         pkgdir, BiocCheck:::.BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
     )
     checkTrue(length(msg) == 2)
+}
+
+test_findCatInRCode <- function()
+{
+    Rdir <- system.file("testpackages", "testpkg0", "R",
+        package="BiocCheck", mustWork = TRUE)
+    msg <- BiocCheck:::checkCatInRCode(
+        Rdir, c("cat", "print")
+    )
+    checkTrue(length(msg) == 8)
 }
 
 test_checkVigInstalls <- function()
@@ -834,7 +845,7 @@ test_checkForBadDepends <- function()
     checkEquals(1, BiocCheck:::.error$getNum())
     checkEquals(1, BiocCheck:::.note$getNum())
     checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
-    checkTrue(grepl("how 5 object", BiocCheck:::.note$get()[1]))
+    checkTrue(grepl("how [0-9] object", BiocCheck:::.note$get()[1]))
 }
 
 test_remotesUsage <- function()

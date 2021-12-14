@@ -1107,6 +1107,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # cat() and print()
+    msg_cat <- checkCatInRCode(Rdir)
+    if (length(msg_cat)) {
+        handleNote(" Avoid use of cat/print outside of 'show' method")
+        handleMessage("Found in files:", indent = 6)
+        for (msg in msg_cat)
+            handleMessage(msg, indent=8)
+    }
+
     # message(paste(...))
     msg_mp <- checkPasteInSignaler(Rdir)
     if (length(msg_mp)) {
@@ -1300,10 +1309,12 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     tokens[tokens[,"token"] != "expr", ,drop=FALSE]
 }
 
-.findSignalerRanges <- function(rfile, tokens) {
+.findSymbolRanges <-
+    function(tokens, symbols)
+{
     txt <- tokens[, "text"]
     signalers <- which(
-        txt %in% c("message", "warning", "stop") &
+        txt %in% symbols &
         tokens[, "token"] == "SYMBOL_FUNCTION_CALL"
     )
     opar <- which(txt == "(")
@@ -1313,9 +1324,9 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     Map(seq, startSig, endSig)
 }
 
-.findInSignaler <- function(rfile, FUN, ...) {
+.findInSignaler <- function(rfile, symbols, FUN, ...) {
     tokens <- .getTokens(rfile)
-    sigRanges <- .findSignalerRanges(rfile, tokens)
+    sigRanges <- .findSymbolRanges(tokens, symbols)
     pasteInd <- lapply(sigRanges, FUN, tokens = tokens, ...)
     tokens <- tokens[unlist(pasteInd), , drop = FALSE]
     rfile <- paste0("R/", basename(rfile))
@@ -1325,8 +1336,34 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     )
 }
 
-.findPasteInSignaler <- function(rfile) {
-    .findInSignaler(rfile, .filtTokens)
+.SIGNALERS_TXT <- c("message", "warning", "stop")
+
+.findPasteInSignaler <- function(rfile, symbols = .SIGNALERS_TXT) {
+    .findInSignaler(rfile, symbols, .filtTokens)
+}
+
+.filtersetMethodRanges <- function(tokens, symbols) {
+    excl <- .findSymbolRanges(tokens, "setMethod")
+    if (length(excl)) {
+        showHits <- vapply(excl,
+            function(x) '"show"' %in% tokens[x, "text"], logical(1))
+        negind <- unlist(lapply(excl[showHits], `-`))
+        tokens <- tokens[negind, ]
+    }
+    tokens
+}
+
+checkCatInRCode <-
+    function(Rdir, symbols = c("cat", "print"))
+{
+    pkgdir <- dirname(Rdir)
+    rfiles <- getRSources(pkgdir)
+    parsedCodes <- lapply(
+        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
+    )
+    parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
+    msg_res <- findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
+    unlist(msg_res)
 }
 
 .grepTokens <-
@@ -1340,8 +1377,8 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     ind[filt]
 }
 
-.findSignalerInSignaler <- function(rfile) {
-    .findInSignaler(rfile, .grepTokens,
+.findSignalerInSignaler <- function(rfile, symbols) {
+    .findInSignaler(rfile, symbols, .grepTokens,
         keywords = c("message", "warn", "error"))
 }
 
@@ -1353,7 +1390,7 @@ checkPasteInSignaler <- function(Rdir) {
 
 checkSignalerInSignaler <- function(Rdir) {
     rfiles <- getRSources(Rdir)
-    sisig <- lapply(rfiles, .findSignalerInSignaler)
+    sisig <- lapply(rfiles, .findSignalerInSignaler, symbols = .SIGNALERS_TXT)
     sisig <- unlist(sisig)
 }
 
