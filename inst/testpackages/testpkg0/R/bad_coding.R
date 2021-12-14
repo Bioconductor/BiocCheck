@@ -52,3 +52,8 @@ bad_cat <- function() {
         cat("Cat is allowed here")
     })
 }
+
+bad_assignment <- function() {
+    # using = assignment
+    value = "there is a equals assignment operator"
+}

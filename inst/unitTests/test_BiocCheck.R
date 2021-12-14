@@ -696,6 +696,16 @@ test_checkCatInRCode <- function()
     checkTrue(length(msg) == 8)
 }
 
+test_checkEqInAssignment <- function()
+{
+    Rdir <- system.file("testpackages", "testpkg0", "R",
+        package="BiocCheck", mustWork = TRUE)
+    msg <- BiocCheck:::checkEqInAssignment(
+        Rdir = Rdir, symbol = "=", tokenType = "EQ_ASSIGN"
+    )
+    checkTrue(length(msg) == 3)
+}
+
 test_checkVigInstalls <- function()
 {
     BiocCheck:::checkVigInstalls(

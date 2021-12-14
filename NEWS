@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.17) Using '=' for assignment should be avoided and '<-' should be
+    used instead for clarity and legibility.
     o (1.31.16) Note the use of `cat` and `print` outside of show methods.
     o (1.31.15) Check for pinned package versions in the `DESCRIPTION` file
     denoted by the use of `==`.

@@ -408,6 +408,10 @@ directory.
 * `message`, `warn*`, and `error` keywords should not be included in
   signal condition functions: `message`, `warning`, and `stop`. This is
   redundant and should be avoided (`NOTE`).
+  
+* It is favorable to use the assignment arrow ('<-') over the equals assignment
+  ('=') for clarity in the code and legibility. Any use of the `=` will be
+  flagged with a `NOTE`.
 
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This

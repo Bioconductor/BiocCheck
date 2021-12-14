@@ -1116,6 +1116,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # assignment with =
+    msg_eq <- checkEqInAssignment(Rdir)
+    if (length(msg_eq)) {
+        handleNote(" Avoid using '=' for assignment and use '<-' instead")
+        handleMessage("Found in files:", indent = 6)
+        for (msg in msg_eq)
+            handleMessage(msg, indent = 8)
+    }
+
     # message(paste(...))
     msg_mp <- checkPasteInSignaler(Rdir)
     if (length(msg_mp)) {
@@ -1363,6 +1372,16 @@ checkCatInRCode <-
     )
     parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
     msg_res <- findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
+    unlist(msg_res)
+}
+
+checkEqInAssignment <- function(Rdir, symbol = "=", tokenType = "EQ_ASSIGN") {
+    pkgdir <- dirname(Rdir)
+    rfiles <- getRSources(pkgdir)
+    parsedCodes <- lapply(
+        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
+    )
+    msg_res <- findSymbolsInParsedCode(parsedCodes, symbol, tokenType)
     unlist(msg_res)
 }
 
