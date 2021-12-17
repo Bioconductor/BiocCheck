@@ -1,7 +1,10 @@
 Package: BiocCheck
 Version: 1.31.18
 Title: Bioconductor-specific package checks
-Description: Executes Bioconductor-specific package checks.
+Description: BiocCheck guides maintainers through Bioconductor best
+  practicies. It runs Bioconductor-specific package checks by searching through
+  package code, examples, and vignettes. Maintainers are required to address all
+  errors, warnings, and most notes produced.
 Authors@R: c(
     person("Bioconductor", "Package Maintainer",
 	email="maintainer@bioconductor.org",
@@ -12,7 +15,7 @@ Authors@R: c(
     person("Marcel", "Ramos", role="ctb"),
     person("Leonardo", "Collado-Torres", role = "ctb"),
     person("Federico", "Marini", role="ctb"))
-Depends: R (>= 3.5.0)
+Depends: R (>= 4.2.0)
 License: Artistic-2.0
 VignetteBuilder: knitr
 Imports: biocViews (>= 1.33.7), BiocManager, stringdist, graph, httr, tools,
@@ -21,5 +24,6 @@ Suggests: RUnit, BiocGenerics, Biobase, RJSONIO, rmarkdown, downloader,
     devtools (>= 1.4.1), usethis, BiocStyle
 Enhances: codetoolsBioC
 biocViews: Infrastructure
-URL: https://github.com/Bioconductor/BiocCheck/issues
+URL: https://github.com/Bioconductor/BiocCheck
+BugReports: https://github.com/Bioconductor/BiocCheck/issues
 RoxygenNote: 7.1.2

@@ -47,7 +47,7 @@ BiocCheckGitClone <- function(package=".", ...){
         stop("Package directory does not exist")
     # be careful here:
     if (.Platform$OS.type=="windows")
-        package=gsub("\\\\", "/", package)
+        package <- gsub("\\\\", "/", package)
     oldwarn <- getOption("warn")
     on.exit(options(warn=oldwarn))
     options(warn=1)

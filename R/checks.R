@@ -166,7 +166,7 @@ checkVersionNumber <- function(pkgdir)
     }, error=function(e) handleError("Invalid package version"))
 }
 
-.compareVersions <- function(pkgVer, RVer = getRversion()[, 1:2]) {
+.compareVersions <- function(pkgVer, RVer = getRversion()[, c(1, 2)]) {
     RVer <- as.package_version(paste0(RVer, ".0"))
     if (pkgVer < RVer)
         handleNote(
@@ -762,7 +762,7 @@ checkVigEngine <- function(builder, vigdircontents)
 checkVigSuggests <- function(builder, vigdircontents, pkgdir)
 {
     vigExt <- tolower(tools::file_ext(vigdircontents))
-    res <- sapply(vigdircontents, getVigEngine)
+    res <- lapply(vigdircontents, getVigEngine)
     lst <- unique(c(unlist(unname(res)), builder))
     if (any(is.na(lst)))
         lst <- lst[!is.na(lst)]
