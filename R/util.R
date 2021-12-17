@@ -283,13 +283,12 @@ getDirFile <- function(fpath) {
     ]
 }
 
-.getTokenExcludeFUN <- function(parsedf, token, text, excludeFUN) {
-    # parsedf <- .getTokens("inst/testpackages/testpkg0/R/bad_coding.R")
-    excl <- .findSymbolRanges(parsedf, symbols = excludeFUN)
-    occ_ind <- which(parsedf$token == token & parsedf$text %in% text)
-    if (length(excl))
-        occ_ind <- occ_ind[!occ_ind %in% unlist(excl)]
-    parsedf[occ_ind, c("line1", "col1", "token", "text"), drop = FALSE]
+.grepTokenTextCode <- function(parsedf, token, text) {
+    parsedf[
+        parsedf$token == token & grepl(text, parsedf$text),
+        c("line1", "col1", "token", "text"),
+        drop = FALSE
+    ]
 }
 
 findSymbolsInParsedCode <-

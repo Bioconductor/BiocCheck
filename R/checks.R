@@ -1319,14 +1319,14 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 }
 
 .findSymbolRanges <-
-    function(tokens, symbols)
+    function(tokens, symbols, tokenType = "SYMBOL_FUNCTION_CALL", isExp = FALSE)
 {
     txt <- tokens[, "text"]
     signalers <- which(
-        txt %in% symbols &
-        tokens[, "token"] == "SYMBOL_FUNCTION_CALL"
+        txt %in% symbols & tokens[, "token"] == tokenType
     )
-    opar <- which(txt == "(")
+    openBracket <- if (isExp) "{" else "("
+    opar <- which(txt == openBracket)
     startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
     parnum <- tokens[startSig, "parent"]
     endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
