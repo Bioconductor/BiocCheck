@@ -397,6 +397,10 @@ directory.
   should re-use data already available in Bioconductor or contribute
   an ExperimentHub, AnnotationHub or similar package (`ERROR`).
 
+* A package should not download files at the time of loading or attaching
+  i.e., using `library`. Using `download.file` and `download` should be avoided
+  and when found, an `ERROR` will be emitted. 
+
 * `paste` and `paste0` function calls within signaling functions such as
   `message`, `warning`, and `stop` are redundant and should be avoided
   (`NOTE`). `paste` calls with the `collapse` argument are ignored.

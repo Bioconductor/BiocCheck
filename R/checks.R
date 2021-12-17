@@ -1185,6 +1185,15 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
             handleMessage(msg, indent=8)
     }
 
+    # download / download.file in .onAttach / .onLoad
+    msg_dl <- checkOnAttachLoadCalls(Rdir)
+    if (length(msg_dl)) {
+        handleError(" Avoid downloads in '.onAttach' or '.onLoad' functions")
+        handleMessage("Found in files:", indent = 6)
+        for (msg in msg_dl)
+            handleMessage(msg, indent=8)
+    }
+
     # set.seed
     msg_seed <- findSymbolsInRFiles(pkgdir, "set.seed", "SYMBOL_FUNCTION_CALL")
     if (length(msg_seed)){
@@ -1480,6 +1489,27 @@ checkExternalData <- function(Rdir) {
     unlist(msg_eda)
 }
 
+checkOnAttachLoadCalls <- function(Rdir) {
+
+    rfiles <- getRSources(Rdir)
+    pkgdir <- dirname(Rdir)
+    parsedCodes <- lapply(
+        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
+    )
+    parsedCodes <- lapply(parsedCodes, function(tokens) {
+        tokens <- tokens[!tokens[, "token"] %in% c("expr", "COMMENT"), ]
+        incl <- .findSymbolRanges(
+            tokens, c(".onLoad", ".onAttach"), "SYMBOL", TRUE
+        )
+        tokens[unlist(incl), ]
+    })
+    parsedCodes <- Filter(nrow, parsedCodes)
+    msg_dl <- findSymbolsInParsedCode(
+        parsedCodes, "download.*", "SYMBOL_FUNCTION_CALL",
+        FUN = .grepTokenTextCode
+    )
+    unlist(msg_dl)
+}
 
 checkForDirectSlotAccess <- function(parsedCode, package_name)
 {
