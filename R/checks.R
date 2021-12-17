@@ -877,7 +877,7 @@ checkVigBiocInst <- function(pkgdir) {
     }
 }
 
-.BAD_CALLS <- c("biocLite", "install.packages", "install_packages",
+.BAD_INSTALL_CALLS <- c("biocLite", "install.packages", "install_packages",
     "update.packages", "install")
 
 
@@ -892,7 +892,7 @@ checkVigInstalls <- function(pkgdir) {
         knitr::purl(input = vfile, output = tempR, quiet = TRUE)
         tokens <- getParseData(parse(tempR, keep.source = TRUE))
         isBadCall <- tokens[, "token"] == "SYMBOL_FUNCTION_CALL" &
-            tokens[, "text"] %in% .BAD_CALLS
+            tokens[, "text"] %in% .BAD_INSTALL_CALLS
         tokens <- tokens[isBadCall, , drop = FALSE]
         viglist[[basename(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
