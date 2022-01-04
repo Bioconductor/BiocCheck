@@ -1390,7 +1390,9 @@ checkEqInAssignment <- function(Rdir, symbol = "=", tokenType = "EQ_ASSIGN") {
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
-    msg_res <- findSymbolsInParsedCode(parsedCodes, symbol, tokenType)
+    msg_res <- findSymbolsInParsedCode(
+        parsedCodes, symbol, tokenType, fun = FALSE
+    )
     unlist(msg_res)
 }
 
