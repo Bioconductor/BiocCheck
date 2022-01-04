@@ -227,7 +227,7 @@ BiocCheck <- function(package=".", ...)
     }
 
     if (is.null(dots[["no-check-function-len"]])){
-        handleCheck("Checking function lengths", appendLF=FALSE)
+        handleCheck("Checking function lengths...")
         checkFunctionLengths(parsedCode, package_name)
     }
 
