@@ -1,41 +1,3 @@
-getOptionList2 <- function()
-{
-    list(
-         make_option("--quit-with-status", action="store_true",
-            help="enable exit code option when performing check")
-        )
-}
-
-getArgParser2 <- function()
-{
-    option_list <- getOptionList2()
-    OptionParser(usage = "R CMD BiocCheckGitClone [options] package",
-        option_list=option_list)
-}
-
-usage2 <- function()
-{
-    print_help(getArgParser2())
-    if (interactive())
-    {
-        cat("When running interactively, options can be passed like so:\n")
-        cat("BiocCheck(package, `quit-with-status`=TRUE)\n")
-    }
-}
-
-.BiocCheckGitCloneFromCommandLine <- function()
-{
-    .Deprecated(msg="\nDEPRECATED: R CMD BiocCheckGitClone\n  Running BiocCheckGitClone from command line is deprecated in 3.12 and will be removed in 3.13.\n  Please run from within R as\n `BiocCheckGitClone(<pkg>)`")
-    parser <- getArgParser2()
-    arguments <- parse_args(parser, positional_arguments = 1)
-    opt <- arguments$options
-    file <- arguments$args
-
-    opt$Called_from_command_line <- TRUE
-    BiocCheckGitClone(file, opt)
-}
-
-
 BiocCheckGitClone <- function(package=".", ...){
 
     .zeroCounters()
@@ -92,9 +54,7 @@ BiocCheckGitClone <- function(package=".", ...){
         errcode <- 0
     }
 
-    if (isTRUE(dots[["quit-with-status"]]) ||
-        "Called_from_command_line" %in% names(dots))
-    {
+    if (isTRUE(dots[["quit-with-status"]])) {
         q("no", errcode)
     } else {
         return (list(

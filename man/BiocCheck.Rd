@@ -1,6 +1,5 @@
 \name{BiocCheck}
 \alias{BiocCheck}
-\alias{usage}
 \title{
 Check a package for compliance with Bioconductor package guidelines
 }
@@ -12,7 +11,6 @@ See the vignette for more details. Not meant to replace \code{R CMD check}, whic
 }
 \usage{
 BiocCheck(package = ".", ...)
-usage()
 }
 \arguments{
   \item{package}{
@@ -24,7 +22,6 @@ usage()
     \verb{BiocCheck(package, `no-check-vignettes`=TRUE)}
   }
 }
-
 
 \details{
 \code{BiocCheck()} analyzes R packages for compliance with

@@ -1,6 +1,5 @@
 \name{BiocCheckGitClone}
 \alias{BiocCheckGitClone}
-\alias{usage2}
 \title{
 Additional checks for a package for compliance with Bioconductor package guidelines
 }
@@ -12,7 +11,6 @@ This function is not meant to replace \code{R CMD check} or \code{BiocCheck}.
 }
 \usage{
 BiocCheckGitClone(package=".", ...)
-usage2()
 }
 \arguments{
   \item{package}{
@@ -21,7 +19,6 @@ usage2()
   \item{\dots}{Only available option currently is quit-with-status.
     See \code{BiocCheck}}
 }
-
 
 \details{
 \code{BiocCheckGitClone()} analyzes R packages for compliance with
@@ -66,5 +63,4 @@ Lori Shepherd
 \examples{
 packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")
 BiocCheckGitClone(packageDir, `quit-with-status`=FALSE)
-
 }
