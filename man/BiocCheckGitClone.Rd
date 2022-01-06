@@ -1,13 +1,13 @@
 \name{BiocCheckGitClone}
 \alias{BiocCheckGitClone}
 \title{
-Additional checks for a package for compliance with Bioconductor package guidelines
+Checks specific to a git clone of a package repository
 }
 \description{
-Analyzes \code{R} packages for compliance with Bioconductor package guidelines
-and best practices. Divides output into three categories:
-ERROR, WARNING, and NOTE.
-This function is not meant to replace \code{R CMD check} or \code{BiocCheck}.
+Analyzes an R package for adherence with Bioconductor package guidelines
+and best practices. The check outputs are categorized into ERROR, WARNING,
+and NOTE. This function is typically used in the Bioconductor Build System
+(BBS) and not intended for general use.
 }
 \usage{
 BiocCheckGitClone(package=".", ...)
@@ -16,27 +16,22 @@ BiocCheckGitClone(package=".", ...)
   \item{package}{
     A directory containing an R source package. Not a package tar ball.
   }
-  \item{\dots}{Only available option currently is quit-with-status.
+  \item{\dots}{Currently, only \code{quit-with-status} is available.
     See \code{BiocCheck}}
 }
 
 \details{
-\code{BiocCheckGitClone()} analyzes R packages for compliance with
-Bioconductor package guidelines and best practices. This function should
-only be run on a open source directory not a tarball.
+\code{BiocCheckGitClone()} reviews R packages for adherence with Bioconductor
+package guidelines and best practices.
+See \url{https://contributions.bioconductor.org} for the latest guidance for
+writing Bioconductor software. This function should only be run on a source
+directory and not on a tarball.
 
 \code{BiocCheckGitClone} is called within R with, as
-
-\verb{BiocCheckGitClone(<package>)}
-
-where \code{package} is a directory containing an \code{R} source package.
-
-\code{BiocCheckGitClone} is not meant as a replacement for
-\code{R CMD check} or \code{BiocCheck}.
-
-See the vignette for detailed explanations of all
-the checks performed by \code{BiocCheckGitClone}.
-
+\preformatted{
+    BiocCheckGitClone(<package>)
+}
+where \code{package} is the source directory containing the \code{R} package.
 }
 \value{
 Mostly called for the side effect of the information displayed.
@@ -51,10 +46,7 @@ can be accepted into Bioconductor.}
   that considerations will escalate in severity.}
 }
 \references{
-\url{http://www.bioconductor.org/developers/how-to/coding-style/}
-\url{http://www.bioconductor.org/developers/package-guidelines/}
-\url{http://www.bioconductor.org/developers/how-to/version-numbering/}
-\url{http://www.bioconductor.org/developers/how-to/unitTesting-guidelines/}
+\url{https://contributions.bioconductor.org}
 }
 \author{
 Lori Shepherd
