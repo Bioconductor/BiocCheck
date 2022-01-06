@@ -41,7 +41,7 @@ tarball that was created using \code{R CMD build}.
 \emph{Note} that \code{BiocCheck} is complementary to \code{R CMD check}.
 \code{R CMD check} should always be run first for best results.
 
-\subsection{... options} {
+\subsection{... options}{
     \describe{
         \item{new-package}{ enable checks specific to new packages}
         \item{no-check-dependencies}{ disable check for bad dependencies}
