@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.22) Remove old code related to running `BiocCheck` on the command
+    line and update `BiocCheck` documentation.
     o (1.31.21) Remove redundant `=` from message to avoid `=` assignment.
     o (1.31.20) Add line feed to "Checking function lengths..." message
     o (1.31.18) Packages should not download files when loaded or attached.
