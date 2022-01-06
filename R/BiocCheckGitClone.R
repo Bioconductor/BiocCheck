@@ -57,9 +57,8 @@ BiocCheckGitClone <- function(package=".", ...){
     if (isTRUE(dots[["quit-with-status"]])) {
         q("no", errcode)
     } else {
-        return (list(
-            error=.error$get(),
-            warning=.warning$get(),
-            note=.note$get()))
+        return(
+            list(error=.error$get(), warning=.warning$get(), note=.note$get())
+        )
     }
 }
