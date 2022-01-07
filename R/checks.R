@@ -1049,31 +1049,22 @@ checkPkgInstallCalls <- function(package_dir, badCalls = .BAD_INSTALL_CALLS) {
     }
 }
 
-checkForLibraryMe <- function(pkgname, parsedCode)
+checkForLibraryRequire <-
+    function(pkgdir, symbols = c("library", "require"),
+        tokenType = "SYMBOL_FUNCTION_CALL")
 {
-    badfiles <- c()
-    for (filename in names(parsedCode))
-    {
-        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
-            next
-        df <- parsedCode[[filename]]
-        if (nrow(df))
-        {
-            res <- doesFileLoadPackage(df, pkgname)
-            if (length(res))
-            {
-                badfiles <- append(badfiles, mungeName(filename, pkgname))
-            }
-        }
+    rfiles <- getRSources(pkgdir)
+    parsedCodes <- lapply(
+        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
+    )
+    msg_res <- findSymbolsInParsedCode(parsedCodes, symbols, tokenType)
+    if (length(unlist(msg_res))) {
+        handleWarning(" Avoid the use of 'library' or 'require' in R code")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_res)
+            handleMessage(msg, indent=8)
     }
-    if (length(badfiles))
-    {
-        msg <- sprintf("The following files call library or require on %s.
-            This is not necessary.\n%s", pkgname,
-            paste(badfiles, collapse=", "))
-        handleWarning(msg)
-    }
-
+    invisible(msg_res)
 }
 
 checkCodingPractice <- function(pkgdir, parsedCode, package_name)

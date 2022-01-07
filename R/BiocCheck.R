@@ -142,7 +142,7 @@ BiocCheck <- function(package=".", ...)
     if (is.null(dots[["no-check-install-self"]])){
         handleCheck(sprintf("Checking for library/require of %s...",
                             package_name))
-        checkForLibraryMe(package_name, parsedCode)
+        checkForLibraryRequire(package_dir)
     }
 
     if (is.null(dots[["no-check-coding-practices"]])){
