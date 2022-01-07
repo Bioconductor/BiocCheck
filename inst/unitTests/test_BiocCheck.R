@@ -886,7 +886,7 @@ test_checkForLibraryRequire <- function()
     pkg_dir <- system.file(
         "testpackages", "testpkg0", package="BiocCheck", mustWork = TRUE
     )
-    msg <- BiocCheck::checkForLibraryRequire(pkg_dir)
+    msg <- BiocCheck:::checkForLibraryRequire(pkg_dir)
     checkTrue(identical(1L, .warning$getNum()))
     checkTrue(identical(length(msg), 14L))
     .zeroCounters()
