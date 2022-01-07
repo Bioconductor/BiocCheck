@@ -33,6 +33,29 @@
     message(paste(txt, collapse="\n"), appendLF=appendLF)
 }
 
+handleEvent <- function(..., help_text, messages) {
+    event <- list(...)
+    ename <- names(event)
+    if (!ename %in% c("warning", "error", "note"))
+        stop("<Internal> Designate input with 'warning', 'error', or 'note'.")
+    eventObj <- switch(
+        ename, error = .error, warning = .warning, note = .note
+    )
+    cl <- sys.call(sys.parent())[[1]]
+    ml <- structure(list(paste0(...)), .Names = as.character(cl))
+    msg <- eventObj$add(...)
+    msg <- eventObj$addList(ml)
+    ind <- 4
+    .msg(paste0("* ", toupper(ename), ": %s"), msg, indent=ind, exdent=6)
+    ## TODO: encapsulate into list
+    if (!missing(help_text))
+        handleMessage(help_text, indent = ind <- ind + 2)
+    if (!missing(messages) && length(messages)) {
+        for (msg in messages)
+            handleMessage(msg, indent = ind + 2)
+    }
+}
+
 handleCheck <- function(..., appendLF=TRUE)
 {
     msg <- paste0(...)
