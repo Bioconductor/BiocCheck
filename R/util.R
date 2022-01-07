@@ -36,7 +36,7 @@
 handleEvent <- function(..., help_text, messages) {
     event <- list(...)
     ename <- names(event)
-    if (!ename %in% c("warning", "error", "note"))
+    if (!tolower(ename) %in% c("warning", "error", "note"))
         stop("<Internal> Designate input with 'warning', 'error', or 'note'.")
     eventObj <- switch(
         ename, error = .error, warning = .warning, note = .note
