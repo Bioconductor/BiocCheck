@@ -41,19 +41,28 @@ handleCheck <- function(..., appendLF=TRUE)
 
 handleError <- function(...)
 {
+    cl <- sys.call(sys.parent())[[1]]
+    ml <- structure(list(paste0(...)), .Names = as.character(cl))
     msg <- .error$add(...)
+    msg <- .error$addList(ml)
     .msg("* ERROR: %s", msg, indent=4, exdent=6)
 }
 
 handleWarning <- function(...)
 {
+    cl <- sys.call(sys.parent())[[1]]
+    ml <- structure(list(paste0(...)), .Names = as.character(cl))
     msg <- .warning$add(...)
+    msg <- .warning$addList(ml)
     .msg("* WARNING: %s", msg, indent=4, exdent=6)
 }
 
 handleNote <- function(...)
 {
+    cl <- sys.call(sys.parent())[[1]]
+    ml <- structure(list(paste0(...)), .Names = as.character(cl))
     msg <- .note$add(...)
+    msg <- .note$addList(ml)
     .msg("* NOTE: %s", msg, indent=4, exdent=6)
 }
 
