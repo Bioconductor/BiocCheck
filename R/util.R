@@ -717,49 +717,6 @@ getFunctionLengths <- function(df)
     res
 }
 
-doesFileLoadPackage <- function(df, pkgname)
-{
-    df <- cbind(df, idx=seq_len(nrow(df)))
-    res <- c()
-    regex <- paste0("^['|\"]*", pkgname, "['|\"]*$")
-    max <- nrow(df)
-    reqs <- df[df$token == "SYMBOL_FUNCTION_CALL" &
-        df$text %in% c("library","require"),]
-    if (nrow(reqs))
-    {
-        for (i in seq_len(nrow(reqs)))
-        {
-            reqRow <- reqs[i,]
-            currIdx <- reqs[i, "idx"]
-            if ((currIdx + 1) >= max) return(res)
-            i1 = df[df$idx == currIdx+1,]
-            p <- i1$parent
-            rowsWithThatParent <- df[df$parent == p,]
-            lastRowWithThatParent <-
-                rowsWithThatParent[nrow(rowsWithThatParent),]
-            rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
-            for (j in seq_len(nrow(rowsToCheck)))
-            {
-                curRow <- rowsToCheck[j,]
-                if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
-                    grepl(regex, curRow$text))
-                {
-                    prevRow <- df[curRow$idx -1,]
-                    prevPrevRow <- df[curRow$idx -2,]
-                    if (!(prevRow$token == "EQ_SUB" &&
-                        prevRow$text == "=" &&
-                        prevPrevRow$token == "SYMBOL_SUB" &&
-                        prevPrevRow$text == "help"))
-                    {
-                        res <- append(res, reqRow$line1)
-                    }
-                }
-            }
-        }
-    res
-    }
-}
-
 doesManPageHaveRunnableExample <- function(rd)
 {
     hasExamples <- any(unlist(lapply(rd,
