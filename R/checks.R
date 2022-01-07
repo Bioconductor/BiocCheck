@@ -617,7 +617,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     checkVigSessionInfo(pkgdir)
 
     msg_eval <- checkVigEvalAllFalse(pkgdir)
-    if(length(msg_eval) > 0) {
+    if(length(msg_eval)) {
         handleWarning(" Vignette set global option 'eval=FALSE'")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_eval)
@@ -632,7 +632,7 @@ checkInstContents <- function(pkgdir, checkingDir)
 {
     instdocdir <- file.path(pkgdir, "inst", "doc")
     instdocdircontents <- getVigSources(instdocdir)
-    if (length(instdocdircontents) > 0)
+    if (length(instdocdircontents))
     {
         if (checkingDir)
         {
@@ -726,7 +726,7 @@ checkVigEngine <- function(builder, vigdircontents)
                             split=" ")[[1]][1]},
                         character(1))
     inval <- names(which(table(filenames) > 1))
-    if (length(inval) > 0){
+    if (length(inval)){
         handleError("More than one VignetteEngine specified.")
         handleMessage("Found in vignette/ files:", indent=6)
         for (msg in inval)
@@ -831,7 +831,7 @@ checkVigChunkEval <- function(vigdircontents)
                                           lines)][c(TRUE,FALSE)]
             indx <- grep("^[\t >]*```+\\s*\\{([a-zA-Z0-9_]+.*)\\}\\s*$",
                          nonEvalChunk)
-            if (length(indx) > 0L)
+            if (length(indx))
                 nonEvalChunk <- nonEvalChunk[-indx]
 
         }
@@ -1073,7 +1073,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # sapply
     msg_sapply <- checkSapply(Rdir)
-    if (length(msg_sapply) > 0) {
+    if (length(msg_sapply)) {
         handleNote(" Avoid sapply(); use vapply()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_sapply)
@@ -1082,7 +1082,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # 1:...
     msg_seq <- check1toN(Rdir)
-    if (length(msg_seq) > 0) {
+    if (length(msg_seq)) {
         handleNote(" Avoid 1:...; use seq_len() or seq_along()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_seq)
@@ -1148,7 +1148,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # class() ==
     msg_class <- checkClassNEEQLookup(pkgdir)
-    if (length(msg_class) > 0) {
+    if (length(msg_class)) {
         handleWarning(
             " Avoid class membership checks with class() / is() and == / !=",
             "; Use is(x, 'class') for S4 classes"
@@ -1160,7 +1160,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # system() vs system2()
     msg_sys <- checkSystemCall(pkgdir)
-    if(length(msg_sys) > 0) {
+    if(length(msg_sys)) {
         handleNote(" Avoid system() ; use system2()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_sys)
@@ -1370,8 +1370,10 @@ checkCatInRCode <-
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
-    parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
-    msg_res <- findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
+    parsedCodes <-
+        lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
+    msg_res <-
+        findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
     unlist(msg_res)
 }
 
@@ -1595,7 +1597,7 @@ checkForPromptComments <- function(pkgdir)
         if (any(grepl("^%% ~", lines)))
             bad <- append(bad, basename(manpage))
     }
-    if (length(bad) > 0)
+    if (length(bad))
     {
         handleNote(
             "Remove generated comments from man pages ",
@@ -1679,12 +1681,12 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
         handleError(
             "At least 80% of man pages documenting exported objects must ",
             "have runnable examples. The following pages do not:")
-    } else if (length(badManPages) > 0) {
+    } else if (length(badManPages)) {
         handleNote(
             "Consider adding runnable examples to the following ",
             "man pages which document exported objects:")
     }
-    if (length(badManPages) > 0)
+    if (length(badManPages))
         .msg(paste(badManPages, collapse=", "), indent=6)
 
 
