@@ -41,10 +41,19 @@
         },
         get = function(condition) {
             cond <- .self[[condition]]
-            if (length(cond))
-                split(unlist(cond, use.names = FALSE), names(cond))
-            else
+            if (length(cond)) {
+                length_elements <- vapply(
+                    cond,
+                    function(x) length(unlist(x, use.names = FALSE)),
+                    integer(1L)
+                )
+                split(
+                    unlist(cond, use.names = FALSE),
+                    rep(names(cond), length_elements)
+                )
+            } else {
                 cond
+            }
         },
         getNum = function(conditions) {
             vapply(
