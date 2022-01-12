@@ -34,12 +34,15 @@
 }
 
 handleCondition <-
-    function(..., condition, help_text = character(0L), messages = character(0L))
+    function(
+        ..., condition, help_text = character(0L),
+        messages = character(0L), nframe = 2L
+    )
 {
     msg <- list(paste0(...))
     if (!tolower(condition) %in% c("warning", "error", "note"))
         stop("<Internal> Designate input with 'warning', 'error', or 'note'.")
-    cl <- sys.call(sys.parent())[[1]]
+    cl <- sys.call(sys.parent(n = nframe))[[1L]]
     ml <- structure(msg, .Names = tail(as.character(cl), 1L))
     .BiocCheck$add(
         ml, condition = condition, help_text = help_text, messages = messages
