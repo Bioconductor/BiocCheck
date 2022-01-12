@@ -202,13 +202,12 @@ BiocCheck <- function(package=".", ...)
     if (is.null(dots[["no-check-bioc-help"]])) {
         handleCheck("Checking for bioc-devel mailing list subscription...")
         if (!nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
-            msg <- paste(
-                "Cannot determine whether maintainer is subscribed to the",
-                "bioc-devel mailing list (requires admin credentials).",
-                "Subscribe here:",
+            handleNote(
+                "Cannot determine whether maintainer is subscribed to the ",
+                "bioc-devel mailing list (requires admin credentials). ",
+                "Subscribe here: ",
                 "https://stat.ethz.ch/mailman/listinfo/bioc-devel"
             )
-            handleNote(paste(strwrap(msg), collapse="\n"))
         } else {
             checkForBiocDevelSubscription(package_dir)
         }
@@ -243,7 +242,11 @@ BiocCheck <- function(package=".", ...)
         q("no", errcode)
     } else {
         return(
-            list(error=.error$get(), warning=.warning$get(), note=.note$get())
+            list(
+                error=.error$getList(),
+                warning=.warning$getList(),
+                note=.note$getList()
+            )
         )
     }
 
