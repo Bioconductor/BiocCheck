@@ -46,7 +46,7 @@ BiocCheckGitClone <- function(package=".", ...){
         exdent=0)
 
 
-    if (.BiocCheck$getNum() > 0)
+    if (.BiocCheck$getNum("error") > 0)
     {
         errcode <- 1
         .msg("BiocCheckGitClone FAILED.")
