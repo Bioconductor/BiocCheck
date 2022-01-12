@@ -65,26 +65,28 @@ checkForBadDepends <- function(pkgdir)
 
     handleCheck("Checking if other packages can import this one...")
     if (any(found)) {
+        msg <- sprintf("%s::%s in %s()", pkgs[found], res[found], fns[found])
         handleError(
             "Packages providing ", sum(found), " object(s) used in this ",
             "package should be imported in the NAMESPACE file, otherwise ",
-            "packages importing this package may fail.")
-
-        msg <- sprintf("  %s::%s in %s()", pkgs[found], res[found], fns[found])
-        handleVerbatim(c("", "package::object in function()", msg, ""))
+            "packages importing this package may fail.",
+            help_text = "package::object in function()",
+            messages = msg
+        )
     }
 
     handleCheck("Checking to see if we understand object initialization...")
     if (!all(found)) {
         n <- sum(!found)
+        msg <- sprintf("%s (%s)", fns[!found], res[!found])
         handleNote(
             "Consider clarifying how ", n, " object(s) are initialized. ",
             "Maybe ", if (n == 1L) "it is" else "they are", " ",
             "part of a data set loaded with data(), or perhaps part of an ",
-            "object referenced in with() or within().")
-
-        msg <- sprintf("%s (%s)", fns[!found], res[!found])
-        handleVerbatim(c("function (object)", msg))
+            "object referenced in with() or within().",
+            help_text = "function (object)",
+            messages = msg
+        )
     }
 }
 
@@ -95,14 +97,16 @@ checkDeprecatedPackages <- function(pkgdir)
     if ("multicore" %in% allDepends)
     {
         handleError("Use 'BiocParallel' instead of 'multicore'. ",
-            "'multicore' is deprecated and does not work on Windows.")
+            "'multicore' is deprecated and does not work on Windows."
+        )
     }
     logVec <- allDeprecated %in% allDepends
     if (any(logVec)){
-        handleError("Package dependency in the DESCRIPTION is 'Deprecated'. ",
-                    "Update your package to not rely on the following:")
-        for(i in allDeprecated[logVec])
-            handleMessage(i, indent=8)
+        handleError(
+            "Package dependency in the DESCRIPTION is 'Deprecated'. ",
+            "Update your package to not rely on the following:",
+            messages = allDeprecated[logVec]
+        )
     }
 }
 
@@ -110,7 +114,10 @@ checkRemotesUsage <- function(pkgdir)
 {
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if ("Remotes" %in% colnames(dcf))
-        handleError("Package dependencies must be on CRAN or Bioconductor. Remove 'Remotes:' from DESCRIPTION")
+        handleError(
+            "Package dependencies must be on CRAN or Bioconductor.",
+            " Remove 'Remotes:' from DESCRIPTION"
+        )
 }
 
 checkLazyDataUsage <- function(pkgdir)
@@ -118,7 +125,9 @@ checkLazyDataUsage <- function(pkgdir)
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if ("LazyData" %in% colnames(dcf) &&
         tools:::str_parse_logic(dcf[, "LazyData"]))
-        handleNote("'LazyData:' in the 'DESCRIPTION' should be set to false or removed")
+        handleNote(
+            "'LazyData:' in the 'DESCRIPTION' should be set to false or removed"
+        )
 }
 
 checkNewPackageVersionNumber <- function(pkgdir)
@@ -131,8 +140,9 @@ checkNewPackageVersionNumber <- function(pkgdir)
                 "(e.g., 1.y.z, 2.y.z); got ", sQuote(version), ".")
         if(!grepl("^[0-9]+[-.]99[-.][0-9]+$", version))
             handleError(
-                "New package y version not 99 (e.g., x.99.z, ",
-                "x.99.z, ...); got ",sQuote(version), ".")
+                "New package 'y' version not 99 (i.e., x.99.z)",
+                "; Package version: ", version
+            )
 }
 
 checkVersionNumber <- function(pkgdir)
@@ -144,7 +154,8 @@ checkVersionNumber <- function(pkgdir)
     {
         handleError(
             "Invalid package Version, see ",
-            "http://www.bioconductor.org/developers/how-to/version-numbering/")
+            "http://www.bioconductor.org/developers/how-to/version-numbering/"
+        )
         return()
     }
     tryCatch({
@@ -163,7 +174,9 @@ checkVersionNumber <- function(pkgdir)
                 "y of x.y.z version should be ", shouldBe, " in ", vers)
         }
 
-    }, error=function(e) handleError("Invalid package version"))
+    }, error = function(e) {
+        handleError("Invalid package version")
+    })
 }
 
 checkRVersionDependency <- function(package_dir) {
@@ -198,14 +211,16 @@ checkPackageSize <- function(pkg, pkgdir, size=5){
         maxSize <- size*10^6 ## 5MB
         pkgSize <- file.size(pkg)
         if (pkgSize > maxSize){
+            msgs <- c(
+                paste0("Package Size: ",
+                       as.character(round(pkgSize/(10^6),2)), " MB"),
+                paste0("Size Requirement: ",
+                       sprintf("%.2f", round(maxSize/(10^6),2)), " MB")
+            )
             handleError(
-                "Package Source tarball exceeds Bioconductor size requirement.")
-            handleMessage(paste0("Package Size: ",
-                                 as.character(round(pkgSize/(10^6),4)), " MB"),
-                          indent=8)
-            handleMessage(paste0("Size Requirement: ",
-                                 sprintf("%.4f", round(maxSize/(10^6),4)), " MB"),
-                          indent=8)
+                "Package tarball exceeds the Bioconductor size requirement.",
+                messages = msgs
+            )
         }
     }
 }
@@ -274,7 +289,9 @@ checkBiocViews <- function(pkgdir)
     }else{
         if (all(views %in% toplevel)) {
             handleError(
-                "Add biocViews other than ", paste(unique(views), collapse=", "))
+                "Add biocViews other than ",
+                paste(unique(views), collapse=", ")
+            )
             return(TRUE)
         }
     }
@@ -416,7 +433,8 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     {
         handleError(
             "Package directory '", pkgNameFromDir, "' must match Package: ",
-            "field (got '", dcf[, "Package"], "').")
+            "field (got '", dcf[, "Package"], "')."
+        )
         return()
     }
     handleCheck("Checking for Version field...")
@@ -428,7 +446,9 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     handleCheck("Checking for valid maintainer...")
     if (!source_tarball){
         if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf)))){
-            handleError("Use Authors@R field not Author/Maintainer fields. Do not use both.")
+            handleError(
+                "Use only the Authors@R field not Author/Maintainer fields."
+            )
         } else {
             if (any((c("Author","Maintainer") %in% colnames(dcf))))
                 handleError("Do not use Author/Maintainer fields. Use Authors@R.")
@@ -634,9 +654,10 @@ checkInstContents <- function(pkgdir, checkingDir)
     {
         if (checkingDir)
         {
-                handleWarning(
+            handleWarning(
                 "Remove vignette sources from inst/doc; ",
-                "they belong in vignettes/.")
+                "they belong in vignettes/."
+            )
         }
     }
 }
@@ -658,9 +679,10 @@ checkVigFiles <- function(vigdir, vigdircontents){
                            },
                            allvigfiles = allvigfiles))
         if (length(badFiles) != 0){
-            handleNote("Potential intermediate files found:")
-            for (msg in badFiles)
-                handleMessage(paste0("vignettes/", msg), indent=8)
+            handleNote(
+                "Potential intermediate files found:",
+                messages = paste0("vignettes/", badFiles)
+            )
         }
     }
 }
@@ -2016,7 +2038,9 @@ checkForBiocDevelSubscription <- function(pkgdir)
     } else {
         handleError(
             "Maintainer must subscribe to the bioc-devel mailing list. ",
-            "Subscribe here: https://stat.ethz.ch/mailman/listinfo/bioc-devel")
+            "Subscribe here: https://stat.ethz.ch/mailman/listinfo/bioc-devel",
+            nframe = 3L
+        )
     }
 }
 
