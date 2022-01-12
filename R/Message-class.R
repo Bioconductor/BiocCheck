@@ -105,10 +105,10 @@
 
 ## singletons. Exported but 'hidden' from ls() by the '.'
 
-.event <- .BiocCheck()
+.BiocCheck <- .BiocCheck()
 .messages <- .MessageCondition()
 
 .zeroCounters <- function()
 {
-    .event$zero(c("error", "warning", "note"))
+    .BiocCheck$zero(c("error", "warning", "note"))
 }

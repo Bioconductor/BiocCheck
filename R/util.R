@@ -41,16 +41,16 @@ handleCondition <-
         stop("<Internal> Designate input with 'warning', 'error', or 'note'.")
     cl <- sys.call(sys.parent())[[1]]
     ml <- structure(msg, .Names = tail(as.character(cl), 1L))
-    .event$add(
+    .BiocCheck$add(
         ml, condition = condition, help_text = help_text, messages = messages
     )
-    .event$log
+    .BiocCheck$log
 }
 
 handleCheck <- function(..., appendLF=TRUE)
 {
     msg <- sprintf("* %s", paste0(...))
-    .event$setCheck(msg)
+    .BiocCheck$setCheck(msg)
     .msg(msg, appendLF=appendLF)
 }
 

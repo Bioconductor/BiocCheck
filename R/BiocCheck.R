@@ -75,8 +75,7 @@ BiocCheck <- function(package=".", ...)
         if (source_tarball){
             checkPackageSize(package, package_dir, size=5)
         } else {
-            handleMessage("Skipped... only checked on source tarball",
-                          indent=8)
+            handleMessage("Skipped... only checked on source tarball", indent=6)
         }
     }
 
@@ -218,9 +217,9 @@ BiocCheck <- function(package=".", ...)
 
     ## Summary
     .msg("\n\nSummary:")
-    .msg("ERROR count: %d", .error$getNum())
-    .msg("WARNING count: %d", .warning$getNum())
-    .msg("NOTE count: %d", .note$getNum())
+    .msg("ERROR count: %d", .BiocCheck$getNum("error"))
+    .msg("WARNING count: %d", .BiocCheck$getNum("warning"))
+    .msg("NOTE count: %d", .BiocCheck$getNum("note"))
     .msg(paste0(
         "For detailed information about these checks, see the BiocCheck ",
         "vignette, available at ",
@@ -230,7 +229,7 @@ BiocCheck <- function(package=".", ...)
         exdent=0)
 
 
-    if (.error$getNum() > 0)
+    if (.BiocCheck$getNum("error") > 0)
     {
         errcode <- 1
         .msg("BiocCheck FAILED.")
@@ -241,13 +240,7 @@ BiocCheck <- function(package=".", ...)
     if (isTRUE(dots[["quit-with-status"]])) {
         q("no", errcode)
     } else {
-        return(
-            list(
-                error=.error$getList(),
-                warning=.warning$getList(),
-                note=.note$getList()
-            )
-        )
+        return(.BiocCheck)
     }
 
 }
