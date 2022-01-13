@@ -1470,7 +1470,7 @@ checkExternalData <- function(Rdir) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
 
-        platforms <- "githubusercontent|github|gitlab|bitbucket|dropbox"
+        platforms <- "githubusercontent|github.*[^html\"]$|gitlab|bitbucket|dropbox"
         txtkns <- tokens[, "text"]
         hits <- grepl(platforms, txtkns, ignore.case = TRUE) &
             grepl("dl|\\.\\w+\"$", txtkns)
