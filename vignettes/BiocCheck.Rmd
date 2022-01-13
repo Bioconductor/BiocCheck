@@ -9,7 +9,11 @@ vignette: >
   % \VignetteEncoding{UTF-8}
 ---
 
-# `BiocCheck`
+# `BiocCheck` Summary
+
+```{r,include=TRUE,results="hide",message=FALSE,warning=FALSE}
+library(BiocCheck)
+```
 
 `BiocCheck` encapsulates _Bioconductor_ package guidelines and best
 practices, analyzing packages and reporting three categories of
@@ -30,50 +34,40 @@ issues:
 
 # Using `BiocCheck`
 
-`BiocCheck` is meant to run within R on a directory containing an R package, or a source
-tarball (`.tar.gz` file):
-
+`BiocCheck` is meant to run within R on a directory containing an R package, or
+a source tarball (`.tar.gz` file):
 
 ```{r eval=FALSE}
-library(BiocCheck)
-BiocCheck("packageDirOrTarball")
+BiocCheck("<packageDirOrTarball>")
 ```
 
-`BiocCheck` takes options which can be seen by:
+`BiocCheck` takes options which can be seen with `?BioCheck`.
 
-```{r echo=FALSE}
-suppressPackageStartupMessages(library(BiocCheck))
-usage()
-```
-Note that the `--new-package` option is turned on in the package
-builder attached to the _Bioconductor_ package tracker, since this is
-almost always used to build new packages that have been submitted.
+Note that the `--new-package` option is turned on in the Single Package
+Builder (SPB) during the new package submission process.
 
 # When should `BiocCheck` be run
 
-Run `BiocCheck` after running `R CMD check`.
+`BiocCheck` should always be run after `R CMD check`.
 
 Note that `BiocCheck` is not a replacement for `R CMD check`; it is
 complementary. It should be run after `R CMD check` completes
 successfully.
 
-`BiocCheck` can also be run via the [Travis-CI](https://www.travis-ci.org/)
-(continuous integration) system. This service allows automatic testing of R
-packages in a controlled build environment.
+`BiocCheck` can also be run via
+[GitHub Actions](https://docs.github.com/en/actions),
+a continuous integration system on GitHub. This service allows automatic
+testing of R packages in a controlled build environment.
 
-Simply add the following line to your package's `.travis.yml` file:
-
-```{yml}
-bioc_check: true
-```
+See the `r Biocpkg("biocthis")` package for more details.
 
 # Installing `BiocCheck`
 
 `BiocCheck` should be installed as follows:
 
-```{r eval=FALSE}
-if (!"BiocManager" %in% rownames(installed.packages()))
-     install.packages("BiocManager")
+```{r, eval = FALSE}
+if (!require("BiocManager"))
+    install.packages("BiocManager")
 BiocManager::install("BiocCheck")
 ```
 
@@ -399,7 +393,7 @@ directory.
 
 * A package should not download files at the time of loading or attaching
   i.e., using `library`. Using `download.file` and `download` should be avoided
-  and when found, an `ERROR` will be emitted. 
+  and when found, an `ERROR` will be emitted.
 
 * `paste` and `paste0` function calls within signaling functions such as
   `message`, `warning`, and `stop` are redundant and should be avoided
@@ -412,7 +406,7 @@ directory.
 * `message`, `warn*`, and `error` keywords should not be included in
   signal condition functions: `message`, `warning`, and `stop`. This is
   redundant and should be avoided (`NOTE`).
-  
+
 * It is favorable to use the assignment arrow ('<-') over the equals assignment
   ('=') for clarity in the code and legibility. Any use of the `=` will be
   flagged with a `NOTE`.
