@@ -68,6 +68,19 @@ handleVerbatim <- function(msg, indent=4, exdent=6, width=getOption("width"))
     .verbatim("%s", msg, indent=indent, exdent=exdent, width=width)
 }
 
+.run_r_command <- function(cmd, args, stderr) {
+    res <- system2(cmd, args, stdout=NULL, stderr=stderr)
+    if (res) {
+        message(
+            "  cmd: ", cmd,
+            "\n  args: ", args,
+            "\n  stderr:",
+            "\n  ", paste(readLines(stderr), collapse="\n  "), "\n"
+        )
+    }
+    res
+}
+
 installAndLoad <- function(pkg)
 {
     r_libs_user_old <- Sys.getenv("R_LIBS_USER")
@@ -81,22 +94,18 @@ installAndLoad <- function(pkg)
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
                     libdir, shQuote(pkg))
-    res <- system2(cmd, args, stdout=NULL, stderr=stderr)
-    if (res != 0)
-    {
-        cat("  cmd: ", cmd,
-            "\n  args: ", args,
-            "\n  stderr:",
-            "\n  ", paste(readLines(stderr), collapse="\n  "),
-            "\n", sep="")
+    res <- .run_r_command(cmd = cmd, args = args, stderr = stderr)
+    if (res) {
         handleError(pkg, " must be installable.")
     }
     pkgname <- .get_package_name(pkg)
-    args <- list(package=pkgname, lib.loc=libdir)
-    if (paste0("package:",pkgname) %in% search())
-        suppressWarnings(unloadNamespace(pkgname))
-
-    suppressPackageStartupMessages(do.call(library, args))
+    args <- sprintf(
+        "--vanilla -e 'library(%s, lib.loc = \"%s\")'", pkgname, libdir
+    )
+    res <- .run_r_command(cmd = cmd, args = args, stderr = stderr)
+    if (res) {
+        handleError(pkg, " must be loadable.")
+    }
     install_dir
 }
 
