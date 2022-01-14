@@ -519,7 +519,8 @@ checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
     pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
     dImports <- cleanupDependency(pkg_desc$Imports)
     deps <- cleanupDependency(pkg_desc$Depends)
-    nImports <- unlist(parseNamespaceFile(pkgname, lib.loc)[["imports"]])
+    imps <- parseNamespaceFile(pkgname, lib.loc)[["imports"]]
+    nImports <- vapply(imps, `[[`, character(1L), 1L)
 
     if(!(all(dImports %in% nImports)))
     {
