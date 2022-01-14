@@ -793,7 +793,7 @@ test_checkDescriptionNamespaceConsistency <- function()
 
     testpkg <- 'testpkg'
 
-    BiocCheck::.zeroCounters()
+    .zeroCounters()
     test_dir <- tempfile()
     dir.create(test_dir)
 
@@ -810,7 +810,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
 
-    BiocCheck::.zeroCounters()
+    .zeroCounters()
 
     pkgpath <- create_test_package(
         testpkg, list(Imports="devtools"),
@@ -826,7 +826,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
 
-    BiocCheck::.zeroCounters()
+    .zeroCounters()
 
     pkgpath <- create_test_package(
         testpkg, list(Imports="usethis"),
@@ -840,7 +840,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     run_check(testpkg, instdir)
     checkTrue(.warning$getNum() == 0L)
 
-    BiocCheck::.zeroCounters()
+    .zeroCounters()
 
     pkgpath <- create_test_package(
         testpkg, list(Imports="usethis, BiocCheck"),
@@ -854,7 +854,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     checkIdentical("Import BiocCheck in NAMESPACE as well as DESCRIPTION.",
                    .warning$get())
 
-    BiocCheck::.zeroCounters()
+    .zeroCounters()
 
     pkgpath <- create_test_package(testpkg, extraActions=function(path){
         cat("import(devtools)\n", file=file.path(path, "NAMESPACE"))
