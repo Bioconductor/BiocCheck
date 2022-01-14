@@ -81,30 +81,31 @@ handleVerbatim <- function(msg, indent=4, exdent=6, width=getOption("width"))
     res
 }
 
-installAndLoad <- function(pkg)
+installAndLoad <- function(pkgpath, install_dir = tempfile())
 {
     r_libs_user_old <- Sys.getenv("R_LIBS_USER")
     on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
     r_libs_user <- paste(.libPaths(), collapse=.Platform$path.sep)
     Sys.setenv(R_LIBS_USER=r_libs_user)
 
-    dir.create(install_dir <- tempfile())
+    if (!dir.exists(install_dir))
+        dir.create(install_dir)
     dir.create(libdir <- file.path(install_dir, "lib"))
     file.create(stderr <- file.path(install_dir, "install.stderr"))
-    cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
+    rcmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
-                    libdir, shQuote(pkg))
-    res <- .run_r_command(cmd = cmd, args = args, stderr = stderr)
+                    libdir, shQuote(pkgpath))
+    res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
     if (res) {
-        handleError(pkg, " must be installable.")
+        handleError(pkgpath, " must be installable.")
     }
-    pkgname <- .get_package_name(pkg)
+    pkgname <- .get_package_name(pkgpath)
     args <- sprintf(
         "--vanilla -e 'library(%s, lib.loc = \"%s\")'", pkgname, libdir
     )
-    res <- .run_r_command(cmd = cmd, args = args, stderr = stderr)
+    res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
     if (res) {
-        handleError(pkg, " must be loadable.")
+        handleError(pkgpath, " must be loadable.")
     }
     install_dir
 }
@@ -554,7 +555,7 @@ getRSources <- function(Rdir) {
     dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
 }
 
-getBadDeps <- function(pkgdir)
+getBadDeps <- function(pkgdir, lib.loc)
 {
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     oldquotes <- getOption("useFancyQuotes")
@@ -562,7 +563,7 @@ getBadDeps <- function(pkgdir)
     options(useFancyQuotes=FALSE)
     args <- sprintf("-q --vanilla --slave -f %s --args %s",
         system.file("script", "checkBadDeps.R", package="BiocCheck"),
-        dQuote(pkgdir))
+        paste(dQuote(pkgdir), dQuote(lib.loc)))
     system2(cmd, args, stdout=TRUE, stderr=FALSE,
         env="R_DEFAULT_PACKAGES=NULL")
 }

@@ -1,19 +1,17 @@
+# R_DEFAULT_PACKAGES=NULL "$HOME/src/svn/r-devel/R/lib/R/bin/R" --vanilla --args "$HOME/bioc/BiocCheck/inst/testpackages/testpkg0" "/tmp/RtmpRE92fA/file26de182a35c4/lib"
 suppressMessages({
     suppressWarnings({
-        pkgdir <- commandArgs(TRUE)
+        args <- commandArgs(TRUE)
+        pkgdir <- args[[1L]]
+        libloc <- args[[2L]]
         options(useFancyQuotes=FALSE)
-        pkgname <- BiocCheck:::.get_package_name(pkgdir)
-        # if (.Platform$OS.type == "windows")
-        # {
-        #     libdir <- file.path(tempdir(), "libdir")
-        #     install.packages(pkgname, repos=NULL, type="source",
-        #         INSTALL_opts=sprintf("--library=%s",
-        #             libdir))
-        # } else {
-            libdir <- sub(paste0(pkgname, "$"), "", pkgdir)
-            libdir <- sub("/$|\\$", "", libdir)
-        # }
-        .libPaths(c(libdir, .libPaths()))
-        cat(utils::capture.output(codetools::checkUsageEnv(base::getNamespace(pkgname))), sep="\n")
+        # BiocCheck is not installed -- use basename
+        pkgname <- basename(pkgdir)
+        .libPaths(c(libloc, .libPaths()))
+        cat(utils::capture.output(
+            codetools::checkUsageEnv(
+                getNamespace(pkgname)
+            )
+        ), sep="\n")
     })
 })

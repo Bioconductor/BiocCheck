@@ -21,13 +21,13 @@ checkForVersionNumberMismatch <- function(package, package_dir)
 }
 
 ## Make sure this is run after pkg is installed.
-checkForBadDepends <- function(pkgdir)
+checkForBadDepends <- function(pkgdir, lib.loc)
 {
     pkgname <- .get_package_name(pkgdir)
-    depends <- cleanupDependency(packageDescription(pkgname)$Depends)
-    depends <- append(depends,
-        cleanupDependency(packageDescription(pkgname)$Imports))
-    output <- getBadDeps(pkgdir)
+    pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
+    depends <- cleanupDependency(pkg_desc$Depends)
+    depends <- append(depends, cleanupDependency(pkg_desc$Imports))
+    output <- getBadDeps(pkgdir, lib.loc = lib.loc)
     if (is.null(output)){
         # put these here to be consistent output messaging
         handleCheck("Checking if other packages can import this one...")
@@ -54,7 +54,8 @@ checkForBadDepends <- function(pkgdir)
 
     res <- gsub("'", "", regmatches(output, res))
     fns <- sub(":$", "", regmatches(output, fns))
-    inGlobals <- res %in% globalVariables(package=pkgname)
+    inGlobals <- res %in%
+        globalVariables(package = loadNamespace(pkgname, lib.loc = lib.loc))
     res <- res[!inGlobals]
     fns <- fns[!inGlobals]
 
@@ -513,19 +514,22 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     }
 }
 
-checkDescriptionNamespaceConsistency <- function(pkgname)
+checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
 {
-    dImports <- cleanupDependency(packageDescription(pkgname)$Imports)
-    deps <- cleanupDependency(packageDescription(pkgname)$Depends)
-    nImports <- names(getNamespaceImports(pkgname))
-    nImports <- nImports[which(nImports != "base")]
+    pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
+    dImports <- cleanupDependency(pkg_desc$Imports)
+    deps <- cleanupDependency(pkg_desc$Depends)
+    nImports <- unlist(parseNamespaceFile(pkgname, lib.loc)[["imports"]])
 
     if(!(all(dImports %in% nImports)))
     {
         badones <- dImports[!dImports %in% nImports]
         tryCatch({
             ## FIXME: not 100% confident that the following always succeeds
-            dcolon <- .checkEnv(loadNamespace(pkgname), .colonWalker())$done()
+            dcolon <- .checkEnv(
+                loadNamespace(pkgname, lib.loc = lib.loc),
+                .colonWalker()
+            )$done()
             badones <- setdiff(badones, dcolon)
         }, error=function(...) NULL)
         if (length(badones))
@@ -556,7 +560,7 @@ checkImportSuggestions <- function(pkgname)
             capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
         )), silent = TRUE
     )
-    if (!length(suggestions) || inherits(suggestions, "try-error")) {
+    if (inherits(suggestions, "try-error")) {
         handleMessage("Could not get namespace suggestions.")
     } else {
         handleMessage("Namespace import suggestions are:")
@@ -1643,11 +1647,11 @@ checkForValueSection <- function(pkgdir)
 }
 
 # Which pages document things that are exported?
-checkExportsAreDocumented <- function(pkgdir, pkgname)
+checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
 {
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
-    exports <- getNamespaceExports(pkgname)
+    exports <- getNamespaceExports(loadNamespace(pkgname, lib.loc = lib.loc))
     badManPages <- character(0)
     exportingPagesCount <- 0L
     noExamplesCount <- 0L
