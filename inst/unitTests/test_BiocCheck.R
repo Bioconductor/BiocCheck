@@ -25,8 +25,8 @@ inspect <- function()
 
 create_test_package <-
     function(
-        pkgname, description=list(), extraActions=function(path=NULL){},
-        path = file.path(tempdir(), pkgname)
+        test_dir = tempfile(),
+        description=list(), extraActions=function(path=NULL){}
     )
 {
     canned <- list(Author="Test Author",
@@ -35,16 +35,18 @@ create_test_package <-
     {
         canned[[name]] <- description[[name]]
     }
-    unlink(path, recursive=TRUE)
+    pkgpath <- tempfile(tmpdir = test_dir)
+    if (!dir.exists(pkgpath))
+        dir.create(pkgpath, recursive = TRUE)
     capture.output({
         suppressMessages(
-            usethis::create_package(path, canned, rstudio=FALSE, open = FALSE)
+            usethis::create_package(pkgpath, canned, rstudio=FALSE, open = FALSE)
         )
     })
 
-    cat("#", file=file.path(path, "NAMESPACE"))
-    extraActions(path)
-    path
+    cat("#", file=file.path(pkgpath, "NAMESPACE"))
+    extraActions(pkgpath)
+    pkgpath
 }
 
 checkError <- function(msg)
@@ -615,7 +617,8 @@ test_installAndLoad <- function()
     instdir <- tempfile()
     dir.create(instdir)
     pkgdir <- create_test_package(
-        "testpkg", path = file.path(instdir, "testpkg")
+        test_dir = instdir,
+        path = file.path(instdir, "testpkg")
     )
     temppkg <- BiocCheck:::installAndLoad(
         pkgpath = pkgdir, install_dir = instdir
@@ -635,19 +638,19 @@ test_installAndLoad <- function()
 
 test_findPackageName <- function()
 {
-    pkgdir <- create_test_package("testpackage")
+    pkgdir <- create_test_package(test_dir = test_dir)
     dirrename <- file.path(dirname(pkgdir), "test_package")
     file.rename(pkgdir, dirrename)
     pkgname <- BiocCheck:::.get_package_name(dirrename)
-    checkTrue(identical(pkgname, "testpackage"))
-    unlink(dirrename, recursive = TRUE)
+    checkTrue(identical(pkgname, basename(pkgdir)))
+    unlink(dirname(pkgdir), recursive = TRUE)
 
     ## test tarball rename
-    pkgdir <- create_test_package("testpackage", list(Version = "0.99.0"))
+    pkgdir <- create_test_package(description = list(Version = "0.99.0"))
     cmd <- sprintf('"%s"/bin/R CMD build %s', R.home(), pkgdir)
     result <- system(cmd, intern=TRUE)
 
-    tarname <- "testpackage_0.99.0.tar.gz"
+    tarname <- paste0(basename(pkgdir), "_0.99.0.tar.gz")
     file.copy(tarname, tempdir())
     file.remove(tarname)
     tarname <- file.path(tempdir(), tarname)
@@ -786,80 +789,93 @@ test_checkDescriptionNamespaceConsistency <- function()
 {
     run_check <- function(pkg, instdir) {
         libloc <- file.path(instdir, "lib")
-        BiocCheck:::checkDescriptionNamespaceConsistency(
-            pkg, lib.loc = libloc
-        )
+        suppressMessages({
+            BiocCheck:::checkDescriptionNamespaceConsistency(
+                pkg, lib.loc = libloc
+            )
+        })
     }
 
-    testpkg <- 'testpkg'
-
-    .zeroCounters()
     test_dir <- tempfile()
     dir.create(test_dir)
+    .zeroCounters()
 
     pkgpath <- create_test_package(
-        testpkg, list(Imports="devtools"), path = file.path(test_dir, "testpkg")
+        test_dir = test_dir,
+        description =list(Imports="devtools")
     )
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
-    run_check(testpkg, instdir)
+    run_check(basename(pkgpath), instdir)
     checkTrue(.warning$getNum() == 1)
     checkEquals(
         "Import devtools in NAMESPACE as well as DESCRIPTION.",
         .warning$get()
     )
+
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
-
     .zeroCounters()
 
     pkgpath <- create_test_package(
-        testpkg, list(Imports="devtools"),
+        test_dir = test_dir,
+        description = list(Imports="devtools"),
         extraActions=function(path) {
             cat("import(devtools)\n", file=file.path(path, "NAMESPACE"))
-        },
-        path = file.path(test_dir, "testpkg")
+        }
     )
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
-    run_check(testpkg, instdir)
+    pkgname <- basename(pkgpath)
+    run_check(pkgname, instdir)
     checkTrue(.warning$getNum() == 0L)
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
-
     .zeroCounters()
 
     pkgpath <- create_test_package(
-        testpkg, list(Imports="usethis"),
-        extraActions=function(path) {
+        test_dir = test_dir,
+        description = list(Imports="usethis"),
+        extraActions = function(path) {
             cat("f = function() usethis::create_package()\n",
                 file=file.path(path, "R", "f.R"))
-        },
-        path = file.path(test_dir, "testpkg")
+        }
     )
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
-    run_check(testpkg, instdir)
+    pkgname <- basename(pkgpath)
+    run_check(pkgname, instdir)
     checkTrue(.warning$getNum() == 0L)
 
+    unlink(test_dir, recursive = TRUE)
+    dir.create(test_dir)
     .zeroCounters()
 
     pkgpath <- create_test_package(
-        testpkg, list(Imports="usethis, BiocCheck"),
-        extraActions=function(path) {
+        test_dir = test_dir,
+        description = list(Imports="usethis, BiocCheck"),
+        extraActions = function(path) {
             cat("f = function() usethis::create_package()\n",
                 file=file.path(path, "R", "f.R"))
-        })
-    instdir <- BiocCheck:::installAndLoad(pkgpath)
-    run_check(testpkg, instdir)
+        }
+    )
+    instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
+    pkgname <- basename(pkgpath)
+    run_check(pkgname, instdir)
     checkTrue(.warning$getNum() == 1L)
-    checkIdentical("Import BiocCheck in NAMESPACE as well as DESCRIPTION.",
+    checkIdentical("Import BiocCheck, usethis in NAMESPACE as well as DESCRIPTION.",
                    .warning$get())
 
+    unlink(test_dir, recursive = TRUE)
+    dir.create(test_dir)
+    .zeroCounters()
     .zeroCounters()
 
-    pkgpath <- create_test_package(testpkg, extraActions=function(path){
-        cat("import(devtools)\n", file=file.path(path, "NAMESPACE"))
-    })
-    instdir <- BiocCheck:::installAndLoad(pkgpath)
+    pkgpath <- create_test_package(
+        test_dir = test_dir,
+        extraActions = function(path) {
+            cat("import(devtools)\n", file=file.path(path, "NAMESPACE"))
+        }
+    )
+    instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     checkTrue(
         "devtools" %in%
             names(getNamespaceImports(
@@ -867,7 +883,8 @@ test_checkDescriptionNamespaceConsistency <- function()
             ))
     )
 
-    run_check(testpkg, instdir)
+    pkgname <- basename(pkgpath)
+    run_check(pkgname, instdir)
     checkTrue(.warning$getNum() == 1)
     checkEquals("Import devtools in DESCRIPTION as well as NAMESPACE.",
         .warning$get()[1])
