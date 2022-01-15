@@ -1575,7 +1575,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     }
 }
 
-checkManDocumentation <- function(package_dir, package_name)
+checkManDocumentation <- function(package_dir, package_name, libloc)
 {
     # canned man prompts
     checkForPromptComments(package_dir)
@@ -1584,7 +1584,7 @@ checkManDocumentation <- function(package_dir, package_name)
     checkForValueSection(package_dir)
 
     # exports are documented and 80% runnable
-    checkExportsAreDocumented(package_dir, package_name)
+    checkExportsAreDocumented(package_dir, package_name, lib.loc = libloc)
 
     # usage of donttest and dontrun
     checkUsageOfDont(package_dir)

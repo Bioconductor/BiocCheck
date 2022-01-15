@@ -158,7 +158,7 @@ BiocCheck <- function(package=".", ...)
 
     if (is.null(dots[["no-check-man-doc"]])){
         handleCheck("Checking man page documentation...")
-        checkManDocumentation(package_dir, package_name)
+        checkManDocumentation(package_dir, package_name, libloc)
     }
 
     if (is.null(dots[["no-check-news"]])){
