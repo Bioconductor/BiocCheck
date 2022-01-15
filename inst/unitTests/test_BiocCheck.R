@@ -1138,17 +1138,17 @@ test_checkForSupportSiteRegistration <- function()
 
 test_checkForVersionNumberMismatch <- function()
 {
-    pkgpath <- create_test_package('badpkg', list(Version="0.0.1"))
-    stopifnot(file.exists(pkgpath))
+    pkgpath <- create_test_package(description = list(Version="0.0.1"))
+    pkgname <- basename(pkgpath)
 
     cmd <- sprintf('"%s"/bin/R CMD build %s', R.home(), pkgpath)
     result <- system(cmd, intern=TRUE)
 
-    oldname <- "badpkg_0.0.1.tar.gz"
+    oldname <- paste0(pkgname, "_0.0.1.tar.gz")
     file.copy(oldname, tempdir())
     file.remove(oldname)
     oldname <- file.path(tempdir(), oldname)
-    newname <- file.path(tempdir(), "badpkg_9.9.9.tar.gz")
+    newname <- file.path(tempdir(), paste0(pkgname, "_9.9.9.tar.gz"))
     if (!file.rename(oldname, newname))
         stop("'file.rename()' failed to rename badkpgk",
              "\n  oldname: ", oldname, " newname: ", newname,
@@ -1159,7 +1159,7 @@ test_checkForVersionNumberMismatch <- function()
     on.exit({
         file.remove(newname)
     })
-    BiocCheck:::installAndLoad(newname)
+    inst_dir <- BiocCheck:::installAndLoad(newname)
 
     BiocCheck:::checkForVersionNumberMismatch(
         newname,
