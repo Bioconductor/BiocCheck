@@ -791,7 +791,6 @@ test_checkDescriptionNamespaceConsistency <- function()
             )
         })
     }
-
     test_dir <- tempfile()
     dir.create(test_dir)
     .zeroCounters()
@@ -857,12 +856,11 @@ test_checkDescriptionNamespaceConsistency <- function()
     pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
     checkTrue(.warning$getNum() == 1L)
-    checkIdentical("Import BiocCheck, usethis in NAMESPACE as well as DESCRIPTION.",
+    checkIdentical("Import BiocCheck in NAMESPACE as well as DESCRIPTION.",
                    .warning$get())
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
-    .zeroCounters()
     .zeroCounters()
 
     pkgpath <- create_test_package(
@@ -872,14 +870,16 @@ test_checkDescriptionNamespaceConsistency <- function()
         }
     )
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
+    pkgname <- basename(pkgpath)
     checkTrue(
         "devtools" %in%
             names(getNamespaceImports(
-                loadNamespace(testpkg, lib.loc = file.path(instdir, "lib"))
+                loadNamespace(
+                    pkgname, lib.loc = file.path(instdir, "lib")
+                )
             ))
     )
 
-    pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
     checkTrue(.warning$getNum() == 1)
     checkEquals("Import devtools in DESCRIPTION as well as NAMESPACE.",
