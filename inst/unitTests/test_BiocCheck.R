@@ -629,6 +629,7 @@ test_installAndLoad <- function()
     )
     testloadEnv <- try(loadNamespace(basename(pkgdir), lib.loc = liblocation))
     checkTrue(is.environment(testloadEnv))
+    unloadNamespace(testloadEnv)
     unlink(instdir, recursive = TRUE)
 }
 
@@ -871,14 +872,11 @@ test_checkDescriptionNamespaceConsistency <- function()
     )
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     pkgname <- basename(pkgpath)
+    pkg_ns <- loadNamespace(pkgname, lib.loc = file.path(instdir, "lib"))
     checkTrue(
-        "devtools" %in%
-            names(getNamespaceImports(
-                loadNamespace(
-                    pkgname, lib.loc = file.path(instdir, "lib")
-                )
-            ))
+        "devtools" %in% names(getNamespaceImports(pkg_ns))
     )
+    unloadNamespace(pkg_ns)
 
     run_check(pkgname, instdir)
     checkTrue(.warning$getNum() == 1)

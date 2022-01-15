@@ -54,8 +54,9 @@ checkForBadDepends <- function(pkgdir, lib.loc)
 
     res <- gsub("'", "", regmatches(output, res))
     fns <- sub(":$", "", regmatches(output, fns))
-    inGlobals <- res %in%
-        globalVariables(package = loadNamespace(pkgname, lib.loc = lib.loc))
+    pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
+    inGlobals <- res %in% globalVariables(package = pkg_ns)
+    unloadNamespace(pkg_ns)
     res <- res[!inGlobals]
     fns <- fns[!inGlobals]
 
@@ -527,10 +528,9 @@ checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
         badones <- dImports[!dImports %in% nImports]
         tryCatch({
             ## FIXME: not 100% confident that the following always succeeds
-            dcolon <- .checkEnv(
-                loadNamespace(pkgname, lib.loc = lib.loc),
-                .colonWalker()
-            )$done()
+            pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
+            dcolon <- .checkEnv(pkg_ns, .colonWalker())$done()
+            unloadNamespace(pkg_ns)
             badones <- setdiff(badones, dcolon)
         }, error=function(...) NULL)
         if (length(badones))
@@ -1652,7 +1652,9 @@ checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
 {
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
-    exports <- getNamespaceExports(loadNamespace(pkgname, lib.loc = lib.loc))
+    pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
+    exports <- getNamespaceExports(pkg_ns)
+    unloadNamespace(pkg_ns)
     badManPages <- character(0)
     exportingPagesCount <- 0L
     noExamplesCount <- 0L
