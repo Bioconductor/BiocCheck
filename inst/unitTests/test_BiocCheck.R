@@ -614,12 +614,8 @@ test_findSignalerInSignaler <- function() {
 
 test_installAndLoad <- function()
 {
-    instdir <- tempfile()
-    dir.create(instdir)
-    pkgdir <- create_test_package(
-        test_dir = instdir,
-        path = file.path(instdir, "testpkg")
-    )
+    pkgdir <- create_test_package()
+    instdir <- dirname(pkgdir)
     temppkg <- BiocCheck:::installAndLoad(
         pkgpath = pkgdir, install_dir = instdir
     )
@@ -631,14 +627,14 @@ test_installAndLoad <- function()
             character(0L)
         )
     )
-    testloadEnv <- try(loadNamespace("testpkg", lib.loc = liblocation))
+    testloadEnv <- try(loadNamespace(basename(pkgdir), lib.loc = liblocation))
     checkTrue(is.environment(testloadEnv))
     unlink(instdir, recursive = TRUE)
 }
 
 test_findPackageName <- function()
 {
-    pkgdir <- create_test_package(test_dir = test_dir)
+    pkgdir <- create_test_package()
     dirrename <- file.path(dirname(pkgdir), "test_package")
     file.rename(pkgdir, dirrename)
     pkgname <- BiocCheck:::.get_package_name(dirrename)
