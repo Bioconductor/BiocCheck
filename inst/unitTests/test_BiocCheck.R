@@ -968,10 +968,12 @@ test_checkImportSuggestions <- function()
         # sometimes it works and sometimes it doesn't
         checkTrue(is.character(suggestions))
 
-        instdir <- BiocCheck:::installAndLoad(create_test_package())
-        require(basename(instdir), lib.loc = file.path(instdir, "lib"))
-        suggestions <- BiocCheck:::checkImportSuggestions("testpkg")
-        unloadNamespace("testpkg")
+        pkgpath <- create_test_package()
+        pkgname <- basename(pkgpath)
+        instdir <- BiocCheck:::installAndLoad(pkgpath)
+        require(pkgname, lib.loc = file.path(instdir, "lib"), character.only = TRUE)
+        suggestions <- BiocCheck:::checkImportSuggestions(pkgname)
+        unloadNamespace(pkgname)
         checkTrue(is.character(suggestions))
         checkTrue(!length(suggestions))
 
