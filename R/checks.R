@@ -278,17 +278,18 @@ checkBiocViews <- function(pkgdir)
     biocViews <- dcf[, "biocViews"]
     views <- strsplit(gsub("\\s*,\\s*", ",", biocViews), ",")[[1]]
     # views <- gsub("\\s", "", views)
-    biocViewsVocab <- NULL
-    data("biocViewsVocab", package="biocViews", envir=environment())
+    dataenv <- new.env(parent = emptyenv())
+    data("biocViewsVocab", package="biocViews", envir=dataenv)
+    biocViewsVocab <- dataenv[["biocViewsVocab"]]
     handleCheck("Checking package type based on biocViews...")
-    type = guessPackageType(views)
+    type <- guessPackageType(views)
     handleMessage(type)
     handleCheck("Checking for non-trivial biocViews...")
     toplevel <- c("Software", "AnnotationData", "ExperimentData", "Workflow")
-    if (length(views) == 0){
+    if (!length(views)) {
         handleError("No biocViews terms found.")
         return(TRUE)
-    }else{
+    } else {
         if (all(views %in% toplevel)) {
             handleError(
                 "Add biocViews other than ",
@@ -309,9 +310,7 @@ checkBiocViews <- function(pkgdir)
         return(TRUE)
     }
     branch <- unique(parents)
-
-
-#    biocViewsVocab <- NULL ## to keep R CMD check happy
+    # TODO: Fix this
     if (interactive())
         env <- environment()
     else
@@ -327,7 +326,7 @@ checkBiocViews <- function(pkgdir)
         distmat <- stringdistmatrix(terms, useNames="strings", method="lv")
         distmat <- as.matrix(distmat)
         distmat <- distmat > 0 & distmat < 3
-        distmat[badViews, badViews] = FALSE
+        distmat[badViews, badViews] <- FALSE
 
         suggestedViews <- vapply(badViews, function(view) {
             alt <- colnames(distmat)[distmat[view,]]
