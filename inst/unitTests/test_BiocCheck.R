@@ -286,10 +286,6 @@ test_checkVersionNumber <- function()
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
     checkTrue(.BiocCheck$getNum("warning") ==1)
     .zeroCounters()
-    BiocCheck:::.compareVersions(
-        as.package_version("4.0"), as.package_version("4.1")
-    )
-    checkTrue(.BiocCheck$getNum("note") ==1)
 }
 
 test_checkNewPackageVersionNumber <- function()
@@ -333,6 +329,8 @@ test_checkRbuildignore <- function()
 
 test_checkBiocViews <- function()
 {
+    if (!dir.exists(UNIT_TEST_TEMPDIR))
+        dir.create(UNIT_TEST_TEMPDIR)
     .zeroCounters()
     cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
@@ -345,10 +343,8 @@ test_checkBiocViews <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
     )
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(
-        .BiocCheck$getNum("warning") == 4,
-        "invalid biocViews don't produce warning"
-    )
+    # Invalid views = 1 warning for 4 terms
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
 
     .zeroCounters()
     cat(
@@ -879,10 +875,9 @@ test_checkDescriptionNamespaceConsistency <- function()
     )
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     run_check(basename(pkgpath), instdir)
-    checkTrue(.warning$getNum() == 1)
-    checkEquals(
-        "Import devtools in NAMESPACE as well as DESCRIPTION.",
-        .warning$get()
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    checkTrue(
+        grepl("Import devtools", .BiocCheck$get("warning"), fixed = TRUE)
     )
 
     unlink(test_dir, recursive = TRUE)
@@ -899,7 +894,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
-    checkTrue(.warning$getNum() == 0L)
+    checkTrue(.BiocCheck$getNum("warning") == 0L)
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
@@ -916,7 +911,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
-    checkTrue(.warning$getNum() == 0L)
+    checkTrue(.BiocCheck$getNum("warning") == 0L)
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
@@ -934,8 +929,9 @@ test_checkDescriptionNamespaceConsistency <- function()
     pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
     checkTrue(.BiocCheck$getNum("warning") == 1L)
-    checkIdentical("Import BiocCheck in NAMESPACE as well as DESCRIPTION.",
-                   .BiocCheck$get("warning"))
+    checkTrue(
+        grepl("Import BiocCheck", .BiocCheck$get("warning"), fixed = TRUE)
+    )
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
@@ -957,8 +953,9 @@ test_checkDescriptionNamespaceConsistency <- function()
 
     run_check(pkgname, instdir)
     checkTrue(.BiocCheck$getNum("warning") == 1)
-    checkEquals("Import devtools in DESCRIPTION as well as NAMESPACE.",
-        .BiocCheck$get("warning"))
+    checkTrue(
+        grepl("Import devtools", .BiocCheck$get("warning"), fixed = TRUE)
+    )
 }
 
 test_checkImportSuggestions <- function()
@@ -992,11 +989,11 @@ test_checkForBadDepends <- function()
         pkgdir = pkg,
         lib.loc = file.path(inst_path, "lib")
     )
-    checkEquals(1, BiocCheck:::.BiocCheck$getNum("error"))
-    checkEquals(1, BiocCheck:::.BiocCheck$getNum("note"))
-    checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
+    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("error"))
+    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("note"))
+    checkTrue(grepl("providing 1 object", BiocCheck:::.BiocCheck$get("error")))
     checkTrue(
-        grepl("how [0-9] object", BiocCheck:::.BiocCheck$get("note")[1])
+        grepl("how [0-9] object", BiocCheck:::.BiocCheck$get("note"))
     )
 }
 
@@ -1027,8 +1024,8 @@ test_checkForLibraryRequire <- function()
         "testpackages", "testpkg0", package="BiocCheck", mustWork = TRUE
     )
     msg <- BiocCheck:::checkForLibraryRequire(pkg_dir)
-    checkTrue(identical(1L, .BiocCheck$getNum("warning")))
-    checkTrue(identical(length(msg), 14L))
+    checkEqualsNumeric(1L, .BiocCheck$getNum("warning"))
+    checkEqualsNumeric(length(msg), 14L)
     .zeroCounters()
 }
 
@@ -1263,12 +1260,12 @@ test_checkForVersionNumberMismatch <- function()
 
 test_checkForDirectSlotAccess <- function()
 {
-    pkgpath <- create_test_package('testpkg', list(VignetteBuilder="knitr"))
+    pkgpath <- create_test_package(description = list(VignetteBuilder="knitr"))
     parsedCode <- list(FooBar=BiocCheck:::parseFile(
         system.file("testfiles", "directSlotAccess.Rmd",
         package="BiocCheck"), pkgpath))
     res <- BiocCheck:::checkForDirectSlotAccess(parsedCode, pkgpath)
-    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
+    checkEqualsNumeric(BiocCheck:::.BiocCheck$getNum("note"), 1)
     .zeroCounters()
     parsedCode <- list(FooBar=BiocCheck:::parseFile(
         system.file("testfiles", "noDirectSlotAccess.Rmd",
