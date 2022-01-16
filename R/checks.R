@@ -330,16 +330,15 @@ checkBiocViews <- function(pkgdir)
 
         suggestedViews <- vapply(badViews, function(view) {
             alt <- colnames(distmat)[distmat[view,]]
-            msg <- paste0("'", view, "' is an invalid BiocViews term.")
+            msg <- shQuote(view)
             if (length(alt))
-                msg <- paste0(
-                    msg, " Did you mean: ",
-                    paste0("'", alt, "'", collapse = " ")
-            )
+                msg <- paste0(msg, ": Did you mean ", shQuote(alt), "?")
             msg
         }, character(1))
 
-        handleWarning(unlist(suggestedViews))
+        handleWarning(
+            "Invalid BiocViews term(s):", messages = unlist(suggestedViews)
+        )
         dirty <- TRUE
     }
 
