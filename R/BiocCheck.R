@@ -28,11 +28,12 @@ BiocCheck <- function(package=".", ...)
         "BiocCheck is a work in progress. Output and severity of issues may ",
         "change. Installing package...", indent=0, exdent=0)
     package_install_dir <- installAndLoad(package)
+    libloc <- file.path(package_install_dir, "lib")
 
     ## checks
     if (is.null(dots[["no-check-dependencies"]])){
         handleCheck("Checking Package Dependencies...")
-        checkForBadDepends(file.path(package_install_dir, "lib", package_name))
+        checkForBadDepends(package, libloc)
     }
 
     if (is.null(dots[["no-check-deprecated"]])){
@@ -107,7 +108,7 @@ BiocCheck <- function(package=".", ...)
 
     if (is.null(dots[["no-check-namespace"]])){
         handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
-        checkDescriptionNamespaceConsistency(package_name)
+        checkDescriptionNamespaceConsistency(package_name, libloc)
 
         if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
                                                                quietly=TRUE))))
@@ -141,7 +142,7 @@ BiocCheck <- function(package=".", ...)
     if (is.null(dots[["no-check-install-self"]])){
         handleCheck(sprintf("Checking for library/require of %s...",
                             package_name))
-        checkForLibraryMe(package_name, parsedCode)
+        checkForLibraryRequire(package_dir)
     }
 
     if (is.null(dots[["no-check-coding-practices"]])){
@@ -156,7 +157,7 @@ BiocCheck <- function(package=".", ...)
 
     if (is.null(dots[["no-check-man-doc"]])){
         handleCheck("Checking man page documentation...")
-        checkManDocumentation(package_dir, package_name)
+        checkManDocumentation(package_dir, package_name, libloc)
     }
 
     if (is.null(dots[["no-check-news"]])){

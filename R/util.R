@@ -83,35 +83,45 @@ handleVerbatim <- function(msg, indent=4, exdent=6, width=getOption("width"))
     .verbatim("%s", msg, indent=indent, exdent=exdent, width=width)
 }
 
-installAndLoad <- function(pkg)
+.run_r_command <- function(cmd, args, stderr) {
+    res <- system2(cmd, args, stdout=NULL, stderr=stderr)
+    if (res) {
+        message(
+            "  cmd: ", cmd,
+            "\n  args: ", args,
+            "\n  stderr:",
+            "\n  ", paste(readLines(stderr), collapse="\n  "), "\n"
+        )
+    }
+    res
+}
+
+installAndLoad <- function(pkgpath, install_dir = tempfile())
 {
     r_libs_user_old <- Sys.getenv("R_LIBS_USER")
     on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
     r_libs_user <- paste(.libPaths(), collapse=.Platform$path.sep)
     Sys.setenv(R_LIBS_USER=r_libs_user)
 
-    dir.create(install_dir <- tempfile())
+    if (!dir.exists(install_dir))
+        dir.create(install_dir)
     dir.create(libdir <- file.path(install_dir, "lib"))
     file.create(stderr <- file.path(install_dir, "install.stderr"))
-    cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
+    rcmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
-                    libdir, shQuote(pkg))
-    res <- system2(cmd, args, stdout=NULL, stderr=stderr)
-    if (res != 0)
-    {
-        cat("  cmd: ", cmd,
-            "\n  args: ", args,
-            "\n  stderr:",
-            "\n  ", paste(readLines(stderr), collapse="\n  "),
-            "\n", sep="")
-        handleError(pkg, " must be installable.")
+                    libdir, shQuote(pkgpath))
+    res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
+    if (res) {
+        handleError(pkgpath, " must be installable.")
     }
-    pkgname <- .get_package_name(pkg)
-    args <- list(package=pkgname, lib.loc=libdir)
-    if (paste0("package:",pkgname) %in% search())
-        suppressWarnings(unloadNamespace(pkgname))
-
-    suppressPackageStartupMessages(do.call(library, args))
+    pkgname <- .get_package_name(pkgpath)
+    args <- sprintf(
+        "--vanilla -e 'library(%s, lib.loc = \"%s\")'", pkgname, libdir
+    )
+    res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
+    if (res) {
+        handleError(pkgpath, " must be loadable.")
+    }
     install_dir
 }
 
@@ -560,7 +570,7 @@ getRSources <- function(Rdir) {
     dir(Rdir, pattern = "\\.[Rr]$", full.names = TRUE)
 }
 
-getBadDeps <- function(pkgdir)
+getBadDeps <- function(pkgdir, lib.loc)
 {
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     oldquotes <- getOption("useFancyQuotes")
@@ -568,7 +578,7 @@ getBadDeps <- function(pkgdir)
     options(useFancyQuotes=FALSE)
     args <- sprintf("-q --vanilla --slave -f %s --args %s",
         system.file("script", "checkBadDeps.R", package="BiocCheck"),
-        dQuote(pkgdir))
+        paste(dQuote(pkgdir), dQuote(lib.loc)))
     system2(cmd, args, stdout=TRUE, stderr=FALSE,
         env="R_DEFAULT_PACKAGES=NULL")
 }
@@ -730,49 +740,6 @@ getFunctionLengths <- function(df)
        )))
     }
     res
-}
-
-doesFileLoadPackage <- function(df, pkgname)
-{
-    df <- cbind(df, idx=seq_len(nrow(df)))
-    res <- c()
-    regex <- paste0("^['|\"]*", pkgname, "['|\"]*$")
-    max <- nrow(df)
-    reqs <- df[df$token == "SYMBOL_FUNCTION_CALL" &
-        df$text %in% c("library","require"),]
-    if (nrow(reqs))
-    {
-        for (i in seq_len(nrow(reqs)))
-        {
-            reqRow <- reqs[i,]
-            currIdx <- reqs[i, "idx"]
-            if ((currIdx + 1) >= max) return(res)
-            i1 = df[df$idx == currIdx+1,]
-            p <- i1$parent
-            rowsWithThatParent <- df[df$parent == p,]
-            lastRowWithThatParent <-
-                rowsWithThatParent[nrow(rowsWithThatParent),]
-            rowsToCheck <- df[i1$idx:lastRowWithThatParent$idx,]
-            for (j in seq_len(nrow(rowsToCheck)))
-            {
-                curRow <- rowsToCheck[j,]
-                if (curRow$token %in% c("SYMBOL", "STR_CONST") &&
-                    grepl(regex, curRow$text))
-                {
-                    prevRow <- df[curRow$idx -1,]
-                    prevPrevRow <- df[curRow$idx -2,]
-                    if (!(prevRow$token == "EQ_SUB" &&
-                        prevRow$text == "=" &&
-                        prevPrevRow$token == "SYMBOL_SUB" &&
-                        prevPrevRow$text == "help"))
-                    {
-                        res <- append(res, reqRow$line1)
-                    }
-                }
-            }
-        }
-    res
-    }
 }
 
 doesManPageHaveRunnableExample <- function(rd)

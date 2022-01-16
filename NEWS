@@ -3,6 +3,10 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.27) Update and clean up unit tests.
+    o (1.31.26) Improve load test for the package being checked.
+    o (1.31.25) Exclude GitHub URLs that end in HTML from external data check.
+    o (1.31.23) Internal updates to the `require` and `library` check.
     o (1.31.22) Remove old code related to running `BiocCheck` on the command
     line and update `BiocCheck` documentation.
     o (1.31.21) Remove redundant `=` from message to avoid `=` assignment.

@@ -21,13 +21,13 @@ checkForVersionNumberMismatch <- function(package, package_dir)
 }
 
 ## Make sure this is run after pkg is installed.
-checkForBadDepends <- function(pkgdir)
+checkForBadDepends <- function(pkgdir, lib.loc)
 {
     pkgname <- .get_package_name(pkgdir)
-    depends <- cleanupDependency(packageDescription(pkgname)$Depends)
-    depends <- append(depends,
-        cleanupDependency(packageDescription(pkgname)$Imports))
-    output <- getBadDeps(pkgdir)
+    pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
+    depends <- cleanupDependency(pkg_desc$Depends)
+    depends <- append(depends, cleanupDependency(pkg_desc$Imports))
+    output <- getBadDeps(pkgdir, lib.loc = lib.loc)
     if (is.null(output)){
         # put these here to be consistent output messaging
         handleCheck("Checking if other packages can import this one...")
@@ -54,7 +54,9 @@ checkForBadDepends <- function(pkgdir)
 
     res <- gsub("'", "", regmatches(output, res))
     fns <- sub(":$", "", regmatches(output, fns))
-    inGlobals <- res %in% globalVariables(package=pkgname)
+    pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
+    inGlobals <- res %in% globalVariables(package = pkg_ns)
+    unloadNamespace(pkg_ns)
     res <- res[!inGlobals]
     fns <- fns[!inGlobals]
 
@@ -531,19 +533,22 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     }
 }
 
-checkDescriptionNamespaceConsistency <- function(pkgname)
+checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
 {
-    dImports <- cleanupDependency(packageDescription(pkgname)$Imports)
-    deps <- cleanupDependency(packageDescription(pkgname)$Depends)
-    nImports <- names(getNamespaceImports(pkgname))
-    nImports <- nImports[which(nImports != "base")]
+    pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
+    dImports <- cleanupDependency(pkg_desc$Imports)
+    deps <- cleanupDependency(pkg_desc$Depends)
+    imps <- parseNamespaceFile(pkgname, lib.loc)[["imports"]]
+    nImports <- vapply(imps, `[[`, character(1L), 1L)
 
     if(!(all(dImports %in% nImports)))
     {
         badones <- dImports[!dImports %in% nImports]
         tryCatch({
             ## FIXME: not 100% confident that the following always succeeds
-            dcolon <- .checkEnv(loadNamespace(pkgname), .colonWalker())$done()
+            pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
+            dcolon <- .checkEnv(pkg_ns, .colonWalker())$done()
+            unloadNamespace(pkg_ns)
             badones <- setdiff(badones, dcolon)
         }, error=function(...) NULL)
         if (length(badones))
@@ -574,7 +579,7 @@ checkImportSuggestions <- function(pkgname)
             capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
         )), silent = TRUE
     )
-    if (!length(suggestions) || inherits(suggestions, "try-error")) {
+    if (inherits(suggestions, "try-error")) {
         handleMessage("Could not get namespace suggestions.")
     } else {
         handleMessage("Namespace import suggestions are:")
@@ -635,7 +640,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     checkVigSessionInfo(pkgdir)
 
     msg_eval <- checkVigEvalAllFalse(pkgdir)
-    if(length(msg_eval) > 0) {
+    if(length(msg_eval)) {
         handleWarning(" Vignette set global option 'eval=FALSE'")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_eval)
@@ -650,7 +655,7 @@ checkInstContents <- function(pkgdir, checkingDir)
 {
     instdocdir <- file.path(pkgdir, "inst", "doc")
     instdocdircontents <- getVigSources(instdocdir)
-    if (length(instdocdircontents) > 0)
+    if (length(instdocdircontents))
     {
         if (checkingDir)
         {
@@ -746,7 +751,7 @@ checkVigEngine <- function(builder, vigdircontents)
                             split=" ")[[1]][1]},
                         character(1))
     inval <- names(which(table(filenames) > 1))
-    if (length(inval) > 0){
+    if (length(inval)){
         handleError("More than one VignetteEngine specified.")
         handleMessage("Found in vignette/ files:", indent=6)
         for (msg in inval)
@@ -851,7 +856,7 @@ checkVigChunkEval <- function(vigdircontents)
                                           lines)][c(TRUE,FALSE)]
             indx <- grep("^[\t >]*```+\\s*\\{([a-zA-Z0-9_]+.*)\\}\\s*$",
                          nonEvalChunk)
-            if (length(indx) > 0L)
+            if (length(indx))
                 nonEvalChunk <- nonEvalChunk[-indx]
 
         }
@@ -1069,31 +1074,22 @@ checkPkgInstallCalls <- function(package_dir, badCalls = .BAD_INSTALL_CALLS) {
     }
 }
 
-checkForLibraryMe <- function(pkgname, parsedCode)
+checkForLibraryRequire <-
+    function(pkgdir, symbols = c("library", "require"),
+        tokenType = "SYMBOL_FUNCTION_CALL")
 {
-    badfiles <- c()
-    for (filename in names(parsedCode))
-    {
-        if (!grepl("\\.R$|\\.Rd$", filename, ignore.case=TRUE))
-            next
-        df <- parsedCode[[filename]]
-        if (nrow(df))
-        {
-            res <- doesFileLoadPackage(df, pkgname)
-            if (length(res))
-            {
-                badfiles <- append(badfiles, mungeName(filename, pkgname))
-            }
-        }
+    rfiles <- getRSources(pkgdir)
+    parsedCodes <- lapply(
+        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
+    )
+    msg_res <- findSymbolsInParsedCode(parsedCodes, symbols, tokenType)
+    if (length(unlist(msg_res))) {
+        handleWarning(" Avoid the use of 'library' or 'require' in R code")
+        handleMessage("Found in files:", indent=6)
+        for (msg in msg_res)
+            handleMessage(msg, indent=8)
     }
-    if (length(badfiles))
-    {
-        msg <- sprintf("The following files call library or require on %s.
-            This is not necessary.\n%s", pkgname,
-            paste(badfiles, collapse=", "))
-        handleWarning(msg)
-    }
-
+    invisible(msg_res)
 }
 
 checkCodingPractice <- function(pkgdir, parsedCode, package_name)
@@ -1102,7 +1098,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # sapply
     msg_sapply <- checkSapply(Rdir)
-    if (length(msg_sapply) > 0) {
+    if (length(msg_sapply)) {
         handleNote(" Avoid sapply(); use vapply()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_sapply)
@@ -1111,7 +1107,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # 1:...
     msg_seq <- check1toN(Rdir)
-    if (length(msg_seq) > 0) {
+    if (length(msg_seq)) {
         handleNote(" Avoid 1:...; use seq_len() or seq_along()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_seq)
@@ -1177,7 +1173,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # class() ==
     msg_class <- checkClassNEEQLookup(pkgdir)
-    if (length(msg_class) > 0) {
+    if (length(msg_class)) {
         handleWarning(
             " Avoid class membership checks with class() / is() and == / !=",
             "; Use is(x, 'class') for S4 classes"
@@ -1189,7 +1185,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # system() vs system2()
     msg_sys <- checkSystemCall(pkgdir)
-    if(length(msg_sys) > 0) {
+    if(length(msg_sys)) {
         handleNote(" Avoid system() ; use system2()")
         handleMessage("Found in files:", indent=6)
         for (msg in msg_sys)
@@ -1399,8 +1395,10 @@ checkCatInRCode <-
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
-    parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
-    msg_res <- findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
+    parsedCodes <-
+        lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
+    msg_res <-
+        findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
     unlist(msg_res)
 }
 
@@ -1497,7 +1495,7 @@ checkExternalData <- function(Rdir) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
 
-        platforms <- "githubusercontent|github|gitlab|bitbucket|dropbox"
+        platforms <- "githubusercontent|github.*[^html\"]$|gitlab|bitbucket|dropbox"
         txtkns <- tokens[, "text"]
         hits <- grepl(platforms, txtkns, ignore.case = TRUE) &
             grepl("dl|\\.\\w+\"$", txtkns)
@@ -1597,7 +1595,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     }
 }
 
-checkManDocumentation <- function(package_dir, package_name)
+checkManDocumentation <- function(package_dir, package_name, libloc)
 {
     # canned man prompts
     checkForPromptComments(package_dir)
@@ -1606,7 +1604,7 @@ checkManDocumentation <- function(package_dir, package_name)
     checkForValueSection(package_dir)
 
     # exports are documented and 80% runnable
-    checkExportsAreDocumented(package_dir, package_name)
+    checkExportsAreDocumented(package_dir, package_name, lib.loc = libloc)
 
     # usage of donttest and dontrun
     checkUsageOfDont(package_dir)
@@ -1624,7 +1622,7 @@ checkForPromptComments <- function(pkgdir)
         if (any(grepl("^%% ~", lines)))
             bad <- append(bad, basename(manpage))
     }
-    if (length(bad) > 0)
+    if (length(bad))
     {
         handleNote(
             "Remove generated comments from man pages ",
@@ -1670,11 +1668,13 @@ checkForValueSection <- function(pkgdir)
 }
 
 # Which pages document things that are exported?
-checkExportsAreDocumented <- function(pkgdir, pkgname)
+checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
 {
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
-    exports <- getNamespaceExports(pkgname)
+    pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
+    exports <- getNamespaceExports(pkg_ns)
+    unloadNamespace(pkg_ns)
     badManPages <- character(0)
     exportingPagesCount <- 0L
     noExamplesCount <- 0L
@@ -1708,12 +1708,12 @@ checkExportsAreDocumented <- function(pkgdir, pkgname)
         handleError(
             "At least 80% of man pages documenting exported objects must ",
             "have runnable examples. The following pages do not:")
-    } else if (length(badManPages) > 0) {
+    } else if (length(badManPages)) {
         handleNote(
             "Consider adding runnable examples to the following ",
             "man pages which document exported objects:")
     }
-    if (length(badManPages) > 0)
+    if (length(badManPages))
         .msg(paste(badManPages, collapse=", "), indent=6)
 
 
