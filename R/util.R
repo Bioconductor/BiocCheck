@@ -83,15 +83,15 @@ handleVerbatim <- function(msg, indent=4, exdent=6, width=getOption("width"))
 
 installAndLoad <- function(pkgpath, install_dir = tempfile())
 {
-    r_libs_user_old <- Sys.getenv("R_LIBS_USER")
-    on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
-    r_libs_user <- paste(.libPaths(), collapse=.Platform$path.sep)
-    Sys.setenv(R_LIBS_USER=r_libs_user)
-
     if (!dir.exists(install_dir))
         dir.create(install_dir)
     dir.create(libdir <- file.path(install_dir, "lib"))
     file.create(stderr <- file.path(install_dir, "install.stderr"))
+
+    r_libs_user_old <- Sys.getenv("R_LIBS_USER")
+    on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
+    Sys.setenv(R_LIBS_USER=libdir)
+
     rcmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
                     libdir, shQuote(pkgpath))
@@ -101,7 +101,7 @@ installAndLoad <- function(pkgpath, install_dir = tempfile())
     }
     pkgname <- .get_package_name(pkgpath)
     args <- sprintf(
-        "--vanilla -e 'library(%s, lib.loc = \"%s\")'", pkgname, libdir
+        "--vanilla -e 'library(%s)'", pkgname
     )
     res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
     if (res) {
