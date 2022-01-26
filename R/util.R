@@ -90,7 +90,8 @@ installAndLoad <- function(pkgpath, install_dir = tempfile())
 
     r_libs_user_old <- Sys.getenv("R_LIBS_USER")
     on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
-    Sys.setenv(R_LIBS_USER=libdir)
+    r_libs_user <- paste(c(libdir, .libPaths()), collapse=.Platform$path.sep)
+    Sys.setenv(R_LIBS_USER=r_libs_user)
 
     rcmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
