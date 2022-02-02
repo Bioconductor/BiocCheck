@@ -515,7 +515,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     }
 }
 
-.parseImportsNamespace <- function(pkg, libloc) {
+.parsePackageImportsFromNamespace <- function(pkg, libloc) {
     importFields <- c("imports", "importClasses", "importMethods")
     imps <- parseNamespaceFile(pkg, libloc)[importFields]
     for (i in names(imps))
@@ -528,7 +528,7 @@ checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
     pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
     dImports <- cleanupDependency(pkg_desc$Imports)
     deps <- cleanupDependency(pkg_desc$Depends)
-    nImports <- .parseImportsNamespace(pkgname, lib.loc)
+    nImports <- .parsePackageImportsFromNamespace(pkgname, lib.loc)
 
     if(!(all(dImports %in% nImports)))
     {
