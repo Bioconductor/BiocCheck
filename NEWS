@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.31) Single package imports in the NAMESPACE were breaking the code
+    to get all package imports.
     o (1.31.29) Include other import fields from NAMESPACE file when checking
     consistency between imports in DESCRIPTION/NAMESPACE.
     o (1.31.27) Update and clean up unit tests.
