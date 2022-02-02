@@ -518,7 +518,8 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
 .parseImportsNamespace <- function(pkg, libloc) {
     importFields <- c("imports", "importClasses", "importMethods")
     imps <- parseNamespaceFile(pkg, libloc)[importFields]
-    imps <- lapply(imps, function(x) unique(unlist(x)[c(TRUE, FALSE)]))
+    for (i in names(imps))
+        imps[[i]] <- vapply(imps[[i]], `[[`, character(1L), 1L)
     unique(unlist(imps))
 }
 
