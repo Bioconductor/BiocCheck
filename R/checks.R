@@ -1330,6 +1330,21 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     tokens[tokens[,"token"] != "expr", ,drop=FALSE]
 }
 
+.grepSymbolRanges <-
+    function(tokens, patterns, tokenType = "SYMBOL_FUNCTION_CALL", isExp = FALSE)
+{
+    txt <- tokens[, "text"]
+    found <- lapply(patterns, function(pattern) grepl(pattern, txt))
+    found <- Reduce(`|`, found)
+    hits <- which(found & tokens[, "token"] == tokenType)
+    openBracket <- if (isExp) "{" else "("
+    opar <- which(txt == openBracket)
+    startHit <- vapply(hits, function(x) min(opar[opar > x]), numeric(1L))
+    parnum <- tokens[startHit, "parent"]
+    endHit <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+    Map(seq, startHit, endHit)
+}
+
 .findSymbolRanges <-
     function(tokens, symbols, tokenType = "SYMBOL_FUNCTION_CALL", isExp = FALSE)
 {
@@ -1363,11 +1378,25 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     .findInSignaler(rfile, symbols, .filtTokens)
 }
 
-.filtersetMethodRanges <- function(tokens, symbols) {
+.filtersetMethodRanges <- function(tokens) {
     excl <- .findSymbolRanges(tokens, "setMethod")
     if (length(excl)) {
         showHits <- vapply(excl,
             function(x) '"show"' %in% tokens[x, "text"], logical(1))
+        negind <- unlist(lapply(excl[showHits], `-`))
+        tokens <- tokens[negind, ]
+    }
+    tokens
+}
+
+.filterS3printRanges <- function(tokens) {
+    excl <- .grepSymbolRanges(
+        tokens, "^print.*", tokenType = "SYMBOL", isExp = TRUE
+    )
+    if (length(excl)) {
+        showHits <- vapply(excl,
+            function(x) '"cat"' %in% tokens[x, "text"], logical(1)
+        )
         negind <- unlist(lapply(excl[showHits], `-`))
         tokens <- tokens[negind, ]
     }
@@ -1383,7 +1412,9 @@ checkCatInRCode <-
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
     parsedCodes <-
-        lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
+        lapply(parsedCodes, .filtersetMethodRanges)
+    parsedCodes <-
+        lapply(parsedCodes, .filterS3printRanges)
     msg_res <-
         findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
     unlist(msg_res)
