@@ -1395,7 +1395,7 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     )
     if (length(excl)) {
         showHits <- vapply(excl,
-            function(x) '"cat"' %in% tokens[x, "text"], logical(1)
+            function(x) "cat" %in% tokens[x, "text"], logical(1)
         )
         negind <- unlist(lapply(excl[showHits], `-`))
         tokens <- tokens[negind, ]
@@ -1411,10 +1411,8 @@ checkCatInRCode <-
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
-    parsedCodes <-
-        lapply(parsedCodes, .filtersetMethodRanges)
-    parsedCodes <-
-        lapply(parsedCodes, .filterS3printRanges)
+    parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges)
+    parsedCodes <- lapply(parsedCodes, .filterS3printRanges)
     msg_res <-
         findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
     unlist(msg_res)
