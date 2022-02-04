@@ -1580,7 +1580,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     dflist <- Filter(length, dflist)
     df <- do.call(rbind, dflist)
     colnames <- c("filename","functionName","length","startLine","endLine")
-    if (ncol(df) == length(colnames))
+    if (!is.null(df) && ncol(df) == length(colnames))
     {
         colnames(df) <- colnames
         df <- df[with(df, order(-length)),]
