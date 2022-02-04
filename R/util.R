@@ -274,7 +274,7 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
 }
 
 getDirFile <- function(fpath) {
-    if (length(fpath) && !is.na(fpath))
+    if (nzchar(fpath) && !is.na(fpath))
         vapply(
             strsplit(normalizePath(fpath), .Platform$file.sep),
             function(pseg) {
@@ -338,11 +338,11 @@ findSymbolsInParsedCode <-
         function(...) rbind.data.frame(..., make.row.names = FALSE),
         matches
     )
-    apply(matches, 1L, function(minidf) {
+    apply(matches, 1L, function(rowdf) {
         fmttxt <- "%s (line %s, column %s)"
-        formt <- if (fun) paste0(minidf["text"], " in ", fmttxt) else fmttxt
-        sprintf(formt, getDirFile(minidf["filename"]),
-            minidf["line1"], minidf["col1"]
+        formt <- if (fun) paste0(rowdf["text"], " in ", fmttxt) else fmttxt
+        sprintf(formt, getDirFile(rowdf["filename"]),
+            rowdf["line1"], rowdf["col1"]
         )
     })
 }
