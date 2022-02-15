@@ -68,6 +68,19 @@
             for (cond in conditions) {
                 .self[[cond]] <- list()
             }
+        },
+        write = function(file) {
+            out <- Filter(length, .self$log)
+            jlog <- toJSON(out, auto_unbox = FALSE)
+            if (!requireNamespace("jsonlite", quietly = TRUE))
+                stop("Install 'jsonlite' to use the write method.")
+            jsonlite::write_json(jlog, file)
+        },
+        read = function(file) {
+            if (!requireNamespace("jsonlite", quietly = TRUE))
+                stop("Install 'jsonlite' to use the read method.")
+            infile <- jsonlite::read_json(file)[[1]]
+            .self[["log"]] <- jsonlite::fromJSON(infile, simplifyVector = FALSE)
         }
     )
 )

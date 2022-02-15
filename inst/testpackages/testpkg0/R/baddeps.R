@@ -1,6 +1,6 @@
 baddep <- function()
 {
-    isValidJSON('{"foo": "bar"}')
+    validate('{"foo": "bar"}')
 }
 
 iambad <- function()
