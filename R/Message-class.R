@@ -15,7 +15,7 @@
                     "<Internal> 'condition' should be:",
                     " 'error', 'warning', or 'note'"
                 )
-            checkName <- .self$getCheck()
+            checkName <- .self$getLastCheck()
             mlist <- list(...)[[1]]
             stopifnot(
                 "<Internal> Input to '$add' must be a list" = is.list(mlist)
@@ -27,7 +27,7 @@
             .self[[condition]] <- append(.self[[condition]], nist)
             .self$log[[checkName]] <- append(.self$log[[checkName]], nist)
         },
-        getCheck = function() {
+        getLastCheck = function() {
             checkName <- .self$check
             if (!length(checkName))
                 "undefined"
