@@ -637,14 +637,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigSessionInfo(pkgdir)
 
-    msg_eval <- checkVigEvalAllFalse(pkgdir)
-    if(length(msg_eval)) {
-        handleWarning(" Vignette set global option 'eval=FALSE'")
-        handleMessage("Found in files:", indent=6)
-        for (msg in msg_eval)
-            handleMessage(msg, indent=8)
-    }
-
+    checkVigEvalAllFalse(pkgdir)
 }
 
 checkVigDirExists <- function(vigdir) { dir.exists(vigdir) }
@@ -884,7 +877,13 @@ checkVigEvalAllFalse <- function(pkgdir){
     Vigdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
     msg_eval <- grepPkgDir(Vigdir,
                            "-rHn 'knitr::opts_chunk\\$set(.*eval\\s*=\\s*F'")
-    msg_eval
+    if (length(msg_eval)) {
+        handleWarning(
+            " Vignette set global option 'eval=FALSE'",
+            help_text = "Found in files:",
+            messages = msg_eval
+        )
+    }
 }
 
 checkVigBiocInst <- function(pkgdir) {
