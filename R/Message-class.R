@@ -94,8 +94,10 @@
         setMessage = function(..., condition) {
             text <- list(...)[[1L]]
             .self$setCondition(condition)
-            indents <- seq(4, by = 2, length = lengths(text))
+            lens <- lengths(text)
+            indents <- seq(4, by = 2, length = lens)
             .self$msg <- append(.self$msg, text)
+            text[[1]][[lens]] <- selectSome(unlist(tail(text[[1]], 1L)))
             mapply(
                 handleMessage,
                 unlist(text, recursive = FALSE, use.names = FALSE),
