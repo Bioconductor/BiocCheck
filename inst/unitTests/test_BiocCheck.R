@@ -213,7 +213,7 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEqualsNumeric(7, .BiocCheck$getNum("warning"))
+    checkEqualsNumeric(8, .BiocCheck$getNum("warning"))
     checkEquals("* WARNING: Evaluate more vignette chunks.",
         .BiocCheck$get("warning")[["checkVigChunkEval"]])
     checkTrue(
@@ -226,28 +226,28 @@ test_vignettes0 <- function()
         "testpkg2", package="BiocCheck"), TRUE)
     checkEqualsNumeric(2, .BiocCheck$getNum("error"))
     checkTrue(
-        grepl(
+        any(grepl(
             pattern="VignetteBuilder",
             .BiocCheck$get("warning")[["checkVigSuggests"]]
-        )
+        ))
     )
     checkTrue(
-        grepl(pattern="VignetteEngine",
+        any(grepl(pattern="VignetteEngine",
               .BiocCheck$get("error")[["checkVigEngine"]]
-        )
+        ))
     )
     checkEqualsNumeric(4, .BiocCheck$getNum("warning"))
     checkTrue(
-        grepl(
-            pattern="missing Vignette metadata",
+        any(grepl(
+            pattern="missing vignette metadata", ignore.case = TRUE,
             .BiocCheck$get("warning")[["checkVigMetadata"]]
-        )
+        ))
     )
     checkTrue(
-        grepl(
+        any(grepl(
             pattern="not currently Suggested",
             .BiocCheck$get("warning")[["checkVigSuggests"]]
-        )
+        ))
     )
     checkTrue(
         grepl(
