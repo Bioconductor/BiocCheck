@@ -62,14 +62,26 @@ handleError <- function(...)
     handleCondition(..., condition = "error")
 }
 
+handleErrorFiles <- function(..., help_text = "Found in files:") {
+    handleCondition(..., help_text = help_text, condition = "error")
+}
+
 handleWarning <- function(...)
 {
     handleCondition(..., condition = "warning")
 }
 
+handleWarningFiles <- function(..., help_text = "Found in files:") {
+    handleCondition(..., help_text = help_text, condition = "warning")
+}
+
 handleNote <- function(...)
 {
     handleCondition(..., condition = "note")
+}
+
+handleNoteFiles <- function(..., help_text = "Found in files:") {
+    handleCondition(..., help_text = help_text, condition = "note")
 }
 
 handleMessage <- function(..., indent=4, exdent=6)
