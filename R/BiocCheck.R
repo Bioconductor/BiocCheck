@@ -97,7 +97,7 @@ BiocCheck <- function(package=".", ...)
         result <- checkBiocViews(package_dir)
         if(result)
         {
-            .msg("See http://bioconductor.org/developers/how-to/biocViews/")
+            .msg("Search 'biocViews' at https://contributions.bioconductor.org")
         }
     }
 
@@ -229,11 +229,8 @@ BiocCheck <- function(package=".", ...)
     .msg("NOTE count: %d", .BiocCheck$getNum("note"))
     .msg(paste0(
         "For detailed information about these checks, see the BiocCheck ",
-        "vignette, available at ",
-        sprintf(
-            "https://bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#interpreting-bioccheck-output",
-            BiocManager::version())),
-        exdent=0)
+        "vignette with `browseVignettes(package = 'BiocCheck')`"
+    ), exdent=0)
 
 
     if (.BiocCheck$getNum("error") > 0)
