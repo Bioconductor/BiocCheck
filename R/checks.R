@@ -1058,22 +1058,18 @@ checkPkgInstallCalls <- function(package_dir, badCalls = .BAD_INSTALL_CALLS) {
     }
 }
 
-checkForLibraryRequire <-
-    function(pkgdir, symbols = c("library", "require"),
-        tokenType = "SYMBOL_FUNCTION_CALL")
-{
-    rfiles <- getRSources(pkgdir)
-    parsedCodes <- lapply(
-        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
+checkForLibraryRequire <- function(pkgdir) {
+    msg_lib <- findSymbolsInRFiles(
+        pkgdir,
+        Symbols = c("library", "require"),
+        tokenType = "SYMBOL_FUNCTION_CALL"
     )
-    msg_res <- findSymbolsInParsedCode(parsedCodes, symbols, tokenType)
-    if (length(unlist(msg_res))) {
+    if (length(msg_lib)) {
         handleWarningFiles(
             " Avoid the use of 'library' or 'require' in R code",
-            messages = msg_res
+            messages = msg_lib
         )
     }
-    invisible(msg_res)
 }
 
 checkCodingPractice <- function(pkgdir, parsedCode, package_name)
