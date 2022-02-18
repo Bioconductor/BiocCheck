@@ -230,7 +230,7 @@ parseFile <- function(infile, pkgdir) {
             })
         ))
     } else if (grepl("\\.Rd$", infile, TRUE)) {
-        rd <- parse_Rd(infile)
+        rd <- tools::parse_Rd(infile)
         outfile <- file.path(parse_dir, "parseFile.tmp")
         code <- capture.output(Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
