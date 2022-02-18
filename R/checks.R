@@ -878,7 +878,6 @@ checkVigChunkEval <- function(vigdircontents)
 }
 
 checkVigEvalAllFalse <- function(pkgdir){
-
     pkgdir <- file.path(pkgdir, "vignettes")
     Vigdir <- sprintf("%s%s", pkgdir, .Platform$file.sep)
     msg_eval <- grepPkgDir(Vigdir,
@@ -892,10 +891,11 @@ checkVigEvalAllFalse <- function(pkgdir){
 }
 
 checkVigBiocInst <- function(pkgdir) {
-    vigdir <- file.path(pkgdir, "vignettes")
-    vigdir <- sprintf("%s%s", vigdir, .Platform$file.sep)
-    msg_return <- grepPkgDir(vigdir,
-        "-EHrn 'BiocInstaller|biocLite|useDevel|biocinstallRepos'")
+    msg_return <- findSymbolsInVignettes(
+         pkgdir,
+         Symbols = "BiocInstaller|biocLite|useDevel|biocinstallRepos",
+         tokenType = c("COMMENT", "SYMBOL_FUNCTION_CALL")
+    )
     if (length(msg_return)) {
         handleWarningFiles(
             " BiocInstaller code found in vignette(s)",
@@ -906,7 +906,6 @@ checkVigBiocInst <- function(pkgdir) {
 
 .BAD_INSTALL_CALLS <- c("biocLite", "install.packages", "install_packages",
     "update.packages", "install")
-
 
 checkVigInstalls <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes", "")
@@ -1029,18 +1028,16 @@ findSymbolsInRFiles <-
 }
 
 findSymbolsInVignettes <-
-    function(pkgdir, Symbols, tokenType)
+    function(pkgdir, Symbols, tokenTypes)
 {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
-    viglist <- structure(
-        vector("list", length(vigfiles)), .Names = vigfiles
-    )
+    viglist <- list()
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
         knitr::purl(input = vfile, output = tempR, quiet = TRUE)
-        tokens <- .getTokenTextCode(parseFile(tempR), tokenType, Symbols)
-        viglist[[basename(vfile)]] <- sprintf(
+        tokens <- .grepTokenTextCode(parseFile(tempR), tokenTypes, Symbols)
+        viglist[[getDirFile(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
            getDirFile(vfile), tokens[,"line1"], tokens[,"col1"]
         )
