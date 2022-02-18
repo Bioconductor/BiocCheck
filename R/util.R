@@ -329,7 +329,10 @@ getDirFile <- function(fpath) {
 }
 
 findSymbolsInParsedCode <-
-    function(parsedCodeList, symbolNames, tokenTypes, FUN = .getTokenTextCode, fun = TRUE, ...)
+    function(
+        parsedCodeList, symbolNames, tokenTypes,
+        FUN = .getTokenTextCode, fun = TRUE, ...
+    )
 {
     matches <- structure(vector("list", length(parsedCodeList)),
         .Names = names(parsedCodeList))
