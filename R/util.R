@@ -314,7 +314,7 @@ getDirFile <- function(fpath) {
 
 .getTokenTextCode <- function(parsedf, token, text) {
     parsedf[
-        parsedf$token == token & parsedf$text %in% text,
+        parsedf$token %in% token & parsedf$text %in% text,
         c("line1", "col1", "token", "text"),
         drop = FALSE
     ]
@@ -322,7 +322,7 @@ getDirFile <- function(fpath) {
 
 .grepTokenTextCode <- function(parsedf, token, text) {
     parsedf[
-        parsedf$token == token & grepl(text, parsedf$text),
+        parsedf$token %in% token & grepl(text, parsedf$text),
         c("line1", "col1", "token", "text"),
         drop = FALSE
     ]

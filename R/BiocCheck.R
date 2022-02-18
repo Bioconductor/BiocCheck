@@ -29,6 +29,12 @@ BiocCheck <- function(package=".", ...)
         "change. Installing package...", indent=0, exdent=0)
     package_install_dir <- installAndLoad(package)
     libloc <- file.path(package_install_dir, "lib")
+    pkgver <- .get_package_version(package_dir)
+    .BiocCheck$metadata <- list(
+        Package = package_name, PackageVersion = pkgver,
+        sourceDir = package_dir, installDir = package_install_dir,
+        platform = .Platform$OS.type, isTarBall = isTar
+    )
 
     ## checks
     if (is.null(dots[["no-check-dependencies"]])){
@@ -287,4 +293,9 @@ BiocCheck <- function(package=".", ...)
         else
             .stop("'%s' is not a directory or package source tarball.", input)
     }
+}
+
+.get_package_version <- function(pkgdir) {
+    desc <- file.path(pkgdir, "DESCRIPTION")
+    package_version(read.dcf(desc, fields = "Version"))
 }

@@ -6,7 +6,8 @@
         # conditions
         error = "list",
         warning = "list",
-        note = "list"
+        note = "list",
+        metadata = "list"
     ),
     methods = list(
         add = function(..., condition, help_text, messages) {
