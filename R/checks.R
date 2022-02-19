@@ -1056,6 +1056,8 @@ checkPkgInstallCalls <- function(package_dir, badCalls = .BAD_INSTALL_CALLS) {
             messages = msg_installs
         )
     }
+    # for unit testing
+    invisible(msg_installs)
 }
 
 checkForLibraryRequire <- function(pkgdir) {
@@ -1070,6 +1072,8 @@ checkForLibraryRequire <- function(pkgdir) {
             messages = msg_lib
         )
     }
+    # for unit testing
+    invisible(msg_lib)
 }
 
 checkCodingPractice <- function(pkgdir, parsedCode, package_name)
