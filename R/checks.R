@@ -894,7 +894,7 @@ checkVigBiocInst <- function(pkgdir) {
     msg_return <- findSymbolsInVignettes(
          pkgdir,
          Symbols = "BiocInstaller|biocLite|useDevel|biocinstallRepos",
-         tokenType = c("COMMENT", "SYMBOL_FUNCTION_CALL")
+         tokenTypes = c("COMMENT", "SYMBOL_FUNCTION_CALL")
     )
     if (length(msg_return)) {
         handleWarningFiles(
