@@ -262,11 +262,11 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
                 if (grepl("\\.R$", name, ignore.case=TRUE))
                     handleMessage(sprintf(
                         "Found %s%s in %s (line %s, column %s)", symbolName,
-                        parens, mungeName(name, pkgname), x[i,1], x[i,2]))
+                        parens, getDirFile(name), x[i,1], x[i,2]))
                 else
                     handleMessage(sprintf(
                         "Found %s%s in %s", symbolName, parens,
-                        mungeName(name, pkgname))) # FIXME test this
+                        getDirFile(name))) # FIXME test this
             }
         }
     }
@@ -275,15 +275,9 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
 
 getDirFile <- function(fpath) {
     if (nzchar(fpath) && !is.na(fpath))
-        vapply(
-            strsplit(normalizePath(fpath), .Platform$file.sep),
-            function(pseg) {
-                paste(utils::tail(pseg, 2L), collapse = .Platform$file.sep)
-            },
-            character(1L)
-        )
-    else
-        fpath
+        fpath <- file.path(basename(dirname(fpath)), basename(fpath))
+
+    fpath
 }
 
 .getTokenTextCode <- function(parsedf, token, text) {
@@ -345,14 +339,6 @@ findSymbolsInParsedCode <-
             rowdf["line1"], rowdf["col1"]
         )
     })
-}
-
-mungeName <- function(name, pkgname)
-{
-    twoseps <- paste0(rep.int(.Platform$file.sep, 2), collapse="")
-    name <- gsub(twoseps, .Platform$file.sep, name, fixed=TRUE)
-    pos <- regexpr(pkgname, name)
-    substr(name, pos+1+nchar(pkgname), nchar(name))
 }
 
 isInfrastructurePackage <- function(pkgDir)

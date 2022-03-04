@@ -1566,7 +1566,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     for (filename in names(parsedCode))
     {
         pc <- parsedCode[[filename]]
-        filename <- mungeName(filename, pkgname)
+        filename <- getDirFile(filename)
         res <- getFunctionLengths(pc)
         functionNames <- names(res)
         mt <- do.call(rbind, res)
@@ -1679,7 +1679,7 @@ checkForValueSection <- function(pkgdir)
     if (!all(ok)) {
         handleWarning(
             "Add non-empty \\value sections to the following man pages: ",
-            paste(mungeName(manpages[!ok], pkgname), collapse=", "))
+            paste(getDirFile(manpages[!ok]), collapse=", "))
     }
 }
 
@@ -1915,7 +1915,7 @@ checkFormatting <- function(pkgdir, nlines=6)
         if (file.exists(file) && file.info(file)$size == 0)
         {
             handleNote("Add content to the empty file ",
-                mungeName(file, pkgname))
+                getDirFile(file))
         }
 
         if (file.exists(file) && file.info(file)$size > 0)
