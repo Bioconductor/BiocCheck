@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.35) Restricted files in `inst` will be flagged with a `WARNING`
+    instead of an `ERROR`
     o (1.31.32) Account for S3 print methods when checking for `cat` usage
     o (1.31.31) Single package imports in the NAMESPACE were breaking the code
     to get all package imports.
