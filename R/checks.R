@@ -2135,18 +2135,26 @@ checkBadFiles <- function(package_dir){
                        ".gitattributes", ".gitmodules",
                        ".hgtags",
                        ".project", ".seed", ".settings", ".tm_properties")
+    ext_expr <- paste0("\\", hidden_file_ext, "$", collapse = "|")
 
-    fls <- dir(package_dir, ignore.case=TRUE, recursive=TRUE, all.files=TRUE)
-    dx <- unlist(lapply(hidden_file_ext,
-        FUN=function(x, suffix){
-            which(endsWith(x, suffix))
-        }, x=tolower(fls)))
-    badFiles <- fls[dx]
+    fls <- dir(package_dir, recursive=TRUE, all.files=TRUE)
+    flist <- split(fls, startsWith(fls, "inst"))
+    warns <- grep(ext_expr, ignore.case = TRUE, flist[['TRUE']], value = TRUE)
+    errs <- grep(ext_expr, ignore.case = TRUE, flist[['FALSE']], value = TRUE)
 
-    if (length(badFiles) != 0){
-        handleError("System Files found that should not be git tracked:")
-        for(msg in badFiles)
-            handleMessage(msg, indent=8)
+    if (length(warns)) {
+        handleWarning("System Files in '/inst' should not be git tracked:")
+        for (w in warns)
+            handleMessage(w, indent = 8)
+    }
+
+    if (length(errs)) {
+        handleError(
+            "System Files found that should not be git tracked:",
+            messages = errs
+        )
+        for (e in errs)
+            handleMessage(e, indent = 8)
     }
 }
 
