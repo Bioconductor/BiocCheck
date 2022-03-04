@@ -649,7 +649,7 @@ getParent <- function(view, biocViewsVocab)
 getFunctionLengths <- function(df)
 {
     df <- df[df$terminal & df$parent > -1,]
-    rownames(df) <- seq_len(nrow(df))
+    rownames(df) <- NULL
     max <- nrow(df)
     res <- list()
     funcRows <- df[df$token == "FUNCTION",]
