@@ -3,6 +3,7 @@ CHANGES IN VERSION 1.32
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o (1.31.36) Reduce function length count slightly by removing empty lines.
     o (1.31.35) Restricted files in `inst` will be flagged with a `WARNING`
     instead of an `ERROR`
     o (1.31.32) Account for S3 print methods when checking for `cat` usage
