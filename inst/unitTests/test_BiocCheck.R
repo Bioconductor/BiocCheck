@@ -956,18 +956,13 @@ test_getFunctionLengths <- function()
         "parseme.R", package="BiocCheck")
     df <- getParseData(parse(file, keep.source=TRUE))
     res <- BiocCheck:::getFunctionLengths(df)
-    expected <-
-        structure(list(`_anonymous_.1` = structure(c(2, 1, 2), .Names = c("length",
-        "startLine", "endLine")), fa = structure(c(1, 3, 3), .Names = c("length",
-        "startLine", "endLine")), f2 = structure(c(1, 6, 6), .Names = c("length",
-        "startLine", "endLine")), f3 = structure(c(5, 9, 13), .Names = c("length",
-        "startLine", "endLine")), f4 = structure(c(4, 16, 19), .Names = c("length",
-        "startLine", "endLine")), `_anonymous_.23` = structure(c(6, 23,
-        28), .Names = c("length", "startLine", "endLine")), f5 = structure(c(1,
-        31, 31), .Names = c("length", "startLine", "endLine")), f6 = structure(c(1,
-        33, 33), .Names = c("length", "startLine", "endLine")), f7 = structure(c(6,
-        35, 40), .Names = c("length", "startLine", "endLine"))), .Names = c("_anonymous_.1",
-        "fa", "f2", "f3", "f4", "_anonymous_.23", "f5", "f6", "f7"))
+    lsnames <- c("length", "startLine", "endLine")
+    values <- c(2, 1, 2, 1, 3, 3, 1, 6, 6, 5, 9, 13, 4, 16, 19, 6, 23, 28,
+        1, 31, 31, 1, 33, 33, 6, 35, 40)
+    names(values) <- rep(lsnames, 9)
+    expected <- split(values, rep(1:9, each = 3))
+    names(expected) <- c("_anonymous_.1", "fa", "f2", "f3", "f4",
+                         "_anonymous_.23", "f5", "f6", "f7")
     checkTrue(all.equal(expected, res))
 }
 
