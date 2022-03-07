@@ -23,7 +23,7 @@
 #' @return Context: a data.frame() with columns File, Line, and Context
 Context <- function(pkg="", file="", lines=character(), idx=logical()) {
     data.frame(
-        File=rep(mungeName(file, pkg), sum(idx)), Line=which(idx),
+        File=rep(getDirFile(file), sum(idx)), Line=which(idx),
         Context=lines[idx], stringsAsFactors=FALSE)
 }
 

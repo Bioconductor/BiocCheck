@@ -110,15 +110,16 @@ handleVerbatim <- function(msg, indent=4, exdent=6, width=getOption("width"))
 
 installAndLoad <- function(pkgpath, install_dir = tempfile())
 {
-    r_libs_user_old <- Sys.getenv("R_LIBS_USER")
-    on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
-    r_libs_user <- paste(.libPaths(), collapse=.Platform$path.sep)
-    Sys.setenv(R_LIBS_USER=r_libs_user)
-
     if (!dir.exists(install_dir))
         dir.create(install_dir)
     dir.create(libdir <- file.path(install_dir, "lib"))
     file.create(stderr <- file.path(install_dir, "install.stderr"))
+
+    r_libs_user_old <- Sys.getenv("R_LIBS_USER")
+    on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
+    r_libs_user <- paste(c(libdir, .libPaths()), collapse=.Platform$path.sep)
+    Sys.setenv(R_LIBS_USER=r_libs_user)
+
     rcmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
                     libdir, shQuote(pkgpath))
@@ -128,7 +129,7 @@ installAndLoad <- function(pkgpath, install_dir = tempfile())
     }
     pkgname <- .get_package_name(pkgpath)
     args <- sprintf(
-        "--vanilla -e 'library(%s, lib.loc = \"%s\")'", pkgname, libdir
+        "--vanilla -e 'library(%s)'", pkgname
     )
     res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
     if (res) {
@@ -235,7 +236,10 @@ parseFile <- function(infile, pkgdir) {
         code <- capture.output(Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
     } else if (grepl("\\.R$", infile, TRUE)) {
-        outfile <- infile
+        outfile <- file.path(parse_dir, "parseFile.tmp")
+        # remove empty lines before parsing
+        txt <- Filter(nzchar, readLines(infile, warn = FALSE))
+        writeLines(txt, outfile)
     }
     p <- parse(outfile, keep.source=TRUE)
     getParseData(p)
@@ -288,11 +292,11 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
                 if (grepl("\\.R$", name, ignore.case=TRUE))
                     handleMessage(sprintf(
                         "Found %s%s in %s (line %s, column %s)", symbolName,
-                        parens, mungeName(name, pkgname), x[i,1], x[i,2]))
+                        parens, getDirFile(name), x[i,1], x[i,2]))
                 else
                     handleMessage(sprintf(
                         "Found %s%s in %s", symbolName, parens,
-                        mungeName(name, pkgname))) # FIXME test this
+                        getDirFile(name))) # FIXME test this
             }
         }
     }
@@ -300,16 +304,10 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
 }
 
 getDirFile <- function(fpath) {
-    if (length(fpath) && !is.na(fpath))
-        vapply(
-            strsplit(normalizePath(fpath), .Platform$file.sep),
-            function(pseg) {
-                paste(utils::tail(pseg, 2L), collapse = .Platform$file.sep)
-            },
-            character(1L)
-        )
-    else
-        fpath
+    if (nzchar(fpath) && !is.na(fpath))
+        fpath <- file.path(basename(dirname(fpath)), basename(fpath))
+
+    fpath
 }
 
 .getTokenTextCode <- function(parsedf, token, text) {
@@ -367,21 +365,13 @@ findSymbolsInParsedCode <-
         function(...) rbind.data.frame(..., make.row.names = FALSE),
         matches
     )
-    apply(matches, 1L, function(minidf) {
+    apply(matches, 1L, function(rowdf) {
         fmttxt <- "%s (line %s, column %s)"
-        formt <- if (fun) paste0(minidf["text"], " in ", fmttxt) else fmttxt
-        sprintf(formt, getDirFile(minidf["filename"]),
-            minidf["line1"], minidf["col1"]
+        formt <- if (fun) paste0(rowdf["text"], " in ", fmttxt) else fmttxt
+        sprintf(formt, getDirFile(rowdf["filename"]),
+            rowdf["line1"], rowdf["col1"]
         )
     })
-}
-
-mungeName <- function(name, pkgname)
-{
-    twoseps <- paste0(rep.int(.Platform$file.sep, 2), collapse="")
-    name <- gsub(twoseps, .Platform$file.sep, name, fixed=TRUE)
-    pos <- regexpr(pkgname, name)
-    substr(name, pos+1+nchar(pkgname), nchar(name))
 }
 
 isInfrastructurePackage <- function(pkgDir)
@@ -692,7 +682,7 @@ getParent <- function(view, biocViewsVocab)
 getFunctionLengths <- function(df)
 {
     df <- df[df$terminal & df$parent > -1,]
-    rownames(df) <- seq_len(nrow(df))
+    rownames(df) <- NULL
     max <- nrow(df)
     res <- list()
     funcRows <- df[df$token == "FUNCTION",]

@@ -531,13 +531,20 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     }
 }
 
+.parsePackageImportsFromNamespace <- function(pkg, libloc) {
+    importFields <- c("imports", "importClasses", "importMethods")
+    imps <- parseNamespaceFile(pkg, libloc)[importFields]
+    for (i in names(imps))
+        imps[[i]] <- vapply(imps[[i]], `[[`, character(1L), 1L)
+    unique(unlist(imps))
+}
+
 checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
 {
     pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
     dImports <- cleanupDependency(pkg_desc$Imports)
     deps <- cleanupDependency(pkg_desc$Depends)
-    imps <- parseNamespaceFile(pkgname, lib.loc)[["imports"]]
-    nImports <- vapply(imps, `[[`, character(1L), 1L)
+    nImports <- .parsePackageImportsFromNamespace(pkgname, lib.loc)
 
     if(!(all(dImports %in% nImports)))
     {
@@ -1322,6 +1329,21 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     tokens[tokens[,"token"] != "expr", ,drop=FALSE]
 }
 
+.grepSymbolRanges <-
+    function(tokens, patterns, tokenType = "SYMBOL_FUNCTION_CALL", isExp = FALSE)
+{
+    txt <- tokens[, "text"]
+    found <- lapply(patterns, function(pattern) grepl(pattern, txt))
+    found <- Reduce(`|`, found)
+    hits <- which(found & tokens[, "token"] == tokenType)
+    openBracket <- if (isExp) "{" else "("
+    opar <- which(txt == openBracket)
+    startHit <- vapply(hits, function(x) min(opar[opar > x]), numeric(1L))
+    parnum <- tokens[startHit, "parent"]
+    endHit <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+    Map(seq, startHit, endHit)
+}
+
 .findSymbolRanges <-
     function(tokens, symbols, tokenType = "SYMBOL_FUNCTION_CALL", isExp = FALSE)
 {
@@ -1355,11 +1377,25 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
     .findInSignaler(rfile, symbols, .filtTokens)
 }
 
-.filtersetMethodRanges <- function(tokens, symbols) {
+.filtersetMethodRanges <- function(tokens) {
     excl <- .findSymbolRanges(tokens, "setMethod")
     if (length(excl)) {
         showHits <- vapply(excl,
             function(x) '"show"' %in% tokens[x, "text"], logical(1))
+        negind <- unlist(lapply(excl[showHits], `-`))
+        tokens <- tokens[negind, ]
+    }
+    tokens
+}
+
+.filterS3printRanges <- function(tokens) {
+    excl <- .grepSymbolRanges(
+        tokens, "^print.*", tokenType = "SYMBOL", isExp = TRUE
+    )
+    if (length(excl)) {
+        showHits <- vapply(excl,
+            function(x) "cat" %in% tokens[x, "text"], logical(1)
+        )
         negind <- unlist(lapply(excl[showHits], `-`))
         tokens <- tokens[negind, ]
     }
@@ -1374,8 +1410,8 @@ checkCatInRCode <-
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
-    parsedCodes <-
-        lapply(parsedCodes, .filtersetMethodRanges, symbols = symbols)
+    parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges)
+    parsedCodes <- lapply(parsedCodes, .filterS3printRanges)
     msg_res <-
         findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
     unlist(msg_res)
@@ -1529,7 +1565,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     for (filename in names(parsedCode))
     {
         pc <- parsedCode[[filename]]
-        filename <- mungeName(filename, pkgname)
+        filename <- getDirFile(filename)
         res <- getFunctionLengths(pc)
         functionNames <- names(res)
         mt <- do.call(rbind, res)
@@ -1543,7 +1579,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     dflist <- Filter(length, dflist)
     df <- do.call(rbind, dflist)
     colnames <- c("filename","functionName","length","startLine","endLine")
-    if (ncol(df) == length(colnames))
+    if (!is.null(df) && ncol(df) == length(colnames))
     {
         colnames(df) <- colnames
         df <- df[with(df, order(-length)),]
@@ -1635,7 +1671,7 @@ checkForValueSection <- function(pkgdir)
     if (!all(ok)) {
         handleWarning(
             "Add non-empty \\value sections to the following man pages: ",
-            paste(mungeName(manpages[!ok], pkgname), collapse=", "))
+            paste(getDirFile(manpages[!ok]), collapse=", "))
     }
 }
 
@@ -1869,7 +1905,7 @@ checkFormatting <- function(pkgdir, nlines=6)
         if (file.exists(file) && file.info(file)$size == 0)
         {
             handleNote("Add content to the empty file ",
-                mungeName(file, pkgname))
+                getDirFile(file))
         }
 
         if (file.exists(file) && file.info(file)$size > 0)
@@ -2091,18 +2127,23 @@ checkBadFiles <- function(package_dir){
                        ".gitattributes", ".gitmodules",
                        ".hgtags",
                        ".project", ".seed", ".settings", ".tm_properties")
+    ext_expr <- paste0("\\", hidden_file_ext, "$", collapse = "|")
 
-    fls <- dir(package_dir, ignore.case=TRUE, recursive=TRUE, all.files=TRUE)
-    dx <- unlist(lapply(hidden_file_ext,
-        FUN=function(x, suffix){
-            which(endsWith(x, suffix))
-        }, x=tolower(fls)))
-    badFiles <- fls[dx]
+    fls <- dir(package_dir, recursive=TRUE, all.files=TRUE)
+    flist <- split(fls, startsWith(fls, "inst"))
+    warns <- grep(ext_expr, ignore.case = TRUE, flist[['TRUE']], value = TRUE)
+    errs <- grep(ext_expr, ignore.case = TRUE, flist[['FALSE']], value = TRUE)
 
-    if (length(badFiles) != 0){
+    if (length(warns)) {
+        handleWarning("System Files in '/inst' should not be git tracked:")
+        for (w in warns)
+            handleMessage(w, indent = 8)
+    }
+
+    if (length(errs)) {
         handleError(
             "System Files found that should not be git tracked:",
-            messages = badFiles
+            messages = errs
         )
     }
 }

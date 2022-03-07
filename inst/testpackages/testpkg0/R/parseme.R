@@ -19,7 +19,7 @@ f4 <- function()
 }
 
 # an lapply with an anonymous function
-lapply(LETTERS, 
+lapply(LETTERS,
     function(x) {
     print(x)
 
