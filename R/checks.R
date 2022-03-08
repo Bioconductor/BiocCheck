@@ -1883,6 +1883,16 @@ checkSkipOnBioc <- function(pkgdir)
     }
 }
 
+.lineReport <- function(linedf) {
+    apply(
+        linedf,
+        1L,
+        function(row)
+            paste0(row["File"], "#L", row["Line"], " ",
+                substr(row["Context"], 1, 40), "...")
+    )
+}
+
 checkFormatting <- function(pkgdir, nlines=6)
 {
     pkgname <- basename(pkgdir)
@@ -1930,28 +1940,40 @@ checkFormatting <- function(pkgdir, nlines=6)
     if (n <- nrow(long))
     {
         ok <- FALSE
-        handleNote(sprintf(
+        msg <- sprintf(
             "Consider shorter lines; %s lines (%i%%) are > 80 characters long.",
-            n, round((n / totallines) * 100)))
-        handleContext(long, nlines)
+            n, round((n / totallines) * 100))
+        msgs <- .lineReport(long)
+        handleNote(
+            msg,
+            help_text = "First few lines:",
+            messages = msgs
+        )
     }
 
     if (n <- nrow(tab))
     {
         ok <- FALSE
-        handleNote(sprintf(
+        msg <- sprintf(
             "Consider 4 spaces instead of tabs; %s lines (%i%%) contain tabs.",
-            n, round((n / totallines) * 100)))
-        handleContext(tab, nlines)
+            n, round((n / totallines) * 100))
+        msgs <- .lineReport(tab)
+        handleNote(msg,
+            help_text = "First few lines:",
+            messages = msgs
+        )
     }
 
     if (n <- nrow(indent))
     {
         ok <- FALSE
+        msgs <- .lineReport(indent)
         handleNote(
-            "Consider multiples of 4 spaces for line indents, ", n, " lines",
-            "(", round((n / totallines) * 100), "%) are not.")
-        handleContext(indent, nlines)
+            "Consider multiples of 4 spaces for line indents; ", n, " lines",
+            " (", round((n / totallines) * 100), "%) are not.",
+            help_text = "First few lines:",
+            messages = msgs
+        )
     }
 
     if (!ok)
