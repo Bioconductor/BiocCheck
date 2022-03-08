@@ -10,7 +10,7 @@
         metadata = "list"
     ),
     methods = list(
-        add = function(..., condition, help_text, messages) {
+        add = function(..., condition, help_text, messages, verbose = FALSE) {
             if (missing(condition))
                 stop(
                     "<Internal> 'condition' should be:",
@@ -24,7 +24,7 @@
             dots <- sprintf(paste0("* ", toupper(condition), ": %s"), mlist)
             ins <- Filter(length, list(dots, help_text, messages))
             nist <- structure(list(ins), .Names = names(mlist))
-            .messages$setMessage(nist, condition = condition)
+            .messages$setMessage(nist, verbose = verbose, condition = condition)
             .self[[condition]] <- append(.self[[condition]], nist)
             .self$log[[checkName]] <- append(.self$log[[checkName]], nist)
         },
@@ -82,6 +82,9 @@
                 stop("Install 'jsonlite' to use the read method.")
             infile <- jsonlite::read_json(file)[[1]]
             .self[["log"]] <- jsonlite::fromJSON(infile, simplifyVector = FALSE)
+        },
+        show = function() {
+
         }
     )
 )
@@ -92,18 +95,24 @@
         condition = "character"
     ),
     methods = list(
-        setMessage = function(..., condition) {
+        setMessage = function(..., verbose = FALSE, condition) {
             text <- list(...)[[1L]]
             .self$setCondition(condition)
-            lens <- lengths(text)
-            indents <- seq(4, by = 2, length = lens)
             .self$msg <- append(.self$msg, text)
-            text[[1]][[lens]] <- selectSome(unlist(tail(text[[1]], 1L)))
-            mapply(
-                handleMessage,
-                unlist(text, recursive = FALSE, use.names = FALSE),
-                indent = indents
-            )
+            if (!verbose) {
+                handleMessage(
+                    head(unlist(text, use.names = FALSE), 1L), indent = 4
+                )
+            } else {
+                lens <- lengths(text)
+                indents <- seq(4, by = 2, length = lens)
+                text[[1]][[lens]] <- selectSome(unlist(tail(text[[1]], 1L)))
+                mapply(
+                    handleMessage,
+                    unlist(text, recursive = FALSE, use.names = FALSE),
+                    indent = indents
+                )
+            }
             .self$msg
         },
         setCondition = function(condition) {
