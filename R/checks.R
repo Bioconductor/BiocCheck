@@ -967,7 +967,7 @@ checkVigClassUsage <- function(pkgdir) {
 }
 
 checkTFSymbolUsage <- function(pkgdir) {
-    viglist <- findSymbolsInVignettes(pkgdir, c("T", "F"), "SYMBOL")
+    viglist <- findSymbolsInVignettes(pkgdir, "T|F", "SYMBOL")
     if (length(viglist)) {
         handleWarningFiles(
             " Avoid T/F variables; If logical, use TRUE/FALSE",
