@@ -70,6 +70,25 @@
                 .self[[cond]] <- list()
             }
         },
+        report = function(check_dir, pkgName, debug, onBBS) {
+            if (onBBS)
+                return()
+            bioccheck_dir <- file.path(
+                check_dir, paste("BioCheck", pkgName, sep = ".")
+            )
+            if (!dir.exists(bioccheck_dir))
+                dir.create(bioccheck_dir)
+            outputs <- unlist(Map(
+                    f = function(...) {
+                        .composeReport(..., debug = debug)
+                    },
+                    checkName = names(.self$log),
+                    lowerElements = lapply(.self$log, .flattenElement)
+            ), use.names = FALSE)
+            writeLines(
+                outputs, con = file.path(bioccheck_dir, "00BiocCheck.log")
+            )
+        },
         toJSON = function(file) {
             out <- Filter(length, .self$log)
             jlog <- toJSON(out, auto_unbox = FALSE)
@@ -137,6 +156,22 @@
         }
     )
 )
+
+.flattenElement <- function(listElem) {
+    debugFun <- names(listElem)
+    lowerElem <- unlist(listElem, use.names = FALSE)
+    attributes(lowerElem) <- list(debugNames = debugFun)
+    lowerElem
+}
+
+.composeReport <- function(checkName, lowerElements, debug = FALSE) {
+    if (!length(lowerElements))
+        checkName <- paste(checkName, "OK")
+    else if (debug)
+        lowerElements <-
+            c(lowerElements, paste("DEBUG:", attr(lowerElements, "debugNames")))
+    c(checkName, lowerElements)
+}
 
 ## singletons. Exported but 'hidden' from ls() by the '.'
 

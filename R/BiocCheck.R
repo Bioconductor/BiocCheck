@@ -1,5 +1,6 @@
 ## 'package' can be a directory or tarball
-BiocCheck <- function(package=".", ...)
+BiocCheck <-
+    function(package=".", checkDir = dirname(package), debug = FALSE, ...)
 {
     .zeroCounters()
     package <- normalizePath(package)
@@ -226,30 +227,28 @@ BiocCheck <- function(package=".", ...)
         checkForSupportSiteRegistration(package_dir)
     }
 
-    ## Summary
-    .msg("\n\nSummary:")
-    .msg("ERROR count: %d", .BiocCheck$getNum("error"))
-    .msg("WARNING count: %d", .BiocCheck$getNum("warning"))
-    .msg("NOTE count: %d", .BiocCheck$getNum("note"))
-    .msg(paste0(
-        "For detailed information about these checks, see the BiocCheck ",
-        "vignette with `browseVignettes(package = 'BiocCheck')`"
-    ), exdent=0)
+    # BiocCheck results -------------------------------------------------------
+    message("\n\U2500 BiocCheck results \U2500\U2500")
+    .msg(
+        "%d ERRORS | %d WARNINGS | %d NOTES",
+        .BiocCheck$getNum("error"),
+        .BiocCheck$getNum("warning"),
+        .BiocCheck$getNum("note")
+    )
+    message(
+        "\nSee the BiocCheck.", package_name, " folder and run\n",
+        "    browseVignettes(package = 'BiocCheck')\n",
+        "for details."
+    )
 
-
-    if (.BiocCheck$getNum("error") > 0)
-    {
-        errcode <- 1
-        .msg("BiocCheck FAILED.")
-    } else {
-        errcode <- 0
-    }
+    .BiocCheck$report(checkDir, package_name, debug, onBBS)
 
     if (isTRUE(dots[["quit-with-status"]])) {
+        errcode <- as.integer(.BiocCheck$getNum("error") > 0)
         q("no", errcode)
-    } else {
-        return(.BiocCheck)
     }
+
+    return(.BiocCheck)
 
 }
 
