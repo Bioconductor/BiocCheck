@@ -5,7 +5,8 @@
 
 .msg <- function(..., appendLF=TRUE, indent=0, exdent=2)
 {
-    txt <- sprintf(...)
+    contents <- list(...)
+    txt <- if (length(contents) != 1L) do.call(sprintf, contents) else contents
     message(paste(strwrap(txt, indent=indent, exdent=exdent), collapse="\n"),
         appendLF=appendLF)
 }
