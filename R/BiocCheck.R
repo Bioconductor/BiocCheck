@@ -236,7 +236,7 @@ BiocCheck <-
         .BiocCheck$getNum("note")
     )
     message(
-        "\nSee the BiocCheck.", package_name, " folder and run\n",
+        "\nSee the ", package_name, ".BiocCheck folder and run\n",
         "    browseVignettes(package = 'BiocCheck')\n",
         "for details."
     )

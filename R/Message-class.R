@@ -74,7 +74,7 @@
             if (onBBS)
                 return()
             bioccheck_dir <- file.path(
-                check_dir, paste("BioCheck", pkgName, sep = ".")
+                check_dir, paste(pkgName, "BiocCheck", sep = ".")
             )
             if (!dir.exists(bioccheck_dir))
                 dir.create(bioccheck_dir)
