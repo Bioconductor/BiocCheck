@@ -208,17 +208,18 @@ BiocCheck <- function(package=".", ...)
         # checkIsPackageNameAlreadyInUse(package_name, "BioCbooks")
     }
 
+    onBBS <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
     if (is.null(dots[["no-check-bioc-help"]])) {
         handleCheck("Checking for bioc-devel mailing list subscription...")
-        if (!nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
+        if (onBBS) {
+            checkForBiocDevelSubscription(package_dir)
+        } else {
             handleNote(
                 "Cannot determine whether maintainer is subscribed to the ",
-                "bioc-devel mailing list (requires admin credentials). ",
+                "Bioc-Devel mailing list (requires admin credentials). ",
                 "Subscribe here: ",
                 "https://stat.ethz.ch/mailman/listinfo/bioc-devel"
             )
-        } else {
-            checkForBiocDevelSubscription(package_dir)
         }
 
         handleCheck("Checking for support site registration...")
