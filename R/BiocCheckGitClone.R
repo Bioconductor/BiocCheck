@@ -4,9 +4,9 @@ BiocCheckGitClone <- function(package=".", ...){
     package <- normalizePath(package)
     isTar <- grepl("\\.tar\\.gz$", package)
     if (isTar)
-        stop("BiocCheckGitClone is run on the raw git clone of package repository")
+        .stop("Run 'BiocCheckGitClone' on the git-cloned package directory.")
     if (!dir.exists(package))
-        stop("Package directory does not exist")
+        .stop("Package directory does not exist")
     # be careful here:
     if (.Platform$OS.type=="windows")
         package <- gsub("\\\\", "/", package)

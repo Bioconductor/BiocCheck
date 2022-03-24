@@ -728,7 +728,7 @@ checkVigMetadata <- function(vigdircontents)
      if (length(badVig) != 0L){
         handleWarning(
             "Vignette(s) missing Vignette metadata. See ",
-            "http://r-pkgs.had.co.nz/vignettes.html ;",
+            "http://r-pkgs.had.co.nz/vignettes.html",
             help_text = "Update the following files:",
             messages = badVig
         )
@@ -2101,8 +2101,10 @@ checkSupportReg <- function(email){
         handleMessage("Maintainer is registered at support site.")
         TRUE
     } else {
-        handleError("Maintainer must register at the support site; ",
-                    "visit https://support.bioconductor.org/accounts/signup/ .")
+        handleError(
+            "Maintainer must register at the support site; ",
+            "visit https://support.bioconductor.org/accounts/signup/"
+        )
         FALSE
     }
 }

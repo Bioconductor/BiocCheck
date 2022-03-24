@@ -4,23 +4,24 @@ BiocCheck <- function(package=".", ...)
     .zeroCounters()
     package <- normalizePath(package)
     if (!file.exists(package))
-        stop("Package directory or tarball does not exist")
+        .stop("Package directory or tarball does not exist.")
+    if (!length(package))
+        .stop("Supply a package directory or source tarball.")
     # be careful here:
     if (identical(.Platform$OS.type, "windows"))
         package <- gsub("\\\\", "/", package)
-    oldwarn <- getOption("warn")
-    on.exit(options(warn=oldwarn))
-    options(warn=1)
-    isTar <- grepl("\\.tar\\.gz$", package)
-    checkingDir <- !isTar && file.info(package)[["isdir"]]
-    package_dir <- .get_package_dir(package, isTar)
 
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))
         dots <- dots[[1]]               # command line args come as list
 
-    if (!length(package))
-        .stop("Supply a package directory or source tarball.")
+    oldwarn <- getOption("warn")
+    on.exit(options(warn=oldwarn))
+    options(warn=1)
+
+    isTar <- grepl("\\.tar\\.gz$", package)
+    checkingDir <- !isTar && file.info(package)[["isdir"]]
+    package_dir <- .get_package_dir(package, isTar)
     package_name <- .get_package_name(package)
 
     handleMessage(
@@ -260,8 +261,7 @@ BiocCheck <- function(package=".", ...)
         })
         desc <- file.path(tmp_pkg_dir, "DESCRIPTION")
         if (!file.exists(desc))
-            stop("The package folder is inconsistent with the tarball name.",
-                call. = FALSE)
+            .stop("The package folder is inconsistent with the tarball name.")
     } else {
         desc <- file.path(input, "DESCRIPTION")
     }
