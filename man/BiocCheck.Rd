@@ -10,11 +10,21 @@ and NOTE. See the vignette for more details. \code{BiocCheck} is complementary
 to \code{R CMD check}, which should always be run first.
 }
 \usage{
-BiocCheck(package = ".", ...)
+BiocCheck(package = ".", checkDir = dirname(package), debug = FALSE, ...)
 }
 \arguments{
   \item{package}{
     A directory or tarball (\code{.tar.gz} file) of an R package.
+  }
+  \item{checkDir}{
+    A directory where the BiocCheck output directory will go. By default,
+    it will be placed in the same directory as the package directory.
+  }
+  \item{debug}{
+    Whether to append the names of functions that correspond to each condition
+    raised by BiocCheck in the written log (i.e., in the
+    \code{'<package_name>.BiocCheck'} folder). This option is only relevant to
+    developers and contributors to BiocCheck.
   }
   \item{\dots}{
     See the details section for available options. When running
