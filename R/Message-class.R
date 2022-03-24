@@ -85,6 +85,16 @@
         },
         show = function() {
             invisible()
+        },
+        show_meta = function() {
+            meta <- .self$metadata
+            if (!length(meta))
+                stop("No metadata to show.")
+            message(
+                paste0(
+                    "\U2500", " ", paste(names(meta), meta, sep = ": "), "\n"
+                )
+            )
         }
     )
 )

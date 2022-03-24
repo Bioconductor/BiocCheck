@@ -23,20 +23,22 @@ BiocCheck <- function(package=".", ...)
     checkingDir <- !isTar && file.info(package)[["isdir"]]
     package_dir <- .get_package_dir(package, isTar)
     package_name <- .get_package_name(package)
-
-    handleMessage(
-        "This is BiocCheck version ", packageVersion("BiocCheck"), ". ",
-        "BiocCheck is a work in progress. Output and severity of issues may ",
-        "change. Installing package...", indent=0, exdent=0)
     package_install_dir <- installAndLoad(package)
     libloc <- file.path(package_install_dir, "lib")
     pkgver <- .get_package_version(package_dir)
+    bioccheckver <- as.character(packageVersion("BiocCheck"))
+    biocver <- as.character(BiocManager::version())
+
     .BiocCheck$metadata <- list(
+        BiocCheckVersion = bioccheckver,
+        BiocVersion = biocver,
         Package = package_name, PackageVersion = pkgver,
         sourceDir = package_dir, installDir = package_install_dir,
         platform = .Platform$OS.type, isTarBall = isTar
     )
+    .BiocCheck$show_meta()
 
+    handleMessage("* Installing package...", indent = 0, exdent = 0)
     ## checks
     if (is.null(dots[["no-check-dependencies"]])){
         handleCheck("Checking Package Dependencies...")
@@ -294,5 +296,5 @@ BiocCheck <- function(package=".", ...)
 
 .get_package_version <- function(pkgdir) {
     desc <- file.path(pkgdir, "DESCRIPTION")
-    package_version(read.dcf(desc, fields = "Version"))
+    as.character(read.dcf(desc, fields = "Version"))
 }
