@@ -131,6 +131,9 @@ BiocCheck <-
     handleCheck("Checking .Rbuildignore...")
     checkRbuildignore(package_dir)
 
+    handleCheck("Checking for stray BiocCheck output folders...")
+    checkBiocCheckOutputFolder(package_dir, package_name)
+
     if (is.null(dots[["no-check-vignettes"]])) {
         handleCheck("Checking vignette directory...")
         checkVignetteDir(package_dir, checkingDir)

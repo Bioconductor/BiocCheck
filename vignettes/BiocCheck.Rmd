@@ -299,6 +299,12 @@ not label it ERROR, WARNING, or NOTE.
 
 [7]: https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/codetoolsBioC
 
+## BiocCheck output folder check
+
+* **Checking for stray BiocCheck output folders...** ensures that the
+  `<package_name>.BiocCheck` folder byproduct when running `BiocCheck(".")`
+  locally does not get included in the package directory (`ERROR`).
+
 ## Vignette Checks
 
 Can be disabled with `--no-check-vignettes`.

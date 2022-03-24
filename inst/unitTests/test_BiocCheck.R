@@ -327,6 +327,16 @@ test_checkRbuildignore <- function()
     )
 }
 
+test_checkBiocCheckOutputFolder <- function()
+{
+    check_folder <- file.path(UNIT_TEST_TEMPDIR, "testpkg.BiocCheck")
+    dir.create(check_folder, recursive = TRUE)
+    BiocCheck:::checkBiocCheckOutputFolder(dirname(check_folder), "testpkg")
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1L)
+    unlink(check_folder)
+    .zeroCounters()
+}
+
 test_checkBiocViews <- function()
 {
     if (!dir.exists(UNIT_TEST_TEMPDIR))

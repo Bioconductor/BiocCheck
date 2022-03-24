@@ -265,6 +265,15 @@ checkRbuildignore <- function(pkgdir) {
     }
 }
 
+checkBiocCheckOutputFolder <- function(pkgdir, pkg_name) {
+    alldirs <- list.dirs(pkgdir, full.names = FALSE)
+    bioccheck_out_dir <- paste(pkg_name, "BiocCheck", sep = ".")
+    if (bioccheck_out_dir %in% alldirs)
+        handleError(
+            "Remove '", bioccheck_out_dir, "' from the package directory"
+        )
+}
+
 checkBiocViews <- function(pkgdir)
 {
     dirty <- FALSE
