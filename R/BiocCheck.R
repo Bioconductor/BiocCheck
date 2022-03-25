@@ -43,7 +43,7 @@ BiocCheck <-
     ## checks
     if (is.null(dots[["no-check-dependencies"]])){
         handleCheck("Checking Package Dependencies...")
-        checkForBadDepends(package, libloc)
+        checkForBadDepends(package_dir, package_name, libloc)
     }
 
     if (is.null(dots[["no-check-deprecated"]])){

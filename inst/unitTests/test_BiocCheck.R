@@ -997,6 +997,7 @@ test_checkForBadDepends <- function()
     inst_path <- BiocCheck:::installAndLoad(pkg)
     BiocCheck:::checkForBadDepends(
         pkgdir = pkg,
+        pkgname = "testpkg0",
         lib.loc = file.path(inst_path, "lib")
     )
     checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("error"))
