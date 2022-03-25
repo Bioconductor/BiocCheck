@@ -582,7 +582,7 @@ getBadDeps <- function(pkgdir, lib.loc)
     oldquotes <- getOption("useFancyQuotes")
     on.exit(options(useFancyQuotes=oldquotes))
     options(useFancyQuotes=FALSE)
-    args <- sprintf("-q --vanilla --slave -f %s --args %s",
+    args <- sprintf("-q --vanilla --no-echo -f %s --args %s",
         system.file("script", "checkBadDeps.R", package="BiocCheck"),
         paste(dQuote(pkgdir), dQuote(lib.loc)))
     system2(cmd, args, stdout=TRUE, stderr=FALSE,
