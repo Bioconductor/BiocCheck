@@ -244,7 +244,7 @@ BiocCheck <-
         "for details."
     )
 
-    .BiocCheck$report(checkDir, package_name, debug, onBBS)
+    .BiocCheck$report(checkDir, package_name, debug)
 
     if (isTRUE(dots[["quit-with-status"]])) {
         errcode <- as.integer(.BiocCheck$getNum("error") > 0)

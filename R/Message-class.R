@@ -70,9 +70,7 @@
                 .self[[cond]] <- list()
             }
         },
-        report = function(check_dir, pkgName, debug, onBBS) {
-            if (onBBS)
-                return()
+        report = function(check_dir, pkgName, debug) {
             bioccheck_dir <- file.path(
                 check_dir, paste(pkgName, "BiocCheck", sep = ".")
             )
