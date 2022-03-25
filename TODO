@@ -1,9 +1,7 @@
 + description namespace consistency  (??? look at FIXME in code ???) 
 
 + Coding Practice
-   - print(), cat() usage outside show and print method
-   - message(), warning(), error() not with paste except collapse
-   - if/while () & vs &&, | vs || ? (if/while/etc...  should be || / &&  not single) 
+   - if/while () & vs &&, | vs || ? (if/while/etc...  should be || / &&  not single)
    - ??Make sure every (non-trivial) class has a show() method or at least display the #/% of classes that don't.
 
 + NEWS 
