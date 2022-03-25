@@ -1,5 +1,5 @@
-BiocCheckGitClone <- function(package=".", ...){
-
+BiocCheckGitClone <- function(package=".", ...)
+{
     .zeroCounters()
     package <- normalizePath(package)
     isTar <- grepl("\\.tar\\.gz$", package)
@@ -10,19 +10,31 @@ BiocCheckGitClone <- function(package=".", ...){
     # be careful here:
     if (.Platform$OS.type=="windows")
         package <- gsub("\\\\", "/", package)
-    oldwarn <- getOption("warn")
-    on.exit(options(warn=oldwarn))
-    options(warn=1)
 
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))
         dots <- dots[[1]]               # command line args come as list
 
-    handleMessage(
-        "This is BiocCheckGitClone version ", packageVersion("BiocCheck"), ". ",
-        "BiocCheckGitClone is a work in progress. Output and severity of issues may ",
-        "change.", indent=0, exdent=0)
+    oldwarn <- getOption("warn")
+    on.exit(options(warn=oldwarn))
+    options(warn=1)
 
+    package_dir <- .get_package_dir(package, isTar)
+    package_name <- .get_package_name(package)
+    pkgver <- .get_package_version(package_dir)
+    bioccheckver <- as.character(packageVersion("BiocCheck"))
+    biocver <- as.character(BiocManager::version())
+
+    .BiocCheck$metadata <- list(
+        BiocCheckVersion = bioccheckver,
+        BiocVersion = biocver,
+        Package = package_name, PackageVersion = pkgver,
+        sourceDir = package_dir,
+        platform = .Platform$OS.type, isTarBall = isTar
+    )
+    .BiocCheck$show_meta()
+
+    ## checks
     handleCheck("Checking valid files...")
     checkBadFiles(package)
 
@@ -32,31 +44,24 @@ BiocCheckGitClone <- function(package=".", ...){
     handleCheck("Checking CITATION...")
     checkForCitationFile(package)
 
-    ## Summary
-    .msg("\n\nSummary:")
-    .msg("ERROR count: %d", .BiocCheck$getNum("error"))
-    .msg("WARNING count: %d", .BiocCheck$getNum("warning"))
-    .msg("NOTE count: %d", .BiocCheck$getNum("note"))
-    .msg(paste0(
-        "For detailed information about these checks, see the BiocCheck ",
-        "vignette, available at ",
-        sprintf(
-            "https://bioconductor.org/packages/%s/bioc/vignettes/BiocCheck/inst/doc/BiocCheck.html#interpreting-bioccheck-output",
-            BiocManager::version())),
-        exdent=0)
-
-
-    if (.BiocCheck$getNum("error") > 0)
-    {
-        errcode <- 1
-        .msg("BiocCheckGitClone FAILED.")
-    } else {
-        errcode <- 0
-    }
+    # BiocCheck results -------------------------------------------------------
+    message("\n\U2500 BiocCheck results \U2500\U2500")
+    .msg(
+        "%d ERRORS | %d WARNINGS | %d NOTES",
+        .BiocCheck$getNum("error"),
+        .BiocCheck$getNum("warning"),
+        .BiocCheck$getNum("note")
+    )
+    message(
+        "\nSee the ", package_name, ".BiocCheck folder and run\n",
+        "    browseVignettes(package = 'BiocCheck')\n",
+        "for details."
+    )
 
     if (isTRUE(dots[["quit-with-status"]])) {
+        errcode <- as.integer(.BiocCheck$getNum("error") > 0)
         q("no", errcode)
-    } else {
-        return(.BiocCheck)
     }
+
+    return(.BiocCheck)
 }
