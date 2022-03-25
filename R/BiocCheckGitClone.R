@@ -38,6 +38,9 @@ BiocCheckGitClone <- function(package=".", ...)
     handleCheck("Checking valid files...")
     checkBadFiles(package)
 
+    handleCheck("Checking for stray BiocCheck output folders...")
+    checkBiocCheckOutputFolder(package_dir, package_name)
+
     handleCheck("Checking DESCRIPTION...")
     checkDescription(package)
 
