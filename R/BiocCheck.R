@@ -22,11 +22,11 @@ BiocCheck <-
 
     isTar <- grepl("\\.tar\\.gz$", package)
     checkingDir <- !isTar && file.info(package)[["isdir"]]
-    package_dir <- .get_package_dir(package, isTar)
-    package_name <- .get_package_name(package)
+    package_dir <- .getPackageDir(package, isTar)
+    package_name <- .getPackageName(package)
     package_install_dir <- installAndLoad(package)
     libloc <- file.path(package_install_dir, "lib")
-    pkgver <- .get_package_version(package_dir)
+    pkgver <- .getPackageVersion(package_dir)
     bioccheckver <- as.character(packageVersion("BiocCheck"))
     biocver <- as.character(BiocManager::version())
     checkDir <- .getBiocCheckDir(package_name, checkDir)
@@ -259,11 +259,11 @@ BiocCheck <-
 }
 
 # input can either be tarball or pkg source dir
-.get_package_name <- function(input)
+.getPackageName <- function(input)
 {
     isTar <- grepl("\\.tar\\.gz$", input)
     if (isTar) {
-        tmp_pkg_dir <- .temp_package_dir_tarball(input)
+        tmp_pkg_dir <- .tempPackageDirTarball(input)
         on.exit({
             unlink(dirname(tmp_pkg_dir), recursive = TRUE)
         })
@@ -276,7 +276,7 @@ BiocCheck <-
     read.dcf(desc, fields = "Package")[[1]]
 }
 
-.temp_package_dir_tarball <- function(pkg_tarball)
+.tempPackageDirTarball <- function(pkg_tarball)
 {
     tmp_dir <- tempfile()
     pkg_name <- gsub("(\\w+)_.*", "\\1", basename(pkg_tarball))
@@ -289,9 +289,9 @@ BiocCheck <-
     file.path(tmp_dir, pkg_name)
 }
 
-.get_package_dir <- function(input, isTar) {
+.getPackageDir <- function(input, isTar) {
     if (isTar) {
-        .temp_package_dir_tarball(input)
+        .tempPackageDirTarball(input)
     } else {
         if (file.info(input)[["isdir"]])
             input
@@ -309,7 +309,7 @@ BiocCheck <-
     bioccheck_dir
 }
 
-.get_package_version <- function(pkgdir) {
+.getPackageVersion <- function(pkgdir) {
     desc <- file.path(pkgdir, "DESCRIPTION")
     as.character(read.dcf(desc, fields = "Version"))
 }

@@ -19,9 +19,9 @@ BiocCheckGitClone <- function(package=".", ...)
     on.exit(options(warn=oldwarn))
     options(warn=1)
 
-    package_dir <- .get_package_dir(package, isTar)
-    package_name <- .get_package_name(package)
-    pkgver <- .get_package_version(package_dir)
+    package_dir <- .getPackageDir(package, isTar)
+    package_name <- .getPackageName(package)
+    pkgver <- .getPackageVersion(package_dir)
     bioccheckver <- as.character(packageVersion("BiocCheck"))
     biocver <- as.character(BiocManager::version())
 

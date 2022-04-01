@@ -719,7 +719,7 @@ test_findPackageName <- function()
     pkgdir <- create_test_package()
     dirrename <- file.path(dirname(pkgdir), "test_package")
     file.rename(pkgdir, dirrename)
-    pkgname <- BiocCheck:::.get_package_name(dirrename)
+    pkgname <- BiocCheck:::.getPackageName(dirrename)
     checkTrue(identical(pkgname, basename(pkgdir)))
     unlink(dirname(pkgdir), recursive = TRUE)
 
@@ -735,7 +735,7 @@ test_findPackageName <- function()
     stopifnot(file.exists(tarname))
     tarrename <- file.path(tempdir(), "test.package_0.99.0.tar.gz")
     file.rename(tarname, tarrename)
-    checkException(BiocCheck:::.get_package_name(tarrename))
+    checkException(BiocCheck:::.getPackageName(tarrename))
     unlink(tarrename)
 }
 
@@ -1264,7 +1264,7 @@ test_checkForVersionNumberMismatch <- function()
 
     BiocCheck:::checkForVersionNumberMismatch(
         newname,
-        BiocCheck:::.temp_package_dir_tarball(newname))
+        BiocCheck:::.tempPackageDirTarball(newname))
     checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
     .zeroCounters()
 }

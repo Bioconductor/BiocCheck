@@ -128,7 +128,7 @@ installAndLoad <- function(pkgpath, install_dir = tempfile())
     if (res) {
         handleError(pkgpath, " must be installable.")
     }
-    pkgname <- .get_package_name(pkgpath)
+    pkgname <- .getPackageName(pkgpath)
     args <- sprintf(
         "--vanilla -e 'library(%s)'", pkgname
     )
