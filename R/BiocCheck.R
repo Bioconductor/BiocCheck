@@ -29,12 +29,14 @@ BiocCheck <-
     pkgver <- .get_package_version(package_dir)
     bioccheckver <- as.character(packageVersion("BiocCheck"))
     biocver <- as.character(BiocManager::version())
+    checkDir <- .getBiocCheckDir(package_name, checkDir)
 
     .BiocCheck$metadata <- list(
         BiocCheckVersion = bioccheckver,
         BiocVersion = biocver,
         Package = package_name, PackageVersion = pkgver,
         sourceDir = package_dir, installDir = package_install_dir,
+        BiocCheckDir = checkDir,
         platform = .Platform$OS.type, isTarBall = isTar
     )
     .BiocCheck$show_meta()
@@ -124,7 +126,8 @@ BiocCheck <-
                                                                quietly=TRUE))))
             {
                 handleCheck("Checking for namespace import suggestions...")
-                checkImportSuggestions(package_name)
+                .BiocCheck$writeNSsuggests()
+                # checkImportSuggestions(package_name)
             }
     }
 
@@ -244,7 +247,7 @@ BiocCheck <-
         "for details."
     )
 
-    .BiocCheck$report(checkDir, package_name, debug)
+    .BiocCheck$report(debug)
 
     if (isTRUE(dots[["quit-with-status"]])) {
         errcode <- as.integer(.BiocCheck$getNum("error") > 0)
@@ -295,6 +298,15 @@ BiocCheck <-
         else
             .stop("'%s' is not a directory or package source tarball.", input)
     }
+}
+
+.getBiocCheckDir <- function(pkgName, checkDir) {
+    bioccheck_dir <- file.path(
+        checkDir, paste(pkgName, "BiocCheck", sep = ".")
+    )
+    if (!dir.exists(bioccheck_dir))
+        dir.create(bioccheck_dir)
+    bioccheck_dir
 }
 
 .get_package_version <- function(pkgdir) {
