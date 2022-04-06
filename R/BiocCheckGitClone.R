@@ -56,9 +56,8 @@ BiocCheckGitClone <- function(package=".", ...)
         .BiocCheck$getNum("note")
     )
     message(
-        "\nSee the ", package_name, ".BiocCheck folder and run\n",
-        "    browseVignettes(package = 'BiocCheck')\n",
-        "for details."
+        "\nFor more details, run\n",
+        "    browseVignettes(package = 'BiocCheck')"
     )
 
     if (isTRUE(dots[["quit-with-status"]])) {
