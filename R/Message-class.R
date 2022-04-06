@@ -71,9 +71,14 @@
             }
         },
         getBiocCheckDir = function() {
-            .self$metadata$BiocCheckDir
+            bioccheck_dir <- .self$metadata$BiocCheckDir
+            if (!dir.exists(bioccheck_dir))
+                dir.create(bioccheck_dir, recursive = TRUE)
+            bioccheck_dir
         },
-        report = function(debug) {
+        report = function(debug, isOnBBS) {
+            if (isOnBBS)
+                return()
             bioccheck_dir <- getBiocCheckDir()
             outputs <- unlist(Map(
                     f = function(...) {
@@ -82,11 +87,13 @@
                     checkName = names(.self$log),
                     lowerElements = lapply(.self$log, .flattenElement)
             ), use.names = FALSE)
-            writeLines(
-                outputs, con = file.path(bioccheck_dir, "00BiocCheck.log")
-            )
+                writeLines(
+                    outputs, con = file.path(bioccheck_dir, "00BiocCheck.log")
+                )
         },
-        writeNSsuggests = function() {
+        writeNSsuggests = function(isOnBBS) {
+            if (isOnBBS)
+                return()
             bioccheck_dir <- getBiocCheckDir()
             pkgName <- getElement(.self$metadata, "Package")
             require(pkgName,

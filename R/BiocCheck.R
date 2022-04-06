@@ -30,6 +30,7 @@ BiocCheck <-
     bioccheckver <- as.character(packageVersion("BiocCheck"))
     biocver <- as.character(BiocManager::version())
     checkDir <- .getBiocCheckDir(package_name, checkDir)
+    onBBS <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
 
     .BiocCheck$metadata <- list(
         BiocCheckVersion = bioccheckver,
@@ -126,7 +127,7 @@ BiocCheck <-
                                                                quietly=TRUE))))
             {
                 handleCheck("Checking for namespace import suggestions...")
-                .BiocCheck$writeNSsuggests()
+                .BiocCheck$writeNSsuggests(onBBS)
                 # checkImportSuggestions(package_name)
             }
     }
@@ -215,7 +216,6 @@ BiocCheck <-
         # checkIsPackageNameAlreadyInUse(package_name, "BioCbooks")
     }
 
-    onBBS <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
     if (is.null(dots[["no-check-bioc-help"]])) {
         handleCheck("Checking for bioc-devel mailing list subscription...")
         if (onBBS) {
@@ -247,7 +247,7 @@ BiocCheck <-
         "for details."
     )
 
-    .BiocCheck$report(debug)
+    .BiocCheck$report(debug, onBBS)
 
     if (isTRUE(dots[["quit-with-status"]])) {
         errcode <- as.integer(.BiocCheck$getNum("error") > 0)
@@ -301,12 +301,9 @@ BiocCheck <-
 }
 
 .getBiocCheckDir <- function(pkgName, checkDir) {
-    bioccheck_dir <- file.path(
+    file.path(
         checkDir, paste(pkgName, "BiocCheck", sep = ".")
     )
-    if (!dir.exists(bioccheck_dir))
-        dir.create(bioccheck_dir)
-    bioccheck_dir
 }
 
 .getPackageVersion <- function(pkgdir) {

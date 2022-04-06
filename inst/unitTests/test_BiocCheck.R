@@ -1360,6 +1360,25 @@ test_packageAlreadyExists <- function()
     .zeroCounters()
 }
 
+test_BiocCheckReporters <- function()
+{
+    pkgdir <- system.file("testpackages", package="BiocCheck")
+    hypo_checkdir <- file.path(pkgdir, "hypoPkg.BiocCheck")
+    oldCheckDir <- .BiocCheck$metadata$BiocCheckDir
+    on.exit({
+        .BiocCheck$metadata$BiocCheckDir <- oldCheckDir
+    })
+    .BiocCheck$metadata$BiocCheckDir <- hypo_checkdir
+    .BiocCheck$report(debug = FALSE, isOnBBS = TRUE)
+    checkTrue(
+        !dir.exists(hypo_checkdir)
+    )
+    .BiocCheck$writeNSsuggests(isOnBBS = TRUE)
+    checkTrue(
+        !dir.exists(hypo_checkdir)
+    )
+}
+
 test_checkUsageOfDont <- function()
 {
     ## testpkg0 should trigger this note for 2 out of 3 man pages
