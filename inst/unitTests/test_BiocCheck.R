@@ -506,7 +506,7 @@ test_checkBBScompatibility <- function()
     checkError("Missing cre role in Authors@R doesn't cause error!")
 
 
-    cat(sprintf("Package: ", UNIT_TEST_PKG),
+    cat(sprintf("Package: %s", UNIT_TEST_PKG),
         "Version: 0.99.0",
         "License: GPL-2",
         sep = "\n",
@@ -514,7 +514,7 @@ test_checkBBScompatibility <- function()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Maintainer and Authors@R doesn't cause error!")
 
-    cat(paste("Package:", UNIT_TEST_PKG),
+    cat(paste("Package: %s", UNIT_TEST_PKG),
         "Version: 0.99.0",
         "Maintainer: Joe Blow",
         "License: GPL-2",
@@ -741,7 +741,7 @@ test_findPackageName <- function()
 
 test_checkDeprecatedPackages <- function()
 {
-    cat(sprintf("Depends: multicore", UNIT_TEST_PKG),
+    cat(sprintf("Depends: multicore, %s", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkDeprecatedPackages(UNIT_TEST_TEMPDIR)
     checkError("Depending on multicore didn't cause error!")
