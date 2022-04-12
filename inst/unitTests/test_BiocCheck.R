@@ -213,7 +213,7 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEqualsNumeric(8, .BiocCheck$getNum("warning"))
+    checkEqualsNumeric(9, .BiocCheck$getNum("warning"))
     checkEquals("* WARNING: Evaluate more vignette chunks.",
         .BiocCheck$get("warning")[["checkVigChunkEval"]])
     checkTrue(
@@ -816,8 +816,17 @@ test_checkVigInstalls <- function()
             "testpackages", "testpkg0", package="BiocCheck", mustWork = TRUE
         )
     )
-    checkTrue(.BiocCheck$getNum("error") == 1)
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
     .zeroCounters()
+}
+
+test_checkTFSymbolUsage <- function()
+{
+    BiocCheck:::checkTFSymbolUsage(
+        system.file("testpackages", "testpkg0", package = "BiocCheck",
+            mustWork = TRUE)
+    )
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
 }
 
 test_checkVigSessionInfo <- function()
@@ -826,7 +835,7 @@ test_checkVigSessionInfo <- function()
         system.file("testpackages", "testpkg0", package = "BiocCheck",
             mustWork = TRUE)
     )
-    checkTrue(.BiocCheck$getNum("note") == 1)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
 }
 
 test_checkForInstall <- function()
