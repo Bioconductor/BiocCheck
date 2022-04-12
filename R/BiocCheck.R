@@ -45,7 +45,7 @@ BiocCheck <-
     handleMessage("* Installing package...", indent = 0, exdent = 0)
     ## checks
     if (is.null(dots[["no-check-dependencies"]])){
-        handleCheck("Checking Package Dependencies...")
+        handleCheck("Checking package dependencies...")
         checkForBadDepends(package_dir, package_name, libloc)
     }
 
@@ -79,7 +79,7 @@ BiocCheck <-
     }
 
     if (is.null(dots[["no-check-R-ver"]])) {
-        handleCheck("Checking R Version dependency...")
+        handleCheck("Checking R version dependency...")
         checkRVersionDependency(package_dir)
     }
 
