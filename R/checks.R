@@ -2149,7 +2149,7 @@ checkBadFiles <- function(package_dir){
     # and
     #https://github.com/wch/r-source/blob/trunk/src/library/tools/R/check.R#L4025
     hidden_file_ext = c(".renviron", ".rprofile", ".rproj", ".rproj.user",
-                       ".rhistory", ".rapp.history",
+                       ".rhistory", ".rapp.history", ".rdata",
                        ".o", ".sl", ".so", ".dylib",
                        ".a", ".dll", ".def",
                        ".ds_store", "unsrturl.bst",
