@@ -530,7 +530,7 @@ test_checkBBScompatibility <- function()
     )
 
     .zeroCounters()
-    cat(paste("Package:", UNIT_TEST_PKG),
+    cat(paste("Package: ", UNIT_TEST_PKG),
         "Version: 0.99.0",
         "Maintainer: Joe Blow <joe@blow.com>",
         "Authors@R: c(person('Bioconductor Package Maintainer',",
@@ -539,13 +539,9 @@ test_checkBBScompatibility <- function()
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkDescription(UNIT_TEST_TEMPDIR)
-    checkTrue(
-        .BiocCheck$getNum("warning") == 0L,
-        "Using Maintainer and Authors@R causes warning!"
-    )
-    checkTrue(
-        .BiocCheck$getNum("error") == 1L,
-        "Using Maintainer and Author@R doesn't cause error!"
+    checkEqualsNumeric(
+        .BiocCheck$getNum("error"), 1L,
+        "Using Maintainer and Author@R causes error"
     )
 
     .zeroCounters()

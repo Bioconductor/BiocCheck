@@ -1,9 +1,4 @@
-##########################
-#
-#  Checks for BiocCheck
-#
-###########################
-
+# Checks for BiocCheck ----------------------------------------------------
 
 checkForVersionNumberMismatch <- function(package, package_dir)
 {
@@ -2136,12 +2131,7 @@ checkWatchedTag <- function(email, pkgname){
     }
 }
 
-#######################################
-#
-#  Checks for BiocCheckGitClone
-#
-#######################################
-
+# Checks for BiocCheckGitClone --------------------------------------------
 
 checkBadFiles <- function(package_dir){
     # taken from
@@ -2167,14 +2157,15 @@ checkBadFiles <- function(package_dir){
     errs <- grep(ext_expr, ignore.case = TRUE, flist[['FALSE']], value = TRUE)
 
     if (length(warns)) {
-        handleWarning("System Files in '/inst' should not be git tracked:")
-        for (w in warns)
-            handleMessage(w, indent = 8)
+        handleWarning(
+            "System files in '/inst' should not be git tracked.",
+            messages = warns
+        )
     }
 
     if (length(errs)) {
         handleError(
-            "System Files found that should not be git tracked:",
+            "System files found that should not be git tracked.",
             messages = errs
         )
     }
@@ -2219,8 +2210,7 @@ checkBadFiles <- function(package_dir){
     }
 }
 
-checkDescription <- function(package_dir){
-
+checkDescription <- function(package_dir) {
     handleCheck("Checking if DESCRIPTION is well formatted...")
     dcf <- tryCatch({
         read.dcf(file.path(package_dir, "DESCRIPTION"))
@@ -2230,12 +2220,14 @@ checkDescription <- function(package_dir){
         return()
     })
     handleCheck("Checking for valid maintainer...")
-    if (("Authors@R" %in% colnames(dcf)) & any((c("Author","Maintainer") %in% colnames(dcf)))){
-        handleError("Use Authors@R field not Author/Maintainer fields. Do not use both.")
-    } else {
-        if (any((c("Author","Maintainer") %in% colnames(dcf))))
-            handleError("Do not use Author/Maintainer fields. Use Authors@R.")
-    }
+    authr <- "Authors@R" %in% colnames(dcf)
+    autmain <- c("Author","Maintainer") %in% colnames(dcf)
+    if (authr && any(autmain))
+        handleError(
+            "Use Authors@R field not Author/Maintainer fields. Do not use both."
+        )
+    else if (any(autmain))
+        handleError("Do not use Author/Maintainer fields. Use Authors@R.")
 }
 
 checkDESCRIPTIONFile <- function(package_dir) {
