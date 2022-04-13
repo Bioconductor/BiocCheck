@@ -217,7 +217,10 @@ test_vignettes0 <- function()
     checkEquals("* WARNING: Evaluate more vignette chunks.",
         .BiocCheck$get("warning")[["checkVigChunkEval"]])
     checkTrue(
-        any(grepl(pattern="VignetteIndex", .BiocCheck$get("warning")[["checkVigTemplate"]]))
+        any(grepl(
+            pattern="VignetteIndex",
+            .BiocCheck$get("warning")[["checkVigTemplate"]]
+        ))
     )
     .zeroCounters()
 

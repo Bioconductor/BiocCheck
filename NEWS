@@ -1,8 +1,24 @@
 CHANGES IN VERSION 1.32
 -----------------------
 
+NEW FEATURES
+
+    o Add package metadata to main report for easier diagnostics
+    o `<pkgname>.BiocCheck` folder, created above the package folder, includes
+    the full report and NAMESPACE suggestions, if available.
+    o Add check to find any stray `<pkgname>.BiocCheck` folders
+    o Update doc links and recommendations for additional information in report
+    o Update `BiocCheck` report to be more brief by only noting the conditions;
+    details are included in the full report
+
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Improve internal handling of condition messages with unified mechanism
+    o Internal improvements to `BiocCheck` mechanism: export `.BiocCheck` object
+    which contains all conditions, log list, and method for writing to JSON
+    o Update to changes in R 4.2 `--no-echo` flag
+    o Make use of `lib.loc` to helper functions that install and load the
+    checked package
     o (1.31.36) Reduce function length count slightly by removing empty lines.
     o (1.31.35) Restricted files in `inst` will be flagged with a `WARNING`
     instead of an `ERROR`
