@@ -2,13 +2,10 @@
 % Please edit documentation in R/Context.R
 \name{Context}
 \alias{Context}
-\alias{handleContext}
 \title{Report context of events to user with a data.frame of events and
 locations}
 \usage{
 Context(pkg = "", file = "", lines = character(), idx = logical())
-
-handleContext(ctxt, nlines = 6, width = getOption("width"))
 }
 \arguments{
 \item{pkg}{character(1) name of the package}
@@ -20,18 +17,9 @@ being summarized.}
 
 \item{idx}{logical() same length as \code{lines} indicating lines
 in which event occurs}
-
-\item{ctxt}{Object derived from Context()}
-
-\item{nlines}{numeric(1) The number of lines to provide context for.}
-
-\item{width}{numeric(1) The width of the console; defaults to the value
-given by \code{getOption("width")}}
 }
 \value{
 Context: a data.frame() with columns File, Line, and Context
-
-handleContext: side effect is output on the message stream
 }
 \description{
 Report context of events to user with a data.frame of events and

@@ -1,0 +1,11 @@
+---
+title: "Test vignette"
+author: "BiocCheck"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  BiocStyle::html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```

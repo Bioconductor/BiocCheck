@@ -7,9 +7,9 @@ importFrom(tools, parse_Rd, Rd2ex, file_ext, file_path_sans_ext)
 importFrom(codetools, walkCode, findGlobals)
 importFrom(utils, Stangle, capture.output, data, getParseData, head,
     packageDescription, packageVersion, untar, globalVariables,
-    readCitationFile)
+    readCitationFile, tail)
 importFrom(stringdist, stringdistmatrix)
 importFrom(knitr, purl)
 export(BiocCheck)
 export(BiocCheckGitClone)
-export(.error, .warning, .note)
+export(.BiocCheck)

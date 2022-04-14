@@ -30,5 +30,15 @@ if (!requireNamespace("BiocCheck", quietly = TRUE))
 ```{r eval=FALSE}
 ```
 
+```{r, eval=TRUE}
+if (T) {
+    cat("bad practice")
+}
+```
+
+
+```{r eval=FALSE}
+```
+
 ```{r, child = "testpkg0_child.Rmd"}
 ```

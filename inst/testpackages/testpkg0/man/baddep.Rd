@@ -42,9 +42,9 @@ baddep()
 
 ## The function is currently defined as
 \dontrun{
-function () 
+function ()
 {
-    isValidJSON("{\"foo\": \"bar\"}")
+    validate("{\"foo\": \"bar\"}")
     }
 }
 }

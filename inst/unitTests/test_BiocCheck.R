@@ -11,15 +11,13 @@ parsedCode <- NULL
 inspect <- function()
 {
     .printf("error: %s, warning: %s, note: %s",
-        .error$getNum(),
-        .warning$getNum(),
-        .note$getNum())
-    print("error:")
-    print(.error$get())
-    print("warning:")
-    print(.warning$get())
-    print("note:")
-    print(.note$get())
+        .BiocCheck$getNum("error"),
+        .BiocCheck$getNum("warning"),
+        .BiocCheck$getNum("note")
+    )
+    print(.BiocCheck$get("error"))
+    print(.BiocCheck$get("warning"))
+    print(.BiocCheck$get("note"))
 
 }
 
@@ -52,14 +50,11 @@ create_test_package <-
 checkError <- function(msg)
 {
     if (missing(msg)) msg = ""
-    # .printf("Errors: %s, Warnings: %s, Notes: %s",
-    #     .error$getNum(),
-    #     .warning$getNum(),
-    #     .note$getNum())
     checkTrue(
-        .note$getNum() == 0 &&
-        .warning$getNum() == 0 &&
-        .error$getNum() == 1,
+        identical(
+            .BiocCheck$getNum(c("note", "warning", "error")),
+            c(note = 0L, warning = 0L, error = 1L)
+        ),
         msg
     )
     .zeroCounters()
@@ -73,7 +68,7 @@ checkCounter <- function(msg, type = "Error") {
         all(
             mapply(
                 all.equal,
-                c(.note$getNum(), .warning$getNum(), .error$getNum()), res
+                .BiocCheck$getNum(c("note", "warning", "error")), res
             )
         ),
         msg
@@ -83,9 +78,10 @@ checkCounter <- function(msg, type = "Error") {
 
 stillZero <- function()
 {
-    .note$getNum() == 0 &&
-        .warning$getNum() == 0 &&
-        .error$getNum() == 0
+    identical(
+        .BiocCheck$getNum(c("note", "warning", "error")),
+        c(note = 0L, warning = 0L, error = 0L)
+    )
 }
 
 .setUp <- function()
@@ -128,19 +124,30 @@ test_vignettes0 <- function()
     cat("nothing", file=file.path(vigdir, "test.Rnw"))
     cat("Title: unitTestTempDir", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.error$getNum() == 0
-        && .warning$getNum() == 1
-        && .note$getNum() == 1,
-        "expected 1 warning and 1 note")
+    checkTrue(
+        identical(
+            .BiocCheck$getNum(c("error", "warning", "note")),
+            c(error = 0L, warning = 1L, note = 1L)
+        ),
+        "expected 1 warning and 1 note"
+    )
     .zeroCounters()
 
     # test OK
-    cat("% \\VignetteIndexEntry{header} \n% \\VignetteEngine{knitr} \nnothing", file=file.path(vigdir, "test.Rnw"))
-    cat("Title: unitTestTempDir\nSuggests: knitr", file=file.path(pkgdir, "DESCRIPTION"))
+    cat(
+        "% \\VignetteIndexEntry{header} \n% \\VignetteEngine{knitr} \nnothing",
+        file=file.path(vigdir, "test.Rnw")
+    )
+    cat(
+        "Title: unitTestTempDir\nSuggests: knitr",
+        file=file.path(pkgdir, "DESCRIPTION")
+    )
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.error$getNum() == 0
-        && .warning$getNum() == 0
-        && .note$getNum() == 1,
+    checkTrue(
+        identical(
+            .BiocCheck$getNum(c("error", "warning", "note")),
+            c(error = 0L, warning = 0L, note = 1L)
+        ),
         "expected 1 note and 0 errors/warnings")
     .zeroCounters()
 
@@ -150,10 +157,13 @@ test_vignettes0 <- function()
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.rnw"))
     BiocCheck:::checkInstContents(pkgdir, TRUE)
-    checkTrue(.error$getNum() == 0
-        && .warning$getNum() == 1
-        && .note$getNum() == 0,
-        "expected 1 warning, no notes or errors")
+    checkTrue(
+        identical(
+            .BiocCheck$getNum(c("error", "warning", "note")),
+            c(error = 0L, warning = 1L, note = 0L)
+        ),
+        "expected 1 warning, no notes or errors"
+    )
     .zeroCounters()
 
     # check rmd file in inst/doc  WARNING
@@ -161,7 +171,7 @@ test_vignettes0 <- function()
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.Rmd"))
     BiocCheck:::checkInstContents(pkgdir, TRUE)
-    checkTrue(.warning$getNum() == 1,
+    checkTrue(.BiocCheck$getNum("warning") == 1,
         "Rmd file not seen as valid vignette source")
     unlink(file.path(instdoc, "test.Rmd"))
     .zeroCounters()
@@ -171,11 +181,16 @@ test_vignettes0 <- function()
     # in Description but not any vignette
     # also checks if builder listed but not in DESCRIPTION import,depend,suggest
     cat("VignetteBuilder: knitr", file=file.path(pkgdir, "DESCRIPTION"))
-    cat("% \\VignetteIndexEntry{header} \nnnothing", file=file.path(vigdir, "test.Rnw"))
+    cat(
+        "% \\VignetteIndexEntry{header} \nnnothing",
+        file=file.path(vigdir, "test.Rnw")
+    )
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.error$getNum() == 1
-        && .warning$getNum() == 1
-        && .note$getNum() == 1,
+    checkTrue(
+        identical(
+            .BiocCheck$getNum(c("error", "warning", "note")),
+            c(error = 1L, warning = 1L, note = 1L)
+        ),
         "expected 1 warning, note, and error."
     )
     .zeroCounters()
@@ -185,35 +200,64 @@ test_vignettes0 <- function()
     unlink(file.path(pkgdir, "DESCRIPTION"))
     cat("Title: something", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.error$getNum() == 0)
-    checkTrue(.note$getNum() == 1)
+    checkTrue(.BiocCheck$getNum("error") == 0)
+    checkTrue(.BiocCheck$getNum("note") == 1)
     # check defined in desc but default vig
     unlink(file.path(pkgdir, "DESCRIPTION"))
     cat("VignetteBuilder: Sweave", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.error$getNum() == 0)
+    checkTrue(.BiocCheck$getNum("error") == 0)
     .zeroCounters()
 
     # check vignette style of example package
     # 2 WARNINGS - vignette template and evaluate more chunks
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg0", package="BiocCheck"), TRUE)
-    checkEquals(7, .warning$getNum())
-    checkEquals("Evaluate more vignette chunks.",
-        .warning$get()[5])
-    checkTrue(grepl(pattern="VignetteIndex",  .warning$get()[3]))
+    checkEqualsNumeric(9, .BiocCheck$getNum("warning"))
+    checkEquals("* WARNING: Evaluate more vignette chunks.",
+        .BiocCheck$get("warning")[["checkVigChunkEval"]])
+    checkTrue(
+        any(grepl(
+            pattern="VignetteIndex",
+            .BiocCheck$get("warning")[["checkVigTemplate"]]
+        ))
+    )
     .zeroCounters()
 
     # check vignette style of example package
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg2", package="BiocCheck"), TRUE)
-    checkEquals(2, .error$getNum())
-    checkTrue(grepl(pattern="VignetteBuilder",  .error$get()[1]))
-    checkTrue(grepl(pattern="VignetteEngine",  .error$get()[2]))
-    checkEquals(4, .warning$getNum())
-    checkTrue(grepl(pattern="missing Vignette metadata",  .warning$get()[1]))
-    checkTrue(grepl(pattern="not currently Suggested",  .warning$get()[2]))
-    checkTrue(grepl(pattern="Evaluate more vignette chunks",  .warning$get()[3]))
+    checkEqualsNumeric(2, .BiocCheck$getNum("error"))
+    checkTrue(
+        any(grepl(
+            pattern="VignetteBuilder",
+            .BiocCheck$get("warning")[["checkVigSuggests"]]
+        ))
+    )
+    checkTrue(
+        any(grepl(pattern="VignetteEngine",
+              .BiocCheck$get("error")[["checkVigEngine"]]
+        ))
+    )
+    checkEqualsNumeric(4, .BiocCheck$getNum("warning"))
+    checkTrue(
+        any(grepl(
+            pattern="missing vignette metadata", ignore.case = TRUE,
+            .BiocCheck$get("warning")[["checkVigMetadata"]]
+        ))
+    )
+    checkTrue(
+        any(grepl(
+            pattern="not currently Suggested",
+            .BiocCheck$get("warning")[["checkVigSuggests"]]
+        ))
+    )
+    checkTrue(
+        grepl(
+            pattern="Evaluate more vignette chunks",
+            .BiocCheck$get("warning")[["checkVigChunkEval"]]
+        )
+    )
     .zeroCounters()
 
     # check vignette 'intermediate' files
@@ -221,7 +265,7 @@ test_vignettes0 <- function()
                           package="BiocCheck")
     vigdircontents <- BiocCheck:::getVigSources(vigdir)
     BiocCheck:::checkVigFiles(vigdir, vigdircontents)
-    checkEquals(1, .note$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
     .zeroCounters()
 
 }
@@ -243,12 +287,8 @@ test_checkVersionNumber <- function()
         setVersion("1.3.3")
     }
     BiocCheck:::checkVersionNumber(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() ==1)
+    checkTrue(.BiocCheck$getNum("warning") ==1)
     .zeroCounters()
-    BiocCheck:::.compareVersions(
-        as.package_version("4.0"), as.package_version("4.1")
-    )
-    checkTrue(.note$getNum() ==1)
 }
 
 test_checkNewPackageVersionNumber <- function()
@@ -290,12 +330,24 @@ test_checkRbuildignore <- function()
     )
 }
 
+test_checkBiocCheckOutputFolder <- function()
+{
+    check_folder <- file.path(UNIT_TEST_TEMPDIR, "testpkg.BiocCheck")
+    dir.create(check_folder, recursive = TRUE)
+    BiocCheck:::checkBiocCheckOutputFolder(dirname(check_folder), "testpkg")
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1L)
+    unlink(check_folder)
+    .zeroCounters()
+}
+
 test_checkBiocViews <- function()
 {
+    if (!dir.exists(UNIT_TEST_TEMPDIR))
+        dir.create(UNIT_TEST_TEMPDIR)
     .zeroCounters()
     cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(.error$getNum() == 1,
+    checkTrue(.BiocCheck$getNum("error") == 1,
         "missing biocViews doesn't produce error")
 
     .zeroCounters()
@@ -304,9 +356,8 @@ test_checkBiocViews <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
     )
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(
-        .warning$getNum() == 4, "invalid biocViews don't produce warning"
-    )
+    # Invalid views = 1 warning for 4 terms
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
 
     .zeroCounters()
     cat(
@@ -314,7 +365,10 @@ test_checkBiocViews <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
     )
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() == 0, "valid biocViews produce warning")
+    checkTrue(
+        .BiocCheck$getNum("warning") == 0,
+        "valid biocViews produce warning"
+    )
 
     .zeroCounters()
     cat(
@@ -322,7 +376,7 @@ test_checkBiocViews <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
     )
     BiocCheck:::checkBiocViews(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() == 1,
+    checkTrue(.BiocCheck$getNum("warning") == 1,
         "biocViews from multiple categories don't produce warning")
 }
 
@@ -333,7 +387,7 @@ test_badFiles <- function(){
     badfile <- file.path(pkgdir, "something.Rproj")
     file.create(badfile)
     BiocCheck:::checkBadFiles(pkgdir)
-    checkEquals(1, .error$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("error"))
     .zeroCounters()
     unlink(pkgdir)
 }
@@ -345,19 +399,19 @@ test_checkLicenseForRestrictiveUse <- function() {
 
     .zeroCounters()
     BiocCheck:::.checkLicenseForRestrictiveUse("CC BY-NC-ND 4.0")
-    checkEquals(1, .error$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("error"))
 
     .zeroCounters()
     BiocCheck:::.checkLicenseForRestrictiveUse("CC BY-NC-ND 4.0 + file LICENSE")
-    checkEquals(1, .error$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("error"))
 
     .zeroCounters()
     BiocCheck:::.checkLicenseForRestrictiveUse("UNKNOWN")
-    checkEquals(1, .note$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
 
     .zeroCounters()
     BiocCheck:::.checkLicenseForRestrictiveUse(NA_character_)
-    checkEquals(1, .note$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
 }
 
 test_checkBBScompatibility <- function()
@@ -418,8 +472,9 @@ test_checkBBScompatibility <- function()
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION")
     )
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkError("Package name which doesn't match dir name does not cause error!")
-
+    checkError(
+        "Package name which doesn't match dir name does not cause error!"
+    )
 
     cat(paste("Package:", UNIT_TEST_PKG),
         "License: GPL-2",
@@ -442,7 +497,10 @@ test_checkBBScompatibility <- function()
 
     cat(paste("Package:", UNIT_TEST_PKG),
         "Version: 0.99.0",
-        "Authors@R: c(person('Bioconductor', 'Package Maintainer', email='maintainer@bioconductor.org', role=c('aut')))",
+        paste(
+            "Authors@R: c(person('Bioconductor', 'Package Maintainer',",
+            "email='maintainer@bioconductor.org', role=c('aut')))"
+        ),
         "License: GPL-2",
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
@@ -451,7 +509,7 @@ test_checkBBScompatibility <- function()
     checkError("Missing cre role in Authors@R doesn't cause error!")
 
 
-    cat(sprintf("Package: ", UNIT_TEST_PKG),
+    cat(sprintf("Package: %s", UNIT_TEST_PKG),
         "Version: 0.99.0",
         "License: GPL-2",
         sep = "\n",
@@ -459,19 +517,20 @@ test_checkBBScompatibility <- function()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkError("Missing Maintainer and Authors@R doesn't cause error!")
 
-
-    cat(paste("Package:", UNIT_TEST_PKG),
+    cat(paste("Package: %s", UNIT_TEST_PKG),
         "Version: 0.99.0",
         "Maintainer: Joe Blow",
         "License: GPL-2",
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkTrue(.error$getNum() > 0L, "Missing email in Maintainer doesn't cause error!")
-
+    checkTrue(
+        .BiocCheck$getNum("error") > 0L,
+        "Missing email in Maintainer doesn't cause error!"
+    )
 
     .zeroCounters()
-    cat(paste("Package:", UNIT_TEST_PKG),
+    cat(paste("Package: ", UNIT_TEST_PKG),
         "Version: 0.99.0",
         "Maintainer: Joe Blow <joe@blow.com>",
         "Authors@R: c(person('Bioconductor Package Maintainer',",
@@ -480,8 +539,10 @@ test_checkBBScompatibility <- function()
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkDescription(UNIT_TEST_TEMPDIR)
-    checkTrue(.warning$getNum() == 0L, "Using Maintainer and Authors@R causes warning!")
-    checkTrue(.error$getNum() == 1L, "Using Maintainer and Author@R doesn't cause error!")
+    checkEqualsNumeric(
+        .BiocCheck$getNum("error"), 1L,
+        "Using Maintainer and Author@R causes error"
+    )
 
     .zeroCounters()
     cat(paste("Package:", UNIT_TEST_PKG),
@@ -494,8 +555,10 @@ test_checkBBScompatibility <- function()
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkTrue(.note$getNum() == 1L, "An invalid ORCID ID causes a note!")
-
+    checkTrue(
+        .BiocCheck$getNum("note") == 1L,
+        "An invalid ORCID ID causes a note!"
+    )
 
     .zeroCounters()
     cat(paste("Package:", UNIT_TEST_PKG),
@@ -505,8 +568,10 @@ test_checkBBScompatibility <- function()
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkTrue(.error$getNum() > 0L,"Utilize Maintainer instead of Authors@R doesn't cause error!")
-
+    checkTrue(
+        .BiocCheck$getNum("error") > 0L,
+        "Utilize Maintainer instead of Authors@R doesn't cause error!"
+    )
 
     .zeroCounters()
     cat(paste("Package:", UNIT_TEST_PKG),
@@ -537,14 +602,29 @@ test_checkBBScompatibility <- function()
 
     .zeroCounters()
     dir.create(file.path(UNIT_TEST_TEMPDIR,"inst"))
-    cat("citEntry(entry='article', title='test', author=personList(as.person('Lori Kern')), year=2020, journal='Loris Best', volume='4', issue='12', textVersion='Shepherd, Lori (2020) test. Loris Best. 4(12)')",file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION"))
+    cat(
+        paste(
+            "citEntry(entry='article', title='test',",
+            "author=personList(as.person('Lori Kern')), year=2020,",
+            "journal='Loris Best', volume='4', issue='12',",
+            "textVersion='Shepherd, Lori (2020) test. Loris Best. 4(12)')"
+        ),
+        file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION")
+    )
     BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
     checkTrue(stillZero())
 
-    cat("citEntry(entry='article', title='test', author=personList(as.person('Lori Kern')), year=2020, journal='Loris Best', volume='4', issue='12')",file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION"),
-    append=FALSE)
+    cat(
+        paste(
+            "citEntry(entry='article', title='test',",
+            "author=personList(as.person('Lori Kern')), year=2020,",
+            "journal='Loris Best', volume='4', issue='12')"
+        ),
+        file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION"),
+        append=FALSE
+    )
     BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
-    checkTrue(.note$getNum()==1, "citation produces note")
+    checkTrue(.BiocCheck$getNum("note")==1, "citation produces note")
 
     .zeroCounters()
 }
@@ -552,7 +632,7 @@ test_checkBBScompatibility <- function()
 test_checkUnitTests <- function()
 {
     BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
-    checkTrue(.note$getNum() == 1)
+    checkTrue(.BiocCheck$getNum("note") == 1)
     dir.create(file.path(UNIT_TEST_TEMPDIR, "tests"),recursive=TRUE)
     cat("nothing", file=file.path(UNIT_TEST_TEMPDIR, "tests",
         "foo.R"))
@@ -562,7 +642,7 @@ test_checkUnitTests <- function()
     .zeroCounters()
     BiocCheck:::checkSkipOnBioc(system.file("testpackages",
         "testpkg0", package="BiocCheck"))
-    checkTrue(.note$getNum() == 1)
+    checkTrue(.BiocCheck$getNum("note") == 1)
     .zeroCounters()
 
     # check coding practice
@@ -638,7 +718,7 @@ test_findPackageName <- function()
     pkgdir <- create_test_package()
     dirrename <- file.path(dirname(pkgdir), "test_package")
     file.rename(pkgdir, dirrename)
-    pkgname <- BiocCheck:::.get_package_name(dirrename)
+    pkgname <- BiocCheck:::.getPackageName(dirrename)
     checkTrue(identical(pkgname, basename(pkgdir)))
     unlink(dirname(pkgdir), recursive = TRUE)
 
@@ -654,13 +734,13 @@ test_findPackageName <- function()
     stopifnot(file.exists(tarname))
     tarrename <- file.path(tempdir(), "test.package_0.99.0.tar.gz")
     file.rename(tarname, tarrename)
-    checkException(BiocCheck:::.get_package_name(tarrename))
+    checkException(BiocCheck:::.getPackageName(tarrename))
     unlink(tarrename)
 }
 
 test_checkDeprecatedPackages <- function()
 {
-     cat(sprintf("Depends: multicore", UNIT_TEST_PKG),
+    cat(sprintf("Depends: multicore, %s", UNIT_TEST_PKG),
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkDeprecatedPackages(UNIT_TEST_TEMPDIR)
     checkError("Depending on multicore didn't cause error!")
@@ -695,7 +775,7 @@ test_checkVigSessionInfo <- function()
 {
     pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
     checkVigSessionInfo(pkgdir)
-    checkTrue(.note$getNum() == 1)
+    checkTrue(.BiocCheck$getNum("note") == 1)
 }
 
 test_findSymbolsInRFiles <- function()
@@ -731,10 +811,21 @@ test_checkEqInAssignment <- function()
 test_checkVigInstalls <- function()
 {
     BiocCheck:::checkVigInstalls(
-        system.file("testpackages", "testpkg0", package="BiocCheck", mustWork = TRUE)
+        system.file(
+            "testpackages", "testpkg0", package="BiocCheck", mustWork = TRUE
+        )
     )
-    checkTrue(.error$getNum() == 1)
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
     .zeroCounters()
+}
+
+test_checkTFSymbolUsage <- function()
+{
+    BiocCheck:::checkTFSymbolUsage(
+        system.file("testpackages", "testpkg0", package = "BiocCheck",
+            mustWork = TRUE)
+    )
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
 }
 
 test_checkVigSessionInfo <- function()
@@ -743,7 +834,7 @@ test_checkVigSessionInfo <- function()
         system.file("testpackages", "testpkg0", package = "BiocCheck",
             mustWork = TRUE)
     )
-    checkTrue(.note$getNum() == 1)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
 }
 
 test_checkForInstall <- function()
@@ -760,7 +851,7 @@ test_checkVigBiocInst <- function()
 {
     pkgdir <- system.file("testpackages", "testpkg0", package = "BiocCheck")
     BiocCheck:::checkVigBiocInst(pkgdir)
-    checkTrue(.warning$getNum() == 1)
+    checkTrue(.BiocCheck$getNum("warning") == 1)
 }
 
 test_checkClassNEEQLookup <- function()
@@ -802,10 +893,9 @@ test_checkDescriptionNamespaceConsistency <- function()
     )
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     run_check(basename(pkgpath), instdir)
-    checkTrue(.warning$getNum() == 1)
-    checkEquals(
-        "Import devtools in NAMESPACE as well as DESCRIPTION.",
-        .warning$get()
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    checkTrue(
+        grepl("Import devtools", .BiocCheck$get("warning"), fixed = TRUE)
     )
 
     unlink(test_dir, recursive = TRUE)
@@ -822,7 +912,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
-    checkTrue(.warning$getNum() == 0L)
+    checkTrue(.BiocCheck$getNum("warning") == 0L)
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
@@ -839,7 +929,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
-    checkTrue(.warning$getNum() == 0L)
+    checkTrue(.BiocCheck$getNum("warning") == 0L)
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
@@ -856,9 +946,10 @@ test_checkDescriptionNamespaceConsistency <- function()
     instdir <- BiocCheck:::installAndLoad(pkgpath, test_dir)
     pkgname <- basename(pkgpath)
     run_check(pkgname, instdir)
-    checkTrue(.warning$getNum() == 1L)
-    checkIdentical("Import BiocCheck in NAMESPACE as well as DESCRIPTION.",
-                   .warning$get())
+    checkTrue(.BiocCheck$getNum("warning") == 1L)
+    checkTrue(
+        grepl("Import BiocCheck", .BiocCheck$get("warning"), fixed = TRUE)
+    )
 
     unlink(test_dir, recursive = TRUE)
     dir.create(test_dir)
@@ -879,21 +970,25 @@ test_checkDescriptionNamespaceConsistency <- function()
     unloadNamespace(pkg_ns)
 
     run_check(pkgname, instdir)
-    checkTrue(.warning$getNum() == 1)
-    checkEquals("Import devtools in DESCRIPTION as well as NAMESPACE.",
-        .warning$get()[1])
+    checkTrue(.BiocCheck$getNum("warning") == 1)
+    checkTrue(
+        grepl("Import devtools", .BiocCheck$get("warning"), fixed = TRUE)
+    )
 }
 
 test_checkImportSuggestions <- function()
 {
     if (requireNamespace("codetoolsBioC", quietly=TRUE)) {
         suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
-        checkTrue(is.character(suggestions)) # sometimes it works and sometimes it doesn't
+        # sometimes it works and sometimes it doesn't
+        checkTrue(is.character(suggestions))
 
-        instdir <- BiocCheck:::installAndLoad(create_test_package("testpkg"))
-        require("testpkg", lib.loc = file.path(instdir, "lib"))
-        suggestions <- BiocCheck:::checkImportSuggestions("testpkg")
-        unloadNamespace("testpkg")
+        pkgpath <- create_test_package()
+        pkgname <- basename(pkgpath)
+        instdir <- BiocCheck:::installAndLoad(pkgpath)
+        require(pkgname, lib.loc = file.path(instdir, "lib"), character.only = TRUE)
+        suggestions <- BiocCheck:::checkImportSuggestions(pkgname)
+        unloadNamespace(pkgname)
         checkTrue(is.character(suggestions))
         checkTrue(!length(suggestions))
 
@@ -910,12 +1005,15 @@ test_checkForBadDepends <- function()
     inst_path <- BiocCheck:::installAndLoad(pkg)
     BiocCheck:::checkForBadDepends(
         pkgdir = pkg,
+        pkgname = "testpkg0",
         lib.loc = file.path(inst_path, "lib")
     )
-    checkEquals(1, BiocCheck:::.error$getNum())
-    checkEquals(1, BiocCheck:::.note$getNum())
-    checkTrue(grepl("providing 1 object", BiocCheck:::.error$get()[1]))
-    checkTrue(grepl("how [0-9] object", BiocCheck:::.note$get()[1]))
+    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("error"))
+    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("note"))
+    checkTrue(grepl("providing 1 object", BiocCheck:::.BiocCheck$get("error")))
+    checkTrue(
+        grepl("how [0-9] object", BiocCheck:::.BiocCheck$get("note"))
+    )
 }
 
 test_remotesUsage <- function()
@@ -923,12 +1021,12 @@ test_remotesUsage <- function()
     pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
     .zeroCounters()
     BiocCheck:::checkRemotesUsage(pkg)
-    checkEquals(1, BiocCheck:::.error$getNum())
-    checkTrue(grepl("Remotes:", BiocCheck:::.error$get()[1]))
+    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("error"))
+    checkTrue(grepl("Remotes:", BiocCheck:::.BiocCheck$get("error")[1]))
     .zeroCounters()
     pkg <- system.file("testpackages", "testpkg1", package="BiocCheck")
     BiocCheck:::checkRemotesUsage(pkg)
-    checkEquals(0, BiocCheck:::.error$getNum())
+    checkEqualsNumeric(0, BiocCheck:::.BiocCheck$getNum("error"))
 }
 
 test_LazyDataUsage <- function()
@@ -936,7 +1034,7 @@ test_LazyDataUsage <- function()
     pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
     .zeroCounters()
     BiocCheck:::checkLazyDataUsage(pkg)
-    checkEquals(1, BiocCheck:::.note$getNum())
+    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("note"))
 }
 
 test_checkForLibraryRequire <- function()
@@ -945,8 +1043,8 @@ test_checkForLibraryRequire <- function()
         "testpackages", "testpkg0", package="BiocCheck", mustWork = TRUE
     )
     msg <- BiocCheck:::checkForLibraryRequire(pkg_dir)
-    checkTrue(identical(1L, .warning$getNum()))
-    checkTrue(identical(length(msg), 14L))
+    checkEqualsNumeric(1L, .BiocCheck$getNum("warning"))
+    checkEqualsNumeric(length(msg), 14L)
     .zeroCounters()
 }
 
@@ -957,12 +1055,13 @@ test_getFunctionLengths <- function()
     df <- getParseData(parse(file, keep.source=TRUE))
     res <- BiocCheck:::getFunctionLengths(df)
     lsnames <- c("length", "startLine", "endLine")
-    values <- c(2, 1, 2, 1, 3, 3, 1, 6, 6, 5, 9, 13, 4, 16, 19, 6, 23, 28,
-        1, 31, 31, 1, 33, 33, 6, 35, 40)
+    values <- c(2, 1, 2, 1, 3, 3, 1, 6, 6, 5, 9, 13, 4, 16,
+        19, 6, 23, 28, 1, 31, 31, 1, 33, 33, 6, 35, 40)
     names(values) <- rep(lsnames, 9)
     expected <- split(values, rep(1:9, each = 3))
     names(expected) <- c("_anonymous_.1", "fa", "f2", "f3", "f4",
-                         "_anonymous_.23", "f5", "f6", "f7")
+        "_anonymous_.23", "f5", "f6", "f7")
+
     checkTrue(all.equal(expected, res))
 }
 
@@ -979,10 +1078,10 @@ test_checkExportsAreDocumented <- function()
     res <- BiocCheck:::checkExportsAreDocumented(
         pkgdir, "testpkg0", lib.loc = file.path(instdir, "lib")
     )
-    checkEquals(1, .error$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("error"))
     .zeroCounters()
     res <- BiocCheck:::checkUsageOfDont(pkgdir)
-    checkEquals(2, .note$getNum())
+    checkEqualsNumeric(2, .BiocCheck$getNum("note"))
     .zeroCounters()
 }
 
@@ -990,7 +1089,7 @@ test_checkNEWS <- function()
 {
     BiocCheck:::checkNEWS(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
-    checkEquals(1, .note$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
     .zeroCounters()
     if (!dir.exists(UNIT_TEST_TEMPDIR))
         dir.create(UNIT_TEST_TEMPDIR)
@@ -1001,12 +1100,12 @@ test_checkNEWS <- function()
     dir.create(file.path(UNIT_TEST_TEMPDIR, "inst"), FALSE)
     cat("lalala", file=file.path(UNIT_TEST_TEMPDIR, "inst", "NEWS.Rd"))
     BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
-    checkEquals(1, .warning$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("warning"))
     .zeroCounters()
     cat("lalala", file=file.path(UNIT_TEST_TEMPDIR, "NEWS.md"))
     BiocCheck:::checkNEWS(UNIT_TEST_TEMPDIR)
-    checkEquals(1, .note$getNum())
-    checkEquals(1, .warning$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
+    checkEqualsNumeric(1, .BiocCheck$getNum("warning"))
     .zeroCounters()
 }
 
@@ -1014,14 +1113,14 @@ test_checkFormatting <- function()
 {
     BiocCheck:::checkFormatting(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
-    checkEquals(3, .note$getNum())
+    checkEqualsNumeric(3, .BiocCheck$getNum("note"))
 }
 
 test_checkForPromptComments <- function()
 {
     BiocCheck:::checkForPromptComments(system.file("testpackages", "testpkg0",
         package="BiocCheck"))
-    checkEquals(1, .note$getNum())
+    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
 
 }
 
@@ -1030,20 +1129,25 @@ test_getPkgType <- function()
    cat("Foo: bar", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 
-   cat("biocViews: bad, Software", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   cat("biocViews: bad, Software",
+       file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 
-   cat("biocViews: DifferentialExpression, CellBiology", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   cat("biocViews: DifferentialExpression, CellBiology",
+       file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals("Software", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 
-   cat("biocViews: DifferentialExpression, ChipManufacturer", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   cat("biocViews: DifferentialExpression, ChipManufacturer",
+       file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 
-   cat("biocViews: GeneCardsCustomSchema, ChipManufacturer", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   cat("biocViews: GeneCardsCustomSchema, ChipManufacturer",
+       file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals("AnnotationData", BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 
    # Cancer is not a valid biocView, so return NA
-   cat("biocViews: Cancer, HapMap", file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+   cat("biocViews: Cancer, HapMap",
+       file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
    checkEquals(NA, BiocCheck:::getPkgType(UNIT_TEST_TEMPDIR))
 }
 
@@ -1054,7 +1158,7 @@ test_checkForBiocDevelSubscription <- function()
         cat("Maintainer: Joe Blow <foo@bar.com>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
-        checkEquals(.error$getNum(), 1)
+        checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
         .zeroCounters()
 
         cat("Maintainer: Dan Tenenbaum <dtenenba@fredhutch.org>",
@@ -1069,16 +1173,20 @@ test_checkForBiocDevelSubscription <- function()
         checkTrue(stillZero())
         .zeroCounters()
 
-        cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Joe', \n  'Blow', email='joe@blow.org', role=c('aut', 'cre')))",
-            UNIT_TEST_PKG),
-            file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        cat(sprintf(paste(
+            "Package: %s\nVersion: 0.99.0\nAuthors@R:",
+            "c(person('Joe', \n  'Blow', email='joe@blow.org',",
+            "role=c('aut', 'cre')))"
+        ), UNIT_TEST_PKG), file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
-        checkEquals(.error$getNum(), 1)
+        checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
         .zeroCounters()
 
-        cat(sprintf("Package: %s\nVersion: 0.99.0\nAuthors@R: c(person('Dan', \n  'Tenenbaum', email='dtenenba@fredhutch.org', role=c('aut', 'cre')))",
-            UNIT_TEST_PKG),
-            file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        cat(sprintf(paste(
+            "Package: %s\nVersion: 0.99.0\nAuthors@R:",
+            "c(person('Dan', \n  'Tenenbaum', email='dtenenba@fredhutch.org',",
+            "role=c('aut', 'cre')))"
+        ), UNIT_TEST_PKG), file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkTrue(stillZero())
         .zeroCounters()
@@ -1106,7 +1214,7 @@ test_checkForSupportSiteRegistration <- function()
         BiocCheck:::checkSupportReg("lori.shepherd@roswellpark.org")
         checkTrue(stillZero())
         BiocCheck:::checkSupportReg("foo@bar.com")
-        checkEquals(.error$getNum(), 1)
+        checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
         .zeroCounters()
         ## api is case insensitivy
         BiocCheck:::checkSupportReg("lori.shePhErd@roswellpark.org")
@@ -1114,16 +1222,24 @@ test_checkForSupportSiteRegistration <- function()
 
 
         # tags
-        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "biocfilecache")
+        BiocCheck:::checkWatchedTag(
+            "lori.shepherd@roswellpark.org", "biocfilecache"
+        )
         checkTrue(stillZero())
-        BiocCheck:::checkWatchedTag("lori.shepherd@roswellpark.org", "unwatchedpackage")
-        checkEquals(.error$getNum(), 1)
+        BiocCheck:::checkWatchedTag(
+            "lori.shepherd@roswellpark.org", "unwatchedpackage"
+        )
+        checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
         .zeroCounters()
         ## email is case insensitive
-        BiocCheck:::checkWatchedTag("lori.shePherd@rosWellpark.org", "biocfilecache")
+        BiocCheck:::checkWatchedTag(
+            "lori.shePherd@rosWellpark.org", "biocfilecache"
+        )
         checkTrue(stillZero())
         ## check tag is case insenstive
-        BiocCheck:::checkWatchedTag("lori.shepherd@rosWellpark.org", "bioCfiLecache")
+        BiocCheck:::checkWatchedTag(
+            "lori.shepherd@rosWellpark.org", "bioCfiLecache"
+        )
         checkTrue(stillZero())
 
     }
@@ -1156,25 +1272,25 @@ test_checkForVersionNumberMismatch <- function()
 
     BiocCheck:::checkForVersionNumberMismatch(
         newname,
-        BiocCheck:::.temp_package_dir_tarball(newname))
-    checkEquals(.error$getNum(), 1)
+        BiocCheck:::.tempPackageDirTarball(newname))
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
     .zeroCounters()
 }
 
 test_checkForDirectSlotAccess <- function()
 {
-    pkgpath <- create_test_package('testpkg', list(VignetteBuilder="knitr"))
+    pkgpath <- create_test_package(description = list(VignetteBuilder="knitr"))
     parsedCode <- list(FooBar=BiocCheck:::parseFile(
         system.file("testfiles", "directSlotAccess.Rmd",
         package="BiocCheck"), pkgpath))
     res <- BiocCheck:::checkForDirectSlotAccess(parsedCode, pkgpath)
-    checkEquals(.note$getNum(), 1)
+    checkEqualsNumeric(BiocCheck:::.BiocCheck$getNum("note"), 1)
     .zeroCounters()
     parsedCode <- list(FooBar=BiocCheck:::parseFile(
         system.file("testfiles", "noDirectSlotAccess.Rmd",
         package="BiocCheck"), pkgpath))
     res <- BiocCheck:::checkForDirectSlotAccess(parsedCode, pkgpath)
-    checkEquals(.note$getNum(), 0)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 0)
     .zeroCounters()
 }
 
@@ -1184,22 +1300,22 @@ test_checkRVersionDependency <- function()
     desc <- file.path(tempdir(), "DESCRIPTION")
     cat("Depends: R (>= 1.0.0)", file=desc)
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.note$getNum(), 1)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
     .zeroCounters()
 
     cat("Depends: R", file=desc)
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.note$getNum(), 0)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 0)
     .zeroCounters()
 
     cat("Imports: foobar)", file=desc)
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.warning$getNum(), 0)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 0)
     .zeroCounters()
 
     cat("Depends: R (>= 10000.0.0)", file=desc) # this test might fail some day!
     BiocCheck:::checkRVersionDependency(dirname(desc))
-    checkEquals(.note$getNum(), 0)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 0)
     .zeroCounters()
 
     unlink(desc)
@@ -1222,34 +1338,53 @@ test_packageAlreadyExists <- function()
 {
     .zeroCounters()
     BiocCheck:::checkIsPackageNameAlreadyInUse("GenomicRanges", "CRAN")
-    checkEquals(.error$getNum(),0)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),0)
     BiocCheck:::checkIsPackageNameAlreadyInUse("devtools", "CRAN")
-    checkEquals(.error$getNum(),1)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),1)
     BiocCheck:::checkIsPackageNameAlreadyInUse("GenomicRanges", "BioCsoft")
-    checkEquals(.error$getNum(),2)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),2)
     BiocCheck:::checkIsPackageNameAlreadyInUse("GO.db", "BioCann")
-    checkEquals(.error$getNum(),3)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),3)
     BiocCheck:::checkIsPackageNameAlreadyInUse("TENxBrainData", "BioCexp")
-    checkEquals(.error$getNum(),4)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),4)
     BiocCheck:::checkIsPackageNameAlreadyInUse("annotation", "BioCworkflows")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("GenomicRanges", "BioCexp")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("GenomicRanges", "BioCann")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("GenomicRanges", "BioCworkflows")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("ImNotFound", "BioCexp")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("ImNotFound", "BioCann")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("ImNotFound", "BioCworkflows")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("ImNotFound", "CRAN")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     BiocCheck:::checkIsPackageNameAlreadyInUse("ImNotFound", "BioCsoft")
-    checkEquals(.error$getNum(),5)
+    checkEqualsNumeric(.BiocCheck$getNum("error"),5)
     .zeroCounters()
+}
+
+test_BiocCheckReporters <- function()
+{
+    pkgdir <- system.file("testpackages", package="BiocCheck")
+    hypo_checkdir <- file.path(pkgdir, "hypoPkg.BiocCheck")
+    oldCheckDir <- .BiocCheck$metadata$BiocCheckDir
+    on.exit({
+        .BiocCheck$metadata$BiocCheckDir <- oldCheckDir
+    })
+    .BiocCheck$metadata$BiocCheckDir <- hypo_checkdir
+    .BiocCheck$report(debug = FALSE, isOnBBS = TRUE)
+    checkTrue(
+        !dir.exists(hypo_checkdir)
+    )
+    .BiocCheck$writeNSsuggests(isOnBBS = TRUE)
+    checkTrue(
+        !dir.exists(hypo_checkdir)
+    )
 }
 
 test_checkUsageOfDont <- function()
@@ -1259,7 +1394,7 @@ test_checkUsageOfDont <- function()
     BiocCheck:::installAndLoad(pkgdir)
     notemsg <- capture.output(BiocCheck:::checkUsageOfDont(pkgdir),
                               type = "message")
-    checkEquals(2, .note$getNum())
+    checkEqualsNumeric(2, .BiocCheck$getNum("note"))
     # here we verify the correct number of pages were detected
     checkTrue( any(grepl("67%", notemsg)) )
     .zeroCounters()
@@ -1269,7 +1404,7 @@ test_checkUsageOfDont <- function()
     pkgdir <- system.file("testpackages", "testpkg1", package="BiocCheck")
     BiocCheck:::installAndLoad(pkgdir)
     BiocCheck:::checkUsageOfDont(pkgdir)
-    checkEquals(0, .note$getNum())
+    checkEqualsNumeric(0, .BiocCheck$getNum("note"))
     .zeroCounters()
 }
 

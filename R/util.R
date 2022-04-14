@@ -5,7 +5,8 @@
 
 .msg <- function(..., appendLF=TRUE, indent=0, exdent=2)
 {
-    txt <- sprintf(...)
+    contents <- list(...)
+    txt <- if (length(contents) != 1L) do.call(sprintf, contents) else contents
     message(paste(strwrap(txt, indent=indent, exdent=exdent), collapse="\n"),
         appendLF=appendLF)
 }
@@ -33,28 +34,55 @@
     message(paste(txt, collapse="\n"), appendLF=appendLF)
 }
 
+handleCondition <-
+    function(
+        ..., condition, help_text = character(0L),
+        messages = character(0L), nframe = 2L
+    )
+{
+    msg <- list(paste0(...))
+    if (!tolower(condition) %in% c("warning", "error", "note"))
+        stop("<Internal> Designate input with 'warning', 'error', or 'note'.")
+    cl <- sys.call(sys.parent(n = nframe))[[1L]]
+    ml <- structure(msg, .Names = tail(as.character(cl), 1L))
+    .BiocCheck$add(
+        ml, condition = condition, help_text = help_text, messages = messages
+    )
+    .BiocCheck$log
+}
+
 handleCheck <- function(..., appendLF=TRUE)
 {
-    msg <- paste0(...)
-    .msg("* %s", msg, appendLF=appendLF)
+    msg <- sprintf("* %s", paste0(...))
+    .BiocCheck$setCheck(msg)
+    .msg(msg, appendLF=appendLF)
 }
 
 handleError <- function(...)
 {
-    msg <- .error$add(...)
-    .msg("* ERROR: %s", msg, indent=4, exdent=6)
+    handleCondition(..., condition = "error")
+}
+
+handleErrorFiles <- function(..., help_text = "Found in files:") {
+    handleCondition(..., help_text = help_text, condition = "error")
 }
 
 handleWarning <- function(...)
 {
-    msg <- .warning$add(...)
-    .msg("* WARNING: %s", msg, indent=4, exdent=6)
+    handleCondition(..., condition = "warning")
+}
+
+handleWarningFiles <- function(..., help_text = "Found in files:") {
+    handleCondition(..., help_text = help_text, condition = "warning")
 }
 
 handleNote <- function(...)
 {
-    msg <- .note$add(...)
-    .msg("* NOTE: %s", msg, indent=4, exdent=6)
+    handleCondition(..., condition = "note")
+}
+
+handleNoteFiles <- function(..., help_text = "Found in files:") {
+    handleCondition(..., help_text = help_text, condition = "note")
 }
 
 handleMessage <- function(..., indent=4, exdent=6)
@@ -100,7 +128,7 @@ installAndLoad <- function(pkgpath, install_dir = tempfile())
     if (res) {
         handleError(pkgpath, " must be installable.")
     }
-    pkgname <- .get_package_name(pkgpath)
+    pkgname <- .getPackageName(pkgpath)
     args <- sprintf(
         "--vanilla -e 'library(%s)'", pkgname
     )
@@ -204,7 +232,7 @@ parseFile <- function(infile, pkgdir) {
             })
         ))
     } else if (grepl("\\.Rd$", infile, TRUE)) {
-        rd <- parse_Rd(infile)
+        rd <- tools::parse_Rd(infile)
         outfile <- file.path(parse_dir, "parseFile.tmp")
         code <- capture.output(Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
@@ -285,7 +313,7 @@ getDirFile <- function(fpath) {
 
 .getTokenTextCode <- function(parsedf, token, text) {
     parsedf[
-        parsedf$token == token & parsedf$text %in% text,
+        parsedf$token %in% token & parsedf$text %in% text,
         c("line1", "col1", "token", "text"),
         drop = FALSE
     ]
@@ -293,14 +321,17 @@ getDirFile <- function(fpath) {
 
 .grepTokenTextCode <- function(parsedf, token, text) {
     parsedf[
-        parsedf$token == token & grepl(text, parsedf$text),
+        parsedf$token %in% token & grepl(text, parsedf$text),
         c("line1", "col1", "token", "text"),
         drop = FALSE
     ]
 }
 
 findSymbolsInParsedCode <-
-    function(parsedCodeList, symbolNames, tokenTypes, FUN = .getTokenTextCode, fun = TRUE, ...)
+    function(
+        parsedCodeList, symbolNames, tokenTypes,
+        FUN = .getTokenTextCode, fun = TRUE, ...
+    )
 {
     matches <- structure(vector("list", length(parsedCodeList)),
         .Names = names(parsedCodeList))
@@ -551,7 +582,7 @@ getBadDeps <- function(pkgdir, lib.loc)
     oldquotes <- getOption("useFancyQuotes")
     on.exit(options(useFancyQuotes=oldquotes))
     options(useFancyQuotes=FALSE)
-    args <- sprintf("-q --vanilla --slave -f %s --args %s",
+    args <- sprintf("-q --vanilla --no-echo -f %s --args %s",
         system.file("script", "checkBadDeps.R", package="BiocCheck"),
         paste(dQuote(pkgdir), dQuote(lib.loc)))
     system2(cmd, args, stdout=TRUE, stderr=FALSE,
@@ -735,4 +766,15 @@ doesManPageHaveRunnableExample <- function(rd)
 
     # if code contains only comments the length with be 0
     length(parsed) && !inherits(parsed, "try-error")
+}
+
+selectSome <- function(obj, maxToShow = 5) {
+    stopifnot(is.character(obj))
+    if (!maxToShow %% 2)
+        stop("'maxToShow' should be an odd value")
+    edge <- (maxToShow - 1) / 2
+    if (length(obj) > maxToShow)
+        c(head(obj, edge), "...", tail(obj, edge))
+    else
+        obj
 }
