@@ -2158,14 +2158,14 @@ checkBadFiles <- function(package_dir){
 
     if (length(warns)) {
         handleWarning(
-            "System files in '/inst' should not be git tracked.",
+            "System files in '/inst' should not be Git tracked.",
             messages = warns
         )
     }
 
     if (length(errs)) {
         handleError(
-            "System files found that should not be git tracked.",
+            "System files found that should not be Git tracked.",
             messages = errs
         )
     }

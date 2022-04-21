@@ -1,7 +1,7 @@
 \name{BiocCheckGitClone}
 \alias{BiocCheckGitClone}
 \title{
-Checks specific to a git clone of a package repository
+Checks specific to a Git clone of a package repository
 }
 \description{
 Analyzes an R package for adherence with Bioconductor package guidelines

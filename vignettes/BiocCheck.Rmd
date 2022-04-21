@@ -175,7 +175,7 @@ Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
 * **Checking individual file sizes**
   The current size limit for all individual files is 5 MB. (WARNING)
 
-It may be necessary to remove large files from your git history; see
+It may be necessary to remove large files from your Git history; see
 [Remove Large Data Files and Clean Git Tree][3.1]
 
 [3.1]: http://bioconductor.org/developers/how-to/git/remove-large-data/
@@ -680,7 +680,7 @@ with the `--no-check-bioc-help` option.
 
 
 `BiocCheckGitClone` provides a few additional _Bioconductor_ package checks that
-can only should be run on a open source directory (raw git clone) NOT a
+can only should be run on a open source directory (raw Git clone) NOT a
 tarball. Reporting similarly in three categories as discussed above:
 
 * **ERROR**.
@@ -711,7 +711,7 @@ Actual `BiocCheckGitClone` output is shown below in **bold**.
 
 **Checking valid files**
 
-There are a number of files that should not be git tracked. This check notifies
+There are a number of files that should not be Git tracked. This check notifies
 if any of these files are present (`ERROR`)
 
 The current list of files checked is as follows:
@@ -731,7 +731,7 @@ The current list of files checked is as follows:
 ```
 
 These files may be included in your personal directories but should be added to
-a `.gitignore` file so they are not git tracked.
+a `.gitignore` file so they are not Git tracked.
 
 ## Description Check
 
