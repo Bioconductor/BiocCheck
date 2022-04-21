@@ -7,10 +7,16 @@
         error = "list",
         warning = "list",
         note = "list",
-        metadata = "list"
+        metadata = "list",
+        verbose = "logical"
     ),
     methods = list(
-        add = function(..., condition, help_text, messages, verbose = FALSE) {
+        isVerbose = function() {
+            .self$verbose
+        },
+        add = function(
+            ..., condition, help_text, messages, verbose = .self$verbose
+        ) {
             if (missing(condition))
                 stop(
                     "<Internal> 'condition' should be:",
@@ -76,20 +82,23 @@
                 dir.create(bioccheck_dir, recursive = TRUE)
             bioccheck_dir
         },
-        report = function(debug, isOnBBS) {
-            if (isOnBBS)
-                return()
-            bioccheck_dir <- getBiocCheckDir()
-            outputs <- unlist(Map(
+        composeReport = function(debug) {
+            unlist(Map(
                     f = function(...) {
                         .composeReport(..., debug = debug)
                     },
                     checkName = names(.self$log),
                     lowerElements = lapply(.self$log, .flattenElement)
             ), use.names = FALSE)
-                writeLines(
-                    outputs, con = file.path(bioccheck_dir, "00BiocCheck.log")
-                )
+        },
+        report = function(debug, isOnBBS) {
+            if (isOnBBS)
+                return()
+            bioccheck_dir <- getBiocCheckDir()
+            outputs <- .self$composeReport(debug = debug)
+            writeLines(
+                outputs, con = file.path(bioccheck_dir, "00BiocCheck.log")
+            )
         },
         writeNSsuggests = function(isOnBBS) {
             if (isOnBBS)

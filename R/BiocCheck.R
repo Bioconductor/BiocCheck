@@ -40,6 +40,7 @@ BiocCheck <-
         BiocCheckDir = checkDir,
         platform = .Platform$OS.type, isTarBall = isTar
     )
+    .BiocCheck$verbose <- FALSE
     .BiocCheck$show_meta()
 
     handleMessage("* Installing package...", indent = 0, exdent = 0)

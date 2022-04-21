@@ -32,6 +32,7 @@ BiocCheckGitClone <- function(package=".", ...)
         sourceDir = package_dir,
         platform = .Platform$OS.type, isTarBall = isTar
     )
+    .BiocCheck$verbose <- TRUE
     .BiocCheck$show_meta()
 
     ## checks
