@@ -1625,20 +1625,21 @@ checkForPromptComments <- function(pkgdir)
 {
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+    names(manpages) <- basename(manpages)
 
-    bad <- c()
-    for (manpage in manpages)
-    {
-        lines <- readLines(manpage, warn=FALSE)
-        if (any(grepl("^%% ~", lines)))
-            bad <- append(bad, basename(manpage))
-    }
-    if (length(bad))
-    {
+    bad <- vapply(manpages,
+        function(manpage) {
+            lines <- readLines(manpage, warn=FALSE)
+            any(grepl("^%% ~", lines))
+        },
+        logical(1L)
+    )
+
+    if (any(bad))
         handleNote(
-            "Remove generated comments from man pages ",
-            paste(bad, collapse=", "))
-    }
+            "Auto-generated '%% ~' comments found in Rd man pages.",
+            messages = names(bad)[bad]
+        )
 }
 
 checkForValueSection <- function(pkgdir)
@@ -1713,20 +1714,20 @@ checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
     }
 
     ratio <- (exportingPagesCount - noExamplesCount) / exportingPagesCount
-    if (exportingPagesCount > 0
-        && ratio  < (0.8 / 1.0))
-    {
+
+    if (exportingPagesCount > 0 && ratio  < 0.8)
         handleError(
             "At least 80% of man pages documenting exported objects must ",
-            "have runnable examples. The following pages do not:")
-    } else if (length(badManPages)) {
+            "have runnable examples.",
+            help_text = "The following pages do not:",
+            messages = badManPages
+        )
+    else if (length(badManPages))
         handleNote(
-            "Consider adding runnable examples to the following ",
-            "man pages which document exported objects:")
-    }
-    if (length(badManPages))
-        .msg(paste(badManPages, collapse=", "), indent=6)
-
+            "Consider adding runnable examples to man pages that document",
+            "exported objects.",
+            messages = badManPages
+        )
 
     badManPages # for testing
 }
