@@ -13,6 +13,8 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Flag only hidden '.RData' files as bad files and allow 'myData.RData'
+    (@hpages, #155)
     o Improve internal handling of condition messages with unified mechanism
     o Internal improvements to `BiocCheck` mechanism: export `.BiocCheck` object
     which contains all conditions, log list, and method for writing to JSON
