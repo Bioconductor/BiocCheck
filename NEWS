@@ -13,6 +13,7 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Initialize default verbose value (FALSE) for internal reference object
     o Flag only hidden '.RData' files as bad files and allow 'myData.RData'
     (@hpages, #155)
     o Improve internal handling of condition messages with unified mechanism
