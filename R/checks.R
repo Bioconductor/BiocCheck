@@ -2131,25 +2131,31 @@ checkWatchedTag <- function(email, pkgname){
     }
 }
 
+# taken from
+# https://github.com/wch/r-source/blob/trunk/src/library/tools/R/build.R#L462
+# https://github.com/wch/r-source/blob/trunk/src/library/tools/R/check.R#L4025
+hidden_file_data <- data.frame(
+    file_ext = c(".renviron", ".rprofile", ".rproj", ".rproj.user", ".rhistory",
+        ".rapp.history", ".o", ".sl", ".so", ".dylib", ".a", ".dll", ".def",
+        ".ds_store", "unsrturl.bst", ".log", ".aux", ".backups", ".cproject",
+        ".directory", ".dropbox", ".exrc", ".gdb.history", ".gitattributes",
+        ".gitmodules", ".hgtags", ".project", ".seed", ".settings",
+        ".tm_properties", ".rdata"),
+    hidden_only = c(TRUE, TRUE, FALSE, TRUE, TRUE,
+        TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
+        TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
+        FALSE, FALSE, FALSE, FALSE, TRUE,
+        TRUE, FALSE, TRUE, FALSE, FALSE,
+        FALSE, TRUE)
+)
+
 # Checks for BiocCheckGitClone --------------------------------------------
 
 checkBadFiles <- function(package_dir){
-    # taken from
-    #https://github.com/wch/r-source/blob/trunk/src/library/tools/R/build.R#L462
-    # and
-    #https://github.com/wch/r-source/blob/trunk/src/library/tools/R/check.R#L4025
-    hidden_file_ext = c(".renviron", ".rprofile", ".rproj", ".rproj.user",
-                       ".rhistory", ".rapp.history", ".rdata",
-                       ".o", ".sl", ".so", ".dylib",
-                       ".a", ".dll", ".def",
-                       ".ds_store", "unsrturl.bst",
-                       ".log", ".aux",
-                       ".backups", ".cproject", ".directory",
-                       ".dropbox", ".exrc", ".gdb.history",
-                       ".gitattributes", ".gitmodules",
-                       ".hgtags",
-                       ".project", ".seed", ".settings", ".tm_properties")
-    ext_expr <- paste0("\\", hidden_file_ext, "$", collapse = "|")
+    swith <- ifelse(hidden_file_data[["hidden_only"]], .Platform$file.sep, "")
+    ext_expr <- paste0(
+        swith, "\\", hidden_file_data[["file_ext"]], "$", collapse = "|"
+    )
 
     fls <- dir(package_dir, recursive=TRUE, all.files=TRUE)
     flist <- split(fls, startsWith(fls, "inst"))
