@@ -2,26 +2,24 @@
 % Please edit documentation in R/Context.R
 \name{Context}
 \alias{Context}
-\title{Report context of events to user with a data.frame of events and
-locations}
+\title{Report context of events to user with a data.frame of events and locations}
 \usage{
 Context(pkg = "", file = "", lines = character(), idx = logical())
 }
 \arguments{
 \item{pkg}{character(1) name of the package}
 
-\item{file}{character(1) full path (including package name) of file
-being summarized.}
+\item{file}{character(1) full path (including package name) of file being
+summarized.}
 
 \item{lines}{character() vector of text lines in file}
 
-\item{idx}{logical() same length as \code{lines} indicating lines
-in which event occurs}
+\item{idx}{logical() same length as \code{lines} indicating lines in which
+event occurs}
 }
 \value{
 Context: a data.frame() with columns File, Line, and Context
 }
 \description{
-Report context of events to user with a data.frame of events and
-locations
+Report context of events to user with a data.frame of events and locations
 }

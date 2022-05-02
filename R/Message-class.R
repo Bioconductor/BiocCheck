@@ -1,3 +1,122 @@
+# BiocCheck-class ---------------------------------------------------------
+
+#' @name BiocCheck-class
+#'
+#' @title A class for composing BiocCheck reports.
+#'
+#' @description The `BiocCheck` class provides a framework for reporting checks
+#'   based on Bioconductor guidelines. With several methods for working with
+#'
+#'
+#' @details The metadata includes a number of standard fields to allow easier
+#'   troubleshooting and display of potentially relevant information. Currently,
+#'   the fields included are
+#'
+#' \describe{
+#'   \item{BiocCheckVersion}{ The version of the BiocCheck package }
+#'   \item{BiocVersion}{ The version of Bioconductor }
+#'   \item{Package}{ The name of the package in check }
+#'   \item{PackageVersion}{ The version of the package in check }
+#'   \item{sourceDir}{ The directory of the package source or tarball in check }
+#'   \item{installDir}{ The directory where the package is installed for
+#'   testing, a temporary location by default
+#'   }
+#'   \item{BiocCheckDir}{ The directory where the `<package>.BiocCheck` folder
+#'   is saved. Usually the same folder as the package in check }
+#'   \item{platform}{ The platform/OS where the check is taking place }
+#'   \item{isTarBall}{ Whether the package in check is a source directory or a
+#'   tarball }
+#' }
+#'
+#' @field log `list()` A running list of all conditions raised (i.e., notes,
+#'   warnings, errors)
+#'
+#' @field check `character(1)` The title of the last check used for logging
+#'   purposes.
+#'
+#' @field error, warning, note `list()` Finer extraction of each condition type
+#'
+#' @field metadata `list()` A list of additional information relevant to the
+#'   package and its state. See details.
+#'
+#' @field verbose `logical(1)` Whether to show the full information pertaining
+#'   to the checks. A `FALSE` value will only show the condition messages
+#'   and not any relevant files or additional information. The defaults are
+#'   `FALSE` and `TRUE` for `BiocCheck` and `BiocCheckGitClone`, respectively.
+#'
+#' @return A `BiocCheck` instance
+#'
+#' @md
+#'
+#' @keywords internal
+#' @seealso Message-class
+#'
+#' @importFrom utils tail
+#'
+#' @examples
+#'
+#' bc <- BiocCheck:::.BiocCheck
+#'
+#' bc$verbose
+#'
+NULL
+
+# BiocCheck-methods -------------------------------------------------------
+
+#' @name BiocCheck-methods
+#'
+#' @title A list of methods for the BiocCheck reference class
+#'
+#' @aliases add,BiocCheck-method
+#'
+#' @param ... character() A vector that makes up the BiocCheck check (e.g.,
+#'   'Checking vignettes')
+#'
+#' @param help_text character(1) Additional text prompting a list of files
+#'   (e.g,. "Found in files")
+#'
+#' @param condition character(1) One of the three conditions handled: `error`,
+#'   `warning`, or `note`
+#'
+#' @param messages character() Often a vector of file names where the check
+#'   was triggered.
+#'
+#' @param verbose logical(1) Whether or not to output both the `help_text` and
+#'   `messages` as part of the report
+#'
+#' @param debug logical(1) Whether to append the name of the originating check
+#'   name into for traceability
+#'
+#' @section methods:
+#' \describe{
+#'   \item{add}{ Include a condition to the `BiocCheck` report }
+#'   \item{getLastCheck}{ Obtain the name of the last check run }
+#'   \item{setCheck}{ Create a new element in the internal list for a check }
+#'   \item{get}{ Extract the list of conditions raised by `BiocCheck` }
+#'   \item{getNum}{ Tally the number of condition provided by the input }
+#'   \item{zero}{ Reset the internal log of the condition provided }
+#'   \item{getBiocCheckDir}{ Report and create the `<package>.BiocCheck`
+#'     directory as obtained from the metadata }
+#'   \item{composeReport}{ Simplify the list structure from the `log` and
+#'     provide a character vector of conditions raised }
+#'   \item{report}{ Write the `00BiocCheck.log` report into the `BiocCheck`
+#'     folder }
+#'   \item{writeNSsuggests}{ Write the namespace suggestions (`00NAMESPACE.log`)
+#'     to the `BiocCheck` folder }
+#'   \item{toJSON}{ Write a JSON file to the location indicated with the
+#'   conditions raised }
+#'   \item{fromJSON}{ Read a JSON file from the location indicated with the
+#'   output of previous conditions raised in the check }
+#'   \item{show}{ Display the information in the class. Currently empty. }
+#'   \item{show_meta}{ Display the metadata information stored in the `metadata`
+#'   field }
+#' }
+#'
+#' @return
+#'
+NULL
+
+#' @exportClass BiocCheck
 .BiocCheck <- setRefClass("BiocCheck",
     fields = list(
         log = "list",
@@ -82,7 +201,7 @@
                 dir.create(bioccheck_dir, recursive = TRUE)
             bioccheck_dir
         },
-        composeReport = function(debug) {
+        composeReport = function(debug = FALSE) {
             unlist(Map(
                     f = function(...) {
                         .composeReport(..., debug = debug)
@@ -124,7 +243,7 @@
         },
         toJSON = function(file) {
             out <- Filter(length, .self$log)
-            jlog <- toJSON(out, auto_unbox = FALSE)
+            jlog <- jsonlite::toJSON(out, auto_unbox = FALSE)
             if (!requireNamespace("jsonlite", quietly = TRUE))
                 stop("Install 'jsonlite' to use the write method.")
             jsonlite::write_json(jlog, file)
@@ -150,6 +269,42 @@
         }
     )
 )
+
+# Message-class -----------------------------------------------------------
+
+#' @name Message-class
+#'
+#' @title A lower level Message helper class for BiocCheck
+#'
+#' @field msg `list()` A list of character messages usually grown with `append`
+#'   with conditions raised by a check
+#'
+#' @field condition character(1) One of the three conditions handled: `error`,
+#'   `warning`, or `note`
+#'
+#' @seealso BiocCheck-class
+#'
+NULL
+
+#' @name Message-methods
+#'
+#' @title A list of methods for the Message reference class
+#'
+#' @aliases setMessage,Message-method
+#' @aliases setCondition,Message-method
+#' @aliases getCondition,Message-method
+#'
+#' @param condition character(1) One of the three conditions handled: `error`,
+#'   `warning`, or `note`
+#'
+#' @param verbose logical(1) Whether to output the full text in the check or
+#'   only the check name itself in the report
+#'
+#' @param \dots `list()` A nested list with the check name as the top level
+#'   layer. Second level lists include any `help_text` and `messages` that are
+#'   part of the check.
+#'
+NULL
 
 .MessageCondition <- setRefClass("Message",
     fields = list(
@@ -208,6 +363,7 @@
 
 ## singletons. Exported but 'hidden' from ls() by the '.'
 
+#' @export
 .BiocCheck <- .BiocCheck()
 .messages <- .MessageCondition()
 

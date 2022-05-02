@@ -1,3 +1,11 @@
+#' @importFrom tools file_path_sans_ext file_ext parse_Rd Rd2ex
+#' @importFrom utils capture.output data getParseData head packageDescription
+#'   packageVersion globalVariables readCitationFile
+#' @importFrom stringdist stringdistmatrix
+#' @importFrom knitr purl
+#' @importFrom BiocManager available install repositories version
+#' @import biocViews httr methods
+
 # Checks for BiocCheck ----------------------------------------------------
 
 checkForVersionNumberMismatch <- function(package, package_dir)
@@ -692,7 +700,6 @@ checkVigFiles <- function(vigdir, vigdircontents){
         }
     }
 }
-
 
 checkVigBuilder <- function(builder, vigdircontents)
 {
@@ -1648,7 +1655,7 @@ checkForValueSection <- function(pkgdir)
     manpages <- dir(file.path(pkgdir, "man"),
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
     ok <- vapply(manpages, function(manpage) {
-        rd <- parse_Rd(manpage)
+        rd <- tools::parse_Rd(manpage)
         tags <- tools:::RdTags(rd)
 
         type <- docType(rd)
@@ -1693,7 +1700,7 @@ checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
 
     for (manpage in manpages)
     {
-        rd <- parse_Rd(manpage)
+        rd <- tools::parse_Rd(manpage)
         name <-
             unlist(rd[unlist(lapply(rd, function(x)
                 attr(x, "Rd_tag") == "\\name"))][[1]][1])
@@ -1742,7 +1749,7 @@ checkUsageOfDont <- function(pkgdir)
     for (dx in seq_along(manpages))
     {
         manpage <- manpages[dx]
-        rd <- parse_Rd(manpage)
+        rd <- tools::parse_Rd(manpage)
         example <- unlist(lapply(rd,
             function(x) attr(x, "Rd_tag") == "\\examples"))
         hasExamples <- any(example)

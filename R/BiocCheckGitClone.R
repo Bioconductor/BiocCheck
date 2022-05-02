@@ -1,3 +1,50 @@
+#' Checks specific to a Git clone of a package repository
+#'
+#' Analyzes an R package for adherence with Bioconductor package guidelines and
+#' best practices. The check outputs are categorized into ERROR, WARNING, and
+#' NOTE. This function is typically used in the Bioconductor Build System (BBS)
+#' and not intended for general use.
+#'
+#' `BiocCheckGitClone()` reviews R packages for adherence with
+#' Bioconductor package guidelines and best practices. See
+#' \url{https://contributions.bioconductor.org} for the latest guidance for
+#' writing Bioconductor software. This function should only be run on a source
+#' directory and not on a tarball.
+#'
+#' `BiocCheckGitClone` is called within R with, as \preformatted{
+#' BiocCheckGitClone(<package>) } where `package` is the source directory
+#' containing the `R` package.
+#'
+#' @param package A directory containing an R source package. Not a package tar
+#' ball.
+#'
+#' @param \dots Currently, only `quit-with-status` is available.  See
+#' `BiocCheck`
+#'
+#'
+#' @return Mainly, the side effect of the information displayed. When run
+#'   interactively, `BiocCheckGitClone()` returns a `BiocCheck` reference class
+#'   with three main list elements:
+#'
+#' \item{error}{Items to address before the package can be accepted}
+#'
+#' \item{warning}{Strongly suggested items that may require attention}
+#'
+#' \item{note}{Items to consider, though not required, before acceptance}
+#'
+#' @author Lori Shepherd
+#'
+#' @references \url{https://contributions.bioconductor.org}
+#' @seealso \link{BiocCheck-class}
+#'
+#' @md
+#'
+#' @examples
+#'
+#' packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+#' BiocCheckGitClone(packageDir, `quit-with-status`=FALSE)
+#'
+#' @export BiocCheckGitClone
 BiocCheckGitClone <- function(package=".", ...)
 {
     .zeroCounters()

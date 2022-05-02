@@ -1,3 +1,9 @@
+#' @importFrom graph nodes acc
+#' @importFrom tools Rd2ex
+#' @importFrom utils Stangle
+#' @importFrom codetools walkCode findGlobals
+
+
 .printf <- function(...) cat(noquote(sprintf(...)), "\n")
 
 .debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
@@ -234,7 +240,7 @@ parseFile <- function(infile, pkgdir) {
     } else if (grepl("\\.Rd$", infile, TRUE)) {
         rd <- tools::parse_Rd(infile)
         outfile <- file.path(parse_dir, "parseFile.tmp")
-        code <- capture.output(Rd2ex(rd))
+        code <- capture.output(tools::Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
     } else if (grepl("\\.R$", infile, TRUE)) {
         outfile <- file.path(parse_dir, "parseFile.tmp")
@@ -756,7 +762,7 @@ doesManPageHaveRunnableExample <- function(rd)
 
     ex <- character()
     tc <- textConnection("ex", "w", local=TRUE)
-    Rd2ex(rd, commentDontrun = TRUE, commentDonttest = TRUE, out = tc)
+    tools::Rd2ex(rd, commentDontrun = TRUE, commentDonttest = TRUE, out = tc)
     close(tc)
 
     if(!length(ex))

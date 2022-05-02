@@ -27,3 +27,4 @@ biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck
 BugReports: https://github.com/Bioconductor/BiocCheck/issues
 RoxygenNote: 7.1.2
+Encoding: UTF-8
