@@ -158,7 +158,7 @@ checkVersionNumber <- function(pkgdir)
     {
         handleError(
             "Invalid package Version, see ",
-            "http://www.bioconductor.org/developers/how-to/version-numbering/"
+            "https://contributions.bioconductor.org/versionnum.html"
         )
         return()
     }
