@@ -49,7 +49,7 @@
 #' @md
 #'
 #' @keywords internal
-#' @seealso Message-class
+#' @seealso \link{Message-class}
 #'
 #' @importFrom utils tail
 #'
@@ -112,7 +112,7 @@ NULL
 #'   field }
 #' }
 #'
-#' @return
+#' @md
 #'
 NULL
 
@@ -282,7 +282,11 @@ NULL
 #' @field condition character(1) One of the three conditions handled: `error`,
 #'   `warning`, or `note`
 #'
-#' @seealso BiocCheck-class
+#' @seealso \link{BiocCheck-class}
+#'
+#' @return A `Message` class instance
+#'
+#' @md
 #'
 NULL
 
@@ -305,6 +309,8 @@ NULL
 #' @param \dots `list()` A nested list with the check name as the top level
 #'   layer. Second level lists include any `help_text` and `messages` that are
 #'   part of the check.
+#'
+#' @md
 #'
 NULL
 

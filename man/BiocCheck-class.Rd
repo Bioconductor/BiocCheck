@@ -59,6 +59,6 @@ bc$verbose
 
 }
 \seealso{
-Message-class
+\link{Message-class}
 }
 \keyword{internal}

@@ -106,7 +106,7 @@ BiocCheck(packageDir, `quit-with-status`=FALSE)
 \url{https://contributions.bioconductor.org}
 }
 \seealso{
-\link{BiocCheck-class}
+\link{BiocCheck-class}, \link{Message-class}
 }
 \author{
 Dan Tenenbaum, Lori Shepherd, and Marcel Ramos

@@ -89,7 +89,7 @@
 #' @md
 #'
 #' @references \url{https://contributions.bioconductor.org}
-#' @seealso \link{BiocCheck-class}
+#' @seealso \link{BiocCheck-class}, \link{Message-class}
 #'
 #' @importFrom utils untar
 #'
