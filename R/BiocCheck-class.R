@@ -10,6 +10,11 @@
 #'   of the metadata. These methods also record the output of the `BiocCheck()`
 #'   report in both plain text and JSON formats.
 #'
+#'   **Note** that currently, multiple `BiocCheck` runs will interfere with
+#'   each other given that they are implemented via a reference class semantic.
+#'   When running multiple checks in the same session, you can separate these
+#'   instances by running them in separate processes (e.g., via `BiocParallel`).
+#'
 #' @details The metadata includes a number of standard fields to allow easier
 #'   troubleshooting and display of potentially relevant information. Currently,
 #'   the fields included are
