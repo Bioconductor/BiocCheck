@@ -5,8 +5,10 @@
 #' @title A class for composing BiocCheck reports.
 #'
 #' @description The `BiocCheck` class provides a framework for reporting checks
-#'   based on Bioconductor guidelines. With several methods for working with
-#'
+#'   based on Bioconductor guidelines. The class has several methods for working
+#'   with the provided checks that handle and display messages and the display
+#'   of the metadata. These methods also record the output of the `BiocCheck()`
+#'   report in both plain text and JSON formats.
 #'
 #' @details The metadata includes a number of standard fields to allow easier
 #'   troubleshooting and display of potentially relevant information. Currently,
