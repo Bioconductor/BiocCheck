@@ -286,6 +286,8 @@ NULL
 #'
 NULL
 
+# Message-methods ---------------------------------------------------------
+
 #' @name Message-methods
 #'
 #' @title A list of methods for the Message reference class
