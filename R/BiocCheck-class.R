@@ -26,13 +26,13 @@
 #'   \item{PackageVersion}{ The version of the package in check }
 #'   \item{sourceDir}{ The directory of the package source or tarball in check }
 #'   \item{installDir}{ The directory where the package is installed for
-#'   testing, a temporary location by default
+#'     testing, a temporary location by default
 #'   }
 #'   \item{BiocCheckDir}{ The directory where the `<package>.BiocCheck` folder
-#'   is saved. Usually the same folder as the package in check }
+#'     is saved. Usually the same folder as the package in check }
 #'   \item{platform}{ The platform/OS where the check is taking place }
 #'   \item{isTarBall}{ Whether the package in check is a source directory or a
-#'   tarball }
+#'     tarball }
 #' }
 #'
 #' @field log `list()` A running list of all conditions raised (i.e., notes,
@@ -76,11 +76,13 @@ NULL
 #'
 #' @aliases add,BiocCheck-method
 #'
-#' @param ... character() A vector that makes up the BiocCheck check (e.g.,
-#'   'Checking vignettes')
+#' @param ... character() A vector that makes up the `BiocCheck` exception
+#'   message (e.g., 'Vignette must be built by R CMD build'). The character
+#'   vector is handled with `paste0` and made into a list and appended with
+#'   `help_text` and `messages`.
 #'
 #' @param help_text character(1) Additional text prompting a list of files
-#'   (e.g,. "Found in files")
+#'   (e.g,. "Found in files:")
 #'
 #' @param condition character(1) One of the three conditions handled: `error`,
 #'   `warning`, or `note`
@@ -93,6 +95,18 @@ NULL
 #'
 #' @param debug logical(1) Whether to append the name of the originating check
 #'   name into for traceability
+#'
+#' @param checkName character(1) The title of the current group of checks. It
+#'   can be set with `handleCheck`, e.g., `handleCheck("Checking for version
+#'   number mismatch...")`. Internally, it is saved with `setCheck` and obtained
+#'   with `getLastCheck`.
+#'
+#' @param isOnBBS logical(1) Indicates whether the checks are being run on the
+#'   Bioconductor Build System (BBS). This is helpful for avoiding the creation
+#'   of folders in the BBS.
+#'
+#' @param file character(1) A path to a JSON file for writing or reading as
+#'   created by `toJSON` and `fromJSON` `BiocCheck` methods.
 #'
 #' @section methods:
 #' \describe{
@@ -111,12 +125,12 @@ NULL
 #'   \item{writeNSsuggests}{ Write the namespace suggestions (`00NAMESPACE.log`)
 #'     to the `BiocCheck` folder }
 #'   \item{toJSON}{ Write a JSON file to the location indicated with the
-#'   conditions raised }
+#'     conditions raised }
 #'   \item{fromJSON}{ Read a JSON file from the location indicated with the
-#'   output of previous conditions raised in the check }
+#'     output of previous conditions raised in the check }
 #'   \item{show}{ Display the information in the class. Currently empty. }
 #'   \item{show_meta}{ Display the metadata information stored in the `metadata`
-#'   field }
+#'     field }
 #' }
 #'
 #' @md

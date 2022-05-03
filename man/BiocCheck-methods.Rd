@@ -5,11 +5,13 @@
 \alias{add,BiocCheck-method}
 \title{A list of methods for the BiocCheck reference class}
 \arguments{
-\item{...}{character() A vector that makes up the BiocCheck check (e.g.,
-'Checking vignettes')}
+\item{...}{character() A vector that makes up the \code{BiocCheck} exception
+message (e.g., 'Vignette must be built by R CMD build'). The character
+vector is handled with \code{paste0} and made into a list and appended with
+\code{help_text} and \code{messages}.}
 
 \item{help_text}{character(1) Additional text prompting a list of files
-(e.g,. "Found in files")}
+(e.g,. "Found in files:")}
 
 \item{condition}{character(1) One of the three conditions handled: \code{error},
 \code{warning}, or \code{note}}
@@ -22,6 +24,17 @@ was triggered.}
 
 \item{debug}{logical(1) Whether to append the name of the originating check
 name into for traceability}
+
+\item{checkName}{character(1) The title of the current group of checks. It
+can be set with \code{handleCheck}, e.g., \code{handleCheck("Checking for version number mismatch...")}. Internally, it is saved with \code{setCheck} and obtained
+with \code{getLastCheck}.}
+
+\item{isOnBBS}{logical(1) Indicates whether the checks are being run on the
+Bioconductor Build System (BBS). This is helpful for avoiding the creation
+of folders in the BBS.}
+
+\item{file}{character(1) A path to a JSON file for writing or reading as
+created by \code{toJSON} and \code{fromJSON} \code{BiocCheck} methods.}
 }
 \description{
 A list of methods for the BiocCheck reference class
