@@ -102,6 +102,22 @@
 BiocCheck <-
     function(package=".", checkDir = dirname(package), debug = FALSE, ...)
 {
+    if (interactive())
+        callr::r(
+            function(...) {BiocCheck:::BiocCheckRun(...)},
+            args = list(
+                package = package, checkDir = checkDir, debug = debug, ...
+            ),
+            cmdargs = c("--no-echo", "--no-save", "--no-restore"),
+            show = TRUE
+        )
+    else
+        BiocCheckRun(package = package, checkDir = checkDir, debug = debug, ...)
+}
+
+BiocCheckRun <-
+    function(package=".", checkDir = dirname(package), debug = FALSE, ...)
+{
     .zeroCounters()
     package <- normalizePath(package)
     if (!file.exists(package))
