@@ -243,10 +243,7 @@ parseFile <- function(infile, pkgdir) {
         code <- capture.output(tools::Rd2ex(rd))
         cat(code, file=outfile, sep="\n")
     } else if (grepl("\\.R$", infile, TRUE)) {
-        outfile <- file.path(parse_dir, "parseFile.tmp")
-        # remove empty lines before parsing
-        txt <- Filter(nzchar, readLines(infile, warn = FALSE))
-        writeLines(txt, outfile)
+        outfile <- infile
     }
     p <- parse(outfile, keep.source=TRUE)
     getParseData(p)
