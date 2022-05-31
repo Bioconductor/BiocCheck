@@ -395,7 +395,8 @@ checkBiocViews <- function(pkgdir)
             than 3 sentences. Please consider expanding this field, and
             structure it as a full paragraph"
 
-        if (nchar(desc_field) < 50 || desc_words < 20) # values chosen sensibly in a data-driven manner
+        # values chosen sensibly in a data-driven manner
+        if (nchar(desc_field) < 50 || desc_words < 20)
             handleWarning(
                 "Description field in the DESCRIPTION file is too concise"
             )
