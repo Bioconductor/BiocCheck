@@ -388,7 +388,9 @@ checkBiocViews <- function(pkgdir)
     if ("Description" %in% colnames(dcf)) {
         desc_field <- dcf[, "Description"]
         desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
-        desc_sentences <- length(gregexpr("[[:alnum:] ][.!?]", desc_field)[[1]])
+        desc_sentences <- length(
+            strsplit(desc_field, split = "[.!?][[:space:]]+")[[1L]]
+        )
         msg <- "The Description field in the DESCRIPTION is made up by less
             than 3 sentences. Please consider expanding this field, and
             structure it as a full paragraph"
