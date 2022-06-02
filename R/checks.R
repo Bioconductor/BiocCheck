@@ -1862,7 +1862,7 @@ checkUnitTests <- function(pkgdir)
         handleError(
             "Add a .R or .Rin file in tests/ directory or unit tests will ",
             "not be run by R CMD check. See ",
-            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/")
+            "https://contributions.bioconductor.org/tests.html")
         return()
     }
     if (!(dir.exists(tests_dir) && cond))
@@ -1871,7 +1871,7 @@ checkUnitTests <- function(pkgdir)
         msg <- paste0(
             "Consider adding unit tests. We strongly encourage them. See",
             "\n  ",
-            "http://bioconductor.org/developers/how-to/unitTesting-guidelines/."
+            "https://contributions.bioconductor.org/tests.html"
         )
         handleNote(msg)
     }
@@ -1993,7 +1993,7 @@ checkFormatting <- function(pkgdir, nlines=6)
     if (!ok)
     {
         handleMessage(
-            "See http://bioconductor.org/developers/how-to/coding-style/")
+            "See https://contributions.bioconductor.org/r-code.html")
         handleMessage(
             "See styler package: https://cran.r-project.org/package=styler ",
             "as described in the BiocCheck vignette.")
