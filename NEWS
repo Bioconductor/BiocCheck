@@ -3,7 +3,13 @@ CHANGES IN VERSION 1.34
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
-    o Updates to internal documentation of the `BiocCheck-class`
+    o Update internal documentation of the `BiocCheck-class`
+    o Fix bug where line numbers were off due to removal of empty lines at
+    parsing (@lshep, #159)
+    o Slightly improve sentence counter for Description field check
+    (@lshep, #160)
+    o Update documentation links to point to contributions.bioconductor.org
+    (@LiNk-NY, #157)
 
 CHANGES IN VERSION 1.32
 -----------------------
