@@ -1851,10 +1851,6 @@ checkNEWS <- function(pkgdir)
 ## OOPS - R CMD check is looking at the INSTALLED directory
 checkUnitTests <- function(pkgdir)
 {
-    ## begin code stolen from tools:::.check_packages
-    dir.exists <- function(x) !is.na(isdir <- file.info(x)$isdir) &
-        isdir
-    ## ...
     tests_dir <- file.path(pkgdir, "tests")
     cond <- length(dir(tests_dir, pattern = "\\.(R|Rin)$"))
     if (dir.exists(tests_dir) && (!cond))
