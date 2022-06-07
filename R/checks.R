@@ -1606,14 +1606,27 @@ checkFunctionLengths <- function(parsedCode, pkgname)
                     row['functionName'], row['filename'], row['length']
                 )
             })
+            statusmsg <- paste(
+                "There are", nrow(df), "functions greater than 50 lines."
+            )
+            statusmsg <- .singularize(df, statusmsg)
             handleNote(
-                "Recommended function length <= 50 lines.",
-                "There are ", nrow(h), " functions > 50 lines.",
+                "The recommended function length is 50 lines or less. ",
+                statusmsg,
                 help_text = "The longest 5 functions are:" ,
                 messages = fn_msg
             )
         }
     }
+}
+
+.singularize <- function(obj, message) {
+    thelen <- nrow(obj)
+    if (identical(thelen, 1L)) {
+        message <- gsub("are", "is", message)
+        message <- gsub("functions", "function", message)    
+    }
+    message
 }
 
 checkManDocumentation <- function(package_dir, package_name, libloc)
@@ -1784,8 +1797,8 @@ checkUsageOfDont <- function(pkgdir)
     if (any(hasBad)){
         perVl <- as.character(round(length(which(hasBad))/length(hasBad)*100))
         handleNoteFiles(
-            "Usage of dontrun{} / donttest{} found in man page examples.",
-            paste0(perVl, "% of man pages use one of these cases."),
+            "Usage of dontrun{} / donttest{} tags found in man page examples. ",
+            paste0(perVl, "% of man pages use at least one of these tags."),
             messages = basename(manpages)[hasBad]
         )
     }
@@ -1811,7 +1824,7 @@ checkNEWS <- function(pkgdir)
     }
     if (length(newsFnd) > 1L){
         handleNote(
-            "More than 1  NEWS file found.",
+            "More than 1  NEWS file found. ",
             "See ?news for recognition ordering.",
             help_text = "Please remove one of the following: ",
             messages = gsub(pattern=pkgdir, replacement="", newsFnd)
