@@ -1624,7 +1624,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     thelen <- nrow(obj)
     if (identical(thelen, 1L)) {
         message <- gsub("are", "is", message)
-        message <- gsub("functions", "function", message)    
+        message <- gsub("functions", "function", message)
     }
     message
 }
@@ -1916,6 +1916,11 @@ checkSkipOnBioc <- function(pkgdir)
     )
 }
 
+.rmYAMLfm <- function(lines) {
+    delim2 <- max(grep("^---\\s*$", lines))
+    lines[-seq_len(delim2)]
+}
+
 checkFormatting <- function(pkgdir, nlines=6)
 {
     pkgname <- basename(pkgdir)
@@ -1949,6 +1954,9 @@ checkFormatting <- function(pkgdir, nlines=6)
             n <- nchar(lines, allowNA=TRUE)
             idx <- !is.na(n) & (n > 80L)
             long <- rbind(long, Context(pkgname, file, lines, idx))
+
+            if (identical(tolower(tools::file_ext(file)), "rmd"))
+                lines <- .rmYAMLfm(lines)
 
             idx <- grepl("\t", lines)
             tab <- rbind(tab, Context(pkgname, file, lines, idx))
