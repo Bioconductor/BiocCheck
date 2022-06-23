@@ -1035,14 +1035,14 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
     "update.packages", "install")
 
 findSymbolsInRFiles <-
-    function(pkgdir, Symbols, tokenType, fun = TRUE)
+    function(pkgdir, Symbols, tokenType, fun = TRUE, ...)
 {
     rfiles <- getRSources(pkgdir)
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
     msg_res <- findSymbolsInParsedCode(
-        parsedCodes, Symbols, tokenType, fun = fun
+        parsedCodes, Symbols, tokenType, fun = fun, ...
     )
     unlist(msg_res)
 }
@@ -1164,7 +1164,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 
     # T/F
-    msg_tf <- findSymbolsInRFiles(pkgdir, c("T", "F"), "SYMBOL")
+    msg_tf <- findSymbolsInRFiles(pkgdir, c("T", "F"), "SYMBOL", lookback = "$")
     if (length(msg_tf)) {
         handleWarning(
             " Avoid T/F variables; If logical, use TRUE/FALSE ",
