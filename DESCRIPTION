@@ -26,5 +26,5 @@ Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck
 BugReports: https://github.com/Bioconductor/BiocCheck/issues
-RoxygenNote: 7.2.0
+RoxygenNote: 7.2.1
 Encoding: UTF-8

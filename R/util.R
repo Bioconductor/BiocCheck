@@ -308,6 +308,8 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
 }
 
 getDirFile <- function(fpath) {
+    if (!identical(length(fpath), 1L))
+        stop("<internal> 'fpath' input must be a scalar character")
     if (nzchar(fpath) && !is.na(fpath))
         fpath <- file.path(basename(dirname(fpath)), basename(fpath))
 

@@ -1696,9 +1696,10 @@ checkForValueSection <- function(pkgdir)
         TRUE
     }, logical(1))
     if (!all(ok)) {
+        not_oks <- vapply(manpages[!ok], getDirFile, character(1L))
         handleWarning(
             "Add non-empty \\value sections to the following man pages: ",
-            paste(getDirFile(manpages[!ok]), collapse=", "))
+            messages = paste(not_oks, collapse=", "))
     }
 }
 

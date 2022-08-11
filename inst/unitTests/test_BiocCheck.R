@@ -1408,7 +1408,7 @@ test_checkUsageOfDont <- function()
     .zeroCounters()
 }
 
-test_IsOrcidIdValid = function()
+test_IsOrcidIdValid <- function()
 {
     orcid <- c(
         "0000-0001-6197-3471",
@@ -1420,4 +1420,21 @@ test_IsOrcidIdValid = function()
     )
     valid <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)
     checkIdentical(valid, BiocCheck:::.checkORCID(orcid))
+}
+
+test_getDirFile <- function() {
+    getDirFile <- BiocCheck:::getDirFile
+    vigfile <- system.file(
+        "testpackages", "testpkg0", "vignettes", "evalfalse.Rmd",
+        package="BiocCheck"
+    )
+    checkIdentical("vignettes/evalfalse.Rmd", getDirFile(vigfile))
+
+    vigfiles <- list.files(
+         system.file(
+        "testpackages", "testpkg0", "vignettes", package="BiocCheck"
+        ),
+        full.names = TRUE
+    )
+    checkException(getDirFile(vigfiles))
 }
