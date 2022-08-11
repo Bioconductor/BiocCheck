@@ -1431,8 +1431,8 @@ test_getDirFile <- function() {
     checkIdentical("vignettes/evalfalse.Rmd", getDirFile(vigfile))
 
     vigfiles <- list.files(
-         system.file(
-        "testpackages", "testpkg0", "vignettes", package="BiocCheck"
+        system.file(
+            "testpackages", "testpkg0", "vignettes", package="BiocCheck"
         ),
         full.names = TRUE
     )
