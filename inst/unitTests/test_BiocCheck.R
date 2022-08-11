@@ -1421,3 +1421,11 @@ test_IsOrcidIdValid = function()
     valid <- c(TRUE, TRUE, FALSE, FALSE, FALSE, FALSE)
     checkIdentical(valid, BiocCheck:::.checkORCID(orcid))
 }
+
+
+test_getDirFile <- function()
+{
+    input <- c(NA, "z/a/b.c", "")
+    valid <- c(NA, "a/b.c", "")
+    checkIdentical(valid, BiocCheck:::getDirFile(input))
+}
