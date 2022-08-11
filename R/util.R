@@ -308,10 +308,11 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
 }
 
 getDirFile <- function(fpath) {
-    if (nzchar(fpath) && !is.na(fpath))
-        fpath <- file.path(basename(dirname(fpath)), basename(fpath))
-
-    fpath
+    ifelse(
+        nzchar(fpath) & !is.na(fpath),
+        file.path(basename(dirname(fpath)), basename(fpath)),
+        fpath
+    )
 }
 
 .getTokenTextCode <- function(parsedf, token, text, lookback = character(0)) {
