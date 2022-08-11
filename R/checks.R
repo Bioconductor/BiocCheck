@@ -1035,14 +1035,14 @@ checkIsVignetteBuilt <- function(package_dir, build_output_file)
     "update.packages", "install")
 
 findSymbolsInRFiles <-
-    function(pkgdir, Symbols, tokenType, fun = TRUE)
+    function(pkgdir, Symbols, tokenType, fun = TRUE, ...)
 {
     rfiles <- getRSources(pkgdir)
     parsedCodes <- lapply(
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
     msg_res <- findSymbolsInParsedCode(
-        parsedCodes, Symbols, tokenType, fun = fun
+        parsedCodes, Symbols, tokenType, fun = fun, ...
     )
     unlist(msg_res)
 }
@@ -1164,7 +1164,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 
     # T/F
-    msg_tf <- findSymbolsInRFiles(pkgdir, c("T", "F"), "SYMBOL")
+    msg_tf <- findSymbolsInRFiles(pkgdir, c("T", "F"), "SYMBOL", lookback = "$")
     if (length(msg_tf)) {
         handleWarning(
             " Avoid T/F variables; If logical, use TRUE/FALSE ",
@@ -1624,7 +1624,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     thelen <- nrow(obj)
     if (identical(thelen, 1L)) {
         message <- gsub("are", "is", message)
-        message <- gsub("functions", "function", message)    
+        message <- gsub("functions", "function", message)
     }
     message
 }
@@ -1917,6 +1917,15 @@ checkSkipOnBioc <- function(pkgdir)
     )
 }
 
+.rmYAMLfm <- function(lines) {
+    fm_idx <- grep("^---\\s*$", lines)
+    if (length(fm_idx) && !identical(length(fm_idx), 2L))
+        stop("More than 2 YAML front matter delimiters, i.e., '---' found")
+    if (length(fm_idx))
+        lines <- lines[-seq(fm_idx[1], fm_idx[2])]
+    lines
+}
+
 checkFormatting <- function(pkgdir, nlines=6)
 {
     pkgname <- basename(pkgdir)
@@ -1950,6 +1959,9 @@ checkFormatting <- function(pkgdir, nlines=6)
             n <- nchar(lines, allowNA=TRUE)
             idx <- !is.na(n) & (n > 80L)
             long <- rbind(long, Context(pkgname, file, lines, idx))
+
+            if (identical(tolower(tools::file_ext(file)), "rmd"))
+                lines <- .rmYAMLfm(lines)
 
             idx <- grepl("\t", lines)
             tab <- rbind(tab, Context(pkgname, file, lines, idx))

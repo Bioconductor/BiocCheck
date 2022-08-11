@@ -5,6 +5,10 @@ BUG FIXES AND MINOR IMPROVEMENTS
 
     o Fix bug where inputs to `getDirFile` were vectors in
     `checkForValueSection` (@zeehio, #163)
+    o Allow lookback for matching T/F and exclude list elements, e.g., `list$F`
+    (@lshep, #161)
+    o Fix indentation count by excluding yaml front matter from vignettes
+    (@harpomaxx, #100)
     o Update internal documentation of the `BiocCheck-class`
     o Fix bug where line numbers were off due to removal of empty lines at
     parsing (@lshep, #159)
