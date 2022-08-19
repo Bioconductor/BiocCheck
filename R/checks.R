@@ -880,20 +880,31 @@ checkVigChunkEval <- function(vigdircontents)
         chunks <- chunks + length(chunklines) + length(nonEvalChunk)
 
         efs <- efs +
-            length(grep("eval\\s?=\\s?FALSE", chunklines))
+            length(grep("eval\\s*=\\s*F(ALSE)?", chunklines))
 
         noneval <- noneval + length(nonEvalChunk)
     }
 
-    percent <- ifelse(chunks == 0 && (efs+noneval) == 0, 0, ((efs+noneval)/chunks) * (100/1))
+    totnon <- efs + noneval
+    percent <- ifelse(
+        chunks == 0 && totnon == 0,
+        0L,
+        as.integer((totnon * 100 / chunks))
+    )
 
     if (percent >= 50){
         handleWarning("Evaluate more vignette chunks.")
-        handleMessage(sprintf("# of code chunks: %s", chunks), indent=8)
-        handleMessage(sprintf("# of eval=FALSE: %s", efs), indent=8)
-        handleMessage(sprintf("# of nonexecutable code chunks by syntax: %s", noneval), indent=8)
-        handleMessage(sprintf("# total unevaluated %s (%i%%)",(efs+noneval), as.integer(percent)), indent=8)
-
+        msg <- sprintf(
+            "%s code chunks / %s total = %i%% percent unevaluated",
+            totnon,
+            chunks,
+            percent
+        )
+        handleMessage(msg, indent = 8)
+        handleMessage(
+            sprintf("%s non-exec code chunks (e.g., '``` r')", noneval),
+            indent=8
+        )
     }
 }
 
