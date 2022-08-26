@@ -60,10 +60,12 @@ checkError <- function(msg)
     .zeroCounters()
 }
 
-checkCounter <- function(msg, type = "Error") {
+checkCounter <- function(msg, type = "error") {
     if (missing(msg))
         stop("<internal> Provide message input")
-    res <- as.integer(c("Note", "Warning", "Error") %in% type)
+    conds <- c("note", "warning", "error")
+    res <- as.integer(conds %in% type)
+    names(res) <- conds
     checkTrue(
         all(
             mapply(
@@ -117,19 +119,16 @@ test_vignettes0 <- function()
     # empty vignette dir ERROR
     dir.create(vigdir, recursive=TRUE)
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkError("No vignette sources in vignettes/ directory.")
+    checkCounter("No vignette sources in vignettes/ directory.", "error")
     .zeroCounters()
 
     # vig dir w/ source file  WARNING
     cat("nothing", file=file.path(vigdir, "test.Rnw"))
     cat("Title: unitTestTempDir", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(
-        identical(
-            .BiocCheck$getNum(c("error", "warning", "note")),
-            c(error = 0L, warning = 1L, note = 1L)
-        ),
-        "expected 1 warning and 1 note"
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 0L, warning = 1L, note = 1L)
     )
     .zeroCounters()
 
@@ -143,12 +142,9 @@ test_vignettes0 <- function()
         file=file.path(pkgdir, "DESCRIPTION")
     )
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(
-        identical(
-            .BiocCheck$getNum(c("error", "warning", "note")),
-            c(error = 0L, warning = 0L, note = 1L)
-        ),
-        "expected 1 note and 0 errors/warnings")
+    checkCounter(
+        "'sessionInfo' not found in vignette", "note"
+    )
     .zeroCounters()
 
 
@@ -157,12 +153,8 @@ test_vignettes0 <- function()
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.rnw"))
     BiocCheck:::checkInstContents(pkgdir, TRUE)
-    checkTrue(
-        identical(
-            .BiocCheck$getNum(c("error", "warning", "note")),
-            c(error = 0L, warning = 1L, note = 0L)
-        ),
-        "expected 1 warning, no notes or errors"
+    checkCounter(
+        "Remove vignette sources from inst/doc", "warning"
     )
     .zeroCounters()
 
@@ -171,8 +163,9 @@ test_vignettes0 <- function()
     dir.create(instdoc, recursive=TRUE)
     cat("nothing", file=file.path(instdoc, "test.Rmd"))
     BiocCheck:::checkInstContents(pkgdir, TRUE)
-    checkTrue(.BiocCheck$getNum("warning") == 1,
-        "Rmd file not seen as valid vignette source")
+    checkCounter(
+        "Rmd file in inst/doc not seen as valid vignette source", "warning"
+    )
     unlink(file.path(instdoc, "test.Rmd"))
     .zeroCounters()
 
@@ -186,12 +179,9 @@ test_vignettes0 <- function()
         file=file.path(vigdir, "test.Rnw")
     )
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(
-        identical(
-            .BiocCheck$getNum(c("error", "warning", "note")),
-            c(error = 1L, warning = 1L, note = 1L)
-        ),
-        "expected 1 warning, note, and error."
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 1L, warning = 1L, note = 1L)
     )
     .zeroCounters()
 
@@ -200,13 +190,17 @@ test_vignettes0 <- function()
     unlink(file.path(pkgdir, "DESCRIPTION"))
     cat("Title: something", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.BiocCheck$getNum("error") == 0)
-    checkTrue(.BiocCheck$getNum("note") == 1)
+    # no error if RNW
+    checkCounter("'sessionInfo' not found in vignette", "note")
+
     # check defined in desc but default vig
     unlink(file.path(pkgdir, "DESCRIPTION"))
     cat("VignetteBuilder: Sweave", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkTrue(.BiocCheck$getNum("error") == 0)
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 0L, warning = 1L, note = 1L)
+    )
     .zeroCounters()
 
     # check vignette style of example package
@@ -297,7 +291,7 @@ test_checkNewPackageVersionNumber <- function()
     BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
     checkCounter(
         "New package x version non-zero",
-        "Warning"
+        "warning"
     )
 
     setVersion("00.99.3")
@@ -308,7 +302,7 @@ test_checkNewPackageVersionNumber <- function()
     BiocCheck:::checkNewPackageVersionNumber(UNIT_TEST_TEMPDIR)
     checkCounter(
         "New package y version not 99",
-        "Error"
+        "error"
     )
 
     setVersion("0.99.1")
@@ -448,7 +442,7 @@ test_checkBBScompatibility <- function()
     BiocCheck:::.checkDescription(desc)
     checkCounter(
         "Description field in the DESCRIPTION file is too concise",
-        "Warning"
+        "warning"
     )
 
 
@@ -463,7 +457,7 @@ test_checkBBScompatibility <- function()
     BiocCheck:::.checkDescription(file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     checkCounter(
         "The Description field in the DESCRIPTION is less than two sentences",
-        "Note"
+        "note"
     )
 
     cat("Package: Foo",
