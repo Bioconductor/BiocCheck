@@ -629,10 +629,7 @@ checkVignetteDir <- function(pkgdir, checkingDir)
     checkVigFiles(vigdir, vigdircontents)
 
     desc <- file.path(pkgdir, "DESCRIPTION")
-    if (file.exists(desc))
-        builder <- getVigBuilder(desc)
-    else
-        builder <- NULL
+    builder <- getVigBuilder(desc)
 
     if (!is.null(builder)){
         checkVigBuilder(builder, vigdircontents)

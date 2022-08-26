@@ -599,14 +599,11 @@ getBadDeps <- function(pkgdir, lib.loc)
 
 getVigBuilder <- function(desc)
 {
-    dcf <- read.dcf(desc)
-    if (!"VignetteBuilder" %in% colnames(dcf)) {
-        builder <- NULL
-    } else {
-        builder <- strsplit(gsub(" ", "",dcf[, "VignetteBuilder"], fixed=TRUE),
-                            ",")[[1]]
-    }
-    return(builder)
+    if (file.exists(desc))
+        builder <- read.dcf(desc, fields = "VignetteBuilder")
+    else
+        builder <- NA
+    if (is.na(builder)) NULL else unlist(strsplit(builder, ",\\s+"))
 }
 
 getVigEngine <- function(vignetteFile){
