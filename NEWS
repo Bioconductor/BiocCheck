@@ -5,6 +5,9 @@ BUG FIXES AND MINOR IMPROVEMENTS
 
     o Only count non evaluated chunks when there are any present in the
     vignette
+    o Fix false positive WARNING "Import {pkg} in NAMESPACE as well as
+    DESCRIPTION." where pkg was not in NAMESPACE but it was used using double
+    colons pkg::function inside an S4 method. (@zeehio, #166)
     o Fix bug where inputs to `getDirFile` were vectors in
     `checkForValueSection` (@zeehio, #163)
     o Allow lookback for matching T/F and exclude list elements, e.g., `list$F`
