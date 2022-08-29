@@ -343,11 +343,13 @@ findSymbolsInParsedCode <-
 {
     matches <- structure(vector("list", length(parsedCodeList)),
         .Names = names(parsedCodeList))
-    if (
-        !identical(length(tokenTypes), length(symbolNames)) &&
-        length(tokenTypes) == 1L
+    allcombos <- expand.grid(
+        tokenTypes = tokenTypes,
+        symbolNames = symbolNames,
+        stringsAsFactors = FALSE
     )
-        tokenTypes <- rep(tokenTypes, length(symbolNames))
+    tokenTypes <- allcombos[["tokenTypes"]]
+    symbolNames <- allcombos[["symbolNames"]]
 
     for (filename in names(parsedCodeList)) {
         df <- parsedCodeList[[filename]]

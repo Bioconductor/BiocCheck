@@ -1434,8 +1434,9 @@ checkCatInRCode <-
     )
     parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges)
     parsedCodes <- lapply(parsedCodes, .filterS3printRanges)
-    msg_res <-
-        findSymbolsInParsedCode(parsedCodes, symbols, "SYMBOL_FUNCTION_CALL")
+    msg_res <- findSymbolsInParsedCode(
+        parsedCodes, symbols, c("SYMBOL_FUNCTION_CALL", "SYMBOL")
+    )
     unlist(msg_res)
 }
 
