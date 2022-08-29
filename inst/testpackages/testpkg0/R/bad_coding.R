@@ -2,10 +2,6 @@ bad_fun <- function(){
 
     update.packages("base")
 
-    for (i in 1:10) {
-        print("test")
-    }
-
     sapply(letters, function(x) x)
 }
 
@@ -47,10 +43,18 @@ bad_install <- function(pkg) {
 
 bad_cat <- function() {
     cat("There is a cat here")
-    print("Using print instead of message")
+    ## except in show methods
     setMethod("show", signature = "character", function(obj) {
         cat("Cat is allowed here")
     })
+}
+
+bad_print <- function() {
+    for (i in 1:10) {
+        print("test")
+    }
+    print("Using print instead of message")
+    lapply(c("A", "B"), print)
 }
 
 bad_assignment <- function() {

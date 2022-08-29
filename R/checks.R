@@ -1411,9 +1411,7 @@ checkSingleColon <- function(Rdir, avail_pkgs = character(0L)) {
 }
 
 .filterS3printRanges <- function(tokens) {
-    excl <- .grepSymbolRanges(
-        tokens, "^print.*", tokenType = "SYMBOL", isExp = TRUE
-    )
+    excl <- .grepSymbolRanges(tokens, "^print\\..*", tokenType = "SYMBOL")
     if (length(excl)) {
         showHits <- vapply(excl,
             function(x) "cat" %in% tokens[x, "text"], logical(1)

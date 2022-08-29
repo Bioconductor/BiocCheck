@@ -789,7 +789,7 @@ test_checkCatInRCode <- function()
     msg <- BiocCheck:::checkCatInRCode(
         Rdir, c("cat", "print")
     )
-    checkTrue(length(msg) == 8)
+    checkTrue(length(msg) == 9)
 }
 
 test_checkEqInAssignment <- function()
