@@ -667,6 +667,10 @@ getParent <- function(view, biocViewsVocab)
         v <- get(n, envir = env)
         if (typeof(v) == "closure")
             walkCode(body(v), walker)
+        else if (typeof(v) == "environment" && !walker$is_explored(v)) {
+            walker$mark_exploration(v)
+            .checkEnv(v, walker)
+        }
     }
     walker
 }
@@ -674,8 +678,11 @@ getParent <- function(view, biocViewsVocab)
 .colonWalker <- function() {
     ## record all pkg used as pkg::foo or pkg:::bar
     PKGS <- character()
+    EXPLORED_ENVIRS <- character()
     collector <- function(e, w)
         PKGS <<- append(PKGS, as.character(e[[2]]))
+    mark_exploration <- function(env)
+        EXPLORED_ENVIRS <<- append(EXPLORED_ENVIRS, format(env))
     list(handler=function(v, w) {
         switch(v, "::"=collector, ":::"=collector, NULL)
     }, call=function(e, w) {
@@ -684,7 +691,10 @@ getParent <- function(view, biocViewsVocab)
         NULL
     }, done = function() {
         sort(unique(PKGS))
-    })
+    }, is_explored = function(env) {
+       format(env) %in% EXPLORED_ENVIRS
+    }, mark_exploration = mark_exploration
+    )
 }
 
 getFunctionLengths <- function(df)

@@ -1432,3 +1432,39 @@ test_getDirFile <- function() {
     )
     checkException(getDirFile(vigfiles))
 }
+
+
+test_checkEnv <- function() {
+    # Simple function in empty environment:
+    env <- new.env(parent = emptyenv())
+    env$f <- function() BiocCheck::BiocCheck
+    dcolon <- BiocCheck:::.checkEnv(env, BiocCheck:::.colonWalker())$done()
+    checkIdentical(dcolon, "BiocCheck")
+
+    # Function inside environment inside environment
+    # This happens on pkg ns environments with S4 methods
+    env <- new.env(parent = emptyenv())
+    env$another <- new.env(parent = emptyenv())
+    env$another$f <- function() BiocCheck::BiocCheck
+    dcolon <- BiocCheck:::.checkEnv(env, BiocCheck:::.colonWalker())$done()
+    checkIdentical(dcolon, "BiocCheck")
+
+    # Environments can contain themselves. Check that this does not
+    # lead to an infinite loop
+    env <- new.env(parent = emptyenv())
+    env$another <- env
+    env$another$f <- function() BiocCheck::BiocCheck
+    dcolon <- BiocCheck:::.checkEnv(env, BiocCheck:::.colonWalker())$done()
+    checkIdentical(dcolon, "BiocCheck")
+
+    # Environments can contain other envs that can contain the first env.
+    # Check that this does not lead to an infinite loop
+    env <- new.env(parent = emptyenv())
+    env$another <- new.env(parent = emptyenv())
+    env$another$env2 <- env
+    env$another$env2$f <- function() BiocCheck::BiocCheck
+    dcolon <- BiocCheck:::.checkEnv(env, BiocCheck:::.colonWalker())$done()
+    checkIdentical(dcolon, "BiocCheck")
+}
+
+
