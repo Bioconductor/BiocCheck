@@ -4,7 +4,13 @@
 \alias{BiocCheck}
 \title{Check a package's adherence with the Bioconductor Package Guidelines}
 \usage{
-BiocCheck(package = ".", checkDir = dirname(package), debug = FALSE, ...)
+BiocCheck(
+  package = ".",
+  checkDir = dirname(package),
+  debug = FALSE,
+  callr = FALSE,
+  ...
+)
 }
 \arguments{
 \item{package}{A directory or tarball (\code{.tar.gz} file) of an R package.}
@@ -16,6 +22,9 @@ default, it will be placed in the same directory as the package directory.}
 each condition raised by BiocCheck in the written log (i.e., in the
 \code{'<package_name>.BiocCheck'} folder). This option is only relevant to
 developers and contributors to BiocCheck.}
+
+\item{callr}{logical(1) Whether to use the \code{callr} package to run \code{BiocCheck}
+in an isolated R session to prevent namespace collisions.}
 
 \item{\dots}{See the details section for available options. When running
 \code{BiocCheck}, options can be specified as:

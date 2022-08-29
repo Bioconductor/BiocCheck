@@ -70,6 +70,9 @@
 #' `'<package_name>.BiocCheck'` folder). This option is only relevant to
 #' developers and contributors to BiocCheck.
 #'
+#' @param callr logical(1) Whether to use the `callr` package to run `BiocCheck`
+#'   in an isolated R session to prevent namespace collisions.
+#'
 #' @param \dots See the details section for available options. When running
 #' `BiocCheck`, options can be specified as:
 #' \preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }
@@ -99,7 +102,29 @@
 #' BiocCheck(packageDir, `quit-with-status`=FALSE)
 #'
 #' @export BiocCheck
-BiocCheck <-
+BiocCheck <- function(
+    package=".", checkDir = dirname(package), debug = FALSE, callr = FALSE, ...
+) {
+    if (callr) {
+        if (!requireNamespace("callr", quietly = TRUE))
+            stop("Install the 'callr' package to run 'BiocCheck()'",
+                 " in a separate R session")
+        callr::r(
+            function(...) { BiocCheck:::BiocCheckRun(...) },
+            args = list(
+                package = package, checkDir = checkDir, debug = debug, ...
+            ),
+            cmdargs = c("--no-echo", "--no-save", "--no-restore"),
+            show = TRUE
+        )
+    } else {
+        BiocCheckRun(
+            package = package, checkDir = checkDir, debug = debug, ...
+        )
+    }
+}
+
+BiocCheckRun <-
     function(package=".", checkDir = dirname(package), debug = FALSE, ...)
 {
     .zeroCounters()
