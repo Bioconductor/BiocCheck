@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.34
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Only count non evaluated chunks when there are any present in the
+    vignette
     o Fix bug where inputs to `getDirFile` were vectors in
     `checkForValueSection` (@zeehio, #163)
     o Allow lookback for matching T/F and exclude list elements, e.g., `list$F`
