@@ -866,13 +866,14 @@ checkVigChunkEval <- function(vigdircontents)
 
             # find non evaluated code chunks (```, ```r, ```R, etc.)
             # assumes every other one for start and stop of code chunk
-            nonEvalChunk <- lines[grep("^[\t >]*```+\\s*",
-                                          lines)][c(TRUE,FALSE)]
-            indx <- grep("^[\t >]*```+\\s*\\{([a-zA-Z0-9_]+.*)\\}\\s*$",
-                         nonEvalChunk)
-            if (length(indx))
-                nonEvalChunk <- nonEvalChunk[-indx]
-
+            nonEvalChunk <- lines[grep("^[\t >]*```+\\s*", lines)]
+            if (length(nonEvalChunk)) {
+                nonEvalChunk <- nonEvalChunk[c(TRUE,FALSE)]
+                indx <- grep("^[\t >]*```+\\s*\\{([a-zA-Z0-9_]+.*)\\}\\s*$",
+                             nonEvalChunk)
+                if (length(indx))
+                    nonEvalChunk <- nonEvalChunk[-indx]
+            }
         }
         chunks <- chunks + length(chunklines) + length(nonEvalChunk)
 
