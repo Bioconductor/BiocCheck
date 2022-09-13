@@ -167,7 +167,7 @@ cleanupDependency <- function(input, remove.R=TRUE)
             tmp <- gsub(")", "", tmp, fixed=TRUE)
             namevec[i] <- tmp
         } else {
-            namevec[i] = ''
+            namevec[i] <- ''
         }
     }
     names(res) <- namevec
@@ -283,9 +283,9 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
         }
     }
     if (token == "SYMBOL_FUNCTION_CALL")
-        parens="()"
+        parens <- "()"
     else
-        parens=""
+        parens <- ""
     for (name in names(matches))
     {
         x <- matches[[name]]
@@ -416,7 +416,7 @@ getMaintainerEmail <- function(pkgdir)
     } else if ("Authors@R" %in% colnames(dcf)) {
         ar <- dcf[, "Authors@R"]
         env <- new.env(parent=emptyenv())
-        env[["c"]] = c
+        env[["c"]] <- c
         env[["person"]] <- utils::person
         pp <- parse(text=ar, keep.source=TRUE)
         tryCatch(people <- eval(pp, env),
@@ -448,7 +448,7 @@ findLogicalFile <- function(fl) {
              error = function(err){
                  return(character())
              })
-    objs = ls(env, all.names=TRUE)
+    objs <- ls(env, all.names=TRUE)
     for (obj in objs){
       if (!is.function(env[[obj]])){
            rm(list = obj, envir = env)
@@ -476,7 +476,7 @@ findLogicalRdir <- function(pkgname, symbol){
     objs <- ls(env, all.names=TRUE)
     objs <- objs[grep("^.__[CTM]__", objs, invert=TRUE)]
     globals <- lapply(objs, function(obj) {
-        value = env[[obj]];
+        value <- env[[obj]]
         if (identical(typeof(value), "closure")) {
             findGlobals(value)
         } else character(0)
@@ -545,17 +545,17 @@ grepPkgDir <- function(pkgdir, greparg, full_path=FALSE){
         error=function(e){character(0)})
     msg_files <- vapply(fnd,
                         FUN=function(x, pkgdir){
-                            vl = strsplit(x, split=":")
-                            filename =
+                            vl <- strsplit(x, split=":")
+                            filename <-
                                 if(full_path){
                                     vl[[1]][1]
                                 } else {
                                     sub(vl[[1]][1], pattern=pkgdir,
                                         replacement="", fixed=TRUE)
                                 }
-                            lineNum = vl[[1]][2]
+                            lineNum <- vl[[1]][2]
                             if (tolower(.Platform$OS.type) == "windows"){
-                                filename =
+                                filename <-
                                     if(full_path){
                                         paste(vl[[1]][1], vl[[1]][2], sep=":")
                                     }else {
@@ -564,7 +564,7 @@ grepPkgDir <- function(pkgdir, greparg, full_path=FALSE){
                                             pattern=pkgdir, replacement="",
                                             fixed=TRUE)
                                     }
-                                lineNum = vl[[1]][3]
+                                lineNum <- vl[[1]][3]
                             }
                             sprintf("%s (line %s)", filename, lineNum)},
                         FUN.VALUE = character(1),

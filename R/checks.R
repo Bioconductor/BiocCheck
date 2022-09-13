@@ -469,7 +469,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     if ("Authors@R" %in% colnames(dcf))
     {
         env <- new.env(parent=emptyenv())
-        env[["c"]] = c
+        env[["c"]] <- c
         env[["person"]] <- utils::person
         pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE)
         tryCatch(people <- eval(pp, env),
@@ -531,7 +531,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     }
     # now need to make sure that regexes work, a la python/BBS
     # I think R CMD check now does this already but can't hurt to keep
-    regex = '(.*\\S)\\s*<(.*)>\\s*'
+    regex <- '(.*\\S)\\s*<(.*)>\\s*'
     match <- regexec(regex, maintainer)[[1]]
     match.length <- attr(match, "match.length")
     if (all(match == -1) && all(match.length == -1))
@@ -724,12 +724,12 @@ checkVigMetadata <- function(vigdircontents)
     badVig <- character(0)
     vigExt <- tolower(tools::file_ext(vigdircontents))
     dx <- which(vigExt != "rnw")
-    vigdircontents = vigdircontents[dx]
+    vigdircontents <- vigdircontents[dx]
     for (file in vigdircontents) {
         lines <- readLines(file, n=100L, warn=FALSE)
         idx <- grep(lines, pattern="vignette:")
         if (length(idx) == 0L)
-            badVig = c(badVig, basename(file))
+            badVig <- c(badVig, basename(file))
     }
      if (length(badVig) != 0L){
         handleWarning(
@@ -778,9 +778,9 @@ checkVigEngine <- function(builder, vigdircontents)
         }
         nadx <- which(is.na(res))
         if (length(nadx) != 0L || is.null(builder)){
-            files = res[nadx]
+            files <- res[nadx]
             if (is.null(builder))
-                files = c(files, "DESCRIPTION")
+                files <- c(files, "DESCRIPTION")
             handleError(
                 "No 'VignetteEngine' specified in vignette or DESCRIPTION. ",
                 help_text = paste(
@@ -821,11 +821,11 @@ checkVigTemplate <- function(vigdircontents)
         if (length(idx) != 0L){
             title <- tolower(gsub(".*\\{|\\}.*", "", lines[idx]))
             if (title == "vignette title"){
-                badVig = c(badVig, basename(file))
+                badVig <- c(badVig, basename(file))
             }
         }
         if (length(idx) == 0L){
-            badVig2 = c(badVig2, basename(file))
+            badVig2 <- c(badVig2, basename(file))
         }
     }
     if (length(badVig) != 0L){
@@ -1777,10 +1777,10 @@ checkUsageOfDont <- function(pkgdir)
                 internalVec <- FALSE
             }
             if (any(donttestVec | dontrunVec) & !any(internalVec))
-                hasBad[dx] = TRUE
+                hasBad[dx] <- TRUE
 
             if (any(dontrunVec) & !any(internalVec))
-                hasdontrun[dx] = TRUE
+                hasdontrun[dx] <- TRUE
         }
     }
     if (any(hasBad)){
