@@ -1224,7 +1224,7 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
 
     # install() / install.packages() calls
     msg_inst <- findSymbolsInRFiles(
-        pkgdir, c("install", "install.packages"), "SYMBOL_FUNCTION_CALL"
+        pkgdir, .BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
     )
     if (length(msg_inst)) {
         handleError(
