@@ -354,13 +354,9 @@ checkBiocViews <- function(pkgdir)
     }
 
     if (packageVersion("biocViews") < package_version("1.33.9")) {
-        if (branch == "Software") {
-            branch = "software"
-        } else if (branch == "AnnotationData") {
-            branch = "annotation"
-        } else if (branch == "ExperimentData") {
-            branch = "experiment"
-        }
+        ## conditional to keep the logic the same
+        if (branch %in% c("Software", "AnnotationData", "ExperimentData"))
+            branch <- gsub("data", "", tolower(branch))
     }
 
     handleCheck("Checking for recommended biocViews...")
