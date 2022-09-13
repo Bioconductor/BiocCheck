@@ -3,23 +3,9 @@ UNIT_TEST_TEMPDIR <- file.path(tempdir(), UNIT_TEST_PKG)
 
 library(devtools)
 
-.printf <- BiocCheck:::.printf
 .zeroCounters <- BiocCheck:::.zeroCounters
 
 parsedCode <- NULL
-
-inspect <- function()
-{
-    .printf("error: %s, warning: %s, note: %s",
-        .BiocCheck$getNum("error"),
-        .BiocCheck$getNum("warning"),
-        .BiocCheck$getNum("note")
-    )
-    print(.BiocCheck$get("error"))
-    print(.BiocCheck$get("warning"))
-    print(.BiocCheck$get("note"))
-
-}
 
 create_test_package <-
     function(

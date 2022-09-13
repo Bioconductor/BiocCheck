@@ -2,12 +2,7 @@
 #' @importFrom tools Rd2ex
 #' @importFrom utils Stangle
 #' @importFrom codetools walkCode findGlobals
-
-
-.printf <- function(...) cat(noquote(sprintf(...)), "\n")
-
-.debug <- function(...) if (getOption("Bioconductor.DEBUG", FALSE))
-    .printf(...)
+NULL
 
 .msg <- function(..., appendLF=TRUE, indent=0, exdent=2)
 {
@@ -492,48 +487,6 @@ findLogicalRdir <- function(pkgname, symbol){
         } else character()
     } else {
       character()
-    }
-}
-
-makeTempRFile <- function(infile){
-    ext <- tolower(tools::file_ext(infile))
-    dir.create(tempr_dir <- tempfile())
-    outfile <- file.path(tempr_dir, paste0(basename(infile), ".R"))
-    if(ext == 'rnw' & isTRUE(vigHelper(infile, "knitr")[1])){
-        ext <- 'rmd'
-    }
-    switch(ext,
-           r = {
-               code <- readLines(infile)
-               validFile <- TRUE
-           },
-           rd = {
-               tempfile <- tools::parse_Rd(infile)
-               code <- capture.output(tools::Rd2ex(tempfile))
-               validFile <- TRUE
-           },
-           rnw = {
-               Stangle(infile, output=outfile, quiet=TRUE)
-               code <- readLines(outfile)
-               validFile <- TRUE
-           },
-           rmd = {
-               knitr::purl(input=infile, output=outfile, quiet=TRUE)
-               code <- readLines(outfile)
-               validFile = TRUE
-           },
-           {
-               validFile = FALSE
-               code <- NA
-           })
-
-    if (validFile){
-        cat("dummyTest <- function(){", file=outfile, sep="\n")
-        cat(code, file=outfile, sep="\n", append =TRUE)
-        cat("}", file=outfile, sep="\n", append =TRUE)
-        outfile
-    } else {
-        character(0)
     }
 }
 
