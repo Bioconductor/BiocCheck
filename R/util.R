@@ -236,7 +236,7 @@ parseFile <- function(infile, pkgdir) {
         rd <- tools::parse_Rd(infile)
         outfile <- file.path(parse_dir, "parseFile.tmp")
         code <- capture.output(tools::Rd2ex(rd))
-        cat(code, file=outfile, sep="\n")
+        writeLines(code, con=outfile, sep="\n")
     } else if (grepl("\\.R$", infile, TRUE)) {
         outfile <- infile
     }
