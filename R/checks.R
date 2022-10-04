@@ -930,7 +930,7 @@ checkVigBiocInst <- function(pkgdir) {
 }
 
 .BAD_INSTALL_CALLS <- c("biocLite", "install.packages", "install_packages",
-    "update.packages", "install")
+    "update.packages", "install$")
 
 checkVigInstalls <- function(pkgdir) {
     msg_return <- findSymbolsInVignettes(
