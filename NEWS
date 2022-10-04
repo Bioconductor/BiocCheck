@@ -8,6 +8,8 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Update `checkVigInstalls` and `checkVigBiocInst` to avoid false positives
+    (@almeidasilvaf, #170).
     o Only count non evaluated chunks when there are any present in the
     vignette
     o Fix false positive WARNING "Import {pkg} in NAMESPACE as well as
