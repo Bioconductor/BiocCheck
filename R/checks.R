@@ -915,10 +915,13 @@ checkVigEvalAllFalse <- function(pkgdir){
     }
 }
 
+.OLD_INSTALL_CALLS <-
+    c("BiocInstaller", "biocLite", "useDevel", "biocinstallRepos")
+
 checkVigBiocInst <- function(pkgdir) {
     msg_return <- findSymbolsInVignettes(
         pkgdir,
-        Symbols = "BiocInstaller|biocLite|useDevel|biocinstallRepos",
+        Symbols = .OLD_INSTALL_CALLS,
         tokenTypes = c("COMMENT", "SYMBOL_FUNCTION_CALL")
     )
     if (length(msg_return)) {
@@ -933,11 +936,18 @@ checkVigBiocInst <- function(pkgdir) {
     "update.packages", "install")
 
 checkVigInstalls <- function(pkgdir) {
-    msg_return <- findSymbolsInVignettes(
+    match_return <- findSymbolsInVignettes(
         pkgdir,
-        Symbols = paste(.BAD_INSTALL_CALLS, collapse = "|"),
+        Symbols = .BAD_INSTALL_CALLS,
         tokenTypes = "SYMBOL_FUNCTION_CALL"
     )
+    grep_return <- findSymbolsInVignettes(
+        pkgdir,
+        Symbols = ".*install[^ed].*",
+        tokenTypes = "SYMBOL_FUNCTION_CALL",
+        FUN = .grepTokenTextCode
+    )
+    msg_return <- c(match_return, grep_return)
     if (length(msg_return)) {
         handleErrorFiles(
             "Installation calls found in vignette(s)",
@@ -972,7 +982,7 @@ checkVigClassUsage <- function(pkgdir) {
 }
 
 checkTFSymbolUsage <- function(pkgdir) {
-    viglist <- findSymbolsInVignettes(pkgdir, "^[TF]$", "SYMBOL")
+    viglist <- findSymbolsInVignettes(pkgdir, c("T", "F"), "SYMBOL")
     if (length(viglist)) {
         handleWarningFiles(
             " Avoid T/F variables; If logical, use TRUE/FALSE",
@@ -1037,7 +1047,7 @@ findSymbolsInRFiles <-
 }
 
 findSymbolsInVignettes <-
-    function(pkgdir, Symbols, tokenTypes)
+    function(pkgdir, Symbols, tokenTypes, FUN = .getTokenTextCode)
 {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
@@ -1045,7 +1055,7 @@ findSymbolsInVignettes <-
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
         knitr::purl(input = vfile, output = tempR, quiet = TRUE)
-        tokens <- .grepTokenTextCode(parseFile(tempR), tokenTypes, Symbols)
+        tokens <- FUN(parseFile(tempR), tokenTypes, Symbols)
         viglist[[getDirFile(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
            getDirFile(vfile), tokens[,"line1"], tokens[,"col1"]

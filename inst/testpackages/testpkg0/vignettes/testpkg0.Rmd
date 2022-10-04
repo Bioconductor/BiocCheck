@@ -2,8 +2,10 @@
 
 ```{r echo=FALSE}
 session_info()
+install_bioc <- function() {
+    message("Installing...")
+}
 ```
-
 
 ```{r eval=FALSE}
 if (!requireNamespace("BiocCheck", quietly = TRUE))
@@ -11,14 +13,24 @@ if (!requireNamespace("BiocCheck", quietly = TRUE))
 ```
 
 ```{r eval=TRUE}
+## This should trigger checkVigInstalls (2x)
 if (!requireNamespace("BiocCheck", quietly = TRUE))
     BiocManager::install("BiocCheck")
+## trigger with grep
+install_bioc("BiocCheck")
 ```
 
-
-```{r eval=FALSE}
+```{r}
+## This should trigger checkVigBiocInst
 if (!requireNamespace("BiocCheck", quietly = TRUE))
     BiocInstaller::biocLite("BiocCheck")
+```
+
+```{r eval=FALSE}
+## This should not trigger checkVigInstalls
+if (!requireNamespace("BiocCheck", quietly = TRUE))
+    BiocInstaller::biocLite("BiocCheck")
+check_install("BiocCheck")
 ```
 
 ```{r eval=FALSE}
@@ -36,6 +48,8 @@ if (T) {
 }
 ```
 
+```{r eval=FALSE}
+```
 
 ```{r eval=FALSE}
 ```

@@ -641,7 +641,7 @@ test_checkUnitTests <- function()
     testval <- ifelse("BiocCheck" %in% avail_pkgs, 1, 0)
     checkTrue(length(msg_sc) == testval)
     pkgdir <- system.file("testpackages", "testpkg2", package="BiocCheck")
-    res <- BiocCheck:::findSymbolsInVignettes(pkgdir, "^[TF]$", "SYMBOL")
+    res <- BiocCheck:::findSymbolsInVignettes(pkgdir, c("T", "F"), "SYMBOL")
     checkTrue(length(res) == 1)
 }
 
@@ -796,6 +796,7 @@ test_checkVigInstalls <- function()
         )
     )
     checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
+    checkEqualsNumeric(length(.BiocCheck$get("error")[[1]]), 5)
     .zeroCounters()
 }
 
