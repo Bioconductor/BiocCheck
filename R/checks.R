@@ -1746,7 +1746,7 @@ checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
         )
     else if (length(badManPages))
         handleNote(
-            "Consider adding runnable examples to man pages that document",
+            "Consider adding runnable examples to man pages that document ",
             "exported objects.",
             messages = badManPages
         )
