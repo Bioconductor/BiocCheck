@@ -979,24 +979,6 @@ test_checkImportSuggestions <- function()
     }
 }
 
-test_checkForBadDepends <- function()
-{
-    .zeroCounters()
-    pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
-    inst_path <- BiocCheck:::installAndLoad(pkg)
-    BiocCheck:::checkForBadDepends(
-        pkgdir = pkg,
-        pkgname = "testpkg0",
-        lib.loc = file.path(inst_path, "lib")
-    )
-    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("error"))
-    checkEqualsNumeric(1, BiocCheck:::.BiocCheck$getNum("note"))
-    checkTrue(grepl("providing 1 object", BiocCheck:::.BiocCheck$get("error")))
-    checkTrue(
-        grepl("how [0-9] object", BiocCheck:::.BiocCheck$get("note"))
-    )
-}
-
 test_remotesUsage <- function()
 {
     pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
