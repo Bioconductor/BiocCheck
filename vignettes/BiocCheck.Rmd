@@ -238,14 +238,13 @@ Can be disabled with `--no-check-bbs`
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
     * That person must have either `family` or `given` name defined.
-    * (optional) A syntactically valid [ORCID iD][1],
-    results in `NOTE` if not.
+    * (optional) A syntactically valid [ORCID iD][], results in `NOTE` if not.
     
-  Suggests that the maintainer provide an [ORCID iD][1] in the `Authors@R`
+  Suggests that the maintainer provide an [ORCID iD][] in the `Authors@R`
   field as an argument in the person function, e.g., `comment = c(ORCID = ...)`
   (`NOTE`).
   
-[1]: https://orcid.org/
+[ORCID iD]: https://orcid.org/
 
 ## DESCRIPTION checks
 
