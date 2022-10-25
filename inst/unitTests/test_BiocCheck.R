@@ -537,7 +537,7 @@ test_checkBBScompatibility <- function()
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
     checkTrue(
         .BiocCheck$getNum("note") == 1L,
-        "An invalid ORCID ID causes a note!"
+        "An invalid ORCID iD causes a note!"
     )
 
     .zeroCounters()

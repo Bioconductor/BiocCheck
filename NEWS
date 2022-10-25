@@ -164,14 +164,14 @@ NEW FEATURES
     (@federicomarini, #65)
     o (1.25.4) Check for single colon typos when using qualified imports
     pkg::foo()
-    o (1.25.8) Validate ORCID IDs (if any) in the DESCRIPTION file
+    o (1.25.8) Validate ORCID iDs (if any) in the DESCRIPTION file
     (@LiNk-NY, #97)
     o (1.25.10) Add check for properly formatted CITATION file
     o (1.25.12) Add NOTE to change dontrun to donttest
 
 BUG FIXES
 
-    o (1.25.14) The ORCID ID check now accepts IDs with a X at the end.
+    o (1.25.14) The ORCID iD check now accepts IDs with a X at the end.
     o (1.25.9) All packages including infrastructure require a vignette
     o Usage of donttest and dontrun in manual pages tagged with the keyword
     'internal' will no longer trigger a NOTE (@grimbough, #59)

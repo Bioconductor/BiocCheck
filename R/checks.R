@@ -423,9 +423,14 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
                 validID <- .checkORCID(orcid)
                 if (!validID)
                     handleNote(
-                        "Invalid ORCID ID for ",
+                        "Invalid ORCID iD for ",
                         person$given, " ", person$family
                     )
+            } else if ("cre" %in% person$role) {
+                handleNote(
+                    "Consider adding the maintainer's ORCID iD in 'Authors@R'",
+                    " with 'comment=c(ORCID=\"...\")'"
+                )
             }
             if ("cre" %in% person$role)
             {
