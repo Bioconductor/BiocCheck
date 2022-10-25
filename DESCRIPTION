@@ -8,11 +8,12 @@ Description: BiocCheck guides maintainers through Bioconductor best
 Authors@R: c(
     person("Bioconductor", "Package Maintainer",
 	email="maintainer@bioconductor.org",
-	role=c("aut", "cre")),
+	role="aut"),
     person("Lori", "Shepherd", role="aut"),
     person("Daniel", "von Twisk", role="ctb"),
     person("Kevin", "Rue", role="ctb"),
-    person("Marcel", "Ramos", role="ctb"),
+    person("Marcel", "Ramos", , "marcel.ramos@roswellpark.org",
+      c("aut", "cre"), c(ORCID = "0000-0002-3242-0582")),
     person("Leonardo", "Collado-Torres", role = "ctb"),
     person("Federico", "Marini", role="ctb"))
 Depends: R (>= 4.2.0)
