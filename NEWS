@@ -3,6 +3,9 @@ CHANGES IN VERSION 1.34
 
 NEW FEATURES
 
+    o Redundant package dependencies checks between `DESCRIPTION` and
+    `NAMESPACE` have been removed. These are already present in `R CMD check`
+    as "checking package dependencies".
     o Use `callr` to run `BiocCheck` in a separate process, this avoids
     interference with loaded packages (@vjcitn, #158)
 
