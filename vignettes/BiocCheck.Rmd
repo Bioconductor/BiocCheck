@@ -75,21 +75,6 @@ BiocManager::install("BiocCheck")
 
 Actual `BiocCheck` output is shown below in **bold**.
 
-## Dependency Checks
-
-**Checking Package Dependencies...**
-
-Can be disabled with `--no-check-dependencies`.
-
-**Checking if other packages can import this one...**
-
-* Checks to make sure that there will be no import problems if another
-  package imports your package (`ERROR`).
-
-**Checking to see if we understand object initialization....**
-
-* Reports if it can't figure out how objects were initialized (`NOTE`).
-
 ## Deprecated Package Checks
 
 **Checking for deprecated package usage...**

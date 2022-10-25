@@ -169,11 +169,6 @@ BiocCheckRun <-
 
     handleMessage("* Installing package...", indent = 0, exdent = 0)
     ## checks
-    if (is.null(dots[["no-check-dependencies"]])){
-        handleCheck("Checking package dependencies...")
-        checkForBadDepends(package_dir, package_name, libloc)
-    }
-
     if (is.null(dots[["no-check-deprecated"]])){
         handleCheck("Checking for deprecated package usage...")
         checkDeprecatedPackages(package_dir)
