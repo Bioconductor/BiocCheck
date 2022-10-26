@@ -151,8 +151,9 @@ NULL
         verbose = "logical"
     ),
     methods = list(
-        initialize = function(verbose = FALSE) {
-            callSuper(verbose = verbose)
+        initialize =
+            function(verbose = FALSE, ...) {
+            callSuper(verbose = verbose, ...)
         },
         add = function(
             ..., condition, help_text, messages, verbose = .self$verbose
