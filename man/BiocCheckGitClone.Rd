@@ -14,9 +14,9 @@ ball.}
 \code{BiocCheck}}
 }
 \value{
-Mainly, the side effect of the information displayed. When run
-interactively, \code{BiocCheckGitClone()} returns a \code{BiocCheck} reference class
-with three main list elements:
+\code{BiocCheckGitClone()} is chiefly called for the side effect of the
+check reporting. The function returns a \code{BiocCheck} reference class with
+three main list elements:
 
 \item{error}{Items to address before the package can be accepted}
 

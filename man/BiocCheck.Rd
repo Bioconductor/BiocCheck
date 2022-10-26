@@ -31,8 +31,8 @@ in an isolated R session to prevent namespace collisions.}
 \preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }}
 }
 \value{
-Mainly, the side effect of the information displayed. When run
-interactively, \code{BiocCheck()} creates a \verb{<package_name>.BiocCheck} folder
+\code{BiocCheck()} is chiefly called for the side effect of the check
+reporting. The function also creates a \verb{<package_name>.BiocCheck} folder
 and returns a \code{BiocCheck} reference class with three main list elements:
 
 \item{error}{Items to address before the package can be accepted}

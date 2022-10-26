@@ -22,9 +22,9 @@
 #' `BiocCheck`
 #'
 #'
-#' @return Mainly, the side effect of the information displayed. When run
-#'   interactively, `BiocCheckGitClone()` returns a `BiocCheck` reference class
-#'   with three main list elements:
+#' @return `BiocCheckGitClone()` is chiefly called for the side effect of the
+#'   check reporting. The function returns a `BiocCheck` reference class with
+#'   three main list elements:
 #'
 #' \item{error}{Items to address before the package can be accepted}
 #'
