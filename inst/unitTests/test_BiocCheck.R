@@ -565,7 +565,11 @@ test_checkBBScompatibility <- function()
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkError("More than one maintainer doesn't cause error!")
+    # ERROR: More than one maintainer & NOTE: Include ORCID iD
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 1L, warning = 0L, note = 1L)
+    )
 
     .zeroCounters()
     cat(paste("Package:", UNIT_TEST_PKG),
@@ -578,7 +582,7 @@ test_checkBBScompatibility <- function()
         sep = "\n",
         file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
     BiocCheck:::checkBBScompatibility(UNIT_TEST_TEMPDIR, FALSE)
-    checkTrue(stillZero())
+    checkCounter("Include ORCID iD", "note")
 
     .zeroCounters()
     dir.create(file.path(UNIT_TEST_TEMPDIR,"inst"))
