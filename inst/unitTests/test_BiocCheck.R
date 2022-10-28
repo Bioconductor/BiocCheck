@@ -1389,6 +1389,17 @@ test_IsOrcidIdValid <- function()
     checkIdentical(valid, BiocCheck:::.checkORCID(orcid))
 }
 
+test_getBiocCheckDir <- function() {
+    getBiocCheckDir <- BiocCheck:::.getBiocCheckDir
+    pkg <- system.file(
+        "testpackages", "testpkg0", package="BiocCheck"
+    )
+    checkIdentical(
+        getBiocCheckDir(basename(pkg), dirname(pkg)),
+        file.path(dirname(pkg), paste(basename(pkg), "BiocCheck", sep = "."))
+    )
+}
+
 test_getDirFile <- function() {
     getDirFile <- BiocCheck:::getDirFile
     vigfile <- system.file(

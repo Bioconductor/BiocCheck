@@ -60,15 +60,19 @@
 #'   \item{quit-with-status}{ enable exit code option when performing check}
 #' }
 #'
-#' @param package A directory or tarball (`.tar.gz` file) of an R package.
+#' @param package The path to an R package directory or tarball (`.tar.gz`). 
+#'   The `BiocCheck` function is intended to be run from the package
+#'   directory; therefore, the current working directory (given by `getwd()`)
+#'   is the default.
 #'
-#' @param checkDir A directory where the BiocCheck output directory will go. By
-#' default, it will be placed in the same directory as the package directory.
+#' @param checkDir The directory where the `BiocCheck` output directory will be
+#'   stored. By default, it will be placed in the same directory as the package
+#'   directory i.e., `dirname(pkg_dir)`.
 #'
 #' @param debug Whether to append the names of functions that correspond to
-#' each condition raised by BiocCheck in the written log (i.e., in the
+#' each condition raised by `BiocCheck` in the written log (i.e., in the
 #' `'<package_name>.BiocCheck'` folder). This option is only relevant to
-#' developers and contributors to BiocCheck.
+#' developers and contributors to `BiocCheck`.
 #'
 #' @param callr logical(1) Whether to use the `callr` package to run `BiocCheck`
 #'   in an isolated R session to prevent namespace collisions.
@@ -103,7 +107,11 @@
 #'
 #' @export BiocCheck
 BiocCheck <- function(
-    package=".", checkDir = dirname(package), debug = FALSE, callr = FALSE, ...
+    package = getwd(),
+    checkDir = dirname(package),
+    debug = FALSE,
+    callr = FALSE,
+    ...
 ) {
     if (callr) {
         if (!requireNamespace("callr", quietly = TRUE))
@@ -125,7 +133,7 @@ BiocCheck <- function(
 }
 
 BiocCheckRun <-
-    function(package=".", checkDir = dirname(package), debug = FALSE, ...)
+    function(package, checkDir, debug, ...)
 {
     .zeroCounters()
     package <- normalizePath(package)
@@ -421,6 +429,7 @@ BiocCheckRun <-
 }
 
 .getBiocCheckDir <- function(pkgName, checkDir) {
+    checkDir <- normalizePath(checkDir)
     file.path(
         checkDir, paste(pkgName, "BiocCheck", sep = ".")
     )

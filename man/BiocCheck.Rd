@@ -5,7 +5,7 @@
 \title{Check a package's adherence with the Bioconductor Package Guidelines}
 \usage{
 BiocCheck(
-  package = ".",
+  package = getwd(),
   checkDir = dirname(package),
   debug = FALSE,
   callr = FALSE,
@@ -13,15 +13,19 @@ BiocCheck(
 )
 }
 \arguments{
-\item{package}{A directory or tarball (\code{.tar.gz} file) of an R package.}
+\item{package}{The path to an R package directory or tarball (\code{.tar.gz}).
+The \code{BiocCheck} function is intended to be run from the package
+directory; therefore, the current working directory (given by \code{getwd()})
+is the default.}
 
-\item{checkDir}{A directory where the BiocCheck output directory will go. By
-default, it will be placed in the same directory as the package directory.}
+\item{checkDir}{The directory where the \code{BiocCheck} output directory will be
+stored. By default, it will be placed in the same directory as the package
+directory i.e., \code{dirname(pkg_dir)}.}
 
 \item{debug}{Whether to append the names of functions that correspond to
-each condition raised by BiocCheck in the written log (i.e., in the
+each condition raised by \code{BiocCheck} in the written log (i.e., in the
 \code{'<package_name>.BiocCheck'} folder). This option is only relevant to
-developers and contributors to BiocCheck.}
+developers and contributors to \code{BiocCheck}.}
 
 \item{callr}{logical(1) Whether to use the \code{callr} package to run \code{BiocCheck}
 in an isolated R session to prevent namespace collisions.}
