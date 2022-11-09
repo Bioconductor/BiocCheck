@@ -1,3 +1,10 @@
+CHANGES IN VERSION 1.36
+
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o Fix issue with path seperators on Windows ('//' vs '\') causing the unit 
+    test test_getBiocCheckDir to report erroneous mismatches
+
 CHANGES IN VERSION 1.34
 -----------------------
 
