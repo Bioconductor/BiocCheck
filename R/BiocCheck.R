@@ -429,7 +429,7 @@ BiocCheckRun <-
 }
 
 .getBiocCheckDir <- function(pkgName, checkDir) {
-    checkDir <- normalizePath(checkDir)
+    checkDir <- normalizePath(checkDir, winslash = "/")
     file.path(
         checkDir, paste(pkgName, "BiocCheck", sep = ".")
     )
