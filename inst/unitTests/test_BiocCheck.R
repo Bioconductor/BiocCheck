@@ -600,7 +600,7 @@ test_checkBBScompatibility <- function()
 
     cat(
         paste(
-            "citEntry(entry='article', title='test',",
+            "citEntry(entry='', title='test',",
             "author=personList(as.person('Lori Kern')), year=2020,",
             "journal='Loris Best', volume='4', issue='12')"
         ),
