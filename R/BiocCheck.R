@@ -163,7 +163,8 @@ BiocCheckRun <-
     bioccheckver <- as.character(packageVersion("BiocCheck"))
     biocver <- as.character(BiocManager::version())
     checkDir <- .getBiocCheckDir(package_name, checkDir)
-    onBBS <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
+    isBBS <- Sys.getenv("IS_BIOC_BUILD_MACHINE")
+    onBBS <- nzchar(isBBS) && identical(tolower(isBBS), "true")
 
     .BiocCheck$metadata <- list(
         BiocCheckVersion = bioccheckver,
