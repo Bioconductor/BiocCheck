@@ -19,13 +19,23 @@ Authors@R: c(
 Depends: R (>= 4.2.0)
 License: Artistic-2.0
 VignetteBuilder: knitr
-Imports: biocViews (>= 1.33.7), BiocManager, stringdist, graph, httr, tools,
-    codetools, methods, utils, knitr
+Imports:
+    BiocFileCache,
+    BiocManager,
+    biocViews (>= 1.33.7),
+    codetools,
+    graph,
+    httr,
+    knitr,
+    methods,
+    stringdist,
+    tools,
+    utils
 Suggests: RUnit, BiocGenerics, Biobase, jsonlite, rmarkdown, downloader,
     devtools (>= 1.4.1), usethis, BiocStyle, callr
 Enhances: codetoolsBioC
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck
 BugReports: https://github.com/Bioconductor/BiocCheck/issues
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.2
 Encoding: UTF-8

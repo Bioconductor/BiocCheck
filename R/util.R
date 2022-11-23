@@ -184,27 +184,48 @@ getAllDependencies <- function(pkgdir)
     out
 }
 
+get_deprecated_status_db_url <- function(version) {
+    sprintf(
+        "https://bioconductor.org/checkResults/%s/bioc-LATEST/meat-index.dcf",
+        version
+    )
+}
+
+get_status_file_cache <- function(url) {
+    cache <- tools::R_user_dir("BiocCheck", "cache")
+    bfc <- BiocFileCache::BiocFileCache(cache, ask = FALSE)
+    rpath <- BiocFileCache::bfcrpath(
+        bfc, rnames = url, exact = TRUE, download = TRUE, rtype = "web"
+    )
+    update <- BiocFileCache::bfcneedsupdate(bfc, names(rpath))
+    if (update)
+        BiocFileCache::bfcdownload(bfc, names(rpath), ask = FALSE)
+    rpath
+}
+
+get_deprecated_status <- function(version) {
+    if (version %in% c("release", "devel"))
+        version <- BiocManager:::.version_bioc(version)
+    status_file_url <- get_deprecated_status_db_url(version)
+    status_file <- get_status_file_cache(status_file_url)
+    pkg_status <- read.dcf(status_file, all = TRUE)
+    is_deprecated <- pkg_status[, "PackageStatus"] == "Deprecated" &
+        !is.na(pkg_status[, "PackageStatus"])
+    names(is_deprecated) <- pkg_status[, "Package"]
+    is_deprecated
+}
+
 getAllDeprecatedPkgs <- function()
 {
-    # our best guess at deprecated packages
-    # if write_views wasn't updated to manual add missing package info
-    # a more complete would be to scrap the build report
-    # html = htmlParse("http://bioconductor.org/checkResults/devel/bioc-LATEST/")
-    # depdevel = xpathSApply(html, "//s", xmlValue)
-
-    con <- url("https://bioconductor.org/packages/release/bioc/VIEWS")
-    views_release <- read.dcf(con, all=TRUE)
-    close(con)
-    con <- url("https://bioconductor.org/packages/devel/bioc/VIEWS")
-    views_devel <- read.dcf(con, all=TRUE)
-    close(con)
-    pkgs <- unique(c(
-        views_release[["Package"]][which(views_release[["PackageStatus"]]
-                                         == "Deprecated")],
-        views_devel[["Package"]][which(views_devel[["PackageStatus"]]
-                                       == "Deprecated")]
-        ))
-    pkgs
+    ## use the more complete BiocPkgTools::biocBuildReport to identify
+    ## deprecated packages rather than using the VIEWS files
+    deps_release <- get_deprecated_status("release")
+    deps_devel <- get_deprecated_status("devel")
+    
+    union(
+        names(deps_release[deps_release]),
+        names(deps_devel[deps_devel])
+    )
 }
 
 parseFile <- function(infile, pkgdir) {
