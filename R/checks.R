@@ -1852,9 +1852,9 @@ checkSkipOnBioc <- function(pkgdir)
 .rmYAMLfm <- function(lines) {
     fm_idx <- grep("^---\\s*$", lines)
     if (length(fm_idx) && !identical(length(fm_idx), 2L))
-        stop("More than 2 YAML front matter delimiters, i.e., '---' found")
+        warning("More than 2 YAML front matter delimiters, i.e., '---' found")
     if (length(fm_idx))
-        lines <- lines[-seq(fm_idx[1], fm_idx[2])]
+        lines <- lines[-seq(min(fm_idx), max(fm_idx))]
     lines
 }
 
