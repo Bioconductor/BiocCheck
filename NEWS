@@ -1,8 +1,10 @@
-CHANGES IN VERSION 1.36
+CHANGES IN VERSION 1.36.0
 -----------------------
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Obtain a more complete list of deprecated packages for
+    `checkDeprecatedPkgs`
     o Fix issue with path seperators on Windows ('\\' vs '/') causing the unit
     test for `getBiocCheckDir` to report erroneous mismatches (@grimbough, #175)
 
