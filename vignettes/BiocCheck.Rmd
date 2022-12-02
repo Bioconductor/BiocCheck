@@ -622,8 +622,10 @@ verify that your code runs as intended after you re-format your code.
 ## Duplication checks
 
 * **Checking if package already exists in CRAN...**
-  This can be disabled with the `--no-check-CRAN` option. A package with the same
-  name (case differences are ignored) cannot exist in CRAN (`ERROR`).
+  This can be disabled with the `--no-check-CRAN` option. A package with the
+  same name (case differences are ignored) cannot exist on CRAN. Packages
+  submitted to Bioconductor must be removed from CRAN before the next
+  Bioconductor release (`WARNING`).
 
 * **Checking if new package already exists in _Bioconductor_...**
   Only run if the `--new-package` flag is turned on.  A package

@@ -1954,47 +1954,54 @@ checkFormatting <- function(pkgdir, nlines=6)
     }
 }
 
-checkIsPackageNameAlreadyInUse <- function(pkgName,
-    repo = c("CRAN", "BioCsoft", "BioCann",
-        "BioCexp", "BioCworkflows", "BioCbooks")
+checkIsPackageNameAlreadyInUse <- function(
+    pkgName,
+    repo = c(
+        "CRAN", "BioCsoft", "BioCann", "BioCexp", "BioCworkflows", "BioCbooks"
+    )
 ) {
     repo <- match.arg(repo)
+    msg <- paste0("'", pkgName, "' already exists in Bioconductor.")
 
-    if (identical(repo, "CRAN")) {
-        repo.url <- sprintf(
+    if (identical(repo, "CRAN"))
+        msg <- paste(
+            "The package already exists on CRAN. Packages submitted to",
+            "Bioconductor must be removed from CRAN before the next",
+            "Bioconductor release."
+        )
+    
+    repo.url <- switch(
+        repo,
+        CRAN = sprintf(
             "%s/src/contrib/PACKAGES", BiocManager::repositories()[repo]
-        )
-    } else {
-        repo.url <- switch(
-            repo,
-            BiocSoft = "http://bioconductor.org/packages/devel/bioc/VIEWS",
-            BioCann =
-                "http://bioconductor.org/packages/devel/data/annotation/VIEWS",
-            BioCexp =
-                "http://bioconductor.org/packages/devel/data/experiment/VIEWS",
-            BioCworkflows =
-                "http://bioconductor.org/packages/devel/workflows/VIEWS",
-            BioCbooks =
-                "https://bioconductor.org/packages/devel/books/VIEWS",
-            "http://bioconductor.org/packages/devel/bioc/VIEWS"
-        )
-    }
+        ),
+        BioCsoft = "http://bioconductor.org/packages/devel/bioc/VIEWS",
+        BioCann =
+            "http://bioconductor.org/packages/devel/data/annotation/VIEWS",
+        BioCexp =
+            "http://bioconductor.org/packages/devel/data/experiment/VIEWS",
+        BioCworkflows =
+            "http://bioconductor.org/packages/devel/workflows/VIEWS",
+        BioCbooks =
+            "https://bioconductor.org/packages/devel/books/VIEWS"
+    )
 
     conn <- url(repo.url)
-    dcf <- tryCatch(suppressWarnings(read.dcf(conn)), error=identity)
-    close(conn)
-    if (inherits(dcf, "error")) {
-        handleMessage(
-            "Unable to access repository ", BiocManager::repositories()[repo]
+    on.exit({ close(conn) })
+    dcf <- try(read.dcf(conn), silent = TRUE)
+    if (is(dcf, "try-error"))
+        return(
+            handleMessage(
+                "Unable to access repository ",
+                BiocManager::repositories()[repo]
+            )
         )
-    } else if (tolower(pkgName) %in% tolower(dcf[,"Package"])) {
-        if (repo == "CRAN")
-            msg <- "Package must be removed from CRAN."
-        else {
-            msg <- paste0("'", pkgName, "' already exists in Bioconductor.")
-        }
+        
+    isDuplicate <- tolower(pkgName) %in% tolower(dcf[,"Package"])
+    if (isDuplicate && identical(repo, "CRAN"))
+        handleWarning(msg)
+    else if (isDuplicate)
         handleError(msg)
-    }
 }
 
 checkForBiocDevelSubscription <- function(pkgdir)
