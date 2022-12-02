@@ -1,6 +1,12 @@
 CHANGES IN VERSION 1.36.0
 -----------------------
 
+NEW FEATURES
+
+    o The error for packages already hosted on CRAN has been converted to a
+    warning (@lshep, #177). Any such incoming packages must be removed from CRAN
+    before the following Bioconductor release.
+
 BUG FIXES AND MINOR IMPROVEMENTS
 
     o Obtain a more complete list of deprecated packages for
