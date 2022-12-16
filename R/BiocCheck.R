@@ -266,6 +266,11 @@ BiocCheckRun <-
 
     handleCheck("Checking for stray BiocCheck output folders...")
     checkBiocCheckOutputFolder(package_dir, package_name)
+    
+    if (!isTar) {
+        handleCheck("Checking for inst/doc folders...")
+        checkInstDocFolder(package_dir, package_name)
+    }
 
     if (is.null(dots[["no-check-vignettes"]])) {
         handleCheck("Checking vignette directory...")
