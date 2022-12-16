@@ -207,7 +207,8 @@ checkBiocCheckOutputFolder <- function(pkgdir, pkg_name) {
 
 checkInstDocFolder <- function(pkgdir, pkg_name) {
     alldirs <- list.dirs(pkgdir, full.names = FALSE)
-    if ("inst/doc" %in% alldirs)
+    instdocfiles <- list.files("inst/doc")
+    if ("inst/doc" %in% alldirs && length(instdocfiles))
         handleError(
             "Remove 'inst/doc' folder from the package source"
         )
