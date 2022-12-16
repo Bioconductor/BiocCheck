@@ -295,6 +295,13 @@ not label it ERROR, WARNING, or NOTE.
 * **Checking for stray BiocCheck output folders...** ensures that the
   `<package_name>.BiocCheck` folder byproduct when running `BiocCheck(".")`
   locally does not get included in the package directory (`ERROR`).
+  
+## Check for inst/doc folder
+
+* **Checking for inst/doc folders...** ensures that there are no pre-built
+  vignettes and their products in the _source_ package directory. Vignettes are
+  built when running `R CMD build`; therefore, `inst/doc` folder is not needed
+  (`ERROR`).
 
 ## Vignette Checks
 
