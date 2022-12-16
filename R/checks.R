@@ -603,16 +603,11 @@ checkInstContents <- function(pkgdir, checkingDir)
 {
     instdocdir <- file.path(pkgdir, "inst", "doc")
     instdocdircontents <- getVigSources(instdocdir)
-    if (length(instdocdircontents))
-    {
-        if (checkingDir)
-        {
-            handleWarning(
-                "Remove vignette sources from inst/doc; ",
-                "they belong in vignettes/."
-            )
-        }
-    }
+    if (length(instdocdircontents) && checkingDir)
+        handleWarning(
+            "Remove vignette sources from inst/doc; ",
+            "they belong in vignettes/."
+        )
 }
 
 checkVigFiles <- function(vigdir, vigdircontents){

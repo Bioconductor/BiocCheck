@@ -549,9 +549,11 @@ grepPkgDir <- function(pkgdir, greparg, full_path=FALSE){
 
 getVigSources <- function(dir)
 {
-    dir(dir,
+    dir(
+        dir,
         pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
-        ignore.case=TRUE, full.names=TRUE)
+        ignore.case=TRUE, full.names=TRUE
+    )
 }
 
 getRSources <- function(Rdir) {
