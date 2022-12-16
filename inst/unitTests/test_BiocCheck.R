@@ -320,6 +320,21 @@ test_checkBiocCheckOutputFolder <- function()
     .zeroCounters()
 }
 
+test_checkInstDocFolder <- function() {
+    pkg_folder <- file.path(UNIT_TEST_TEMPDIR, "testPkg")
+    inst_dir <- file.path(pkg_folder, "inst", "doc") 
+    dir.create(inst_dir, recursive = TRUE)
+    BiocCheck:::checkInstDocFolder(pkg_folder, "testpkg")
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 0L)
+    
+    file.create(file.path(inst_dir, "index.html"))
+    BiocCheck:::checkInstDocFolder(pkg_folder, "testpkg")
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1L)
+    
+    unlink(pkg_folder, recursive = TRUE)
+    .zeroCounters()
+}
+
 test_checkBiocViews <- function()
 {
     if (!dir.exists(UNIT_TEST_TEMPDIR))

@@ -82,12 +82,15 @@ BiocCheckGitClone <- function(package=".", ...)
     .BiocCheck$verbose <- TRUE
     .BiocCheck$show_meta()
 
-    ## checks
+    # BiocCheck checks --------------------------------------------------------
     handleCheck("Checking valid files...")
     checkBadFiles(package)
 
     handleCheck("Checking for stray BiocCheck output folders...")
     checkBiocCheckOutputFolder(package_dir, package_name)
+    
+    handleCheck("Checking for inst/doc folders...")
+    checkInstDocFolder(package_dir, package_name)
 
     handleCheck("Checking DESCRIPTION...")
     checkDescription(package)

@@ -205,6 +205,15 @@ checkBiocCheckOutputFolder <- function(pkgdir, pkg_name) {
         )
 }
 
+checkInstDocFolder <- function(pkgdir, pkg_name) {
+    alldirs <- list.dirs(pkgdir, full.names = FALSE)
+    instdocfiles <- list.files(file.path(pkgdir, "inst/doc"))
+    if ("inst/doc" %in% alldirs && length(instdocfiles))
+        handleError(
+            "Remove 'inst/doc' folder from the package source"
+        )
+}
+
 checkBiocViews <- function(pkgdir)
 {
     dirty <- FALSE
@@ -594,16 +603,11 @@ checkInstContents <- function(pkgdir, checkingDir)
 {
     instdocdir <- file.path(pkgdir, "inst", "doc")
     instdocdircontents <- getVigSources(instdocdir)
-    if (length(instdocdircontents))
-    {
-        if (checkingDir)
-        {
-            handleWarning(
-                "Remove vignette sources from inst/doc; ",
-                "they belong in vignettes/."
-            )
-        }
-    }
+    if (length(instdocdircontents) && checkingDir)
+        handleWarning(
+            "Remove vignette sources from inst/doc; ",
+            "they belong in vignettes/."
+        )
 }
 
 checkVigFiles <- function(vigdir, vigdircontents){

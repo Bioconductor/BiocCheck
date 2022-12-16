@@ -3,6 +3,9 @@ CHANGES IN VERSION 1.36.0
 
 NEW FEATURES
 
+    o Source package directories that include an `inst/doc` folder with files
+    are now flagged with an error. `doc` folders are generated during
+    `R CMD build`.
     o The error for packages already hosted on CRAN has been converted to a
     warning (@lshep, #177). Any such incoming packages must be removed from CRAN
     before the following Bioconductor release.

@@ -177,7 +177,8 @@ BiocCheckRun <-
     .BiocCheck$show_meta()
 
     handleMessage("* Installing package...", indent = 0, exdent = 0)
-    ## checks
+    
+    # BiocCheck checks --------------------------------------------------------
     if (is.null(dots[["no-check-deprecated"]])){
         handleCheck("Checking for deprecated package usage...")
         checkDeprecatedPackages(package_dir)
@@ -266,6 +267,11 @@ BiocCheckRun <-
 
     handleCheck("Checking for stray BiocCheck output folders...")
     checkBiocCheckOutputFolder(package_dir, package_name)
+    
+    if (!isTar) {
+        handleCheck("Checking for inst/doc folders...")
+        checkInstDocFolder(package_dir, package_name)
+    }
 
     if (is.null(dots[["no-check-vignettes"]])) {
         handleCheck("Checking vignette directory...")
