@@ -165,6 +165,7 @@ BiocCheckRun <-
     checkDir <- .getBiocCheckDir(package_name, checkDir)
     isBBS <- Sys.getenv("IS_BIOC_BUILD_MACHINE")
     onBBS <- nzchar(isBBS) && identical(tolower(isBBS), "true")
+    hasAdmin <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
 
     .BiocCheck$metadata <- list(
         BiocCheckVersion = bioccheckver,
@@ -353,7 +354,7 @@ BiocCheckRun <-
 
     if (is.null(dots[["no-check-bioc-help"]])) {
         handleCheck("Checking for bioc-devel mailing list subscription...")
-        if (onBBS) {
+        if (hasAdmin) {
             checkForBiocDevelSubscription(package_dir)
         } else {
             handleNote(
