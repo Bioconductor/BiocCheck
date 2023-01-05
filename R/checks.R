@@ -158,23 +158,40 @@ checkPackageSize <- function(pkg, pkgdir, size=5){
     }
 }
 
+.MAX_FILE_SIZE <- 5*10^6 ## 5MB
+
+.checkLargeSize <- function(filenames) {
+    datasizes <- file.size(filenames)
+    allfiles[datasizes > .MAX_FILE_SIZE]
+}
+
 checkIndivFileSizes <- function(pkgdir)
 {
-    pkgType <- getPkgType(pkgdir)
-    if (is.na(pkgType) ||  pkgType == "Software") {
-        maxSize <- 5*10^6 ## 5MB
-        allFiles <- list.files(pkgdir, all.files=TRUE, recursive=TRUE)
-        allFilesFullName <- file.path(pkgdir, allFiles)
-        sizes <- file.size(allFilesFullName)
-        largeFiles <- paste(allFiles[sizes > maxSize], collapse=" ")
-        if (any(sizes > maxSize)) {
-            handleWarning(
-                "The following files are over 5MB in size: ",
-                paste0("'", largeFiles, "'", collapse = " ")
+
+    allFolders <- list.dirs(pkgdir, full.names = TRUE, recursive = TRUE)
+    dataf <- basename(allFolders) %in% c("data", "extdata", "data-raw")
+    alldatafiles <- list.files(
+        allFolders[dataf], full.names = TRUE, recursive = TRUE
+    )
+    if (length(alldatafiles)) {
+        largefiles <- .checkLargeSize(alldatafiles)
+        if (length(largefiles))
+            handleWarningFiles(
+                "The 5MB size limit was exceeded in data files",
+                messages = largefiles
             )
-            return(TRUE)
-        }
     }
+
+    allother <- list.files(
+        allFolders[!dataf], all.files = TRUE,
+        recursive = TRUE, full.names = TRUE
+    )
+    otherlarge <- .checkLargeSize(allother)
+    if (length(otherlarge))
+        handleWarningFiles(
+            "The 5MB size limit was exceeded in package files",
+            messages = otherlarge
+        )
 }
 
 .testRbuildignore <- function(text) {
