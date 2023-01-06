@@ -409,6 +409,26 @@ test_checkLicenseForRestrictiveUse <- function() {
     checkEqualsNumeric(1, .BiocCheck$getNum("note"))
 }
 
+test_checkIndivFileSizes <- function() {
+    .zeroCounters()
+    .findLargeFiles_org <- BiocCheck:::.findLargeFiles
+    .findLargeFiles <- function(...) {
+        c("fileA.rda", "fileB.rds")
+    } 
+    assignInNamespace('.findLargeFiles', .findLargeFiles, "BiocCheck")
+    on.exit({
+        assignInNamespace('.findLargeFiles', .findLargeFiles_org, "BiocCheck")
+    })
+    
+    BiocCheck:::checkIndivFileSizes(UNIT_TEST_TEMPDIR)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    .zeroCounters()
+    
+    BiocCheck:::checkDataFileSizes(UNIT_TEST_TEMPDIR)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    .zeroCounters()
+}
+
 test_checkBBScompatibility <- function()
 {
     pkgdir <- UNIT_TEST_TEMPDIR

@@ -227,6 +227,7 @@ BiocCheckRun <-
     if (is.null(dots[["no-check-file-size"]])){
         handleCheck("Checking individual file sizes...")
         checkIndivFileSizes(package_dir)
+        checkDataFileSizes(package_dir)
     }
 
     if (is.null(dots[["no-check-bioc-views"]]))
