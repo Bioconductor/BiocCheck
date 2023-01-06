@@ -160,37 +160,37 @@ checkPackageSize <- function(pkg, pkgdir, size=5){
 
 .MAX_FILE_SIZE <- 5*10^6 ## 5MB
 
-.checkLargeSize <- function(filenames) {
-    datasizes <- file.size(filenames)
-    allfiles[datasizes > .MAX_FILE_SIZE]
+.findLargeFiles <- function(pkgdir, data_only) {
+    stopifnot(is.logical(data_only))
+    folders <- list.dirs(pkgdir, full.names = TRUE, recursive = TRUE)
+    data_folders <- basename(folders) %in% c("data", "extdata", "data-raw")
+    if (data_only)
+        folders <- folders[data_folders]
+    else
+        folders <- folders[!data_folders]
+    files <- list.files(folders, full.names = TRUE, recursive = TRUE)
+    filesizes <- file.size(files)
+    files[filesizes > .MAX_FILE_SIZE]
 }
 
 checkIndivFileSizes <- function(pkgdir)
 {
-
-    allFolders <- list.dirs(pkgdir, full.names = TRUE, recursive = TRUE)
-    dataf <- basename(allFolders) %in% c("data", "extdata", "data-raw")
-    alldatafiles <- list.files(
-        allFolders[dataf], full.names = TRUE, recursive = TRUE
-    )
-    if (length(alldatafiles)) {
-        largefiles <- .checkLargeSize(alldatafiles)
-        if (length(largefiles))
-            handleWarningFiles(
-                "The 5MB size limit was exceeded in data files",
-                messages = largefiles
-            )
-    }
-
-    allother <- list.files(
-        allFolders[!dataf], all.files = TRUE,
-        recursive = TRUE, full.names = TRUE
-    )
-    otherlarge <- .checkLargeSize(allother)
-    if (length(otherlarge))
+    largefiles <- .findLargeFiles(pkgdir, data_only = FALSE)
+    if (length(largefiles))
         handleWarningFiles(
-            "The 5MB size limit was exceeded in package files",
-            messages = otherlarge
+            "The 5MB size limit was exceeded in package files.",
+            messages = largefiles
+        )
+}
+
+checkDataFileSizes <- function(pkgdir) {
+    largedata <- .findLargeFiles(pkgdir, data_only = TRUE)
+    if (length(largedata))
+        handleWarning(
+            "The 5MB size limit was exceeded in data files.",
+            help_text =
+                "Use 'ExperimentHub' or 'AnnotationHub' for the files: ",
+            messages = largedata
         )
 }
 
