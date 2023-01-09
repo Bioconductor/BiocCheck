@@ -177,8 +177,9 @@ checkIndivFileSizes <- function(pkgdir)
 {
     largefiles <- .findLargeFiles(pkgdir, data_only = FALSE)
     if (length(largefiles))
-        handleWarningFiles(
-            "The 5MB size limit was exceeded in package files.",
+        handleWarning(
+            "Package files exceed the 5MB size limit.",
+            help_text = "Files over the limit: ",
             messages = largefiles
         )
 }
@@ -187,7 +188,7 @@ checkDataFileSizes <- function(pkgdir) {
     largedata <- .findLargeFiles(pkgdir, data_only = TRUE)
     if (length(largedata))
         handleWarning(
-            "The 5MB size limit was exceeded in data files.",
+            "Data files exceed the 5MB size limit.",
             help_text =
                 "Use 'ExperimentHub' or 'AnnotationHub' for the files: ",
             messages = largedata

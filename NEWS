@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.36.0
 
 NEW FEATURES
 
+    o Include size limit checks for data files in `data`, `inst/extdata`, and
+    `data-raw` folders (@lshep, #167, #67)
     o Source package directories that include an `inst/doc` folder with files
     are now flagged with an error. `doc` folders are generated during
     `R CMD build`.

@@ -158,7 +158,9 @@ Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
   checking a source tarball. (ERROR)
 
 * **Checking individual file sizes**
-  The current size limit for all individual files is 5 MB. (WARNING)
+  The current size limit for all individual files is 5 MB. Checks inspect both
+  package-wide files and data files found in the `data`, `inst/extdata`, and
+  `data-raw` folders. (WARNING)
 
 It may be necessary to remove large files from your Git history; see
 [Remove Large Data Files and Clean Git Tree][3.1]
