@@ -71,3 +71,58 @@ check_install <- function(pkg) {
 check_inst_pkg <- function(pkg = "getPass") {
     check_install(pkg = pkg)
 }
+
+## test functions > 50 lines are reported
+really_long_function <- function() {
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  
+  return(TRUE)
+}
