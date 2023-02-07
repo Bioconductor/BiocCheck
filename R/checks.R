@@ -1543,9 +1543,9 @@ checkFunctionLengths <- function(parsedCode, pkgname)
                 )
             })
             statusmsg <- paste(
-                "There are", nrow(df), "functions greater than 50 lines."
+                "There are", nrow(h), "functions greater than 50 lines."
             )
-            statusmsg <- .singularize(df, statusmsg)
+            statusmsg <- .singularize(h, statusmsg)
             handleNote(
                 "The recommended function length is 50 lines or less. ",
                 statusmsg,
