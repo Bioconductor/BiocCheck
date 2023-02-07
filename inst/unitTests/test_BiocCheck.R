@@ -1051,6 +1051,17 @@ test_getFunctionLengths2 <- function()
 {
     load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
     BiocCheck:::checkFunctionLengths(IRangesParsedCode, "IRanges")
+    .zeroCounters()
+    
+    ## we should find 1 function that is greater than 50 lines long
+    parsedCode <- BiocCheck:::parseFiles(system.file("testpackages", "testpkg0",
+                                                     package="BiocCheck"))
+    res <- BiocCheck:::checkFunctionLengths(parsedCode, "testpkg0")
+    checkEqualsNumeric(BiocCheck:::.BiocCheck$getNum("note"), 1)
+    checkTrue(grepl(pattern = "There is 1 function greater than 50 lines", 
+                    x = BiocCheck:::.BiocCheck$note$checkFunctionLengths[[1]]),
+              msg = "Checking we report functions > 50 lines long.")
+    .zeroCounters()
 }
 
 test_checkExportsAreDocumented <- function()

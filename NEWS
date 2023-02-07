@@ -16,6 +16,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
     `checkDeprecatedPkgs`
     o Fix issue with path seperators on Windows ('\\' vs '/') causing the unit
     test for `getBiocCheckDir` to report erroneous mismatches (@grimbough, #175)
+    o Fix bug where the wrong number of functions with length greater than 50
+    was reported (@grimbough, #182)
 
 CHANGES IN VERSION 1.34
 -----------------------
