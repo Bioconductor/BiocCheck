@@ -734,9 +734,9 @@ getFunctionLengths <- function(df)
 
         }
     } else {
-       res <- list(as.data.frame(list(
+       res <- list(data.frame(
            length = integer(0), startLine = integer(0), endLine = integer(0)
-       )))
+       ))
     }
     res
 }
