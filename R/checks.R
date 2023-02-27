@@ -1510,45 +1510,40 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
 
 checkFunctionLengths <- function(parsedCode, pkgname)
 {
-    dflist <- vector("list", length(names(parsedCode)))
-    for (filename in names(parsedCode))
-    {
+    parsedCode <- parsedCode[grepl("\\.[Rr]$", names(parsedCode))]
+    fileNames <- vapply(names(parsedCode), getDirFile, character(1L))
+    dflist <- structure(
+        vector("list", length(names(parsedCode))),
+        .Names = fileNames
+    )
+    names(parsedCode) <- fileNames
+    for (filename in names(parsedCode)) {
         pc <- parsedCode[[filename]]
-        filename <- getDirFile(filename)
         res <- getFunctionLengths(pc)
         functionNames <- names(res)
         mt <- do.call(rbind, res)
+        fname <- if (is.null(functionNames)) character(0L) else filename
         df <- cbind.data.frame(
-            filename =
-                if (is.null(functionNames)) {character(0)} else {filename},
-            functionName = functionNames, mt, row.names = NULL
+            filename = fname, functionName = functionNames, mt,
+            row.names = NULL
         )
         dflist[[filename]] <- df
     }
-    dflist <- Filter(length, dflist)
+    dflist <- Filter(nrow, dflist)
     df <- do.call(rbind, dflist)
-    colnames <- c("filename","functionName","length","startLine","endLine")
-    if (!is.null(df) && ncol(df) == length(colnames))
-    {
-        colnames(df) <- colnames
-        df <- df[with(df, order(-length)),]
-        h <- df[df$length > 50,]
-        if (nrow(h))
-        {
-            h5 <- head(df, n=5)
-            fn_msg <- apply(h5, 1L, function(row) {
+    if (nrow(df)) {
+        df <- df[order(-df[["length"]]),]
+        h <- df[df[["length"]] > 50,]
+        if (nrow(h)) {
+            fn_msg <- apply(head(h, n=5), 1L, function(row) {
                 sprintf(
                     "%s() (%s): %s lines",
                     row['functionName'], row['filename'], row['length']
                 )
             })
-            statusmsg <- paste(
-                "There are", nrow(h), "functions greater than 50 lines."
-            )
-            statusmsg <- .singularize(h, statusmsg)
             handleNote(
                 "The recommended function length is 50 lines or less. ",
-                statusmsg,
+                .nline_report(h),
                 help_text = "The longest 5 functions are:" ,
                 messages = fn_msg
             )
@@ -1556,13 +1551,15 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     }
 }
 
-.singularize <- function(obj, message) {
-    thelen <- nrow(obj)
-    if (identical(thelen, 1L)) {
-        message <- gsub("are", "is", message)
-        message <- gsub("functions", "function", message)
-    }
-    message
+.nline_report <- function(data) {
+    fnoun <- "functions"
+    plural <- !identical(nrow(data), 1L)
+    mverb <- if (plural) "are" else "is"
+    if (!plural)
+        fnoun <- substr(fnoun, 1, nchar(fnoun) - 1)
+    paste(
+        "There", mverb, nrow(data), fnoun, "greater than 50 lines."
+    )
 }
 
 checkManDocumentation <- function(package_dir, package_name, libloc)
