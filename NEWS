@@ -18,6 +18,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
     test for `getBiocCheckDir` to report erroneous mismatches (@grimbough, #175)
     o Fix bug where the wrong number of functions with length greater than 50
     was reported (@grimbough, #182)
+    o biocViews term suggestions should be a scalar character (@lcolladotor,
+    #184)
 
 CHANGES IN VERSION 1.34
 -----------------------
