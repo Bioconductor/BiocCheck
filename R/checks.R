@@ -271,8 +271,12 @@ checkBiocViews <- function(pkgdir)
         suggestedViews <- vapply(badViews, function(view) {
             alt <- colnames(distmat)[distmat[view,]]
             msg <- shQuote(view)
-            if (length(alt))
-                msg <- paste0(msg, ": Did you mean ", shQuote(alt), "?")
+            if (length(alt)) {
+                alt <- shQuote(alt)
+                oneof <- if (length(alt) > 1L) "one of" else ""
+                alt <- paste(oneof, paste(alt, collapse = ", "))
+                msg <- paste0(msg, ": Did you mean", alt, "?")
+            }
             msg
         }, character(1))
 
