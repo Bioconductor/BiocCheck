@@ -1146,21 +1146,23 @@ test_getPkgType <- function()
 
 test_checkForBiocDevelSubscription <- function()
 {
-    if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD")))
-    {
+    if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
+
+        if (!dir.exists(UNIT_TEST_TEMPDIR))
+            dir.create(UNIT_TEST_TEMPDIR)
         cat("Maintainer: Joe Blow <foo@bar.com>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
         .zeroCounters()
 
-        cat("Maintainer: Dan Tenenbaum <dtenenba@fredhutch.org>",
+        cat("Maintainer: Bioconductor Maintainer <maintainer@bioconductor.org>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkTrue(stillZero())
         .zeroCounters()
 
-        cat("Maintainer: Dan Tenenbaum <DTENENBA@fredhutch.ORG>",
+        cat("Maintainer: Bioconductor Maintainer <MAINTAINER@bioconductor.ORG>",
                 file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkTrue(stillZero())
@@ -1177,16 +1179,15 @@ test_checkForBiocDevelSubscription <- function()
 
         cat(sprintf(paste(
             "Package: %s\nVersion: 0.99.0\nAuthors@R:",
-            "c(person('Dan', \n  'Tenenbaum', email='dtenenba@fredhutch.org',",
+            "c(person('BioC', \n  'Maintainer',",
+            "email='maintainer@bioconductor.org',",
             "role=c('aut', 'cre')))"
         ), UNIT_TEST_PKG), file=file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkTrue(stillZero())
         .zeroCounters()
 
-
     }
-
 }
 
 test_checkForSupportSiteRegistration <- function()
