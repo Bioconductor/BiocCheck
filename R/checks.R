@@ -1533,6 +1533,8 @@ checkForDirectSlotAccess <- function(parsedCode, package_name)
 checkFunctionLengths <- function(parsedCode, pkgname)
 {
     parsedCode <- parsedCode[grepl("\\.[Rr]$", names(parsedCode))]
+    if (!length(parsedCode))
+        return(invisible())
     fileNames <- vapply(names(parsedCode), getDirFile, character(1L))
     dflist <- structure(
         vector("list", length(names(parsedCode))),
@@ -1553,7 +1555,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     }
     dflist <- Filter(nrow, dflist)
     df <- do.call(rbind, dflist)
-    if (nrow(df)) {
+    if (length(df) && nrow(df)) {
         df <- df[order(-df[["length"]]),]
         h <- df[df[["length"]] > 50,]
         if (nrow(h)) {
