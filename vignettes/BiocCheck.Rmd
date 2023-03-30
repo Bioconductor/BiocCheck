@@ -510,6 +510,9 @@ lists the ones that don't contain runnable examples (either because
 there is no `examples` section or because its examples are tagged with
 `dontrun` or `donttest`). Runnable examples are a key part of literate
 programming and help ensure that your code does what you say it does.
+Currently, the man page for re-exported functions (`man/reexports.Rd`)
+is excluded from this check, as it's not possible to add runnable examples
+for the re-rexported functions.
 
 * Checks that at least 80% of man pages must have runnable examples (`ERROR`).
 * Checks that, if more than 80% of the man pages have runnable
