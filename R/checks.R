@@ -1622,36 +1622,25 @@ checkForPromptComments <- function(pkgdir)
         )
 }
 
+.valueInManPage <- function(manpage) {
+    rd <- tools::parse_Rd(manpage)
+    tags <- tools:::RdTags(rd)
+    value <- rd[grepl("\\value", tags)]
+    value <- unlist(value, recursive = FALSE)
+    value <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", value)
+    values <- paste(value, collapse='')
+    nzchar(trimws(values)) && length(value)
+}
+
 checkForValueSection <- function(pkgdir)
 {
     pkgname <- basename(pkgdir)
-    manpages <- dir(file.path(pkgdir, "man"),
-        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
-    ok <- vapply(manpages, function(manpage) {
-        rd <- tools::parse_Rd(manpage)
-        tags <- tools:::RdTags(rd)
-
-        type <- docType(rd)
-        if (identical(type, "data"))
-            return(TRUE)
-
-        value <- NULL
-        if ("\\usage" %in% tags && (!"\\value" %in% tags))
-            return(FALSE)
-
-        if ("\\value" %in% tags)
-            value <- rd[grep("\\value", tags)]
-
-        if ("\\usage" %in% tags && !is.null(value))
-        {
-            values <- paste(unlist(value), collapse='')
-            tst <- (is.list(value[[1]]) && length(value[[1]]) == 0) ||
-                nchar(gsub("^\\s+|\\s+$", "", values)) == 0
-            if (tst)
-                return(FALSE)
-        }
-        TRUE
-    }, logical(1))
+    manpages <- list.files(
+        path = file.path(pkgdir, "man"),
+        pattern = "\\.[Rr][Dd]$",
+        full.names = TRUE
+    )
+    ok <- vapply(manpages, .valueInManPage, logical(1))
     if (!all(ok)) {
         not_oks <- vapply(manpages[!ok], getDirFile, character(1L))
         handleWarningFiles(

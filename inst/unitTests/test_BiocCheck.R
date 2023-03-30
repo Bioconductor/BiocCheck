@@ -1348,6 +1348,22 @@ test_doesManPageHaveRunnableExample <- function()
     checkEquals(BiocCheck:::doesManPageHaveRunnableExample(bad), FALSE)
 }
 
+test_checkForValueSection <- function() {
+    man <- system.file(
+        "testpackages", "testpkg0", "man", package = "BiocCheck"
+    )
+    mans <- list.files(man, full.names = TRUE)
+    checkTrue(!BiocCheck:::.valueInManPage(mans[1]))
+    checkTrue(!BiocCheck:::.valueInManPage(mans[2]))
+    checkTrue(BiocCheck:::.valueInManPage(mans[3]))
+    man <- system.file(
+        "testpackages", "testpkg1", "man", package = "BiocCheck"
+    )
+    mans <- list.files(man, full.names = TRUE)
+    checkTrue(!BiocCheck:::.valueInManPage(mans[1]))
+    checkTrue(!BiocCheck:::.valueInManPage(mans[2]))
+}
+
 test_packageAlreadyExists <- function()
 {
     .zeroCounters()
