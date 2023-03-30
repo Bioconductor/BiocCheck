@@ -22,6 +22,14 @@ BUG FIXES AND MINOR IMPROVEMENTS
     was reported (@grimbough, #182)
     o biocViews term suggestions should be a scalar character (@lcolladotor,
     #184)
+    o Update email in bioc-devel subscription check (@lshep, #185)
+    o Handle function length checks when there is no R code (@lshep, #186)
+    o Edit warning text when empty or missing `value` sections are found in
+    a package (@vjcitn)
+    o `checkForValueSection` re-implemented for clarity; filters out comments
+    in `value` sections (@LiNk-NY)
+    o Correctly identify `Rd` comments by updating the regular expression to
+    identify them (@LiNk-NY)
 
 CHANGES IN VERSION 1.34
 -----------------------
