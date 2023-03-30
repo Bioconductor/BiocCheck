@@ -1610,7 +1610,7 @@ checkForPromptComments <- function(pkgdir)
     bad <- vapply(manpages,
         function(manpage) {
             lines <- readLines(manpage, warn=FALSE)
-            any(grepl("^%% ~", lines))
+            any(grepl("^%%\\s+~", lines))
         },
         logical(1L)
     )
