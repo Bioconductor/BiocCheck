@@ -1662,10 +1662,18 @@ checkForValueSection <- function(pkgdir)
 }
 
 # Which pages document things that are exported?
-checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
+checkExportsAreDocumented <- 
+    function(pkgdir, pkgname, lib.loc, exclude = c("reexports.Rd"))
 {
-    manpages <- dir(file.path(pkgdir, "man"),
-        pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+
+    manpages <- if(length(exclude) == 0) { 
+            dir(file.path(pkgdir, "man"),
+              pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+        } else { 
+            manpages_all <- dir(file.path(pkgdir, "man"),
+              pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
+            manpages_all[!basename(manpages_all) %in% exclude]
+        } 
     pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
     exports <- getNamespaceExports(pkg_ns)
     unloadNamespace(pkg_ns)
