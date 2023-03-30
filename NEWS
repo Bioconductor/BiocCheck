@@ -22,7 +22,7 @@ BUG FIXES AND MINOR IMPROVEMENTS
     was reported (@grimbough, #182)
     o biocViews term suggestions should be a scalar character (@lcolladotor,
     #184)
-    o exclude `man/reexport.Rd` from `checkExportsAreDocumented` check
+    o exclude `man/reexports.Rd` from `checkExportsAreDocumented` check
 
 CHANGES IN VERSION 1.34
 -----------------------
