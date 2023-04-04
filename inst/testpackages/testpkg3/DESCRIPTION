@@ -1,0 +1,13 @@
+Package: testpkg3
+Title: test umbrella pkg
+Description: this is the dummpy umbrella package
+Version: 0.1
+Author: Joe Blow
+Maintainer: Joe Blow <joe@blow.com>
+Depends: R (>= 3.1.0), jsonlite
+Imports: utils, stats
+License: GPL-2
+LazyData: false
+VignetteBuilder: knitr
+RoxygenNote: 7.2.3
+Encoding: UTF-8
