@@ -1096,6 +1096,19 @@ test_checkExportsAreDocumented <- function()
     res <- BiocCheck:::checkUsageOfDont(pkgdir)
     checkEqualsNumeric(2, .BiocCheck$getNum("note"))
     .zeroCounters()
+
+    # check for umbrella package with re-rexports
+    pkgdir_re <- system.file("testpackages", "testpkg3", package="BiocCheck")
+    instdir_re <- BiocCheck:::installAndLoad(pkgdir_re)
+    ## re-exports.Rd skipped - no errors
+    res_pass <- BiocCheck:::checkExportsAreDocumented(
+        pkgdir_re, "testpkg3", lib.loc = file.path(instdir_re, "lib"))
+    checkEqualsNumeric(0, .BiocCheck$getNum("error"))
+    ## re-exports.Rd not skipped - expected error thrown
+    res_fail <- BiocCheck:::checkExportsAreDocumented(
+        pkgdir_re, "testpkg3", lib.loc = file.path(instdir_re, "lib"),
+        exclude = NULL)
+    checkEqualsNumeric(1, .BiocCheck$getNum("error"))
 }
 
 test_checkNEWS <- function()
