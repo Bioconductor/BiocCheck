@@ -1642,9 +1642,9 @@ checkForPromptComments <- function(pkgdir)
     if (identical(docType(rd, tags), "package"))
         return(TRUE)
     tagList <- .tagListExtract(rd, tags, "\\value")
-    value <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", tagList)
-    values <- paste(value, collapse='')
-    nzchar(trimws(values)) && length(value)
+    values <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", tagList)
+    value <- paste(values, collapse = "")
+    nzchar(trimws(value)) && length(values)
 }
 
 checkForValueSection <- function(pkgdir)
