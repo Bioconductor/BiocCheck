@@ -1622,12 +1622,34 @@ checkForPromptComments <- function(pkgdir)
         )
 }
 
+.isTagValue <- function(rd, tags, tagName, value) {
+    identical(
+        .tagsExtract(rd, tags, paste0("\\", tagName)),
+        value
+    )
+}
+
+.tagListExtract <- function(rd, tags, Tag) {
+    if (missing(tags))
+        tags <- tools:::RdTags(rd)
+    if (!Tag %in% tags)
+        character(0L)
+    else
+        unlist(rd[tags == Tag], recursive = FALSE)
+}
+
+.tagsExtract <- function(rd, tags, Tag) {
+    tagList <- .tagListExtract(rd = rd, tags = tags, Tag = Tag)
+    as.character(tagList)
+}
+
 .valueInManPage <- function(manpage) {
     rd <- tools::parse_Rd(manpage)
     tags <- tools:::RdTags(rd)
-    value <- rd[grepl("\\value", tags)]
-    value <- unlist(value, recursive = FALSE)
-    value <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", value)
+    if (.isTagValue(rd, tags, "docType", "package"))
+        return(TRUE)
+    tagList <- .tagListExtract(rd, tags, "\\value")
+    value <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", tagList)
     values <- paste(value, collapse='')
     nzchar(trimws(values)) && length(value)
 }
