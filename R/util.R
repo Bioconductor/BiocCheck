@@ -451,10 +451,10 @@ getMaintainerEmail <- function(pkgdir)
     return(email)
 }
 
-docType <- function(rd) {
-    tags <- tools:::RdTags(rd)
-    if (any(tags == "\\docType"))
-        as.character(rd[tags == "\\docType"][[1L]])
+docType <- function(rd, tags) {
+    if (missing(tags))
+        tags <- tools:::RdTags(rd)
+    .tagsExtract(rd, tags, "\\docType")
 }
 
 

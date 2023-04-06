@@ -1622,13 +1622,6 @@ checkForPromptComments <- function(pkgdir)
         )
 }
 
-.isTagValue <- function(rd, tags, tagName, value) {
-    identical(
-        .tagsExtract(rd, tags, paste0("\\", tagName)),
-        value
-    )
-}
-
 .tagListExtract <- function(rd, tags, Tag) {
     if (missing(tags))
         tags <- tools:::RdTags(rd)
@@ -1646,7 +1639,7 @@ checkForPromptComments <- function(pkgdir)
 .valueInManPage <- function(manpage) {
     rd <- tools::parse_Rd(manpage)
     tags <- tools:::RdTags(rd)
-    if (.isTagValue(rd, tags, "docType", "package"))
+    if (identical(docType(rd, tags), "package"))
         return(TRUE)
     tagList <- .tagListExtract(rd, tags, "\\value")
     value <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", tagList)
