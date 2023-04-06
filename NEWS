@@ -14,6 +14,8 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Filter out 'package' docTypes from '\value' documentaiton checks
+    (@grimbough, #189)
     o Obtain a more complete list of deprecated packages for
     `checkDeprecatedPkgs`
     o Fix issue with path seperators on Windows ('\\' vs '/') causing the unit
