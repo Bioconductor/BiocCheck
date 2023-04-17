@@ -114,7 +114,7 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkIdentical(
         .BiocCheck$getNum(c("error", "warning", "note")),
-        c(error = 0L, warning = 1L, note = 1L)
+        c(error = 0L, warning = 2L, note = 1L)
     )
     .zeroCounters()
 
@@ -128,8 +128,9 @@ test_vignettes0 <- function()
         file=file.path(pkgdir, "DESCRIPTION")
     )
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkCounter(
-        "'sessionInfo' not found in vignette", "note"
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 0L, warning = 1L, note = 1L)
     )
     .zeroCounters()
 
@@ -155,6 +156,15 @@ test_vignettes0 <- function()
     unlink(file.path(instdoc, "test.Rmd"))
     .zeroCounters()
 
+    # check for Rnw vignettes, warn if any
+    vigdircontents <- BiocCheck:::getVigSources(
+        system.file(
+            "testpackages", "testpkg0", "vignettes", package="BiocCheck"
+        )
+    )
+    BiocCheck:::checkVigTypeRNW(vigdircontents)
+    checkEqualsNumeric(1, .BiocCheck$getNum("warning"))
+    .zeroCounters()
 
     # check vigbuilder ERROR
     # in Description but not any vignette
@@ -167,7 +177,7 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkIdentical(
         .BiocCheck$getNum(c("error", "warning", "note")),
-        c(error = 1L, warning = 1L, note = 1L)
+        c(error = 1L, warning = 2L, note = 1L)
     )
     .zeroCounters()
 
@@ -177,7 +187,8 @@ test_vignettes0 <- function()
     cat("Title: something", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     # no error if RNW
-    checkCounter("'sessionInfo' not found in vignette", "note")
+    checkEqualsNumeric(1, .BiocCheck$getNum("warning"))
+    .zeroCounters()
 
     # check defined in desc but default vig
     unlink(file.path(pkgdir, "DESCRIPTION"))
@@ -185,7 +196,7 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkIdentical(
         .BiocCheck$getNum(c("error", "warning", "note")),
-        c(error = 0L, warning = 1L, note = 1L)
+        c(error = 0L, warning = 2L, note = 1L)
     )
     .zeroCounters()
 
@@ -194,8 +205,6 @@ test_vignettes0 <- function()
     pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkEqualsNumeric(9, .BiocCheck$getNum("warning"))
-    checkEquals("* WARNING: Evaluate more vignette chunks.",
-        .BiocCheck$get("warning")[["checkVigChunkEval"]])
     checkTrue(
         any(grepl(
             pattern="VignetteIndex",

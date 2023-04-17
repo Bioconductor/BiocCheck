@@ -609,6 +609,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigMetadata(vigdircontents)
 
+    checkVigTypeRNW(vigdircontents)
+
     checkVigEngine(builder, vigdircontents)
 
     checkVigSuggests(builder, vigdircontents, pkgdir)
@@ -690,6 +692,18 @@ checkVigBuilder <- function(builder, vigdircontents)
             messages = badBuilder
         )
     }
+}
+
+checkVigTypeRNW <- function(vigdircontents) {
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    isRNW <- vigExt == "rnw"
+    vigNames <- basename(vigdircontents[isRNW])
+    if (length(vigNames))
+        handleWarning(
+            "Use RMarkdown instead of Sweave 'Rnw' vignettes.",
+            help_text = "Rnw vignette(s) found:",
+            messages = vigNames
+        )
 }
 
 checkVigMetadata <- function(vigdircontents)

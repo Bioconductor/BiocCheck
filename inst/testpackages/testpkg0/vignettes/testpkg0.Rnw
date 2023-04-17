@@ -1,0 +1,22 @@
+%\VignetteIndexEntry{HowTo}
+%\VignetteDepends{BiocCheck}
+%\VignetteKeywords{example, vignette}
+%\VignettePackage{testpkg0}
+
+\documentclass{article}
+
+<<style, echo=FALSE, results=tex>>=
+BiocStyle::latex(use.unsrturl=FALSE)
+@
+
+\title{testpkg0 How-To}
+\author{Bioconductor Core Team}
+\date{Edited: April 2023; Compiled: \today}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\end{document}

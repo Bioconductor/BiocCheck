@@ -307,6 +307,8 @@ Can be disabled with `--no-check-vignettes`.
 * Checks that the `vignettes` directory exists (`ERROR`).
 * Checks that the `vignettes` directory only contains vignette sources
   *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
+* Checks for `.Rnw` vignettes, if any found, suggest RMarkdown (`.Rmd`)
+  vignettes instead (`WARNING`)
 * Checks whether, while checking a directory (not a tarball), vignette
   sources exist in inst/doc (`ERROR`).
 * Checks that vignetteBuidler/vignetteEngine are listed in, minimally, Suggests
@@ -314,7 +316,7 @@ Can be disabled with `--no-check-vignettes`.
 * Checks that vignetteBuilder in DESCRIPTION and VignetteEngine in vignette
   are compatible (`ERROR`)
 * Checks whether vignette title is still using template value (`WARNING`)
-* Checks wheher the number of `eval=FALSE` chunks is more than 50% of
+* Checks whether the number of `eval=FALSE` chunks is more than 50% of
   the total (`WARNING`).
 * Checks whether the global vignette code option is set to `eval=FALSE`.
   The majority of vignette code is expected to be evaluated (`WARNING`)
