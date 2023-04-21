@@ -650,6 +650,7 @@ test_checkBBScompatibility <- function()
 
 test_checkUnitTests <- function()
 {
+    .zeroCounters()
     BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
     checkTrue(.BiocCheck$getNum("note") == 1)
     dir.create(file.path(UNIT_TEST_TEMPDIR, "tests"),recursive=TRUE)
@@ -1394,7 +1395,6 @@ test_BiocCheckReporters <- function()
     checkTrue(
         !dir.exists(hypo_checkdir)
     )
-    .BiocCheck$writeNSsuggests(isOnBBS = TRUE)
     checkTrue(
         !dir.exists(hypo_checkdir)
     )

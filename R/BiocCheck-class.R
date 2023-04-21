@@ -122,8 +122,6 @@ NULL
 #'     provide a character vector of conditions raised }
 #'   \item{report}{ Write the `00BiocCheck.log` report into the `BiocCheck`
 #'     folder }
-#'   \item{writeNSsuggests}{ Write the namespace suggestions (`00NAMESPACE.log`)
-#'     to the `BiocCheck` folder }
 #'   \item{toJSON}{ Write a JSON file to the location indicated with the
 #'     conditions raised }
 #'   \item{fromJSON}{ Read a JSON file from the location indicated with the

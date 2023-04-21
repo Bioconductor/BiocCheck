@@ -54,8 +54,6 @@ directory as obtained from the metadata }
 provide a character vector of conditions raised }
 \item{report}{ Write the \verb{00BiocCheck.log} report into the \code{BiocCheck}
 folder }
-\item{writeNSsuggests}{ Write the namespace suggestions (\verb{00NAMESPACE.log})
-to the \code{BiocCheck} folder }
 \item{toJSON}{ Write a JSON file to the location indicated with the
 conditions raised }
 \item{fromJSON}{ Read a JSON file from the location indicated with the
