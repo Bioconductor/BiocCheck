@@ -272,25 +272,10 @@ Can be disabled with `--no-check-namespace`
 DESCRIPTION, or vice versa, and provides an explanation of how to fix
 this (`ERROR`).
 
-
-**Checking for namespace import suggestions...**
-
-If the package `codetoolsBioC` is installed, `BiocCheck` will run it
-to see if it has suggestions for the "Imports" section of your package
-NAMESPACE.
-
 ## .Rbuildignore checks
 
 * **Checking .Rbuildignore...** ensures that the 'tests' folder is
   not accidentally added to the `.Rbuildignore` file (`ERROR`).
-
-`codetoolsBioC` is an experimental package that is not presently
-available via `BiocManager::install()`. It is available from our
-[Subversion repository][7] with the credentials readonly/readonly.
-Output of codetoolsBioC is printed to the screen but `BiocCheck` does
-not label it ERROR, WARNING, or NOTE.
-
-[7]: https://hedgehog.fhcrc.org/bioconductor/trunk/madman/Rpacks/codetoolsBioC
 
 ## BiocCheck output folder check
 

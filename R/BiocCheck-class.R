@@ -241,28 +241,6 @@ NULL
                 outputs, con = file.path(bioccheck_dir, "00BiocCheck.log")
             )
         },
-        writeNSsuggests = function(isOnBBS) {
-            if (isOnBBS)
-                return()
-            bioccheck_dir <- getBiocCheckDir()
-            pkgName <- getElement(.self$metadata, "Package")
-            require(pkgName,
-                lib.loc = file.path(.self$metadata$installDir, "lib"),
-                quietly = TRUE, character.only = TRUE)
-            suggestions <- try(
-                suppressMessages(suppressWarnings(
-                    capture.output(codetoolsBioC::writeNamespaceImports(pkgName))
-                )), silent = TRUE
-            )
-            if (inherits(suggestions, "try-error")) {
-                msg <- "Could not get namespace suggestions."
-            } else {
-                msg <- c("Namespace import suggestions are:", suggestions)
-            }
-            writeLines(
-                msg, con = file.path(bioccheck_dir, "00NAMESPACE.log")
-            )
-        },
         toJSON = function(file) {
             out <- Filter(length, .self$log)
             jlog <- jsonlite::toJSON(out, auto_unbox = FALSE)

@@ -254,14 +254,6 @@ BiocCheckRun <-
     if (is.null(dots[["no-check-namespace"]])){
         handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
         checkDescriptionNamespaceConsistency(package_name, libloc)
-
-        if (suppressMessages(suppressWarnings(requireNamespace("codetoolsBioC",
-                                                               quietly=TRUE))))
-            {
-                handleCheck("Checking for namespace import suggestions...")
-                .BiocCheck$writeNSsuggests(onBBS)
-                # checkImportSuggestions(package_name)
-            }
     }
 
     handleCheck("Checking .Rbuildignore...")

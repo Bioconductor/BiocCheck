@@ -552,23 +552,6 @@ checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
     }
 }
 
-checkImportSuggestions <- function(pkgname)
-{
-    suggestions <- try(
-        suppressMessages(suppressWarnings(
-            capture.output(codetoolsBioC::writeNamespaceImports(pkgname))
-        )), silent = TRUE
-    )
-    if (inherits(suggestions, "try-error")) {
-        handleMessage("Could not get namespace suggestions.")
-    } else {
-        handleMessage("Namespace import suggestions are:")
-        handleVerbatim(suggestions, indent=4, exdent=4, width=100000)
-        handleMessage("--END of namespace import suggestions.")
-    }
-    suggestions
-}
-
 checkVignetteDir <- function(pkgdir, checkingDir)
 {
     vigdir <- file.path(pkgdir, "vignettes")

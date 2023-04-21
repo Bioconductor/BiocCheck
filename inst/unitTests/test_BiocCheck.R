@@ -996,28 +996,6 @@ test_checkDescriptionNamespaceConsistency <- function()
     )
 }
 
-test_checkImportSuggestions <- function()
-{
-    if (requireNamespace("codetoolsBioC", quietly=TRUE)) {
-        suggestions <- BiocCheck:::checkImportSuggestions("RUnit")
-        # sometimes it works and sometimes it doesn't
-        checkTrue(is.character(suggestions))
-
-        pkgpath <- create_test_package()
-        pkgname <- basename(pkgpath)
-        instdir <- BiocCheck:::installAndLoad(pkgpath)
-        require(pkgname, lib.loc = file.path(instdir, "lib"), character.only = TRUE)
-        suggestions <- BiocCheck:::checkImportSuggestions(pkgname)
-        unloadNamespace(pkgname)
-        checkTrue(is.character(suggestions))
-        checkTrue(!length(suggestions))
-
-        suggestions <- BiocCheck:::checkImportSuggestions("FakePackage")
-        checkTrue(is.character(suggestions))
-        checkTrue(inherits(suggestions, "try-error"))
-    }
-}
-
 test_remotesUsage <- function()
 {
     pkg <- system.file("testpackages", "testpkg0", package="BiocCheck")
