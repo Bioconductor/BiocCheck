@@ -1013,8 +1013,9 @@ checkPkgInstallCalls <- function(package_dir, badCalls = .BAD_INSTALL_CALLS) {
     )
     if (length(msg_installs)) {
         handleNote(
-            "install, biocLite, install.packages,",
-            " or update.packages found in R files",
+            "Avoid using install, biocLite, install.packages,",
+            " or update.packages",
+            help_text = "Functions in files:",
             messages = msg_installs
         )
     }
