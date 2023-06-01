@@ -191,16 +191,49 @@ get_deprecated_status_db_url <- function(version) {
     )
 }
 
+#' @importFrom BiocFileCache BiocFileCache bfcquery bfcneedsupdate bfcdownload
+#'   bfcrpath
 get_status_file_cache <- function(url) {
     cache <- tools::R_user_dir("BiocCheck", "cache")
-    bfc <- BiocFileCache::BiocFileCache(cache, ask = FALSE)
-    rpath <- BiocFileCache::bfcrpath(
+    bfc <- BiocFileCache(cache, ask = FALSE)
+
+    bquery <- bfcquery(bfc, url, "rname", exact = TRUE)
+    if (identical(nrow(bquery), 1L) && bfcneedsupdate(bfc, bquery[["rid"]]))
+        bfcdownload(x = bfc, rid = bquery[["rid"]], rtype = "web")
+
+    bfcrpath(
         bfc, rnames = url, exact = TRUE, download = TRUE, rtype = "web"
     )
-    update <- BiocFileCache::bfcneedsupdate(bfc, names(rpath))
-    if (update)
-        BiocFileCache::bfcdownload(bfc, names(rpath), ask = FALSE)
-    rpath
+}
+
+.STATUS_FILE_FIELDS <- c(
+    "Package", "Version", "Maintainer", "MaintainerEmail",
+    "PackageStatus", "UnsupportedPlatforms"
+)
+
+.SENTINEL_PACKAGE_STATUS <- matrix(
+    ncol = length(.STATUS_FILE_FIELDS),
+    dimnames = list(NULL, .STATUS_FILE_FIELDS)
+)
+
+.try_read_dcf <- function(file) {
+    pkg_status <- try({
+        read.dcf(
+            file, all = TRUE, fields = .STATUS_FILE_FIELDS
+        )
+    }, silent = TRUE)
+    if (is(pkg_status, "try-error"))
+        .SENTINEL_PACKAGE_STATUS
+    else
+        pkg_status
+}
+
+get_status_from_dcf <- function(status_file) {
+    pkg_status <- .try_read_dcf(status_file)
+    is_deprecated <- pkg_status[, "PackageStatus"] == "Deprecated" &
+        !is.na(pkg_status[, "PackageStatus"])
+    names(is_deprecated) <- pkg_status[, "Package"]
+    is_deprecated
 }
 
 get_deprecated_status <- function(version) {
@@ -208,11 +241,7 @@ get_deprecated_status <- function(version) {
         version <- BiocManager:::.version_bioc(version)
     status_file_url <- get_deprecated_status_db_url(version)
     status_file <- get_status_file_cache(status_file_url)
-    pkg_status <- read.dcf(status_file, all = TRUE)
-    is_deprecated <- pkg_status[, "PackageStatus"] == "Deprecated" &
-        !is.na(pkg_status[, "PackageStatus"])
-    names(is_deprecated) <- pkg_status[, "Package"]
-    is_deprecated
+    get_status_from_dcf(status_file)
 }
 
 getAllDeprecatedPkgs <- function()
@@ -221,7 +250,7 @@ getAllDeprecatedPkgs <- function()
     ## deprecated packages rather than using the VIEWS files
     deps_release <- get_deprecated_status("release")
     deps_devel <- get_deprecated_status("devel")
-    
+
     union(
         names(deps_release[deps_release]),
         names(deps_devel[deps_devel])
