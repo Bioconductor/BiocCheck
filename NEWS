@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.38.0
+-----------------------
+
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o Improve the `read.dcf` operation that looks for any deprecated packages
+    in both Bioconductor release and devel versions.
+
 CHANGES IN VERSION 1.36.0
 -----------------------
 
