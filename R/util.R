@@ -364,7 +364,7 @@ getDirFile <- function(fpath) {
 .getTokenTextCode <- function(parsedf, token, text, lookback = character(0)) {
     cond <- parsedf$token %in% token & parsedf$text %in% text
     if (length(lookback))
-        cond <- cond & parsedf$token[which(cond) - 1] != shQuote(lookback)
+        cond[cond] <- parsedf$token[which(cond) - 1] != lookback
     parsedf[
         cond,
         c("line1", "col1", "token", "text"),

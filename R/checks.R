@@ -1117,7 +1117,9 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
     }
 
     # T/F
-    msg_tf <- findSymbolsInRFiles(pkgdir, c("T", "F"), "SYMBOL", lookback = "$")
+    msg_tf <- findSymbolsInRFiles(
+        pkgdir, c("T", "F"), "SYMBOL", lookback = "'$'"
+    )
     if (length(msg_tf)) {
         handleWarning(
             " Avoid T/F variables; If logical, use TRUE/FALSE ",
