@@ -955,7 +955,9 @@ checkVigSessionInfo <- function(pkgdir) {
             list(parseFile(vfile, pkgdir)), .Names = vfile
         )
         res <- findSymbolsInParsedCode(
-            pc, c("sessionInfo", "session_info"), "SYMBOL_FUNCTION_CALL"
+            parsedCodeList = pc,
+            symbolNames = c("sessionInfo", "session_info"),
+            tokenTypes = "SYMBOL_FUNCTION_CALL"
         )
         if (!length(res)) {
             notFoundVig[[vfile]] <- TRUE
@@ -994,7 +996,10 @@ findSymbolsInRFiles <-
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
     msg_res <- findSymbolsInParsedCode(
-        parsedCodes, Symbols, tokenType, fun = fun, ...
+        parsedCodeList = parsedCodes,
+        symbolNames = Symbols,
+        tokenTypes = tokenType,
+        fun = fun, ...
     )
     unlist(msg_res)
 }
@@ -1379,7 +1384,9 @@ checkCatInRCode <-
     parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges)
     parsedCodes <- lapply(parsedCodes, .filterS3printRanges)
     msg_res <- findSymbolsInParsedCode(
-        parsedCodes, symbols, c("SYMBOL_FUNCTION_CALL", "SYMBOL")
+        parsedCodeList = parsedCodes,
+        symbolNames = symbols,
+        tokenTypes = c("SYMBOL_FUNCTION_CALL", "SYMBOL")
     )
     unlist(msg_res)
 }
@@ -1391,7 +1398,10 @@ checkEqInAssignment <- function(Rdir, symbol = "=", tokenType = "EQ_ASSIGN") {
         structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
     )
     msg_res <- findSymbolsInParsedCode(
-        parsedCodes, symbol, tokenType, fun = FALSE
+        parsedCodeList = parsedCodes,
+        symbolNames = symbol,
+        tokenTypes = tokenType,
+        fun = FALSE
     )
     unlist(msg_res)
 }
@@ -1507,7 +1517,9 @@ checkOnAttachLoadCalls <- function(Rdir) {
     })
     parsedCodes <- Filter(nrow, parsedCodes)
     msg_dl <- findSymbolsInParsedCode(
-        parsedCodes, "download.*", "SYMBOL_FUNCTION_CALL",
+        parsedCodeList = parsedCodes,
+        symbolNames = "download.*",
+        tokenTypes = "SYMBOL_FUNCTION_CALL",
         FUN = .grepTokenTextCode
     )
     unlist(msg_dl)

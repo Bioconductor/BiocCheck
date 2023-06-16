@@ -786,8 +786,11 @@ test_checkForBrowser <- function()
     if (is.null(parsedCode))
         parsedCode <- BiocCheck:::parseFiles(system.file("testpackages",
             "testpkg0", package="BiocCheck"))
-    res <- BiocCheck:::findSymbolsInParsedCode(parsedCode, "browser",
-        "SYMBOL_FUNCTION_CALL")
+    res <- BiocCheck:::findSymbolsInParsedCode(
+        parsedCodeList = parsedCode,
+        symbolNames = "browser",
+        tokenTypes = "SYMBOL_FUNCTION_CALL"
+    )
     checkTrue(length(res) == 1)
 }
 
