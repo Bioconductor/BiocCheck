@@ -991,7 +991,7 @@ test_checkDescriptionNamespaceConsistency <- function()
     checkTrue(
         "devtools" %in% names(getNamespaceImports(pkg_ns))
     )
-    unloadNamespace(pkg_ns)
+    try(unloadNamespace(pkg_ns), silent = TRUE)
 
     run_check(pkgname, instdir)
     checkTrue(.BiocCheck$getNum("warning") == 1)

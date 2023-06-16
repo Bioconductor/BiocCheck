@@ -1680,7 +1680,8 @@ checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
         pattern="\\.Rd$", ignore.case=TRUE, full.names=TRUE)
     pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
     exports <- getNamespaceExports(pkg_ns)
-    unloadNamespace(pkg_ns)
+    ## attempt to unload package namespace
+    try(unloadNamespace(pkg_ns), silent = TRUE)
     badManPages <- character(0)
     exportingPagesCount <- 0L
     noExamplesCount <- 0L
