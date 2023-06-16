@@ -899,6 +899,16 @@ checkVigInstalls <- function(pkgdir) {
     }
 }
 
+## Completely suppress spurious knitr:::remind_sweave() warning that shows up
+## in TclTk popup window in addition to the usual text-only warning.
+quiet_knitr_purl <- function(...)
+{
+    old_CI <- Sys.getenv("CI")
+    Sys.setenv(CI="true")
+    on.exit(Sys.setenv(CI=old_CI))
+    suppressWarnings(knitr::purl(...))
+}
+
 checkVigClassUsage <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
@@ -907,7 +917,7 @@ checkVigClassUsage <- function(pkgdir) {
     )
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
-        knitr::purl(input = vfile, output = tempR, quiet = TRUE)
+        quiet_knitr_purl(input = vfile, output = tempR, quiet = TRUE)
         tokens <- getClassNEEQLookup(tempR)
         viglist[[basename(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
@@ -997,7 +1007,7 @@ findSymbolsInVignettes <-
     viglist <- list()
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
-        knitr::purl(input = vfile, output = tempR, quiet = TRUE)
+        quiet_knitr_purl(input = vfile, output = tempR, quiet = TRUE)
         tokens <- FUN(parseFile(tempR), tokenTypes, Symbols)
         viglist[[getDirFile(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
