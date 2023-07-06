@@ -1668,7 +1668,7 @@ checkForValueSection <- function(pkgdir)
         not_oks <- vapply(manpages[!ok], getDirFile, character(1L))
         handleWarningFiles(
             "Empty or missing \\value sections found in man pages.",
-            messages = paste(not_oks, collapse=", ")
+            messages = not_oks
         )
     }
 }
