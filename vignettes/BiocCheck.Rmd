@@ -9,6 +9,10 @@ vignette: >
   % \VignetteEncoding{UTF-8}
 ---
 
+```{r,include=FALSE,results="hide",message=FALSE,warning=FALSE}
+library(BiocStyle)
+```
+
 # `BiocCheck` Summary
 
 ```{r,include=TRUE,results="hide",message=FALSE,warning=FALSE}
@@ -241,11 +245,11 @@ Can be disabled with `--no-check-bbs`
     * That person must have a syntactically valid email address.
     * That person must have either `family` or `given` name defined.
     * (optional) A syntactically valid [ORCID iD][], results in `NOTE` if not.
-    
+
   Suggests that the maintainer provide an [ORCID iD][] in the `Authors@R`
   field as an argument in the person function, e.g., `comment = c(ORCID = ...)`
   (`NOTE`).
-  
+
 [ORCID iD]: https://orcid.org/
 
 ## DESCRIPTION checks
@@ -282,7 +286,7 @@ this (`ERROR`).
 * **Checking for stray BiocCheck output folders...** ensures that the
   `<package_name>.BiocCheck` folder byproduct when running `BiocCheck(".")`
   locally does not get included in the package directory (`ERROR`).
-  
+
 ## Check for inst/doc folder
 
 * **Checking for inst/doc folders...** ensures that there are no pre-built
