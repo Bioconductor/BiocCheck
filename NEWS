@@ -5,6 +5,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
 
     o Improve the `read.dcf` operation that looks for any deprecated packages
     in both Bioconductor release and devel versions.
+    o Remove overwrite prompt when updating cached resources in deprecated
+    packages check.
 
 CHANGES IN VERSION 1.36.0
 -----------------------
