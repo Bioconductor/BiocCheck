@@ -322,15 +322,15 @@ test_checkBiocCheckOutputFolder <- function()
 
 test_checkInstDocFolder <- function() {
     pkg_folder <- file.path(UNIT_TEST_TEMPDIR, "testPkg")
-    inst_dir <- file.path(pkg_folder, "inst", "doc") 
+    inst_dir <- file.path(pkg_folder, "inst", "doc")
     dir.create(inst_dir, recursive = TRUE)
     BiocCheck:::checkInstDocFolder(pkg_folder, "testpkg")
     checkEqualsNumeric(.BiocCheck$getNum("error"), 0L)
-    
+
     file.create(file.path(inst_dir, "index.html"))
     BiocCheck:::checkInstDocFolder(pkg_folder, "testpkg")
     checkEqualsNumeric(.BiocCheck$getNum("error"), 1L)
-    
+
     unlink(pkg_folder, recursive = TRUE)
     .zeroCounters()
 }
@@ -414,16 +414,16 @@ test_checkIndivFileSizes <- function() {
     .findLargeFiles_org <- BiocCheck:::.findLargeFiles
     .findLargeFiles <- function(...) {
         c("fileA.rda", "fileB.rds")
-    } 
+    }
     assignInNamespace('.findLargeFiles', .findLargeFiles, "BiocCheck")
     on.exit({
         assignInNamespace('.findLargeFiles', .findLargeFiles_org, "BiocCheck")
     })
-    
+
     BiocCheck:::checkIndivFileSizes(UNIT_TEST_TEMPDIR)
     checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
     .zeroCounters()
-    
+
     BiocCheck:::checkDataFileSizes(UNIT_TEST_TEMPDIR)
     checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
     .zeroCounters()
@@ -1075,13 +1075,13 @@ test_getFunctionLengths2 <- function()
     load(system.file("unitTests", "IRangesParsedCode.rda", package="BiocCheck"))
     BiocCheck:::checkFunctionLengths(IRangesParsedCode, "IRanges")
     .zeroCounters()
-    
+
     ## we should find 1 function that is greater than 50 lines long
     parsedCode <- BiocCheck:::parseFiles(system.file("testpackages", "testpkg0",
                                                      package="BiocCheck"))
     res <- BiocCheck:::checkFunctionLengths(parsedCode, "testpkg0")
     checkEqualsNumeric(BiocCheck:::.BiocCheck$getNum("note"), 1)
-    checkTrue(grepl(pattern = "There is 1 function greater than 50 lines", 
+    checkTrue(grepl(pattern = "There is 1 function greater than 50 lines",
                     x = BiocCheck:::.BiocCheck$note$checkFunctionLengths[[1]]),
               msg = "Checking we report functions > 50 lines long.")
     .zeroCounters()

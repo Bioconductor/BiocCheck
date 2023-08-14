@@ -60,7 +60,7 @@
 #'   \item{quit-with-status}{ enable exit code option when performing check}
 #' }
 #'
-#' @param package The path to an R package directory or tarball (`.tar.gz`). 
+#' @param package The path to an R package directory or tarball (`.tar.gz`).
 #'   The `BiocCheck` function is intended to be run from the package
 #'   directory; therefore, the current working directory (given by `getwd()`)
 #'   is the default.
@@ -178,7 +178,7 @@ BiocCheckRun <-
     .BiocCheck$show_meta()
 
     handleMessage("* Installing package...", indent = 0, exdent = 0)
-    
+
     # BiocCheck checks --------------------------------------------------------
     if (is.null(dots[["no-check-deprecated"]])){
         handleCheck("Checking for deprecated package usage...")
@@ -261,7 +261,7 @@ BiocCheckRun <-
 
     handleCheck("Checking for stray BiocCheck output folders...")
     checkBiocCheckOutputFolder(package_dir, package_name)
-    
+
     if (!isTar) {
         handleCheck("Checking for inst/doc folders...")
         checkInstDocFolder(package_dir, package_name)

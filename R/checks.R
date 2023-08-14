@@ -2008,7 +2008,7 @@ checkIsPackageNameAlreadyInUse <- function(
             "Bioconductor must be removed from CRAN before the next",
             "Bioconductor release."
         )
-    
+
     repo.url <- switch(
         repo,
         CRAN = sprintf(
@@ -2035,7 +2035,7 @@ checkIsPackageNameAlreadyInUse <- function(
                 BiocManager::repositories()[repo]
             )
         )
-        
+
     isDuplicate <- tolower(pkgName) %in% tolower(dcf[,"Package"])
     if (isDuplicate && identical(repo, "CRAN"))
         handleWarning(msg)
