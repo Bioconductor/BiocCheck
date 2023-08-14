@@ -265,6 +265,9 @@ Can be disabled with `--no-check-bbs`
 * **Checking for pinned package versions...**
   Ensures that maintainers are not indicating a specific dependency version
   using `==` in the `DESCRIPTION` file (`ERROR`).
+* **Checking for recommended fields in DESCRIPTION...** Looks through the
+  DESCRIPTION file to see whether recommended fields e.g., 'URL' and
+  'BugReports' are populated (`NOTE`).
 
 ##  NAMESPACE checks
 
