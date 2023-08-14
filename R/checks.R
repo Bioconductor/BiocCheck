@@ -2227,6 +2227,18 @@ checkBadFiles <- function(package_dir){
     }
 }
 
+.checkDESCfields <- function(dcf) {
+    handleCheck("Checking for recommeded fields in DESCRIPTION...")
+
+    fields <- c("URL", "BugReports")
+    present <- fields %in% colnames(dcf)
+    res <- fields[!present]
+    if (length(res)) {
+        notFields <- paste(shQuote(res), collapse = ", ")
+        handleNote("Provide ", notFields, " field(s) in DESCRIPTION")
+    }
+}
+
 checkDescription <- function(package_dir) {
     handleCheck("Checking if DESCRIPTION is well formatted...")
     dcf <- tryCatch({
@@ -2250,6 +2262,8 @@ checkDescription <- function(package_dir) {
 checkDESCRIPTIONFile <- function(package_dir) {
     dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
     .checkLicenseForRestrictiveUse(dcf[,"License"])
+
+    .checkDESCfields(dcf)
 
     handleCheck("Checking for pinned package versions...")
     deps <- c("Depends", "Imports", "Suggests", "Enhances", "LinkingTo")

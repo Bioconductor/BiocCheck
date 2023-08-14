@@ -897,6 +897,27 @@ test_checkClassNEEQLookup <- function()
     checkIdentical(4L, length(match))
 }
 
+test_checkDESCRIPTIONfile <- function()
+{
+    dcf <- matrix("https://example.com", dimnames = list(NULL, "URL"))
+    BiocCheck:::.checkDESCfields(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
+    .zeroCounters()
+
+    dcf <- matrix("https://example.com", dimnames = list(NULL, "BugReports"))
+    BiocCheck:::.checkDESCfields(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
+    .zeroCounters()
+
+    dcf <- matrix(
+        c("https://example.com", "https://example.com"), nrow = 1,
+        dimnames = list(NULL, c("BugReports", "URL"))
+    )
+    BiocCheck:::.checkDESCfields(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 0)
+    .zeroCounters()
+}
+
 test_checkDescriptionNamespaceConsistency <- function()
 {
     run_check <- function(pkg, instdir) {
