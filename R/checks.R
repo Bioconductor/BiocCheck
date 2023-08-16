@@ -1644,8 +1644,8 @@ checkForPromptComments <- function(pkgdir)
     as.character(tagList)
 }
 
-.valueInManPage <- function(manpage) {
-    rd <- tools::parse_Rd(manpage)
+.valueInManPage <- function(manpage, usesRdpack) {
+    rd <- .parse_Rd_pack(manpage, usesRdpack)
     tags <- tools:::RdTags(rd)
     if (identical(docType(rd, tags), "package"))
         return(TRUE)
@@ -1653,6 +1653,24 @@ checkForPromptComments <- function(pkgdir)
     values <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", tagList)
     value <- paste(values, collapse = "")
     nzchar(trimws(value)) && length(values)
+}
+
+.usesRdpack <- function(pkgdir) {
+    alldeps <- getAllDependencies(pkgdir)
+    "Rdpack" %in% alldeps
+}
+
+.parse_Rd_pack <- function(manpage, usesRdpack) {
+    sysfile_rdpack <- system.file(package = "Rdpack")
+    rdpack_avail <- nzchar(sysfile_rdpack)
+    if (usesRdpack && rdpack_avail)
+        rdmacros <- file.path(
+            sysfile_rdpack, "help", "macros", "refmacros.Rd"
+        )
+    else
+        rdmacros <- file.path(R.home("share"), "Rd", "macros", "system.Rd")
+
+    tools::parse_Rd(manpage, macros = rdmacros)
 }
 
 checkForValueSection <- function(pkgdir)
@@ -1663,7 +1681,9 @@ checkForValueSection <- function(pkgdir)
         pattern = "\\.[Rr][Dd]$",
         full.names = TRUE
     )
-    ok <- vapply(manpages, .valueInManPage, logical(1))
+    ok <- vapply(
+        manpages, .valueInManPage, logical(1), usesRdpack = .usesRdpack(pkgdir)
+    )
     if (!all(ok)) {
         not_oks <- vapply(manpages[!ok], getDirFile, character(1L))
         handleWarningFiles(
@@ -1685,10 +1705,11 @@ checkExportsAreDocumented <- function(pkgdir, pkgname, lib.loc)
     badManPages <- character(0)
     exportingPagesCount <- 0L
     noExamplesCount <- 0L
+    uses_rd_pack <- .usesRdpack(pkgdir)
 
     for (manpage in manpages)
     {
-        rd <- tools::parse_Rd(manpage)
+        rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
         name <-
             unlist(rd[unlist(lapply(rd, function(x)
                 attr(x, "Rd_tag") == "\\name"))][[1]][1])
@@ -1734,10 +1755,11 @@ checkUsageOfDont <- function(pkgdir)
 
     hasBad <- rep(FALSE, length(manpages))
     hasdontrun <- rep(FALSE, length(manpages))
+    uses_rd_pack <- .usesRdpack(pkgdir)
     for (dx in seq_along(manpages))
     {
         manpage <- manpages[dx]
-        rd <- tools::parse_Rd(manpage)
+        rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
         example <- unlist(lapply(rd,
             function(x) attr(x, "Rd_tag") == "\\examples"))
         hasExamples <- any(example)

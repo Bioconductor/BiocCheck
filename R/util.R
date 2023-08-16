@@ -283,7 +283,8 @@ parseFile <- function(infile, pkgdir) {
             })
         ))
     } else if (grepl("\\.Rd$", infile, TRUE)) {
-        rd <- tools::parse_Rd(infile)
+        uses_rd_pack <- .usesRdpack(pkgdir)
+        rd <- .parse_Rd_pack(infile, usesRdpack = uses_rd_pack)
         outfile <- file.path(parse_dir, "parseFile.tmp")
         code <- capture.output(tools::Rd2ex(rd))
         writeLines(code, con=outfile, sep="\n")
