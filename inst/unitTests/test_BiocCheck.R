@@ -1356,15 +1356,15 @@ test_checkForValueSection <- function() {
         "testpackages", "testpkg0", "man", package = "BiocCheck"
     )
     mans <- list.files(man, full.names = TRUE)
-    checkTrue(!BiocCheck:::.valueInManPage(mans[1]))
-    checkTrue(!BiocCheck:::.valueInManPage(mans[2]))
-    checkTrue(BiocCheck:::.valueInManPage(mans[3]))
+    checkTrue(!BiocCheck:::.valueInManPage(mans[1], FALSE))
+    checkTrue(!BiocCheck:::.valueInManPage(mans[2], FALSE))
+    checkTrue(BiocCheck:::.valueInManPage(mans[3], FALSE))
     man <- system.file(
         "testpackages", "testpkg1", "man", package = "BiocCheck"
     )
     mans <- list.files(man, full.names = TRUE)
-    checkTrue(!BiocCheck:::.valueInManPage(mans[1]))
-    checkTrue(!BiocCheck:::.valueInManPage(mans[2]))
+    checkTrue(!BiocCheck:::.valueInManPage(mans[1], FALSE))
+    checkTrue(!BiocCheck:::.valueInManPage(mans[2], FALSE))
 }
 
 test_packageAlreadyExists <- function()
