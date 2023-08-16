@@ -1013,7 +1013,7 @@ findSymbolsInVignettes <-
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
         quiet_knitr_purl(input = vfile, output = tempR, quiet = TRUE)
-        tokens <- FUN(parseFile(tempR), tokenTypes, Symbols)
+        tokens <- FUN(parseFile(tempR, pkgdir), tokenTypes, Symbols)
         viglist[[getDirFile(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
            getDirFile(vfile), tokens[,"line1"], tokens[,"col1"]
