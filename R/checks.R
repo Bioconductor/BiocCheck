@@ -1489,7 +1489,7 @@ checkExternalData <- function(Rdir) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] == "STR_CONST", ,drop=FALSE]
 
-        platforms <- "githubusercontent|github.*[^html\"]$|gitlab|bitbucket|dropbox"
+        platforms <- "githubusercontent|github.*[^html\"]$|gitlab|bitbucket|[^\\.]dropbox"
         txtkns <- tokens[, "text"]
         hits <- grepl(platforms, txtkns, ignore.case = TRUE) &
             grepl("dl|\\.\\w+\"$", txtkns)
@@ -2166,16 +2166,20 @@ checkWatchedTag <- function(email, pkgname){
     }
 }
 
+.HIDDEN_FILE_EXTS <- c(
+    ".renviron", ".rprofile", ".rproj", ".rproj.user", ".rhistory",
+    ".rapp.history", ".o", ".sl", ".so", ".dylib", ".a", ".dll", ".def",
+    ".ds_store", "unsrturl.bst", ".log", ".aux", ".backups", ".cproject",
+    ".directory", ".dropbox", ".exrc", ".gdb.history", ".gitattributes",
+    ".gitmodules", ".hgtags", ".project", ".seed", ".settings",
+    ".tm_properties", ".rdata"
+)
+
 # taken from
 # https://github.com/wch/r-source/blob/trunk/src/library/tools/R/build.R#L462
 # https://github.com/wch/r-source/blob/trunk/src/library/tools/R/check.R#L4025
 hidden_file_data <- data.frame(
-    file_ext = c(".renviron", ".rprofile", ".rproj", ".rproj.user", ".rhistory",
-        ".rapp.history", ".o", ".sl", ".so", ".dylib", ".a", ".dll", ".def",
-        ".ds_store", "unsrturl.bst", ".log", ".aux", ".backups", ".cproject",
-        ".directory", ".dropbox", ".exrc", ".gdb.history", ".gitattributes",
-        ".gitmodules", ".hgtags", ".project", ".seed", ".settings",
-        ".tm_properties", ".rdata"),
+    file_ext = .HIDDEN_FILE_EXTS,
     hidden_only = c(TRUE, TRUE, FALSE, TRUE, TRUE,
         TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
         TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
