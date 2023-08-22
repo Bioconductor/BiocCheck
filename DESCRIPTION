@@ -16,7 +16,7 @@ Authors@R: c(
       c("aut", "cre"), c(ORCID = "0000-0002-3242-0582")),
     person("Leonardo", "Collado-Torres", role = "ctb"),
     person("Federico", "Marini", role="ctb"))
-Depends: R (>= 4.2.0)
+Depends: R (>= 4.3.0)
 License: Artistic-2.0
 VignetteBuilder: knitr
 Imports:
