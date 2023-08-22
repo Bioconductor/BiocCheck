@@ -114,9 +114,6 @@ BiocCheck <- function(
     ...
 ) {
     if (callr) {
-        if (!requireNamespace("callr", quietly = TRUE))
-            stop("Install the 'callr' package to run 'BiocCheck()'",
-                 " in a separate R session")
         callr::r(
             function(...) { BiocCheck:::BiocCheckRun(...) },
             args = list(

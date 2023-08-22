@@ -903,10 +903,12 @@ checkVigInstalls <- function(pkgdir) {
 ## in TclTk popup window in addition to the usual text-only warning.
 quiet_knitr_purl <- function(...)
 {
-    old_CI <- Sys.getenv("CI")
-    Sys.setenv(CI="true")
-    on.exit(Sys.setenv(CI=old_CI))
-    suppressWarnings(knitr::purl(...))
+    args <- list(...)
+    callr::r(
+        function(...) suppressWarnings(knitr::purl(...)),
+        args = args,
+        env = c(CI = "true")
+    )
 }
 
 checkVigClassUsage <- function(pkgdir) {

@@ -23,6 +23,7 @@ Imports:
     BiocFileCache,
     BiocManager,
     biocViews (>= 1.33.7),
+    callr,
     codetools,
     graph,
     httr,
@@ -32,7 +33,7 @@ Imports:
     tools,
     utils
 Suggests: RUnit, BiocGenerics, Biobase, jsonlite, rmarkdown, downloader,
-    devtools (>= 1.4.1), usethis, BiocStyle, callr
+    devtools (>= 1.4.1), usethis, BiocStyle
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck
 BugReports: https://github.com/Bioconductor/BiocCheck/issues

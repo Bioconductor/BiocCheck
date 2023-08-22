@@ -117,24 +117,40 @@ installAndLoad <- function(pkgpath, install_dir = tempfile())
     dir.create(libdir <- file.path(install_dir, "lib"))
     file.create(stderr <- file.path(install_dir, "install.stderr"))
 
-    r_libs_user_old <- Sys.getenv("R_LIBS_USER")
-    on.exit(do.call("Sys.setenv", list(R_LIBS_USER=r_libs_user_old)))
     r_libs_user <- paste(c(libdir, .libPaths()), collapse=.Platform$path.sep)
-    Sys.setenv(R_LIBS_USER=r_libs_user)
+    lpath <- paste0("--library=", libdir)
+    res <- callr::rcmd_safe(
+        "INSTALL",
+        c(
+            "--no-test-load", "--use-vanilla", lpath, pkgpath
+        ),
+        env = c(callr::rcmd_safe_env(), R_LIBS_USER = r_libs_user)
+    )
 
-    rcmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
-    args <- sprintf("--vanilla CMD INSTALL --no-test-load --library=%s %s",
-                    libdir, shQuote(pkgpath))
-    res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
-    if (res) {
+    if (!identical(res[["status"]], 0L)) {
         handleError(pkgpath, " must be installable.")
     }
     pkgname <- .getPackageName(pkgpath)
-    args <- sprintf(
-        "--vanilla -e 'library(%s)'", pkgname
+    res <- callr::r(
+        function(pkgname, libdir) {
+            tryCatch({
+                library(
+                    package = pkgname, character.only = TRUE, lib.loc = libdir
+                )
+                TRUE
+            }, error = function(e) {
+                FALSE
+            })
+        },
+        args = list(pkgname = pkgname, libdir = libdir),
+        libpath = libdir,
+        cmdargs = c(
+            "--no-save", "--no-restore", "--no-site-file",
+            "--no-init-file", "--no-environ"
+        ),
+        env = c(callr::rcmd_safe_env(), R_LIBS_USER = r_libs_user)
     )
-    res <- .run_r_command(cmd = rcmd, args = args, stderr = stderr)
-    if (res) {
+    if (!res) {
         handleError(pkgpath, " must be loadable.")
     }
     install_dir
