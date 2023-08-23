@@ -17,6 +17,10 @@ only the check name itself in the report}
 layer. Second level lists include any \code{help_text} and \code{messages} that are
 part of the check.}
 }
+\value{
+An internal \code{R5} Reference Class to handle messages and their
+conditions, e.g., for errors, warnings, or notes.
+}
 \description{
 A list of methods for the Message reference class
 }

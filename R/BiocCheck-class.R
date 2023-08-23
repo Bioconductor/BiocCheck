@@ -131,6 +131,9 @@ NULL
 #'     field }
 #' }
 #'
+#' @return An internal `BiocCheck` R5 Reference Class used to document
+#'   conditions such as errors, warnings, and notes
+#'
 #' @md
 #'
 NULL
@@ -307,6 +310,9 @@ NULL
 #' @param \dots `list()` A nested list with the check name as the top level
 #'   layer. Second level lists include any `help_text` and `messages` that are
 #'   part of the check.
+#'
+#' @return An internal `R5` Reference Class to handle messages and their
+#'   conditions, e.g., for errors, warnings, or notes.
 #'
 #' @md
 #'

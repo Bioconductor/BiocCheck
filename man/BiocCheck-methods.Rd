@@ -36,6 +36,10 @@ of folders in the BBS.}
 \item{file}{character(1) A path to a JSON file for writing or reading as
 created by \code{toJSON} and \code{fromJSON} \code{BiocCheck} methods.}
 }
+\value{
+An internal \code{BiocCheck} R5 Reference Class used to document
+conditions such as errors, warnings, and notes
+}
 \description{
 A list of methods for the BiocCheck reference class
 }
