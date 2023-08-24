@@ -1916,8 +1916,11 @@ checkSkipOnBioc <- function(pkgdir)
     fm_idx <- grep("^---\\s*$", lines)
     if (length(fm_idx) && !identical(length(fm_idx), 2L))
         warning("More than 2 YAML front matter delimiters, i.e., '---' found")
-    if (length(fm_idx))
+    if (length(fm_idx)) {
         lines <- lines[-seq(min(fm_idx), max(fm_idx))]
+        class(lines) <- c("readLines", class(lines))
+        attributes(lines) <- list(offset = max(fm_idx))
+    }
     lines
 }
 
@@ -1949,22 +1952,25 @@ checkFormatting <- function(pkgdir, nlines=6)
         if (file.exists(file) && file.info(file)$size > 0)
         {
             lines <- readLines(file, warn=FALSE)
+            offset <- 0L
             totallines <- totallines + length(lines)
 
             n <- nchar(lines, allowNA=TRUE)
             idx <- !is.na(n) & (n > 80L)
-            long <- rbind(long, Context(pkgname, file, lines, idx))
+            long <- rbind(long, Context(file, lines, idx, offset))
 
-            if (identical(tolower(tools::file_ext(file)), "rmd"))
+            if (identical(tolower(tools::file_ext(file)), "rmd")) {
                 lines <- .rmYAMLfm(lines)
+                offset <- attr(lines, "offset")
+            }
 
             idx <- grepl("\t", lines)
-            tab <- rbind(tab, Context(pkgname, file, lines, idx))
+            tab <- rbind(tab, Context(file, lines, idx, offset))
 
             res <- regexpr("^([ ]+)", lines)
             match.length <- attr(res, "match.length")
             idx <- (match.length != -1L) & (match.length %% 4 != 0)
-            indent <- rbind(indent, Context(pkgname, file, lines, idx))
+            indent <- rbind(indent, Context(file, lines, idx, offset))
         }
     }
 

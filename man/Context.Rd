@@ -4,11 +4,9 @@
 \alias{Context}
 \title{Report context of events to user with a data.frame of events and locations}
 \usage{
-Context(pkg = "", file = "", lines = character(), idx = logical())
+Context(file = "", lines = character(), idx = logical(), offset = 0L)
 }
 \arguments{
-\item{pkg}{character(1) name of the package}
-
 \item{file}{character(1) full path (including package name) of file being
 summarized.}
 
