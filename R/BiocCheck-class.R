@@ -318,6 +318,7 @@ NULL
 #'
 NULL
 
+#' @importFrom BiocBaseUtils selectSome
 .MessageCondition <- setRefClass("Message",
     fields = list(
         msg = "list",
@@ -335,7 +336,9 @@ NULL
             } else {
                 lens <- lengths(text)
                 indents <- seq(4, by = 2, length = lens)
-                text[[1]][[lens]] <- selectSome(unlist(tail(text[[1]], 1L)))
+                text[[1]][[lens]] <- selectSome(
+                    unlist(tail(text[[1]], 1L))
+                )
                 mapply(
                     handleMessage,
                     unlist(text, recursive = FALSE, use.names = FALSE),

@@ -20,6 +20,7 @@ Depends: R (>= 4.3.0)
 License: Artistic-2.0
 VignetteBuilder: knitr
 Imports:
+    BiocBaseUtils,
     BiocFileCache,
     BiocManager,
     biocViews (>= 1.33.7),

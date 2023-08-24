@@ -806,14 +806,3 @@ doesManPageHaveRunnableExample <- function(rd)
     # if code contains only comments the length with be 0
     length(parsed) && !inherits(parsed, "try-error")
 }
-
-selectSome <- function(obj, maxToShow = 5) {
-    stopifnot(is.character(obj))
-    if (!maxToShow %% 2)
-        stop("'maxToShow' should be an odd value")
-    edge <- (maxToShow - 1) / 2
-    if (length(obj) > maxToShow)
-        c(head(obj, edge), "...", tail(obj, edge))
-    else
-        obj
-}
