@@ -1903,12 +1903,9 @@ checkSkipOnBioc <- function(pkgdir)
 }
 
 .lineReport <- function(linedf) {
-    apply(
-        linedf,
-        1L,
-        function(row)
-            paste0(row["File"], "#L", row["Line"], " ",
-                substr(row["Context"], 1, 40), "...")
+    paste0(
+        linedf[, "File"], "#L", linedf[, "Line"], " ",
+        substr(linedf[, "Context"], 1, 40), " ..."
     )
 }
 
