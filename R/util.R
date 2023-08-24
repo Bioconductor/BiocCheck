@@ -134,8 +134,8 @@ installAndLoad <- function(pkgpath, install_dir = tempfile())
     res <- callr::r(
         function(pkgname, libdir) {
             tryCatch({
-                library(
-                    package = pkgname, character.only = TRUE, lib.loc = libdir
+                loadNamespace(
+                    package = pkgname, lib.loc = libdir
                 )
                 TRUE
             }, error = function(e) {
