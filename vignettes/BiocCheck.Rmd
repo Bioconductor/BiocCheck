@@ -70,8 +70,9 @@ See the `r Biocpkg("biocthis")` package for more details.
 `BiocCheck` should be installed as follows:
 
 ```{r, eval = FALSE}
-if (!require("BiocManager"))
+if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
+
 BiocManager::install("BiocCheck")
 ```
 
@@ -689,7 +690,6 @@ tarball. Reporting similarly in three categories as discussed above:
 
 
 ```{r eval=FALSE}
-library(BiocCheck)
 BiocCheckGitClone("packageDir")
 ```
 
@@ -708,20 +708,10 @@ Actual `BiocCheckGitClone` output is shown below in **bold**.
 There are a number of files that should not be Git tracked. This check notifies
 if any of these files are present (`ERROR`)
 
-The current list of files checked is as follows:
+The current list of files checked are given by this internal constant:
 
-```
-    hidden_file_ext = c(".renviron", ".rprofile", ".rproj", ".rproj.user",
-        ".rhistory", ".rapp.history",
-        ".o", ".sl", ".so", ".dylib",
-        ".a", ".dll", ".def",
-        ".ds_store", "unsrturl.bst",
-        ".log", ".aux",
-        ".backups", ".cproject", ".directory",
-        ".dropbox", ".exrc", ".gdb.history",
-        ".gitattributes", ".gitmodules",
-        ".hgtags",
-        ".project", ".seed", ".settings", ".tm_properties")
+```{r}
+BiocCheck:::.HIDDEN_FILE_EXTS
 ```
 
 These files may be included in your personal directories but should be added to
@@ -759,6 +749,16 @@ properly without the package being installed. Most common causes of failure
 occur when trying to use helper functions like packageVersion() or packageDate()
 instead of using meta$Version or meta$Date. See [R documentation](https://cran.r-project.org/doc/manuals/r-release/R-exts.html#CITATION-files) for more
 information.
+
+Here is an example of a formatted `CITATION` file. See the `GenomicRanges`
+package `CITATION` file for details.
+
+```{r}
+library(utils)
+readCitationFile(
+    system.file("CITATION", package = "GenomicRanges")
+)
+```
 
 
 # Expanding `BiocCheck`
