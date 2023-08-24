@@ -834,15 +834,15 @@ checkVigChunkEval <- function(vigdircontents)
     if (percent >= 50){
         handleWarning("Evaluate more vignette chunks.")
         msg <- sprintf(
-            "%s code chunks / %s total = %i%% percent unevaluated",
+            "%s out of %s code chunks = %i%% unevaluated",
             totnon,
             chunks,
             percent
         )
         handleMessage(msg, indent = 8)
         handleMessage(
-            sprintf("%s non-exec code chunks (e.g., '``` r')", noneval),
-            indent=8
+            sprintf("%s non-exec code chunk(s) (e.g., '```r')", noneval),
+            indent = 8
         )
     }
 }
