@@ -96,7 +96,9 @@ checkVersionNumber <- function(pkgdir)
         x <- pv$major
         y <- pv$minor
         mod <- y %% 2
-        isDevel <- (BiocManager:::.version_bioc("devel") == BiocManager::version())
+        isDevel <- identical(
+            BiocManager:::.version_bioc("devel"), BiocManager::version()
+        )
         bioc.mod <- ifelse(isDevel, 1, 0)
         if (x == 0) {
             handleMessage("Package version ", as.character(pv), "; pre-release")
