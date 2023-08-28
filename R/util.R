@@ -813,7 +813,5 @@ doesManPageHaveRunnableExample <- function(rd)
         stop("More than 2 YAML front matter delimiters, i.e., '---' found")
     if (length(fm_idx))
         lines <- lines[seq(min(fm_idx), max(fm_idx))]
-    else
-        stop("No YAML delimiters, i.e., '---' found")
     lines
 }
