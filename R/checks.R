@@ -765,30 +765,26 @@ checkVigTemplate <- function(vigdircontents)
         if (identical(tolower(tools::file_ext(file)), "rmd"))
             lines <- .getYAMLfront(lines)
         idx <- grep(lines, pattern="VignetteIndexEntry")
-        if (length(idx) != 0L){
+        if (length(idx)) {
             title <- tolower(gsub(".*\\{|\\}.*", "", lines[idx]))
-            if (title == "vignette title"){
+            if (identical(title, "vignette title"))
                 badVig <- c(badVig, basename(file))
-            }
         }
-        if (length(idx) == 0L){
+        if (!length(idx))
             badVig2 <- c(badVig2, basename(file))
-        }
     }
-    if (length(badVig) != 0L){
+    if (length(badVig))
         handleWarning(
             "Vignette(s) still using 'VignetteIndexEntry{Vignette Title}' ",
             help_text = "The following files use template defaults:",
             messages = badVig
         )
-    }
-    if (length(badVig2) != 0L){
+    if (length(badVig2))
         handleWarning(
             "Vignette(s) missing '\\%VignetteIndexEntry{Vignette Title}'. ",
             help_text = "Update the following files:",
             messages = badVig2
         )
-    }
 }
 
 checkVigChunkEval <- function(vigdircontents)
