@@ -761,7 +761,9 @@ checkVigTemplate <- function(vigdircontents)
     badVig <- character(0)
     badVig2 <- character(0)
     for (file in vigdircontents) {
-        lines <- readLines(file, n=100L, warn=FALSE)
+        lines <- readLines(file, warn=FALSE)
+        if (identical(tolower(tools::file_ext(file)), "rmd"))
+            lines <- .getYAMLfront(lines)
         idx <- grep(lines, pattern="VignetteIndexEntry")
         if (length(idx) != 0L){
             title <- tolower(gsub(".*\\{|\\}.*", "", lines[idx]))

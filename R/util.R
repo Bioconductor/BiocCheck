@@ -806,3 +806,14 @@ doesManPageHaveRunnableExample <- function(rd)
     # if code contains only comments the length with be 0
     length(parsed) && !inherits(parsed, "try-error")
 }
+
+.getYAMLfront <- function(lines) {
+    fm_idx <- grep("^---\\s*$", lines)
+    if (length(fm_idx) && !identical(length(fm_idx), 2L))
+        stop("More than 2 YAML front matter delimiters, i.e., '---' found")
+    if (length(fm_idx))
+        lines <- lines[seq(min(fm_idx), max(fm_idx))]
+    else
+        stop("No YAML delimiters, i.e., '---' found")
+    lines
+}
