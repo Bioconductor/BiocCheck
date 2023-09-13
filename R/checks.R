@@ -161,16 +161,42 @@ checkPackageSize <- function(pkg, pkgdir, size=5){
 }
 
 .MAX_FILE_SIZE <- 5*10^6 ## 5MB
+.DATA_DIRS <- c("data", "inst/extdata", "data-raw")
 
-.findLargeFiles <- function(pkgdir, data_only) {
-    stopifnot(is.logical(data_only))
-    folders <- list.dirs(pkgdir, full.names = TRUE, recursive = TRUE)
-    data_folders <- basename(folders) %in% c("data", "extdata", "data-raw")
-    if (data_only)
-        folders <- folders[data_folders]
-    else
-        folders <- folders[!data_folders]
-    files <- list.files(folders, full.names = TRUE, recursive = TRUE)
+.filter_data <- function(files, for_data = FALSE) {
+    data_dirs <- paste0(.DATA_DIRS, "/")
+    hitmat <- vapply(
+        data_dirs,
+        grepl,
+        logical(length(files)),
+        x = files,
+        fixed = TRUE
+    )
+    hits <- as.logical(rowSums(hitmat))
+    decision <- if (for_data) force else `!`
+    files[decision(hits)]
+}
+
+.in_data <- function(f) { f %in% .DATA_DIRS }
+
+.filter_folders <- function(pkgdir, data_only) {
+    gitignore <- file.exists(file.path(pkgdir, ".gitignore"))
+    if (requireNamespace("gert", quietly = TRUE) && gitignore) {
+        files <- gert::git_ls(repo = pkgdir)[["path"]]
+        files <- .filter_data(files, for_data = data_only)
+        file.path(pkgdir, files)
+    } else {
+        folders <- list.dirs(pkgdir, full.names = FALSE, recursive = TRUE)
+        decision <- if (data_only) force else Negate
+        folders <- Filter(decision(.in_data), folders)
+        list.files(
+            file.path(pkgdir, folders), full.names = TRUE, recursive = TRUE
+        )
+    }
+}
+
+.findLargeFiles <- function(pkgdir, data_only = FALSE) {
+    files <- .filter_folders(pkgdir, data_only = data_only)
     filesizes <- file.size(files)
     files[filesizes > .MAX_FILE_SIZE]
 }
