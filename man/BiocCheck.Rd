@@ -13,10 +13,10 @@ BiocCheck(
 )
 }
 \arguments{
-\item{package}{The path to an R package directory or tarball (\code{.tar.gz}).
-The \code{BiocCheck} function is intended to be run from the package
-directory; therefore, the current working directory (given by \code{getwd()})
-is the default.}
+\item{package}{The path to an R package directory or tarball (\code{.tar.gz} or
+\code{.tar.xz}). The \code{BiocCheck} function is intended to be run from the package
+directory; therefore, the current working directory (given by \code{getwd()}) is
+the default.}
 
 \item{checkDir}{The directory where the \code{BiocCheck} output directory will be
 stored. By default, it will be placed in the same directory as the package
@@ -61,8 +61,8 @@ vignette also provides detailed explanations of all the checks performed by
 \code{BiocCheck}.
 
 \code{BiocCheck} is called within R with \preformatted{ BiocCheck(<package>)
-} where \code{package} points to the source directory or the \code{.tar.gz}
-tarball that was created using \verb{R CMD build}.
+} where \code{package} points to the source directory or the \code{.tar.gz} (or
+\code{.tar.xz}) tarball that was created using \verb{R CMD build}.
 
 \emph{Note} that \code{BiocCheck} is complementary to \verb{R CMD check}.
 \verb{R CMD check} should always be run first for best results.

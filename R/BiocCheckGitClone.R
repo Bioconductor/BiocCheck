@@ -49,7 +49,7 @@ BiocCheckGitClone <- function(package=".", ...)
 {
     .zeroCounters()
     package <- normalizePath(package)
-    isTar <- grepl("\\.tar\\.gz$", package)
+    isTar <- grepl("\\.tar\\.[gx]z$", package)
     if (isTar)
         .stop("Run 'BiocCheckGitClone' on the Git-cloned package directory.")
     if (!dir.exists(package))

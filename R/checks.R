@@ -11,7 +11,7 @@
 checkForVersionNumberMismatch <- function(package, package_dir)
 {
     bn <- basename(package)
-    bn <- sub(".tar.gz", "", bn, TRUE)
+    bn <- sub("\\.tar\\.[gx]z", "", bn, TRUE)
     ver <- strsplit(bn, "_")[[1]][2]
     dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
     dcfVer <- unname(dcf[, "Version"])

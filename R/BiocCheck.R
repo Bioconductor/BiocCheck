@@ -14,8 +14,8 @@
 #' `BiocCheck`.
 #'
 #' `BiocCheck` is called within R with \preformatted{ BiocCheck(<package>)
-#' } where `package` points to the source directory or the `.tar.gz`
-#' tarball that was created using `R CMD build`.
+#' } where `package` points to the source directory or the `.tar.gz` (or
+#' `.tar.xz`) tarball that was created using `R CMD build`.
 #'
 #' \emph{Note} that `BiocCheck` is complementary to `R CMD check`.
 #' `R CMD check` should always be run first for best results.
@@ -60,10 +60,10 @@
 #'   \item{quit-with-status}{ enable exit code option when performing check}
 #' }
 #'
-#' @param package The path to an R package directory or tarball (`.tar.gz`).
-#'   The `BiocCheck` function is intended to be run from the package
-#'   directory; therefore, the current working directory (given by `getwd()`)
-#'   is the default.
+#' @param package The path to an R package directory or tarball (`.tar.gz` or
+#'   `.tar.xz`). The `BiocCheck` function is intended to be run from the package
+#'   directory; therefore, the current working directory (given by `getwd()`) is
+#'   the default.
 #'
 #' @param checkDir The directory where the `BiocCheck` output directory will be
 #'   stored. By default, it will be placed in the same directory as the package
@@ -150,7 +150,7 @@ BiocCheckRun <-
     on.exit(options(warn=oldwarn))
     options(warn=1)
 
-    isTar <- grepl("\\.tar\\.gz$", package)
+    isTar <- grepl("\\.tar\\.[gx]z$", package)
     checkingDir <- !isTar && file.info(package)[["isdir"]]
     package_dir <- .getPackageDir(package, isTar)
     package_name <- .getPackageName(package)
@@ -211,10 +211,9 @@ BiocCheckRun <-
         checkRVersionDependency(package_dir)
     }
 
-    source_tarball <- grepl("\\.tar\\.gz$", package)
     if (is.null(dots[["no-check-pkg-size"]])){
         handleCheck("Checking package size...")
-        if (source_tarball){
+        if (isTar) {
             checkPackageSize(package, package_dir, size=5)
         } else {
             handleMessage("Skipped... only checked on source tarball", indent=6)
@@ -239,7 +238,7 @@ BiocCheckRun <-
 
     if (is.null(dots[["no-check-bbs"]])){
         handleCheck("Checking build system compatibility...")
-        checkBBScompatibility(package_dir, source_tarball)
+        checkBBScompatibility(package_dir, isTar)
     }
 
     if (is.null(dots[["no-check-description"]])) {
@@ -387,7 +386,7 @@ BiocCheckRun <-
 # input can either be tarball or pkg source dir
 .getPackageName <- function(input)
 {
-    isTar <- grepl("\\.tar\\.gz$", input)
+    isTar <- grepl("\\.tar\\.[gx]z$", input)
     if (isTar) {
         tmp_pkg_dir <- .tempPackageDirTarball(input)
         on.exit({
