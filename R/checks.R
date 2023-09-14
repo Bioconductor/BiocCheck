@@ -1646,11 +1646,7 @@ checkForPromptComments <- function(pkgdir)
     as.character(tagList)
 }
 
-.valueInManPage <- function(manpage, usesRdpack) {
-    rd <- .parse_Rd_pack(manpage, usesRdpack)
-    tags <- tools:::RdTags(rd)
-    if (identical(docType(rd, tags), "package"))
-        return(TRUE)
+.valueInParsedRd <- function(rd, tags) {
     tagList <- .tagListExtract(rd, tags, "\\value")
     values <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", tagList)
     value <- paste(values, collapse = "")
@@ -1675,19 +1671,52 @@ checkForPromptComments <- function(pkgdir)
     tools::parse_Rd(manpage, macros = rdmacros)
 }
 
-checkForValueSection <- function(pkgdir)
-{
-    pkgname <- basename(pkgdir)
+.read_all_rds <- function(pkgdir) {
     manpages <- list.files(
         path = file.path(pkgdir, "man"),
         pattern = "\\.[Rr][Dd]$",
         full.names = TRUE
     )
-    ok <- vapply(
-        manpages, .valueInManPage, logical(1), usesRdpack = .usesRdpack(pkgdir)
+    names(manpages) <- .getDirFiles(manpages)
+    usesRdpack <- .usesRdpack(pkgdir)
+    lapply(
+        manpages,
+        function(manpage, usesRdpack) {
+            .parse_Rd_pack(manpage, usesRdpack)
+        },
+        usesRdpack = usesRdpack
+    )
+}
+
+.formatsInParsedRd <- function(rds, tags) {
+    formats <- .tagsExtract(rds, tags, "\\format")
+    value <- paste(formats, collapse = "")
+    nzchar(trimws(value)) && length(formats)
+}
+
+.isValidRdSkip <- function(rds, tags) {
+    dt <- docType(rds, tags)
+    identical(dt, "package") ||
+        (identical(dt, "data") && .formatsInParsedRd(rds, tags))
+}
+
+checkForValueSection <- function(pkgdir)
+{
+    all_rds <- .read_all_rds(pkgdir)
+    all_tags <- lapply(all_rds, tools:::RdTags)
+    ok <- mapply(
+        function(rds, tags) {
+            if (.isValidRdSkip(rds, tags))
+                TRUE
+            else
+                .valueInParsedRd(rds, tags)
+        },
+        rds = all_rds,
+        tags = all_tags,
+        SIMPLIFY = TRUE
     )
     if (!all(ok)) {
-        not_oks <- vapply(manpages[!ok], getDirFile, character(1L))
+        not_oks <- names(ok[!ok])
         handleWarningFiles(
             "Empty or missing \\value sections found in man pages.",
             messages = not_oks
