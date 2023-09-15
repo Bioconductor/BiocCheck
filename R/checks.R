@@ -1940,13 +1940,15 @@ checkSkipOnBioc <- function(pkgdir)
 
 .rmYAMLfm <- function(lines) {
     fm_idx <- grep("^---\\s*$", lines)
+    offval <- 0L
     if (length(fm_idx) && !identical(length(fm_idx), 2L))
         warning("More than 2 YAML front matter delimiters, i.e., '---' found")
     if (length(fm_idx)) {
-        lines <- lines[-seq(min(fm_idx), max(fm_idx))]
-        class(lines) <- c("readLines", class(lines))
-        attributes(lines) <- list(offset = max(fm_idx))
+        offval <- max(fm_idx)
+        lines <- lines[-seq(min(fm_idx), offval)]
     }
+    class(lines) <- c("readLines", class(lines))
+    attributes(lines) <- list(offset = offval)
     lines
 }
 
