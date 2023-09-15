@@ -1352,19 +1352,21 @@ test_doesManPageHaveRunnableExample <- function()
 }
 
 test_checkForValueSection <- function() {
-    man <- system.file(
-        "testpackages", "testpkg0", "man", package = "BiocCheck"
+    pkgdir <- system.file(
+        "testpackages", "testpkg0", package = "BiocCheck"
     )
-    mans <- list.files(man, full.names = TRUE)
-    checkTrue(!BiocCheck:::.valueInManPage(mans[1], FALSE))
-    checkTrue(!BiocCheck:::.valueInManPage(mans[2], FALSE))
-    checkTrue(BiocCheck:::.valueInManPage(mans[3], FALSE))
-    man <- system.file(
-        "testpackages", "testpkg1", "man", package = "BiocCheck"
+    mans <- BiocCheck:::.read_all_rds(pkgdir)
+    tags <- lapply(mans, tools:::RdTags)
+    checkTrue(!BiocCheck:::.valueInParsedRd(mans[[1]], tags[[1]]))
+    checkTrue(!BiocCheck:::.valueInParsedRd(mans[[2]], tags[[2]]))
+    checkTrue(BiocCheck:::.valueInParsedRd(mans[[3]], tags[[3]]))
+    pkgdir <- system.file(
+        "testpackages", "testpkg1", package = "BiocCheck"
     )
-    mans <- list.files(man, full.names = TRUE)
-    checkTrue(!BiocCheck:::.valueInManPage(mans[1], FALSE))
-    checkTrue(!BiocCheck:::.valueInManPage(mans[2], FALSE))
+    mans <- BiocCheck:::.read_all_rds(pkgdir)
+    tags <- lapply(mans, tools:::RdTags)
+    checkTrue(!BiocCheck:::.valueInParsedRd(mans[[1]], tags[[1]]))
+    checkTrue(!BiocCheck:::.valueInParsedRd(mans[[2]], tags[[2]]))
 }
 
 test_packageAlreadyExists <- function()
