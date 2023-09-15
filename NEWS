@@ -3,6 +3,8 @@ CHANGES IN VERSION 1.38.0
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Exclude data docs with `\\format` tags in addition to 'package' docs when
+    checking for `\\value` / `@return` in documentation.
     o Resolve unknown macro warnings when using Rdpack (@LiNK-NY, #196)
     o Improve the `read.dcf` operation that looks for any deprecated packages
     in both Bioconductor release and devel versions.
