@@ -17,6 +17,10 @@
 #'
 #' @return Context: a data.frame() with columns File, Line, and Context
 Context <- function(file="", lines=character(), idx=logical(), offset = 0L) {
+    stopifnot(
+        BiocBaseUtils::isScalarCharacter(file, zchar = TRUE),
+        BiocBaseUtils::isScalarInteger(offset)
+    )
     data.frame(
         File = rep(.getDirFiles(file), sum(idx)),
         Line = which(idx) + offset,
