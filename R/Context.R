@@ -18,7 +18,7 @@
 #' @return Context: a data.frame() with columns File, Line, and Context
 Context <- function(file="", lines=character(), idx=logical(), offset = 0L) {
     data.frame(
-        File = rep(getDirFile(file), sum(idx)),
+        File = rep(.getDirFiles(file), sum(idx)),
         Line = which(idx) + offset,
         Context = lines[idx],
         stringsAsFactors=FALSE

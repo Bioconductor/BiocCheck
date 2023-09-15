@@ -969,7 +969,7 @@ checkVigSessionInfo <- function(pkgdir) {
         handleNote(
             " 'sessionInfo' not found in vignette(s)",
             help_text = "Missing from file(s):",
-            messages = vapply(vigfiles[notFoundVig], getDirFile, character(1L))
+            messages = .getDirFiles(vigfiles[notFoundVig])
         )
     }
 }
@@ -1016,9 +1016,9 @@ findSymbolsInVignettes <-
         tempR <- tempfile(fileext=".R")
         quiet_knitr_purl(input = vfile, output = tempR, quiet = TRUE)
         tokens <- FUN(parseFile(tempR, pkgdir), tokenTypes, Symbols)
-        viglist[[getDirFile(vfile)]] <- sprintf(
+        viglist[[.getDirFiles(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
-           getDirFile(vfile), tokens[,"line1"], tokens[,"col1"]
+           .getDirFiles(vfile), tokens[,"line1"], tokens[,"col1"]
         )
     }
     Filter(length, viglist)
@@ -1545,7 +1545,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     parsedCode <- parsedCode[grepl("\\.[Rr]$", names(parsedCode))]
     if (!length(parsedCode))
         return(invisible())
-    fileNames <- vapply(names(parsedCode), getDirFile, character(1L))
+    fileNames <- .getDirFiles(names(parsedCode))
     dflist <- structure(
         vector("list", length(names(parsedCode))),
         .Names = fileNames
@@ -1974,7 +1974,7 @@ checkFormatting <- function(pkgdir, nlines=6)
         if (file.exists(file) && file.info(file)$size == 0)
         {
             handleNote("Add content to the empty file ",
-                getDirFile(file))
+                .getDirFiles(file))
         }
 
         if (file.exists(file) && file.info(file)$size > 0)

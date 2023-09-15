@@ -1472,21 +1472,18 @@ test_getBiocCheckDir <- function() {
     )
 }
 
-test_getDirFile <- function() {
-    getDirFile <- BiocCheck:::getDirFile
-    vigfile <- system.file(
-        "testpackages", "testpkg0", "vignettes", "evalfalse.Rmd",
-        package="BiocCheck"
-    )
-    checkIdentical("vignettes/evalfalse.Rmd", getDirFile(vigfile))
-
+test_getDirFiles <- function() {
     vigfiles <- list.files(
         system.file(
             "testpackages", "testpkg0", "vignettes", package="BiocCheck"
         ),
         full.names = TRUE
     )
-    checkException(getDirFile(vigfiles))
+    targets <- file.path(basename(dirname(vigfiles)), basename(vigfiles))
+    checkIdentical(
+        targets[1], unname(BiocCheck:::.getDirFiles(vigfiles[1]))
+    )
+    checkIdentical(targets, unname(BiocCheck:::.getDirFiles(vigfiles)))
 }
 
 

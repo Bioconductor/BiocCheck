@@ -358,24 +358,25 @@ findSymbolInParsedCode <- function(parsedCode, pkgname, symbolName,
                 if (grepl("\\.R$", name, ignore.case=TRUE))
                     handleMessage(sprintf(
                         "Found %s%s in %s (line %s, column %s)", symbolName,
-                        parens, getDirFile(name), x[i,1], x[i,2]))
+                        parens, .getDirFiles(name), x[i,1], x[i,2]))
                 else
                     handleMessage(sprintf(
                         "Found %s%s in %s", symbolName, parens,
-                        getDirFile(name))) # FIXME test this
+                        .getDirFiles(name))) # FIXME test this
             }
         }
     }
     length(matches) # for tests
 }
 
-getDirFile <- function(fpath) {
-    if (!identical(length(fpath), 1L))
-        stop("<internal> 'fpath' input must be a scalar character")
-    if (nzchar(fpath) && !is.na(fpath))
-        fpath <- file.path(basename(dirname(fpath)), basename(fpath))
-
-    fpath
+.getDirFiles <- function(fpaths) {
+    if (!BiocBaseUtils::isCharacter(fpaths, zchar = TRUE, na.ok = TRUE))
+        stop("<internal> 'fpaths' input must be a character vector")
+    vapply(fpaths, function(fpath) {
+        if (nzchar(fpath) && !is.na(fpath))
+            fpath <- file.path(basename(dirname(fpath)), basename(fpath))
+        fpath
+    }, character(1L))
 }
 
 .getTokenTextCode <- function(parsedf, token, text, lookback = character(0)) {
@@ -441,7 +442,7 @@ findSymbolsInParsedCode <-
     apply(matches, 1L, function(rowdf) {
         fmttxt <- "%s (line %s, column %s)"
         formt <- if (fun) paste0(rowdf["text"], " in ", fmttxt) else fmttxt
-        sprintf(formt, getDirFile(rowdf["filename"]),
+        sprintf(formt, .getDirFiles(as.character(rowdf["filename"])),
             rowdf["line1"], rowdf["col1"]
         )
     })
