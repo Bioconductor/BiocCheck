@@ -1224,6 +1224,17 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
         )
     }
 
+    # Sys.getenv HOME calls
+    msg_sys <- checkVarInSysEnv(pkgdir, "Sys.getenv", "HOME")
+    if (length(msg_sys)) {
+        handleError(
+            "Avoid interacting with 'Sys.getenv(\"HOME\")' (found ",
+            length(msg_sys),
+            " times)",
+            messages = msg_sys
+        )
+    }
+
     # suppressWarnings/Messages calls
     msg_supp <- findSymbolsInRFiles(
         pkgdir,
@@ -1389,6 +1400,27 @@ checkCatInRCode <-
         parsedCodeList = parsedCodes,
         symbolNames = symbols,
         tokenTypes = c("SYMBOL_FUNCTION_CALL", "SYMBOL")
+    )
+    unlist(msg_res)
+}
+
+## variable must be a STR_CONST called in 'symbol' e.g. symbol("STR_CONST")
+checkVarInSysEnv <- function(pkgdir, symbol, variable) {
+    rfiles <- getRSources(pkgdir)
+    parsedCodes <- lapply(
+        structure(rfiles, .Names = rfiles), parseFile, pkgdir = pkgdir
+    )
+    msg_res <- findSymbolsInParsedCode(
+        parsedCodeList = parsedCodes,
+        symbolNames = symbol,
+        tokenTypes = "SYMBOL_FUNCTION_CALL",
+        FUN = function(token, text, ...) {
+            .getTokenTextCode(
+                token = "STR_CONST",
+                text = dQuote(variable),
+                ...
+            )
+        }
     )
     unlist(msg_res)
 }
