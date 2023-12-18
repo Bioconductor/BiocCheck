@@ -303,6 +303,7 @@ test_checkRbuildignore <- function()
         "tests", "tests/", "^tests$", "^tests/",
         ".*/testthat", "^tests/testthat/cache$", "^longtests/testthat/cache$",
         "longtests", "longtests/", "^longtests/", "^longtests$",
+        "^ABCDtests$",
         sep = "\n", file = rbuildfile
     )
     checkTrue(
