@@ -237,7 +237,7 @@ checkRbuildignore <- function(pkgdir) {
         testIgnore <- .testRbuildignore(rbuild)
         if (any(testIgnore))
             handleError(
-                ".Rbuildignore file includes the 'tests' folder."
+                ".Rbuildignore includes 'tests' or 'longtests' folder."
             )
     }
 }
