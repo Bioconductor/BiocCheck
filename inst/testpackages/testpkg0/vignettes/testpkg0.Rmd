@@ -7,12 +7,12 @@ install_bioc <- function() {
 }
 ```
 
-```{r eval=FALSE}
+```{r,dupname, eval=FALSE}
 if (!requireNamespace("BiocCheck", quietly = TRUE))
     BiocManager::install("BiocCheck")
 ```
 
-```{r eval=TRUE}
+```{r,dupname, eval=TRUE}
 ## This should trigger checkVigInstalls (2x)
 if (!requireNamespace("BiocCheck", quietly = TRUE))
     BiocManager::install("BiocCheck")

@@ -847,6 +847,21 @@ test_checkVigInstalls <- function()
     .zeroCounters()
 }
 
+test_checkDupChunkLabels <- function() {
+    BiocCheck:::checkDupChunkLabels(
+        BiocCheck:::getVigSources(
+            system.file(
+                "testpackages", "testpkg0", "vignettes",
+                package="BiocCheck", mustWork = TRUE
+            )
+        )
+    )
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    ## check length of warning / 1 file affected plus 2 info messages
+    checkEqualsNumeric(length(.BiocCheck$get("warning")[[1]]), 3)
+    .zeroCounters()
+}
+
 test_checkTFSymbolUsage <- function()
 {
     BiocCheck:::checkTFSymbolUsage(
