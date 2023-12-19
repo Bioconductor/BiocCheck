@@ -300,10 +300,10 @@ test_checkRbuildignore <- function()
 {
     rbuildfile <- file.path(UNIT_TEST_TEMPDIR, ".Rbuildignore")
     cat(
-        "tests", "tests/", "^tests$", "^tests/",
+        "tests", "tests/", "^tests$", "^tests/", "^tests/$",
         ".*/testthat", "^tests/testthat/cache$", "^longtests/testthat/cache$",
-        "longtests", "longtests/", "^longtests/", "^longtests$",
-        "^ABCDtests$",
+        "longtests", "longtests/", "^longtests/", "^longtests$", "^longtests/$",
+        "^nnntests$",
         sep = "\n", file = rbuildfile
     )
     checkTrue(
