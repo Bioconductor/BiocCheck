@@ -306,10 +306,13 @@ test_checkRbuildignore <- function()
         "^nnntests$",
         sep = "\n", file = rbuildfile
     )
-    checkTrue(
-        identical(
-            sum(BiocCheck:::.testRbuildignore(readLines(rbuildfile))),
-            8L
+    checkIdentical(
+        BiocCheck:::.testRbuildignore(readLines(rbuildfile)),
+        c(
+            TRUE, TRUE, TRUE, TRUE, FALSE,
+            FALSE, FALSE, FALSE,
+            TRUE, TRUE, TRUE, TRUE, FALSE,
+            FALSE
         )
     )
 }
