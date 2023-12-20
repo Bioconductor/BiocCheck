@@ -227,7 +227,7 @@ checkDataFileSizes <- function(pkgdir) {
     entries <- Filter(nchar,
         grep("^#", trimws(text), value = TRUE, invert = TRUE)
     )
-    grepl("^\\^?(long)?tests[\\$\\/]?$", entries, perl = TRUE)
+    grepl("^\\^?(long)?tests[\\$\\/]?$", entries)
 }
 
 checkRbuildignore <- function(pkgdir) {
