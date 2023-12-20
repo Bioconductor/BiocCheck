@@ -1,3 +1,18 @@
+CHANGES IN VERSION 1.40.0
+-----------------------
+
+NEW FEATURES
+
+    o Check for duplicate chunk labels in vignettes and produce an error when
+    present (@hpages, #199)
+
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o Update `checkRbuildignore` to flag `test` and `longtests` entries
+    appropriately (@hpages, #197)
+    o Fix issue where BiocCheck would fail when errors caused by duplicate chunk
+    labels were present (@hpages, #199)
+
 CHANGES IN VERSION 1.38.0
 -----------------------
 
