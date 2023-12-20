@@ -323,6 +323,8 @@ Can be disabled with `--no-check-vignettes`.
   reproducibility (`NOTE`).
 * Checks that evaluated vignette code does not invoke package installation
   functions (`ERROR`).
+* Checks that there are no duplicate code chunk labels in the vignettes
+  (`ERROR`).
 
 **Checking whether vignette is built with 'R CMD build'...**
 

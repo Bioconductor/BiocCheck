@@ -227,7 +227,7 @@ checkDataFileSizes <- function(pkgdir) {
     entries <- Filter(nchar,
         grep("^#", trimws(text), value = TRUE, invert = TRUE)
     )
-    grepl("^\\^?(long)?tests[\\$\\/]?$", entries, perl = TRUE)
+    grepl("^\\^?(long)?tests[\\$\\/]?$", entries)
 }
 
 checkRbuildignore <- function(pkgdir) {
@@ -617,6 +617,8 @@ checkVignetteDir <- function(pkgdir, checkingDir)
 
     checkVigChunkEval(vigdircontents)
 
+    checkDupChunkLabels(vigdircontents)
+
     checkVigBiocInst(pkgdir)
 
     checkVigInstalls(pkgdir)
@@ -884,6 +886,32 @@ checkVigEvalAllFalse <- function(pkgdir){
     }
 }
 
+checkDupChunkLabels <- function(vigfiles) {
+    viglist <- structure(
+        vector("logical", length(vigfiles)),
+        .Names = vigfiles
+    )
+    for (vfile in vigfiles) {
+        tempR <- tempfile(fileext=".R")
+        tryCatch({
+            quiet_knitr_purl(input = vfile, output = tempR, quiet = TRUE)
+        }, error = function(e) {
+            viglist[[vfile]] <<- grepl(
+                "Duplicate chunk label", conditionMessage(e), fixed = TRUE
+            )
+            if (viglist[[vfile]])
+                invisible(NULL)
+            else
+                stop(e)
+        })
+    }
+    if (any(viglist))
+        handleErrorFiles(
+            " Vignette(s) found with duplicate chunk labels",
+            messages = basename(vigfiles[viglist])
+        )
+}
+
 .OLD_INSTALL_CALLS <-
     c("BiocInstaller", "biocLite", "useDevel", "biocinstallRepos")
 
@@ -937,6 +965,29 @@ quiet_knitr_purl <- function(...)
     )
 }
 
+purl_or_tangle <- function(input, output, quiet, ...) {
+    if (tolower(tools::file_ext(input)) != "rnw")
+        quiet_knitr_purl(input = input, output = output, quiet = quiet, ...)
+    else
+        utils::Stangle(file = input, output = output, quiet = quiet)
+}
+
+try_purl_or_tangle <- function(input, output, quiet, ...) {
+    tryCatch({
+        purl_or_tangle(input = input, output = output, quiet = quiet, ...)
+    }, error = function(e) {
+        hasDups <- grepl(
+            "Duplicate chunk label", conditionMessage(e), fixed = TRUE
+        )
+        if (hasDups) {
+            file.create(output)
+            invisible(NULL)
+        } else {
+            stop(e)
+        }
+    })
+}
+
 checkVigClassUsage <- function(pkgdir) {
     vigdir <- file.path(pkgdir, "vignettes", "")
     vigfiles <- getVigSources(vigdir)
@@ -945,7 +996,7 @@ checkVigClassUsage <- function(pkgdir) {
     )
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
-        quiet_knitr_purl(input = vfile, output = tempR, quiet = TRUE)
+        try_purl_or_tangle(input = vfile, output = tempR, quiet = TRUE)
         tokens <- getClassNEEQLookup(tempR)
         viglist[[basename(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
@@ -1040,7 +1091,7 @@ findSymbolsInVignettes <-
     viglist <- list()
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
-        quiet_knitr_purl(input = vfile, output = tempR, quiet = TRUE)
+        try_purl_or_tangle(input = vfile, output = tempR, quiet = TRUE)
         tokens <- FUN(parseFile(tempR, pkgdir), tokenTypes, Symbols)
         viglist[[.getDirFiles(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",

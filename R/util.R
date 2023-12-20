@@ -293,8 +293,8 @@ parseFile <- function(infile, pkgdir) {
         outfile <- file.path(parse_dir, "parseFile.tmp")
         suppressWarnings(suppressMessages(
             capture.output({
-                quiet_knitr_purl(
-                    input=infile, output=outfile, documentation=0L
+                try_purl_or_tangle(
+                    input=infile, output=outfile, quiet = TRUE, documentation=0L
                 )
             })
         ))
