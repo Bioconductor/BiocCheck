@@ -906,7 +906,7 @@ checkDupChunkLabels <- function(vigfiles) {
         })
     }
     if (any(viglist))
-        handleWarningFiles(
+        handleErrorFiles(
             " Vignette(s) found with duplicate chunk labels",
             messages = basename(vigfiles[viglist])
         )
@@ -966,25 +966,25 @@ quiet_knitr_purl <- function(...)
 }
 
 purl_or_tangle <- function(input, output, quiet, ...) {
-    withCallingHandlers({
-        tryCatch({
-            if (tolower(tools::file_ext(input)) != "rnw")
-                quiet_knitr_purl(
-                    input = input, output = output, quiet = quiet, ...
-                )
-            else
-                utils::Stangle(file = input, output = output, quiet = quiet)
-        }, error = function(e) {
-            hasDups <- grepl(
-                "Duplicate chunk label", conditionMessage(e), fixed = TRUE
-            )
-            if (hasDups)
-                message(conditionMessage(e))
-            else
-                stop(e)
-        })
-    }, warning = function(w) {
-        invokeRestart("muffleWarning")
+    if (tolower(tools::file_ext(input)) != "rnw")
+        quiet_knitr_purl(input = input, output = output, quiet = quiet, ...)
+    else
+        utils::Stangle(file = input, output = output, quiet = quiet)
+}
+
+try_purl_or_tangle <- function(input, output, quiet, ...) {
+    tryCatch({
+        purl_or_tangle(input = input, output = output, quiet = quiet, ...)
+    }, error = function(e) {
+        hasDups <- grepl(
+            "Duplicate chunk label", conditionMessage(e), fixed = TRUE
+        )
+        if (hasDups) {
+            file.create(output)
+            invisible(NULL)
+        } else {
+            stop(e)
+        }
     })
 }
 
@@ -996,7 +996,7 @@ checkVigClassUsage <- function(pkgdir) {
     )
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
-        purl_or_tangle(input = vfile, output = tempR, quiet = TRUE)
+        try_purl_or_tangle(input = vfile, output = tempR, quiet = TRUE)
         tokens <- getClassNEEQLookup(tempR)
         viglist[[basename(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",
@@ -1091,7 +1091,7 @@ findSymbolsInVignettes <-
     viglist <- list()
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
-        purl_or_tangle(input = vfile, output = tempR, quiet = TRUE)
+        try_purl_or_tangle(input = vfile, output = tempR, quiet = TRUE)
         tokens <- FUN(parseFile(tempR, pkgdir), tokenTypes, Symbols)
         viglist[[.getDirFiles(vfile)]] <- sprintf(
             "%s (code line %d, column %d)",

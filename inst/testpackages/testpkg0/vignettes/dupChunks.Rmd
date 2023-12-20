@@ -1,0 +1,38 @@
+---
+title: "Test Duplicate Chunks Vignette"
+author: "BiocCheck Maintainer"
+date: "`r format(Sys.time(), '%B %d, %Y')`"
+output:
+  BiocStyle::html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,dupname}
+if (!requireNamespace("BiocCheck", quietly = TRUE))
+    BiocManager::install("BiocCheck")
+```
+
+```{r,dupname}
+## This should trigger checkVigInstalls (2x)
+if (!requireNamespace("BiocCheck", quietly = TRUE))
+    BiocManager::install("BiocCheck")
+## trigger with grep
+install_bioc("BiocCheck")
+```
+
+```{r,eval=FALSE}
+## adding more eval=FALSE chunks
+```
+
+```{r,eval=FALSE}
+print("hello world")
+```
+
+```{r, eval=FALSE}
+## This should trigger checkVigChunkEval
+```
+
+

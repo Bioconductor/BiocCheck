@@ -191,8 +191,8 @@ test_vignettes0 <- function()
 
     # check vignette style of example package
     # 2 WARNINGS - vignette template and evaluate more chunks
-    BiocCheck:::checkVignetteDir(system.file("testpackages",
-        "testpkg0", package="BiocCheck"), TRUE)
+    pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
+    BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkEqualsNumeric(9, .BiocCheck$getNum("warning"))
     checkEquals("* WARNING: Evaluate more vignette chunks.",
         .BiocCheck$get("warning")[["checkVigChunkEval"]])
@@ -849,16 +849,14 @@ test_checkVigInstalls <- function()
 
 test_checkDupChunkLabels <- function() {
     BiocCheck:::checkDupChunkLabels(
-        BiocCheck:::getVigSources(
-            system.file(
-                "testpackages", "testpkg0", "vignettes",
-                package="BiocCheck", mustWork = TRUE
-            )
+        system.file(
+            "testpackages", "testpkg0", "vignettes", "dupChunks.Rmd",
+            package="BiocCheck", mustWork = TRUE
         )
     )
-    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
     ## check length of warning / 1 file affected plus 2 info messages
-    checkEqualsNumeric(length(.BiocCheck$get("warning")[[1]]), 3)
+    checkEqualsNumeric(length(.BiocCheck$get("error")[[1]]), 3)
     .zeroCounters()
 }
 
