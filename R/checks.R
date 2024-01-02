@@ -2358,10 +2358,11 @@ checkBadFiles <- function(package_dir){
         return(invisible())
     }
     licenses <- read.dcf(ldb_file)
-    test <- tools:::analyze_licenses(license, licenses)[["restricts_use"]]
+    result <- tools:::analyze_licenses(license, licenses)
+    test <- result[["restricts_use"]]
     if (isTRUE(test))
         handleError("License '", license, "' restricts use")
-    else
+    else if (is.na(test) || !result[, "is_verified"])
         handleNote(
             "License '", license, "' unknown; licenses cannot restrict use"
         )
