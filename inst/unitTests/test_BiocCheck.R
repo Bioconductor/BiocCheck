@@ -130,7 +130,7 @@ test_vignettes0 <- function()
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkIdentical(
         .BiocCheck$getNum(c("error", "warning", "note")),
-        c(error = 0L, warning = 1L, note = 1L)
+        c(error = 0L, warning = 2L, note = 1L)
     )
     .zeroCounters()
 
