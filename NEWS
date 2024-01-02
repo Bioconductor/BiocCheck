@@ -5,6 +5,7 @@ NEW FEATURES
 
     o Check for duplicate chunk labels in vignettes and produce an error when
     present (@hpages, #199)
+    o Warn when Rnw vignettes are present (@jwokaty, #190)
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
