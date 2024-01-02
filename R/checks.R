@@ -966,7 +966,9 @@ quiet_knitr_purl <- function(...)
 }
 
 purl_or_tangle <- function(input, output, quiet, ...) {
-    if (tolower(tools::file_ext(input)) != "rnw")
+    vigEng <- getVigEngine(input)
+    vigExt <- tolower(tools::file_ext(input))
+    if (!identical(vigExt, "rnw") || identical(vigEng, "knitr"))
         quiet_knitr_purl(input = input, output = output, quiet = quiet, ...)
     else
         utils::Stangle(file = input, output = output, quiet = quiet)
