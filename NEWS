@@ -15,7 +15,7 @@ BUG FIXES AND MINOR IMPROVEMENTS
     labels were present (@hpages, #199)
     o Avoid format checks e.g., length, indentation, and tabs for Rd files
     o Use the `tools:::analyze_licenses` function to check for restrictive
-    license use (ref. #119)
+    license use (@hpages, #119)
 
 CHANGES IN VERSION 1.38.0
 -----------------------
