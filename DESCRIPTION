@@ -1,5 +1,5 @@
 Package: BiocCheck
-Version: 1.39.7
+Version: 1.39.8
 Title: Bioconductor-specific package checks
 Description: BiocCheck guides maintainers through Bioconductor best
   practicies. It runs Bioconductor-specific package checks by searching through
