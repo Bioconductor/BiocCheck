@@ -13,6 +13,7 @@ BUG FIXES AND MINOR IMPROVEMENTS
     appropriately (@hpages, #197)
     o Fix issue where BiocCheck would fail when errors caused by duplicate chunk
     labels were present (@hpages, #199)
+    o Avoid format checks e.g., length, indentation, and tabs for Rd files
 
 CHANGES IN VERSION 1.38.0
 -----------------------
