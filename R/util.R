@@ -633,12 +633,12 @@ getVigBuilder <- function(desc)
 
 getVigEngine <- function(vignetteFile){
     lines <- readLines(vignetteFile, n=100L, warn=FALSE)
-    idx <- grep(lines, pattern="VignetteEngine")
-    if (length(idx) != 0){
-        eng <- gsub("::.*", "", gsub(".*\\{|\\}.*", "", lines[idx]))
-        return(eng)
+    vigEngine <- grep(lines, pattern="VignetteEngine", value = TRUE)
+    vigEngine <- trimws(vigEngine)
+    if (length(vigEngine)) {
+        gsub("%\\\\VignetteEngine\\{(.*)::.*\\}", "\\1", vigEngine)
     } else {
-        return(NA)
+        NA
     }
 }
 
