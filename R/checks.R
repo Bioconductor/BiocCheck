@@ -2052,8 +2052,6 @@ checkFormatting <- function(pkgdir, nlines=6)
         dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
             full.names=TRUE),
         file.path(pkgdir, "NAMESPACE"),
-        dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
-            full.names=TRUE),
         dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
             pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
             ignore.case=TRUE)
