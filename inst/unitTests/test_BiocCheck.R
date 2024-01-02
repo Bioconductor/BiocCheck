@@ -98,12 +98,14 @@ test_vignettes0 <- function()
         dir.create(pkgdir)
 
     ## no vignettes dir ERROR
-    vde <- BiocCheck:::checkVigDirExists(vigdir)
-    checkTrue(!vde)
-    .zeroCounters()
+    if (!dir.exists(vigdir)) {
+        vde <- BiocCheck:::checkVigDirExists(vigdir)
+        checkTrue(!vde)
+        .zeroCounters()
+        # empty vignette dir ERROR
+        dir.create(vigdir, recursive=TRUE)
+    }
 
-    # empty vignette dir ERROR
-    dir.create(vigdir, recursive=TRUE)
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     checkCounter("No vignette sources in vignettes/ directory.", "error")
     .zeroCounters()
@@ -167,7 +169,7 @@ test_vignettes0 <- function()
     .zeroCounters()
 
     # check vigbuilder ERROR
-    # in Description but not any vignette
+    # in DESCRIPTION but not any vignette
     # also checks if builder listed but not in DESCRIPTION import,depend,suggest
     cat("VignetteBuilder: knitr", file=file.path(pkgdir, "DESCRIPTION"))
     cat(
@@ -187,7 +189,10 @@ test_vignettes0 <- function()
     cat("Title: something", file=file.path(pkgdir, "DESCRIPTION"))
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
     # no error if RNW
-    checkEqualsNumeric(1, .BiocCheck$getNum("warning"))
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 0L, warning = 1L, note = 1L)
+    )
     .zeroCounters()
 
     # check defined in desc but default vig
@@ -204,7 +209,10 @@ test_vignettes0 <- function()
     # 2 WARNINGS - vignette template and evaluate more chunks
     pkgdir <- system.file("testpackages", "testpkg0", package="BiocCheck")
     BiocCheck:::checkVignetteDir(pkgdir, TRUE)
-    checkEqualsNumeric(9, .BiocCheck$getNum("warning"))
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 4L, warning = 9L, note = 1L)
+    )
     checkTrue(
         any(grepl(
             pattern="VignetteIndex",
@@ -216,7 +224,10 @@ test_vignettes0 <- function()
     # check vignette style of example package
     BiocCheck:::checkVignetteDir(system.file("testpackages",
         "testpkg2", package="BiocCheck"), TRUE)
-    checkEqualsNumeric(2, .BiocCheck$getNum("error"))
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 2L, warning = 4L, note = 2L)
+    )
     checkTrue(
         any(grepl(
             pattern="VignetteBuilder",
@@ -228,7 +239,6 @@ test_vignettes0 <- function()
               .BiocCheck$get("error")[["checkVigEngine"]]
         ))
     )
-    checkEqualsNumeric(4, .BiocCheck$getNum("warning"))
     checkTrue(
         any(grepl(
             pattern="missing vignette metadata", ignore.case = TRUE,
@@ -254,7 +264,10 @@ test_vignettes0 <- function()
                           package="BiocCheck")
     vigdircontents <- BiocCheck:::getVigSources(vigdir)
     BiocCheck:::checkVigFiles(vigdir, vigdircontents)
-    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
+    checkIdentical(
+        .BiocCheck$getNum(c("error", "warning", "note")),
+        c(error = 0L, warning = 0L, note = 1L)
+    )
     .zeroCounters()
 
 }

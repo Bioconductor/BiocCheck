@@ -382,7 +382,7 @@ NULL
 .BiocCheck <- .BiocCheck()
 .messages <- .MessageCondition()
 
-.zeroCounters <- function()
+.zeroCounters <- function(conditions = c("error", "warning", "note"))
 {
-    .BiocCheck$zero(c("error", "warning", "note"))
+    .BiocCheck$zero(conditions = conditions)
 }
