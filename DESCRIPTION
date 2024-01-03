@@ -27,7 +27,7 @@ Imports:
     callr,
     codetools,
     graph,
-    httr,
+    httr2,
     knitr,
     methods,
     stringdist,
