@@ -2341,10 +2341,12 @@ checkBadFiles <- function(package_dir){
     }
 }
 
+.LICENSE_DB_LOCATION <- "$R_HOME/share/licenses/license.db"
+
 .checkLicenseForRestrictiveUse <- function(license) {
     handleCheck("Checking License: for restrictive use...")
 
-    if (length(license) != 1L || is.na(license)) {
+    if (!identical(length(license), 1L) || is.na(license)) {
         handleNote("malformed 'License:' field '", license, "'")
         return(invisible())
     }
@@ -2362,10 +2364,15 @@ checkBadFiles <- function(package_dir){
     test <- result[["restricts_use"]]
     if (isTRUE(test))
         handleError("License '", license, "' restricts use")
-    else if (is.na(test) || !result[, "is_verified"])
+    else if (is.na(test) || !result[, "is_verified"]) {
         handleNote(
-            "License '", license, "' unknown; licenses cannot restrict use"
+            "License '", license, "' unknown; refer to ", .LICENSE_DB_LOCATION
         )
+        handleMessage(
+            "and https://choosealicense.com/appendix/ for more info.",
+            indent = 6L
+        )
+    }
 }
 
 .checkDESCfields <- function(dcf) {
