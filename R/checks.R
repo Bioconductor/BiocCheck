@@ -2251,43 +2251,53 @@ checkForSupportSiteRegistration <- function(package_dir)
     }
 }
 
+#' @importFrom httr2 req_perform request resp_body_json
 checkSupportReg <- function(email){
 
-    url <- paste0("https://support.bioconductor.org/api/email/", email, "/")
-    response <- tryCatch(GET(url), error=identity)
-    if (inherits(response, "error")) {
+    url <- paste0("https://support.bioconductor.org/api/email/", email)
+    response <- try(
+        req_perform(request(url)), silent = TRUE
+    )
+    response_error <- inherits(response, "try-error")
+    result <- !response_error && resp_body_json(response)
+    if (response_error) {
         handleMessage(
-            "Unable to connect to support site:",
-            "\n  ", conditionMessage(response))
-        FALSE
-    } else if (suppressMessages(content(response))) {
+            "Unable to find your email in the Support Site:",
+            "\n  ", conditionMessage(attr(response, "condition"))
+        )
+    } else if (resp_body_json(response)) {
         handleMessage("Maintainer is registered at support site.")
-        TRUE
     } else {
         handleError(
-            "Maintainer must register at the support site; ",
+            "Register your email account in the Support Site; ",
             "visit https://support.bioconductor.org/accounts/signup/"
         )
-        FALSE
     }
+    result
 }
 
 checkWatchedTag <- function(email, pkgname){
 
-    url <- paste0("https://support.bioconductor.org/api/watched/tags/", email, "/")
-    response <- tryCatch(GET(url), error=identity)
-    if (inherits(response, "error")) {
+    url <- paste0("https://support.bioconductor.org/api/watched/tags/", email)
+    response <- try(
+        req_perform(request(url)), silent = TRUE
+    )
+    if (inherits(response, "try-error")) {
         handleMessage(
-            "Unable to connect to support site:",
-            "\n  ", conditionMessage(response))
+            "Unable to find your email in the Support Site:",
+            "\n  ", conditionMessage(attr(response, "condition"))
+        )
     } else {
-        tags<-tolower(trimws(unlist(strsplit(content(response)$watched_tags, split=","))))
-        if (tolower(pkgname) %in% tags){
-            handleMessage("Package name is in support site watched tags.")
-        }else{
-            handleError("Maintainer must add package name to Watched Tags on the support site; ",
-                        "Edit your Support Site User Profile to add Watched Tags.")
-        }
+        alltags <- resp_body_json(response)[["watched_tags"]]
+        taglist <- unlist(strsplit(alltags, split = ","))
+        tags <- tolower(taglist)
+        if (tolower(pkgname) %in% tags)
+            handleMessage("Package is in the Support Site Watched Tags.")
+        else
+            handleError(
+                "Add package to Watched Tags in your Support Site profile; ",
+                "visit https://support.bioconductor.org/accounts/edit/profile"
+            )
     }
 }
 
