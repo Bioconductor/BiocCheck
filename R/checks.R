@@ -2196,9 +2196,13 @@ checkIsPackageNameAlreadyInUse <- function(
 checkForBiocDevelSubscription <- function(pkgdir)
 {
     email <- getMaintainerEmail(pkgdir)
-    ## TODO: Return an error when no email found.
-    if (!exists("email"))
+    if (is.null(email)) {
+        handleError(
+            "Unable to determine maintainer email from DESCRIPTION file.",
+            nframe = 3L
+        )
         return()
+    }
     if (tolower(email) == "maintainer@bioconductor.org")
     {
         handleMessage("Maintainer email is ok.")
