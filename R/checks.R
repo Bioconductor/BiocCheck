@@ -4,7 +4,7 @@
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom knitr purl
 #' @importFrom BiocManager available install repositories version
-#' @import biocViews httr methods
+#' @import biocViews methods
 
 # Checks for BiocCheck ----------------------------------------------------
 
@@ -2192,6 +2192,7 @@ checkIsPackageNameAlreadyInUse <- function(
         handleError(msg)
 }
 
+#' @importFrom httr2 req_body_form resp_status resp_body_html
 checkForBiocDevelSubscription <- function(pkgdir)
 {
     email <- getMaintainerEmail(pkgdir)
@@ -2203,33 +2204,40 @@ checkForBiocDevelSubscription <- function(pkgdir)
         handleMessage("Maintainer email is ok.")
         return()
     }
-    response <- tryCatch({
-        POST(
-            "https://stat.ethz.ch/mailman/admin/bioc-devel",
-            body=list(adminpw=Sys.getenv("BIOC_DEVEL_PASSWORD")))
-    }, error=identity)
-    if (inherits(response, "error")) {
+    response <- try({
+        request("https://stat.ethz.ch/mailman/admin/bioc-devel") |>
+            req_body_form(
+                adminpw = Sys.getenv("BIOC_DEVEL_PASSWORD")
+            ) |>
+            req_perform()
+    }, silent = TRUE)
+    if (inherits(response, "try-error")) {
         handleMessage(
-            "Unable to connect to mailing list",
-            "\n  ", conditionMessage(response))
+            "Unable to connect to the Bioc-devel mailing list",
+            "\n  ", conditionMessage(attr(response, "condition")))
         return()
-    } else if (status_code(response) >= 300) {
+    } else if (resp_status(response) >= 300) {
         handleMessage(
-            "Unable to connect to mailing list",
-            "\n  status code ", status_code(response))
+            "Unable to connect to the Bioc-devel mailing list",
+            "\n  status code ", resp_status(response))
         return()
     }
-    response2 <- POST(
-        "https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
-        body=list(findmember=email))
-    content <- content(response2, as="text")
-    if(grepl(paste0(">", tolower(email), "<"), tolower(content), fixed=TRUE))
-    {
+    response2 <- request(
+        "https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4") |>
+        req_body_form(
+            findmember = email, adminpw = Sys.getenv("BIOC_DEVEL_PASSWORD")
+        ) |>
+        req_perform()
+    content <- resp_body_html(response2)
+    result_email <- unlist(
+        rvest::html_table(content)[[5L]][3L, 2L], use.names = FALSE
+    )
+    if (identical(tolower(result_email), tolower(email))) {
         handleMessage("Maintainer is subscribed to bioc-devel.")
     } else {
         handleError(
-            "Maintainer must subscribe to the bioc-devel mailing list. ",
-            "Subscribe here: https://stat.ethz.ch/mailman/listinfo/bioc-devel",
+            "Subscribe to the Bioc-devel mailing list by going to ",
+            "https://stat.ethz.ch/mailman/listinfo/bioc-devel",
             nframe = 3L
         )
     }
@@ -2261,7 +2269,7 @@ checkSupportReg <- function(email){
     response_error <- inherits(response, "try-error")
     result <- !response_error && resp_body_json(response)
     if (response_error) {
-        handleMessage(
+        handleError(
             "Unable to find your email in the Support Site:",
             "\n  ", conditionMessage(attr(response, "condition"))
         )

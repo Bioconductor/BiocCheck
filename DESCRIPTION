@@ -30,6 +30,7 @@ Imports:
     httr2,
     knitr,
     methods,
+    rvest,
     stringdist,
     tools,
     utils
