@@ -2045,6 +2045,11 @@ checkSkipOnBioc <- function(pkgdir)
     lines
 }
 
+.roxygen_in_desc <- function(pkgdir) {
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    "RoxygenNote" %in% colnames(dcf)
+}
+
 checkFormatting <- function(pkgdir, nlines=6)
 {
     pkgname <- basename(pkgdir)
@@ -2052,6 +2057,9 @@ checkFormatting <- function(pkgdir, nlines=6)
         dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
             full.names=TRUE),
         file.path(pkgdir, "NAMESPACE"),
+        if (!.roxygen_in_desc(pkgdir))
+            dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
+                full.names=TRUE),
         dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
             pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
             ignore.case=TRUE)
