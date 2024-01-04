@@ -6,6 +6,7 @@ NEW FEATURES
     o Check for duplicate chunk labels in vignettes and produce an error when
     present (@hpages, #199)
     o Warn when Rnw vignettes are present (@jwokaty, #190)
+    o Add error when maintainer email not parse-able in DESCRIPTION
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
@@ -14,6 +15,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
     o Fix issue where BiocCheck would fail when errors caused by duplicate chunk
     labels were present (@hpages, #199)
     o Avoid format checks e.g., length, indentation, and tabs for Rd files
+    that use roxygen2
+    o Use httr2 over httr for http requests
 
 CHANGES IN VERSION 1.38.0
 -----------------------
