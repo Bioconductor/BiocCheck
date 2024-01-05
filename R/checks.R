@@ -2440,7 +2440,9 @@ checkBadFiles <- function(package_dir){
         )
     else
         handleMessage(
-            "* ", percent, "% of dependencies are Bioconductor packages."
+            "Bioconductor dependencies found in Imports & Depends (",
+            percent,
+            "%)."
         )
 }
 
