@@ -256,7 +256,7 @@ Can be disabled with `--no-check-bbs`
 ## DESCRIPTION checks
 
 * **Checking License: for restrictive use...** Checks to make sure
-  that the License: in the DESCRIPTION file does not restrict use,
+  that the `License:` in the DESCRIPTION file does not restrict use,
   e.g., to academic-use only (`ERROR`). Licenses are compared to the
   database provided at `file.path(R.home("share)", "licenses",
   "license.db"))`.  Licenses not listed in the database are flagged
@@ -269,6 +269,9 @@ Can be disabled with `--no-check-bbs`
 * **Checking for recommended fields in DESCRIPTION...** Looks through the
   DESCRIPTION file to see whether recommended fields e.g., 'URL' and
   'BugReports' are populated (`NOTE`).
+* **Checking for Bioconductor software dependencies...** Checks to see if
+  the package depends on any Bioconductor software packages in the `Depends:`
+  and `Imports:` fields; if none (`WARNING`).
 
 ##  NAMESPACE checks
 

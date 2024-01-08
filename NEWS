@@ -7,6 +7,8 @@ NEW FEATURES
     present (@hpages, #199)
     o Warn when Rnw vignettes are present (@jwokaty, #190)
     o Add error when maintainer email not parse-able in DESCRIPTION
+    o Check for Bioconductor dependencies in the Imports and Depends fields;
+    if none, produce a warning (@vjcitn).
 
 BUG FIXES AND MINOR IMPROVEMENTS
 

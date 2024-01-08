@@ -435,7 +435,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         )
         return()
     }
-    handleCheck("Checking for Version field...")
+    handleCheck("Checking for Version: field...")
     if (!"Version" %in% colnames(dcf))
     {
         handleError("No 'Version:' field in DESCRIPTION.")
@@ -2225,12 +2225,12 @@ checkForBiocDevelSubscription <- function(pkgdir)
     }, silent = TRUE)
     if (inherits(response, "try-error")) {
         handleMessage(
-            "Unable to connect to the Bioc-devel mailing list",
+            "Unable to connect to the Bioc-devel mailing list:",
             "\n  ", conditionMessage(attr(response, "condition")))
         return()
     } else if (resp_status(response) >= 300) {
         handleMessage(
-            "Unable to connect to the Bioc-devel mailing list",
+            "Unable to connect to the Bioc-devel mailing list:",
             "\n  status code ", resp_status(response))
         return()
     }
@@ -2411,7 +2411,7 @@ checkBadFiles <- function(package_dir){
 }
 
 .checkDESCfields <- function(dcf) {
-    handleCheck("Checking for recommeded fields in DESCRIPTION...")
+    handleCheck("Checking for recommended DESCRIPTION fields...")
 
     fields <- c("URL", "BugReports")
     present <- fields %in% colnames(dcf)
@@ -2420,6 +2420,30 @@ checkBadFiles <- function(package_dir){
         notFields <- paste(shQuote(res), collapse = ", ")
         handleNote("Provide ", notFields, " field(s) in DESCRIPTION")
     }
+}
+
+.checkBiocDepsDESC <- function(dcf, which = c("Depends", "Imports")) {
+    handleCheck("Checking for Bioconductor software dependencies...")
+    which_fields <- dcf[, colnames(dcf) %in% which]
+    all_deps <- unlist(
+        lapply(which_fields, function(x) strsplit(x, ",\\n")[[1L]]),
+        use.names = FALSE
+    )
+    all_db <- utils::available.packages(repos = BiocManager::repositories())
+    repo <- BiocManager:::.repositories_bioc(BiocManager::version())["BioCsoft"]
+    biocdb <- utils::available.packages(repos = repo)
+    bioc_deps <- all_deps %in% rownames(biocdb)
+    percent <- unname(round(prop.table(table(bioc_deps))["TRUE"], 2L) * 100)
+    if (!any(bioc_deps))
+        handleWarning(
+            "No Bioconductor dependencies detected; consider a CRAN submission."
+        )
+    else
+        handleMessage(
+            "Bioconductor dependencies found in Imports & Depends (",
+            percent,
+            "%)."
+        )
 }
 
 checkDescription <- function(package_dir) {
@@ -2442,18 +2466,22 @@ checkDescription <- function(package_dir) {
         handleError("Do not use Author/Maintainer fields. Use Authors@R.")
 }
 
-checkDESCRIPTIONFile <- function(package_dir) {
-    dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
-    .checkLicenseForRestrictiveUse(dcf[,"License"])
-
-    .checkDESCfields(dcf)
-
-    handleCheck("Checking for pinned package versions...")
+.checkPinnedDeps <- function(dcf) {
+    handleCheck("Checking for pinned package versions in DESCRIPTION...")
     deps <- c("Depends", "Imports", "Suggests", "Enhances", "LinkingTo")
     validdeps <- deps[deps %in% colnames(dcf)]
     doubleeq <- grepl("==", dcf[, validdeps], fixed = TRUE)
     if (any(doubleeq))
         handleError("Dependencies in the DESCRIPTION file contain '=='")
+}
+
+checkDESCRIPTIONFile <- function(package_dir) {
+    dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
+
+    .checkLicenseForRestrictiveUse(dcf[,"License"])
+    .checkDESCfields(dcf)
+    .checkBiocDepsDESC(dcf)
+    .checkPinnedDeps(dcf)
 }
 
 checkForCitationFile <- function(package_dir) {
