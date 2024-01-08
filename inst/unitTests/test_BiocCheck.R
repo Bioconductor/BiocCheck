@@ -958,6 +958,22 @@ test_checkDESCRIPTIONfile <- function()
     BiocCheck:::.checkDESCfields(dcf)
     checkEqualsNumeric(.BiocCheck$getNum("note"), 0)
     .zeroCounters()
+
+    dcf <- matrix(
+        c("https://example.com", "https://example.com"), nrow = 1,
+        dimnames = list(NULL, c("BugReports", "URL"))
+    )
+    BiocCheck:::.checkBiocDepsDESC(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    .zeroCounters()
+
+    dcf <- matrix(
+        "S4Vectors (== 0.99.0)", nrow = 1,
+        dimnames = list(NULL, "Depends")
+    )
+    BiocCheck:::.checkPinnedDeps(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
+    .zeroCounters()
 }
 
 test_checkDescriptionNamespaceConsistency <- function()
