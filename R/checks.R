@@ -2432,7 +2432,7 @@ checkBadFiles <- function(package_dir){
     all_db <- utils::available.packages(repos = BiocManager::repositories())
     repo <- BiocManager:::.repositories_bioc(BiocManager::version())["BioCsoft"]
     biocdb <- utils::available.packages(repos = repo)
-    bioc_deps <- all_deps %in% rownames(biocdb) 
+    bioc_deps <- all_deps %in% rownames(biocdb)
     percent <- unname(round(prop.table(table(bioc_deps))["TRUE"], 2L) * 100)
     if (!any(bioc_deps))
         handleWarning(
@@ -2477,7 +2477,7 @@ checkDescription <- function(package_dir) {
 
 checkDESCRIPTIONFile <- function(package_dir) {
     dcf <- read.dcf(file.path(package_dir, "DESCRIPTION"))
-    
+
     .checkLicenseForRestrictiveUse(dcf[,"License"])
     .checkDESCfields(dcf)
     .checkBiocDepsDESC(dcf)
