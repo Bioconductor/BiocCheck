@@ -2225,12 +2225,12 @@ checkForBiocDevelSubscription <- function(pkgdir)
     }, silent = TRUE)
     if (inherits(response, "try-error")) {
         handleMessage(
-            "Unable to connect to the Bioc-devel mailing list",
+            "Unable to connect to the Bioc-devel mailing list:",
             "\n  ", conditionMessage(attr(response, "condition")))
         return()
     } else if (resp_status(response) >= 300) {
         handleMessage(
-            "Unable to connect to the Bioc-devel mailing list",
+            "Unable to connect to the Bioc-devel mailing list:",
             "\n  status code ", resp_status(response))
         return()
     }
