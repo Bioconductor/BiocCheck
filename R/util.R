@@ -485,7 +485,7 @@ getMaintainerEmail <- function(pkgdir)
         tryCatch(people <- eval(pp, env),
             error=function(e) {
                 # could not parse Authors@R
-                return()
+                return(NULL)
             })
         for (person in people)
         {

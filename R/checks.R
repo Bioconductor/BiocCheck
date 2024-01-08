@@ -4,7 +4,7 @@
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom knitr purl
 #' @importFrom BiocManager available install repositories version
-#' @import biocViews httr methods
+#' @import biocViews methods
 
 # Checks for BiocCheck ----------------------------------------------------
 
@@ -2045,6 +2045,11 @@ checkSkipOnBioc <- function(pkgdir)
     lines
 }
 
+.roxygen_in_desc <- function(pkgdir) {
+    dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
+    "RoxygenNote" %in% colnames(dcf)
+}
+
 checkFormatting <- function(pkgdir, nlines=6)
 {
     pkgname <- basename(pkgdir)
@@ -2052,6 +2057,9 @@ checkFormatting <- function(pkgdir, nlines=6)
         dir(file.path(pkgdir, "R"), pattern="\\.R$", ignore.case=TRUE,
             full.names=TRUE),
         file.path(pkgdir, "NAMESPACE"),
+        if (!.roxygen_in_desc(pkgdir))
+            dir(file.path(pkgdir, "man"), pattern="\\.Rd$", ignore.case=TRUE,
+                full.names=TRUE),
         dir(file.path(pkgdir, "vignettes"), full.names=TRUE,
             pattern="\\.Rnw$|\\.Rmd$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
             ignore.case=TRUE)
@@ -2192,44 +2200,56 @@ checkIsPackageNameAlreadyInUse <- function(
         handleError(msg)
 }
 
+#' @importFrom httr2 req_body_form resp_status resp_body_html
 checkForBiocDevelSubscription <- function(pkgdir)
 {
     email <- getMaintainerEmail(pkgdir)
-    ## TODO: Return an error when no email found.
-    if (!exists("email"))
+    if (is.null(email)) {
+        handleError(
+            "Unable to determine maintainer email from DESCRIPTION file.",
+            nframe = 3L
+        )
         return()
+    }
     if (tolower(email) == "maintainer@bioconductor.org")
     {
         handleMessage("Maintainer email is ok.")
         return()
     }
-    response <- tryCatch({
-        POST(
-            "https://stat.ethz.ch/mailman/admin/bioc-devel",
-            body=list(adminpw=Sys.getenv("BIOC_DEVEL_PASSWORD")))
-    }, error=identity)
-    if (inherits(response, "error")) {
+    response <- try({
+        request("https://stat.ethz.ch/mailman/admin/bioc-devel") |>
+            req_body_form(
+                adminpw = Sys.getenv("BIOC_DEVEL_PASSWORD")
+            ) |>
+            req_perform()
+    }, silent = TRUE)
+    if (inherits(response, "try-error")) {
         handleMessage(
-            "Unable to connect to mailing list",
-            "\n  ", conditionMessage(response))
+            "Unable to connect to the Bioc-devel mailing list",
+            "\n  ", conditionMessage(attr(response, "condition")))
         return()
-    } else if (status_code(response) >= 300) {
+    } else if (resp_status(response) >= 300) {
         handleMessage(
-            "Unable to connect to mailing list",
-            "\n  status code ", status_code(response))
+            "Unable to connect to the Bioc-devel mailing list",
+            "\n  status code ", resp_status(response))
         return()
     }
-    response2 <- POST(
-        "https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4",
-        body=list(findmember=email))
-    content <- content(response2, as="text")
-    if(grepl(paste0(">", tolower(email), "<"), tolower(content), fixed=TRUE))
-    {
+    response2 <- request(
+        "https://stat.ethz.ch/mailman/admin/bioc-devel/members?letter=4") |>
+        req_body_form(
+            findmember = email, adminpw = Sys.getenv("BIOC_DEVEL_PASSWORD")
+        ) |>
+        req_perform()
+    content <- resp_body_html(response2)
+    result_email <- unlist(
+        rvest::html_table(content)[[5L]][3L, 2L], use.names = FALSE
+    )
+    if (identical(tolower(result_email), tolower(email))) {
         handleMessage("Maintainer is subscribed to bioc-devel.")
     } else {
         handleError(
-            "Maintainer must subscribe to the bioc-devel mailing list. ",
-            "Subscribe here: https://stat.ethz.ch/mailman/listinfo/bioc-devel",
+            "Subscribe to the Bioc-devel mailing list by going to ",
+            "https://stat.ethz.ch/mailman/listinfo/bioc-devel",
             nframe = 3L
         )
     }
@@ -2251,43 +2271,53 @@ checkForSupportSiteRegistration <- function(package_dir)
     }
 }
 
+#' @importFrom httr2 req_perform request resp_body_json
 checkSupportReg <- function(email){
 
-    url <- paste0("https://support.bioconductor.org/api/email/", email, "/")
-    response <- tryCatch(GET(url), error=identity)
-    if (inherits(response, "error")) {
-        handleMessage(
-            "Unable to connect to support site:",
-            "\n  ", conditionMessage(response))
-        FALSE
-    } else if (suppressMessages(content(response))) {
+    url <- paste0("https://support.bioconductor.org/api/email/", email)
+    response <- try(
+        req_perform(request(url)), silent = TRUE
+    )
+    response_error <- inherits(response, "try-error")
+    result <- !response_error && resp_body_json(response)
+    if (response_error) {
+        handleError(
+            "Unable to find your email in the Support Site:",
+            "\n  ", conditionMessage(attr(response, "condition"))
+        )
+    } else if (resp_body_json(response)) {
         handleMessage("Maintainer is registered at support site.")
-        TRUE
     } else {
         handleError(
-            "Maintainer must register at the support site; ",
+            "Register your email account in the Support Site; ",
             "visit https://support.bioconductor.org/accounts/signup/"
         )
-        FALSE
     }
+    result
 }
 
 checkWatchedTag <- function(email, pkgname){
 
-    url <- paste0("https://support.bioconductor.org/api/watched/tags/", email, "/")
-    response <- tryCatch(GET(url), error=identity)
-    if (inherits(response, "error")) {
+    url <- paste0("https://support.bioconductor.org/api/watched/tags/", email)
+    response <- try(
+        req_perform(request(url)), silent = TRUE
+    )
+    if (inherits(response, "try-error")) {
         handleMessage(
-            "Unable to connect to support site:",
-            "\n  ", conditionMessage(response))
+            "Unable to find your email in the Support Site:",
+            "\n  ", conditionMessage(attr(response, "condition"))
+        )
     } else {
-        tags<-tolower(trimws(unlist(strsplit(content(response)$watched_tags, split=","))))
-        if (tolower(pkgname) %in% tags){
-            handleMessage("Package name is in support site watched tags.")
-        }else{
-            handleError("Maintainer must add package name to Watched Tags on the support site; ",
-                        "Edit your Support Site User Profile to add Watched Tags.")
-        }
+        alltags <- resp_body_json(response)[["watched_tags"]]
+        taglist <- unlist(strsplit(alltags, split = ","))
+        tags <- tolower(taglist)
+        if (tolower(pkgname) %in% tags)
+            handleMessage("Package is in the Support Site Watched Tags.")
+        else
+            handleError(
+                "Add package to Watched Tags in your Support Site profile; ",
+                "visit https://support.bioconductor.org/accounts/edit/profile"
+            )
     }
 }
 
