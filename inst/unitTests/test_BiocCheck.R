@@ -1249,6 +1249,25 @@ test_checkForBiocDevelSubscription <- function()
         checkTrue(stillZero())
         .zeroCounters()
 
+        result_email <- BiocCheck:::getMaintainerEmail(UNIT_TEST_TEMPDIR)
+        checkTrue(
+            identical(result_email, "MAINTAINER@bioconductor.ORG")
+        )
+
+        writeLines(c(
+            "Package: uniTestTempDir",
+            "Version: 0.99.0",
+            paste0(
+                "Authors@R: person('BioC', 'Maintainer', ,",
+                " email = 'Maintainer@bioconductor.org',",
+                "  role = c('aut', 'cre'))"
+            )
+        ), con = file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        result_email <- BiocCheck:::getMaintainerEmail(UNIT_TEST_TEMPDIR)
+        checkTrue(
+            identical(result_email, "Maintainer@bioconductor.org")
+        )
+
         cat(sprintf(paste(
             "Package: %s\nVersion: 0.99.0\nAuthors@R:",
             "c(person('Joe', \n  'Blow', email='joe@blow.org',",

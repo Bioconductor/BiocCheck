@@ -472,7 +472,7 @@ getMaintainerEmail <- function(pkgdir)
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if ("Maintainer" %in% colnames(dcf))
     {
-        m <- dcf[, "Maintainer"]
+        m <- unname(dcf[, "Maintainer"])
         ret <- regexec("<([^>]*)>", m)[[1]]
         ml <- attr(ret, "match.length")
         email <- substr(m, ret[2], ret[2]+ml[2]-1)

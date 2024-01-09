@@ -2211,7 +2211,7 @@ checkForBiocDevelSubscription <- function(pkgdir)
         )
         return()
     }
-    if (tolower(email) == "maintainer@bioconductor.org")
+    if (identical(tolower(email), "maintainer@bioconductor.org"))
     {
         handleMessage("Maintainer email is ok.")
         return()
@@ -2258,7 +2258,7 @@ checkForBiocDevelSubscription <- function(pkgdir)
 checkForSupportSiteRegistration <- function(package_dir)
 {
     email <- getMaintainerEmail(package_dir)
-    if (tolower(email) == "maintainer@bioconductor.org")
+    if (identical(tolower(email), "maintainer@bioconductor.org"))
     {
         handleMessage("Maintainer email is ok.")
         return()
