@@ -2488,9 +2488,19 @@ checkForCitationFile <- function(package_dir) {
     citfile_location <- file.path(package_dir, "inst", "CITATION")
     if(file.exists(citfile_location)) {
         handleCheck("Checking that provided CITATION file is correctly formatted...")
-        cit <- tryCatch(
-            readCitationFile(citfile_location),
-            error = function(e)
-                handleNote("CITATION file might be not correctly formatted"))
+        cit <- try(readCitationFile(citfile_location), silent = TRUE)
+        if (is(cit, "try-error"))
+            handleNote("Unable to read CITATION file with 'readCitationFile()'")
+        else if (is.null(cit$doi))
+            handleWarning("Include the 'doi' argument in CITATION 'bibentry()'")
+    } else {
+        handleNote(
+            "No CITATION file found. Bioconductor packages are not required to",
+            " have a CITATION file but it is useful both for users and for ",
+            "tracking Bioconductor project-wide metrics. If you later post a ",
+            "preprint or publish a paper about your Bioconductor package, ",
+            "please add the details with a 'doi' argument in the CITATION ",
+            "file's 'bibentry()'."
+        )
     }
 }

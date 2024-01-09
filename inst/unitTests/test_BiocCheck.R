@@ -660,7 +660,8 @@ test_checkBBScompatibility <- function()
         file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION")
     )
     BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
-    checkTrue(stillZero())
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    .zeroCounters()
 
     cat(
         paste(
@@ -672,8 +673,7 @@ test_checkBBScompatibility <- function()
         append=FALSE
     )
     BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
-    checkTrue(.BiocCheck$getNum("note")==1, "citation produces note")
-
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
     .zeroCounters()
 }
 
