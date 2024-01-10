@@ -2437,7 +2437,9 @@ checkBadFiles <- function(package_dir){
     percent <- unname(round(prop.table(table(bioc_deps))["TRUE"], 2L) * 100)
     if (!any(bioc_deps))
         handleWarning(
-            "No Bioconductor dependencies detected; consider a CRAN submission."
+            "No Bioconductor dependencies detected. ",
+            "Reach out to the Bioconductor community or ",
+            "consider a CRAN submission."
         )
     else
         handleMessage(
