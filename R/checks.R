@@ -2429,7 +2429,8 @@ checkBadFiles <- function(package_dir){
         lapply(which_fields, function(x) strsplit(x, ",\\n")[[1L]]),
         use.names = FALSE
     )
-    all_db <- utils::available.packages(repos = BiocManager::repositories())
+    all_deps <- gsub("(\\w+)\\s+\\(.*\\)$", "\\1", all_deps)
+    all_deps <- all_deps[all_deps != "R"]
     repo <- BiocManager:::.repositories_bioc(BiocManager::version())["BioCsoft"]
     biocdb <- utils::available.packages(repos = repo)
     bioc_deps <- all_deps %in% rownames(biocdb)

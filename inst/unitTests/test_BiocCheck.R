@@ -971,6 +971,14 @@ test_checkDESCRIPTIONfile <- function()
         "S4Vectors (== 0.99.0)", nrow = 1,
         dimnames = list(NULL, "Depends")
     )
+    BiocCheck:::.checkBiocDepsDESC(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 0)
+    .zeroCounters()
+
+    dcf <- matrix(
+        "S4Vectors (== 0.99.0)", nrow = 1,
+        dimnames = list(NULL, "Depends")
+    )
     BiocCheck:::.checkPinnedDeps(dcf)
     checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
     .zeroCounters()
