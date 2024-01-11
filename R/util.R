@@ -439,10 +439,11 @@ findSymbolsInParsedCode <-
         function(...) rbind.data.frame(..., make.row.names = FALSE),
         matches
     )
+    matches[] <- lapply(matches, as.character)
     apply(matches, 1L, function(rowdf) {
         fmttxt <- "%s (line %s, column %s)"
         formt <- if (fun) paste0(rowdf["text"], " in ", fmttxt) else fmttxt
-        sprintf(formt, .getDirFiles(as.character(rowdf["filename"])),
+        sprintf(formt, .getDirFiles(rowdf["filename"]),
             rowdf["line1"], rowdf["col1"]
         )
     })
