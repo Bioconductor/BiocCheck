@@ -850,6 +850,17 @@ test_checkCatInRCode <- function()
     checkTrue(length(msg) == 9)
 }
 
+test_checkDepDefInRCode <- function() {
+    pkgdir <- system.file("testpackages", "testpkg0",
+        package="BiocCheck", mustWork = TRUE)
+    msg <- BiocCheck:::findSymbolsInRFiles(
+        pkgdir, c(".Deprecated", ".Defunct"), "SYMBOL_FUNCTION_CALL"
+    )
+    checkTrue(
+        identical(length(msg), 2L)
+    )
+}
+
 test_checkEqInAssignment <- function()
 {
     Rdir <- system.file("testpackages", "testpkg0", "R",

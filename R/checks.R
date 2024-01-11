@@ -1274,6 +1274,18 @@ checkCodingPractice <- function(pkgdir, parsedCode, package_name)
         )
     }
 
+    # .Deprecated / .Defunct usage should be updated after every release
+    msg_depr <- findSymbolsInRFiles(
+        pkgdir, c(".Deprecated", ".Defunct"), "SYMBOL_FUNCTION_CALL"
+    )
+    if (length(msg_depr)) {
+        handleWarning(
+            ".Deprecated / .Defunct usage (found ",
+            length(msg_depr), " times)",
+            messages = msg_depr
+        )
+    }
+
     handleCheck("Checking parsed R code in R directory, examples, vignettes...")
 
     # direct slot access

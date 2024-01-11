@@ -89,14 +89,12 @@ Can be disabled with `--no-check-deprecated`.
 At present, this looks to see whether your package has a dependency on
 the `multicore` package (`ERROR`).
 
-Our recommendation is to use [BiocParallel][7.1]. Note that 'fork'
-clusters do not rpovide any gain from parallelizing code on
+Our recommendation is to use `r Biocpkg('BiocParallel')`. Note that 'fork'
+clusters do not provide any gain from parallelizing code on
 Windows. Socket clusters work on all operating systems.
 
 Also checks `Deprecated` Packages currently specified in release and devel
 versions of Bioconductor (`ERROR`).
-
-[7.1]: https://bioconductor.org/packages/BiocParallel
 
 ## Remotes Usage Check
 
@@ -148,9 +146,9 @@ Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
   confusion and errors (`NOTE`).
 
 For more information on package versions, see the
-[Version Numbering HOWTO][3].
+[Version Numbering HOWTO][1].
 
-[3]: https://contributions.bioconductor.org/versionnum.html
+[1]: https://contributions.bioconductor.org/versionnum.html
 
 ## Package and File Size Check
 
@@ -168,9 +166,9 @@ Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
   `data-raw` folders. (WARNING)
 
 It may be necessary to remove large files from your Git history; see
-[Remove Large Data Files and Clean Git Tree][3.1]
+[Remove Large Data Files and Clean Git Tree][2]
 
-[3.1]: https://contributions.bioconductor.org/git-version-control.html#remove-large-data-files-and-clean-git-tree
+[2]: https://contributions.bioconductor.org/git-version-control.html#remove-large-data-files-and-clean-git-tree
 
 ## biocViews Checks
 
@@ -202,9 +200,9 @@ Can be disabled with `--no-check-bioc-views`
   automatically suggest some biocViews for your package.
 
 More information about biocViews is available in the
-[Using biocViews HOWTO][4].
+[Using biocViews HOWTO][3].
 
-[4]: https://contributions.bioconductor.org/important-bioconductor-package-development-features.html#biocviews
+[3]: https://contributions.bioconductor.org/important-bioconductor-package-development-features.html#biocviews
 
 ## Build System Compatibility Checks
 
@@ -349,12 +347,12 @@ be several causes:
 * Missing or invalid `VignetteBuilder` line in the `DESCRIPTION` file.
 * Missing or invalid `VignetteEngine` line in the vignette source.
 
-See `knitr`'s [package vignette][1] page, or the
-[Non-Sweave vignettes][2] section of "Writing R Extensions" for more
+See `knitr`'s [package vignette][4] page, or the
+[Non-Sweave vignettes][5] section of "Writing R Extensions" for more
 information.
 
-[1]: http://yihui.name/knitr/demo/vignette/
-[2]: https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Non_002dSweave-vignettes
+[4]: http://yihui.name/knitr/demo/vignette/
+[5]: https://cran.r-project.org/doc/manuals/r-release/R-exts.html#Non_002dSweave-vignettes
 
 
 ## Checking Install or Update Package Calls in R code
@@ -395,7 +393,7 @@ directory.
   and BitBucket. For the same reason we do not import GitHub packages,
   external data can be unstable and not well maintained. Maintainers
   should re-use data already available in Bioconductor or contribute
-  an ExperimentHub, AnnotationHub or similar package (`ERROR`).
+  an `ExperimentHub`, `AnnotationHub` or similar package (`ERROR`).
 
 * A package should not download files at the time of loading or attaching
   i.e., using `library`. Using `download.file` and `download` should be avoided
@@ -416,6 +414,13 @@ directory.
 * It is favorable to use the assignment arrow ('<-') over the equals assignment
   ('=') for clarity in the code and legibility. Any use of the `=` will be
   flagged with a `NOTE`.
+  
+* New submissions should not use any `.Deprecated` or `.Defunct` function calls
+  (`WARNING`). Existing packages should evolve `.Deprecated` and `.Defunct`
+  functions after a Bioconductor release according to the
+  [package guidelines][6].
+  
+[6]: https://contributions.bioconductor.org/deprecation.html
 
 * **Checking for T...** **Checking for F...**
   It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
@@ -558,9 +563,9 @@ Can be disabled with `--no-check-unit-tests`.
 
 We strongly recommend unit tests, though we do not at present require
 them. For more on what unit tests are, why they are helpful, and how
-to implement them, read our [Unit Testing HOWTO][5].
+to implement them, read our [Unit Testing HOWTO][7].
 
-[5]: https://contributions.bioconductor.org/tests.html
+[7]: https://contributions.bioconductor.org/tests.html
 
 At present we just check to see whether unit tests are present, and if not,
 urge you to add them (`NOTE`).
