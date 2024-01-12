@@ -2438,7 +2438,7 @@ checkBadFiles <- function(package_dir){
     handleCheck("Checking for Bioconductor software dependencies...")
     which_fields <- dcf[, colnames(dcf) %in% which]
     all_deps <- unlist(
-        lapply(which_fields, function(x) strsplit(x, ",\\n")[[1L]]),
+        lapply(which_fields, function(x) strsplit(x, ",\\s+")[[1L]]),
         use.names = FALSE
     )
     all_deps <- gsub("(\\w+)\\s+\\(.*\\)$", "\\1", all_deps)
