@@ -427,6 +427,9 @@ findSymbolsInParsedCode <-
     }
 
     matches <- Filter(nrow, matches)
+    if (!length(matches))
+        return(character(0L))
+
     matches <- lapply(names(matches), function(nm) {
         dframe <- matches[[nm]]
         dframe[["text"]] <- paste0(dframe$text,
