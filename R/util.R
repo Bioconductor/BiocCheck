@@ -640,7 +640,8 @@ getVigEngine <- function(vignetteFile){
     vigEngine <- grep(lines, pattern="VignetteEngine", value = TRUE)
     vigEngine <- trimws(vigEngine)
     if (length(vigEngine)) {
-        gsub("%\\\\VignetteEngine\\{(.*)::.*\\}", "\\1", vigEngine)
+        ve <- gsub("%\\\\VignetteEngine\\{(.*)\\}", "\\1", vigEngine)
+        head(strsplit(ve, "::", fixed = TRUE)[[1L]], 1L)
     } else {
         NA
     }
