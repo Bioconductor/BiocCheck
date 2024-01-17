@@ -2425,7 +2425,12 @@ checkBadFiles <- function(package_dir){
 .checkDESCfields <- function(dcf) {
     handleCheck("Checking for recommended DESCRIPTION fields...")
 
-    fields <- c("URL", "BugReports")
+    fields <- c("URL", "BugReports", "Date")
+    if ("Date" %in% colnames(dcf)) {
+        date <- dcf[, "Date"]
+        if (!grepl("^\\d{4}-\\d{2}-\\d{2}$", date))
+            handleNote("'Date:' field format is not 'YYYY-MM-DD': ", date)
+    }
     present <- fields %in% colnames(dcf)
     res <- fields[!present]
     if (length(res)) {
