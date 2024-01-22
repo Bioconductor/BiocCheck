@@ -40,5 +40,5 @@ Date: 2024-01-17
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck
 BugReports: https://github.com/Bioconductor/BiocCheck/issues
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 Encoding: UTF-8
