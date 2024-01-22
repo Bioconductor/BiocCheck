@@ -967,7 +967,7 @@ test_checkDESCRIPTIONfile <- function()
         dimnames = list(NULL, c("BugReports", "URL"))
     )
     BiocCheck:::.checkDESCfields(dcf)
-    checkEqualsNumeric(.BiocCheck$getNum("note"), 0)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
     .zeroCounters()
 
     dcf <- matrix("Date: 01-01-2024", dimnames = list(NULL, "Date"))
