@@ -1,5 +1,5 @@
 Package: BiocCheck
-Version: 1.38.1
+Version: 1.38.2
 Title: Bioconductor-specific package checks
 Description: BiocCheck guides maintainers through Bioconductor best
   practicies. It runs Bioconductor-specific package checks by searching through
@@ -41,3 +41,4 @@ URL: https://github.com/Bioconductor/BiocCheck
 BugReports: https://github.com/Bioconductor/BiocCheck/issues
 RoxygenNote: 7.2.3
 Encoding: UTF-8
+Date: 2024-01-26
