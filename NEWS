@@ -19,6 +19,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
     o Avoid format checks e.g., length, indentation, and tabs for Rd files
     that use roxygen2
     o Use httr2 over httr for http requests
+    o Clarify `NOTE` and `WARNING` messages for `CITATION` file inclusion
+    (#209).
 
 CHANGES IN VERSION 1.38.0
 -----------------------
