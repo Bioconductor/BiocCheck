@@ -690,7 +690,7 @@ test_checkBBScompatibility <- function()
         append=FALSE
     )
     BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
-    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
     .zeroCounters()
 }
 
