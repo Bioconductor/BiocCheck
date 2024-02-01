@@ -253,14 +253,18 @@ Can be disabled with `--no-check-bbs`
 
 ## DESCRIPTION checks
 
-* **Checking License: for restrictive use...** Checks to make sure
-  that the `License:` in the DESCRIPTION file does not restrict use,
-  e.g., to academic-use only (`ERROR`). Licenses are compared to the
-  database provided at `file.path(R.home("share)", "licenses",
-  "license.db"))`.  Licenses not listed in the database are flagged
-  with a `NOTE` indicating that restrictive use status cannot be
-  determined. A `NOTE` is also generated if the `License:` field is
-  malformed, or the database cannot be located.
+* **Checking License: for restrictive use...**
+  Checks to make sure that the `License:` in the `DESCRIPTION` file does not
+  restrict use, e.g., to academic-use only (`ERROR`). Licenses are compared to
+  R's internal database provided at `r BiocCheck:::.LICENSE_DB_LOCATION` and
+  read with `read.dcf`. Licenses not listed in the database or with spelling
+  deviations e.g., `GPL-3.0` vs `GPL-3` are flagged with a `NOTE`. A `NOTE` is
+  also generated if the license is not a valid SPDX license identifier (with the
+  exception of those already in the database file) or if the license cannot be
+  verified in the database. A `NOTE` is also generated if the `License:` field
+  is malformed, or the database cannot be located. We also recommend developers
+  to browse to the [choosealicense][] to find a suitable license for their
+  package as well as the [SPDX License List][] website.
 * **Checking for pinned package versions...**
   Ensures that maintainers are not indicating a specific dependency version
   using `==` in the `DESCRIPTION` file (`ERROR`).
@@ -271,6 +275,9 @@ Can be disabled with `--no-check-bbs`
 * **Checking for Bioconductor software dependencies...** Checks to see if
   the package depends on any Bioconductor software packages in the `Depends:`
   and `Imports:` fields; if none (`WARNING`).
+
+[choosealicense]: https://choosealicense.com/appendix
+[SPDX License List]: https://spdx.org/licenses/
 
 ##  NAMESPACE checks
 

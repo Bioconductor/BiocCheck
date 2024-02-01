@@ -438,6 +438,23 @@ test_checkLicenseForRestrictiveUse <- function() {
     checkEqualsNumeric(1, .BiocCheck$getNum("note"))
 }
 
+test_analyze_licenses <- function() {
+    licensedb <- gsub(
+        "$R_HOME", Sys.getenv("R_HOME"),
+        BiocCheck:::.LICENSE_DB_LOCATION, fixed = TRUE
+    )
+    result <- tools:::analyze_licenses("GPL-3.0", licensedb)
+    checkTrue(!result$is_verified)
+    BiocCheck:::.checkLicenseForRestrictiveUse("GPL-3.0")
+    checkEqualsNumeric(1, .BiocCheck$getNum("note"))
+    .zeroCounters()
+
+    result <- tools:::analyze_licenses("GPL-3", licensedb)
+    checkTrue(result$is_verified)
+    BiocCheck:::.checkLicenseForRestrictiveUse("GPL-3")
+    checkEqualsNumeric(0, .BiocCheck$getNum("note"))
+}
+
 test_checkIndivFileSizes <- function() {
     .zeroCounters()
     .findLargeFiles_org <- BiocCheck:::.findLargeFiles

@@ -18,6 +18,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
     labels were present (@hpages, #199)
     o Avoid format checks e.g., length, indentation, and tabs for Rd files
     that use roxygen2
+    o Use the `tools:::analyze_licenses` function to check for restrictive
+    license use (@hpages, #119)    
     o Use httr2 over httr for http requests
     o Clarify `NOTE` and `WARNING` messages for `CITATION` file inclusion
     (#209).

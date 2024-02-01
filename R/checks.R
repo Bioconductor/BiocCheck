@@ -2383,10 +2383,12 @@ checkBadFiles <- function(package_dir){
     }
 }
 
+.LICENSE_DB_LOCATION <- "$R_HOME/share/licenses/license.db"
+
 .checkLicenseForRestrictiveUse <- function(license) {
     handleCheck("Checking License: for restrictive use...")
 
-    if (length(license) != 1L || is.na(license)) {
+    if (!identical(length(license), 1L) || is.na(license)) {
         handleNote("malformed 'License:' field '", license, "'")
         return(invisible())
     }
@@ -2400,24 +2402,17 @@ checkBadFiles <- function(package_dir){
         return(invisible())
     }
     licenses <- read.dcf(ldb_file)
-    sss <- licenses[, "SSS"]
-    abbrev <- licenses[, "Abbrev"]
-    abbrev[!is.na(sss)] <- sss[!is.na(sss)]
-    restrict <- licenses[, "Restricts_use"]
-    idx <- (restrict == "yes") & !is.na(restrict) & !is.na(abbrev)
-
-    ## PCAN/DESCRIPTION:License: CC BY-NC-ND 4.0
-    ## QUBIC/DESCRIPTION:License: CC BY-NC-ND 4.0 + file LICENSE
-    test0 <- any(vapply(abbrev[idx], grepl, logical(1), license, fixed = TRUE))
-    test1 <-
-        !any(vapply(
-             abbrev[!is.na(abbrev)], grepl, logical(1), license, fixed = TRUE
-         ))
-    if (test0) {
+    result <- tools:::analyze_licenses(license, licenses)
+    test <- result[["restricts_use"]]
+    if (isTRUE(test))
         handleError("License '", license, "' restricts use")
-    } else if (test1) {
+    else if (is.na(test) || !result[, "is_verified"]) {
         handleNote(
-            "License '", license, "' unknown; licenses cannot restrict use"
+            "License '", license, "' unknown; refer to ", .LICENSE_DB_LOCATION
+        )
+        handleMessage(
+            "and https://choosealicense.com/appendix/ for more info.",
+            indent = 6L
         )
     }
 }
