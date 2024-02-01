@@ -72,6 +72,11 @@ check_inst_pkg <- function(pkg = "getPass") {
     check_install(pkg = pkg)
 }
 
+check_Dep_Defunct <- function() {
+    .Deprecated("This function is deprecated")
+    .Defunct("This function is defunct")
+}
+
 ## test functions > 50 lines are reported
 really_long_function <- function() {
   

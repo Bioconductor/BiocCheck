@@ -427,6 +427,9 @@ findSymbolsInParsedCode <-
     }
 
     matches <- Filter(nrow, matches)
+    if (!length(matches))
+        return(character(0L))
+
     matches <- lapply(names(matches), function(nm) {
         dframe <- matches[[nm]]
         dframe[["text"]] <- paste0(dframe$text,
@@ -439,10 +442,11 @@ findSymbolsInParsedCode <-
         function(...) rbind.data.frame(..., make.row.names = FALSE),
         matches
     )
+    matches[] <- lapply(matches, as.character)
     apply(matches, 1L, function(rowdf) {
         fmttxt <- "%s (line %s, column %s)"
         formt <- if (fun) paste0(rowdf["text"], " in ", fmttxt) else fmttxt
-        sprintf(formt, .getDirFiles(as.character(rowdf["filename"])),
+        sprintf(formt, .getDirFiles(rowdf["filename"]),
             rowdf["line1"], rowdf["col1"]
         )
     })
@@ -472,7 +476,7 @@ getMaintainerEmail <- function(pkgdir)
     dcf <- read.dcf(file.path(pkgdir, "DESCRIPTION"))
     if ("Maintainer" %in% colnames(dcf))
     {
-        m <- dcf[, "Maintainer"]
+        m <- unname(dcf[, "Maintainer"])
         ret <- regexec("<([^>]*)>", m)[[1]]
         ml <- attr(ret, "match.length")
         email <- substr(m, ret[2], ret[2]+ml[2]-1)
@@ -636,7 +640,8 @@ getVigEngine <- function(vignetteFile){
     vigEngine <- grep(lines, pattern="VignetteEngine", value = TRUE)
     vigEngine <- trimws(vigEngine)
     if (length(vigEngine)) {
-        gsub("%\\\\VignetteEngine\\{(.*)::.*\\}", "\\1", vigEngine)
+        ve <- gsub("%\\\\VignetteEngine\\{(.*)\\}", "\\1", vigEngine)
+        head(strsplit(ve, "::", fixed = TRUE)[[1L]], 1L)
     } else {
         NA
     }

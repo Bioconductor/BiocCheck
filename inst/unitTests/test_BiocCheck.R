@@ -677,7 +677,8 @@ test_checkBBScompatibility <- function()
         file=file.path(UNIT_TEST_TEMPDIR,"inst/CITATION")
     )
     BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
-    checkTrue(stillZero())
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    .zeroCounters()
 
     cat(
         paste(
@@ -689,8 +690,7 @@ test_checkBBScompatibility <- function()
         append=FALSE
     )
     BiocCheck:::checkForCitationFile(UNIT_TEST_TEMPDIR)
-    checkTrue(.BiocCheck$getNum("note")==1, "citation produces note")
-
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
     .zeroCounters()
 }
 
@@ -867,6 +867,17 @@ test_checkCatInRCode <- function()
     checkTrue(length(msg) == 9)
 }
 
+test_checkDepDefInRCode <- function() {
+    pkgdir <- system.file("testpackages", "testpkg0",
+        package="BiocCheck", mustWork = TRUE)
+    msg <- BiocCheck:::findSymbolsInRFiles(
+        pkgdir, c(".Deprecated", ".Defunct"), "SYMBOL_FUNCTION_CALL"
+    )
+    checkTrue(
+        identical(length(msg), 2L)
+    )
+}
+
 test_checkEqInAssignment <- function()
 {
     Rdir <- system.file("testpackages", "testpkg0", "R",
@@ -973,7 +984,36 @@ test_checkDESCRIPTIONfile <- function()
         dimnames = list(NULL, c("BugReports", "URL"))
     )
     BiocCheck:::.checkDESCfields(dcf)
-    checkEqualsNumeric(.BiocCheck$getNum("note"), 0)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 1)
+    .zeroCounters()
+
+    dcf <- matrix("Date: 01-01-2024", dimnames = list(NULL, "Date"))
+    BiocCheck:::.checkDESCfields(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("note"), 2)
+    .zeroCounters()
+
+    dcf <- matrix(
+        c("https://example.com", "https://example.com"), nrow = 1,
+        dimnames = list(NULL, c("BugReports", "URL"))
+    )
+    BiocCheck:::.checkBiocDepsDESC(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 1)
+    .zeroCounters()
+
+    dcf <- matrix(
+        "S4Vectors (== 0.99.0)", nrow = 1,
+        dimnames = list(NULL, "Depends")
+    )
+    BiocCheck:::.checkBiocDepsDESC(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("warning"), 0)
+    .zeroCounters()
+
+    dcf <- matrix(
+        "S4Vectors (== 0.99.0)", nrow = 1,
+        dimnames = list(NULL, "Depends")
+    )
+    BiocCheck:::.checkPinnedDeps(dcf)
+    checkEqualsNumeric(.BiocCheck$getNum("error"), 1)
     .zeroCounters()
 }
 
@@ -1249,6 +1289,25 @@ test_checkForBiocDevelSubscription <- function()
         BiocCheck:::checkForBiocDevelSubscription(UNIT_TEST_TEMPDIR)
         checkTrue(stillZero())
         .zeroCounters()
+
+        result_email <- BiocCheck:::getMaintainerEmail(UNIT_TEST_TEMPDIR)
+        checkTrue(
+            identical(result_email, "MAINTAINER@bioconductor.ORG")
+        )
+
+        writeLines(c(
+            "Package: uniTestTempDir",
+            "Version: 0.99.0",
+            paste0(
+                "Authors@R: person('BioC', 'Maintainer', ,",
+                " email = 'Maintainer@bioconductor.org',",
+                "  role = c('aut', 'cre'))"
+            )
+        ), con = file.path(UNIT_TEST_TEMPDIR, "DESCRIPTION"))
+        result_email <- BiocCheck:::getMaintainerEmail(UNIT_TEST_TEMPDIR)
+        checkTrue(
+            identical(result_email, "Maintainer@bioconductor.org")
+        )
 
         cat(sprintf(paste(
             "Package: %s\nVersion: 0.99.0\nAuthors@R:",

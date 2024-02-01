@@ -1,5 +1,5 @@
 Package: BiocCheck
-Version: 1.39.10
+Version: 1.39.22
 Title: Bioconductor-specific package checks
 Description: BiocCheck guides maintainers through Bioconductor best
   practicies. It runs Bioconductor-specific package checks by searching through
@@ -36,8 +36,9 @@ Imports:
     utils
 Suggests: RUnit, BiocGenerics, Biobase, jsonlite, rmarkdown, downloader,
     devtools (>= 1.4.1), usethis, BiocStyle, GenomicRanges, gert
+Date: 2024-02-01
 biocViews: Infrastructure
 URL: https://github.com/Bioconductor/BiocCheck
 BugReports: https://github.com/Bioconductor/BiocCheck/issues
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.0
 Encoding: UTF-8
