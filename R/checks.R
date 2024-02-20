@@ -462,7 +462,7 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
         pp <- parse(text=dcf[,"Authors@R"], keep.source=TRUE)
         tryCatch(people <- eval(pp, env),
             error=function(e) {
-                handleError("AuthorsR@ field must be valid R code.")
+                handleError("Authors@R field must be valid R code.")
             })
         if (!exists("people")) return()
         if (!"person" %in% class(people))
