@@ -790,18 +790,22 @@ test_findPackageName <- function()
 
     ## test tarball rename
     pkgdir <- create_test_package(description = list(Version = "0.99.0"))
-    cmd <- sprintf('"%s"/bin/R CMD build %s', R.home(), pkgdir)
-    result <- system(cmd, intern=TRUE)
+    oldname <- devtools::build(pkgdir)
+    newname <- file.path(tempdir(), "test.package_0.99.0.tar.gz")
 
-    tarname <- paste0(basename(pkgdir), "_0.99.0.tar.gz")
-    file.copy(tarname, tempdir())
-    file.remove(tarname)
-    tarname <- file.path(tempdir(), tarname)
-    stopifnot(file.exists(tarname))
-    tarrename <- file.path(tempdir(), "test.package_0.99.0.tar.gz")
-    file.rename(tarname, tarrename)
-    checkException(BiocCheck:::.getPackageName(tarrename))
-    unlink(tarrename)
+    if (!file.rename(oldname, newname)) {
+        file.remove(oldname)
+        stop("'file.rename()' failed to rename package",
+             "\n  oldname: ", oldname, " newname: ", newname,
+             "\n  cmd: ", cmd,
+             "\n  result:",
+             "\n    ", paste(result, collapse="\n    "),
+             "\n")
+    }
+    on.exit({
+        file.remove(newname)
+    })
+    checkException(BiocCheck:::.getPackageName(newname))
 }
 
 test_checkDeprecatedPackages <- function()
@@ -1380,21 +1384,18 @@ test_checkForVersionNumberMismatch <- function()
     pkgpath <- create_test_package(description = list(Version="0.0.1"))
     pkgname <- basename(pkgpath)
 
-    cmd <- sprintf('"%s"/bin/R CMD build %s', R.home(), pkgpath)
-    result <- system(cmd, intern=TRUE)
+    oldname <- devtools::build(pkgpath)
 
-    oldname <- paste0(pkgname, "_0.0.1.tar.gz")
-    file.copy(oldname, tempdir())
-    file.remove(oldname)
-    oldname <- file.path(tempdir(), oldname)
-    newname <- file.path(tempdir(), paste0(pkgname, "_9.9.9.tar.gz"))
-    if (!file.rename(oldname, newname))
+    newname <- file.path(dirname(oldname), paste0(pkgname, "_9.9.9.tar.gz"))
+    if (!file.rename(oldname, newname)) {
+        file.remove(oldname)
         stop("'file.rename()' failed to rename badkpgk",
              "\n  oldname: ", oldname, " newname: ", newname,
              "\n  cmd: ", cmd,
              "\n  result:",
              "\n    ", paste(result, collapse="\n    "),
              "\n")
+    }
     on.exit({
         file.remove(newname)
     })
