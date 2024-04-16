@@ -85,7 +85,6 @@ packages)}
 \item{no-check-bbs}{ disable BBS-specific checks (for non-BioC packages).
 Valid DESCRIPTION}
 \item{no-check-description}{ disable DESCRIPTION file checks}
-\item{no-check-namespace}{ disable namespace checks}
 \item{no-check-vignettes}{ disable vignette checks}
 \item{no-check-library-calls}{ disable check usage of functions that
 install or update packages}

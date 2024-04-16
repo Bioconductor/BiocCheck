@@ -541,44 +541,6 @@ checkBBScompatibility <- function(pkgdir, source_tarball)
     unique(unlist(imps))
 }
 
-checkDescriptionNamespaceConsistency <- function(pkgname, lib.loc)
-{
-    pkg_desc <- packageDescription(pkgname, lib.loc = lib.loc)
-    dImports <- cleanupDependency(pkg_desc$Imports)
-    deps <- cleanupDependency(pkg_desc$Depends)
-    nImports <- .parsePackageImportsFromNamespace(pkgname, lib.loc)
-
-    if(!(all(dImports %in% nImports)))
-    {
-        badones <- dImports[!dImports %in% nImports]
-        tryCatch({
-            ## FIXME: not 100% confident that the following always succeeds
-            pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
-            dcolon <- .checkEnv(pkg_ns, .colonWalker())$done()
-            unloadNamespace(pkg_ns)
-            badones <- setdiff(badones, dcolon)
-        }, error=function(...) NULL)
-        if (length(badones))
-            handleWarning(
-                "Import ", paste(badones, collapse=", "), " in NAMESPACE ",
-                "as well as DESCRIPTION.")
-    }
-    if (!all (nImports %in% dImports))
-    {
-        badones <- nImports[!nImports %in% dImports]
-        if (!is.null(deps))
-        {
-            badones <- badones[!badones %in% deps]
-        }
-        if (length(badones))
-        {
-            handleWarning(
-                "Import ", paste(unique(badones), collapse=", "), " in ",
-                "DESCRIPTION as well as NAMESPACE.")
-        }
-    }
-}
-
 checkVignetteDir <- function(pkgdir, checkingDir)
 {
     vigdir <- file.path(pkgdir, "vignettes")

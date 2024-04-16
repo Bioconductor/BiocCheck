@@ -37,7 +37,6 @@
 #'   \item{no-check-bbs}{ disable BBS-specific checks (for non-BioC packages).
 #'     Valid DESCRIPTION}
 #'   \item{no-check-description}{ disable DESCRIPTION file checks}
-#'   \item{no-check-namespace}{ disable namespace checks}
 #'   \item{no-check-vignettes}{ disable vignette checks}
 #'   \item{no-check-library-calls}{ disable check usage of functions that
 #'     install or update packages}
@@ -246,11 +245,6 @@ BiocCheckRun <-
         ## the following is redundant with other outputs...
         ## handleCheck("Checking DESCRIPTION file...")
         checkDESCRIPTIONFile(package_dir)
-    }
-
-    if (is.null(dots[["no-check-namespace"]])){
-        handleCheck("Checking DESCRIPTION/NAMESPACE consistency...")
-        checkDescriptionNamespaceConsistency(package_name, libloc)
     }
 
     handleCheck("Checking .Rbuildignore...")
