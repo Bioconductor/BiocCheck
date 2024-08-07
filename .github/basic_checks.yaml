@@ -3,7 +3,7 @@ name: Check, build, and test
 on:
   push:
     branches:
-      - devel
+      - gha_test
     paths:
       - DESCRIPTION
   pull_request:
