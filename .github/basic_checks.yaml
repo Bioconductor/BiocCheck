@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - gha_test
-    paths:
-      - DESCRIPTION
+    # paths:
+    #   - DESCRIPTION
   pull_request:
     branches:
       - devel
