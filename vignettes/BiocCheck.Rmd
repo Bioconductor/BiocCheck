@@ -307,9 +307,12 @@ Can be disabled with `--no-check-vignettes`.
 
 * Checks that the `vignettes` directory exists (`ERROR`).
 * Checks that the `vignettes` directory only contains vignette sources
-  *(*.Rmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
+  *(*.Rmd, *.qmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
 * Checks for `.Rnw` vignettes, if any found, suggest RMarkdown (`.Rmd`)
   vignettes instead (`WARNING`)
+* Checks for `.qmd` vignettes, if any found, a 'SystemRequirements' field
+  must be present in the `DESCRIPTION` file (`WARNING`). The field should
+  list `quarto` as a system requirement.
 * Checks whether, while checking a directory (not a tarball), vignette
   sources exist in inst/doc (`ERROR`).
 * Checks that vignetteBuidler/vignetteEngine are listed in, minimally, Suggests
