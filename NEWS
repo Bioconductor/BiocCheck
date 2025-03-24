@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.46.0
+-----------------------
+
+NEW FEATURES
+
+    o Checks support `qmd` vignettes and require that a `SystemRequirements`
+    field be present and list the `quarto` CLI in the DESCRIPTION file.
+
 CHANGES IN VERSION 1.44.0
 -----------------------
 
