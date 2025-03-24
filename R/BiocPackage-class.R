@@ -169,7 +169,7 @@
                 file.path(.self[["sourceDir"]], "vignettes")
             vigfiles <- list.files(
                 .self[["vignettesDir"]],
-                pattern="\\.Rmd$|\\.Rnw$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
+                pattern="\\.Rmd$|\\.qmd$|\\.Rnw$|\\.Rrst$|\\.Rhtml$|\\.Rtex$",
                 ignore.case=TRUE, full.names=TRUE
             )
             if (length(vigfiles))

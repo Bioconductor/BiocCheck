@@ -618,7 +618,7 @@ checkFormatting <- function(.BiocPackage, nlines=6)
             idx <- !is.na(n) & (n > 80L)
             long <- rbind(long, Context(file, lines, idx, offset))
 
-            if (identical(tolower(tools::file_ext(file)), "rmd")) {
+            if (tolower(tools::file_ext(file)) %in% c("rmd", "qmd")) {
                 lines <- .rmYAMLfm(lines)
                 offset <- attr(lines, "offset")
             }

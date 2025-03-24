@@ -28,7 +28,7 @@ checkCounter("No vignette sources in vignettes/ directory.", "error")
 BiocCheck:::checkVignetteDir(.bioctest)
 expect_identical(
     .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 0L, warning = 2L, note = 1L),
+    c(error = 0L, warning = 3L, note = 1L),
     "Rmd recommend WARNING"
 )
 .BiocCheck$zero()
@@ -111,6 +111,17 @@ expect_equivalent(
 )
 .BiocCheck$zero()
 
+## check 'SystemRequirements' in DESCRIPTION for qmd
+.bioctest <- read_test_package("testpkg0")
+BiocCheck:::checkVigTypeQMD(.bioctest)
+expect_true(
+    grepl(
+        pattern = "'SystemRequirements' field not in DESCRIPTION",
+        .BiocCheck$get("warning")[["checkVigTypeQMD"]]
+    )
+)
+.BiocCheck$zero()
+
 BiocCheck:::checkVigSessionInfo(.bioctest)
 expect_equivalent(
     .BiocCheck$getNum("note"), 1L
@@ -159,7 +170,7 @@ expect_identical(
 BiocCheck:::checkVignetteDir(.bioctest)
 expect_identical(
     .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 4L, warning = 9L, note = 1L),
+    c(error = 5L, warning = 10L, note = 1L),
     "check vignette style of example pkg; test multiple errors, warnings"
 )
 expect_true(

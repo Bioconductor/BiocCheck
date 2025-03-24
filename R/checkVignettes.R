@@ -26,6 +26,8 @@ checkVignetteDir <- function(.BiocPackage)
 
     checkVigTypeRNW(.BiocPackage)
 
+    checkVigTypeQMD(.BiocPackage)
+
     checkVigEngine(.BiocPackage)
 
     checkVigSuggests(.BiocPackage)
@@ -140,6 +142,26 @@ checkVigTypeRNW <- function(.BiocPackage) {
         )
 }
 
+checkVigTypeQMD <- function(.BiocPackage) {
+    vigdircontents <- .BiocPackage$VigSources
+    vigExt <- tolower(tools::file_ext(vigdircontents))
+    isQMD <- vigExt == "qmd"
+    vigNames <- basename(vigdircontents[isQMD])
+    desc <- .BiocPackage$DESCRIPTION
+    if (length(vigNames)) {
+        if (!"SystemRequirements" %in% colnames(desc))
+            handleWarning(
+                "Quarto vignette found but 'SystemRequirements'",
+                " field not in DESCRIPTION."
+            )
+        else if (!grepl("quarto", desc[, "SystemRequirements"]))
+            handleWarning(
+                "Quarto vignette found but 'SystemRequirements'",
+                " does not list 'quarto'."
+            )
+    }
+}
+
 checkVigMetadata <- function(vigdircontents)
 {
     badVig <- character(0)
@@ -245,9 +267,9 @@ checkVigTemplate <- function(vigdircontents)
     badVig2 <- character(0)
     for (file in vigdircontents) {
         lines <- readLines(file, warn=FALSE)
-        if (identical(tolower(tools::file_ext(file)), "rmd"))
+        if (tolower(tools::file_ext(file)) %in% c("rmd", "qmd"))
             lines <- .getYAMLfront(lines)
-        idx <- grep(lines, pattern="VignetteIndexEntry")
+        idx <- grep(lines, pattern="VignetteIndexEntry", fixed = TRUE)
         if (length(idx)) {
             title <- tolower(gsub(".*\\{|\\}.*", "", lines[idx]))
             if (identical(title, "vignette title"))
@@ -454,7 +476,7 @@ quiet_knitr_purl <- function(...)
 purl_or_tangle <- function(input, output, quiet, ...) {
     vigEng <- getVigEnginePkg(input)
     vigExt <- tolower(tools::file_ext(input))
-    if (!identical(vigExt, "rnw") || identical(vigEng, "knitr"))
+    if (!identical(vigExt, "rnw") || vigEng %in% c("knitr", "quarto"))
         quiet_knitr_purl(input = input, output = output, quiet = quiet, ...)
     else
         utils::Stangle(file = input, output = output, quiet = quiet)

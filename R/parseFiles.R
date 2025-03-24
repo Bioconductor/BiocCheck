@@ -3,7 +3,8 @@ parseFile <- function(.BiocPackage, infile) {
     outfile <- file.path(parse_dir, "parseFile.tmp")
     if (grepl("\\.R$", infile, TRUE))
         outfile <- infile
-    if (grepl("\\.Rnw$|\\.Rmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE)) {
+    if (grepl("\\.Rnw$|\\.Rmd|\\.qmd|\\.Rrst|\\.Rhtml$|\\.Rtex", infile, TRUE))
+    {
         vigBuilder <- .BiocPackage$VigBuilder
         if ("knitr" %in% vigBuilder)
             checkInstalled("knitr")

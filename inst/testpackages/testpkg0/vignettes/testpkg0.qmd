@@ -1,0 +1,36 @@
+---
+title: "testpkg0"
+vignette: >
+  %\VignetteIndexEntry{Test Qmd Format}
+  %\VignetteEngine{quarto}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r}
+#| label: calculate
+
+1 + 1
+```
+
+```{r}
+#| echo: true
+
+2 * 2
+```
+
+
+
+```{r}
+#| echo: false
+#| label: mtcars-scatterplot
+#| fig.cap: "A scatterplot of mtcars"
+
+data("mtcars", package = "datasets")
+
+plot(
+    x = mtcars$wt, y = mtcars$mpg,
+    xlab = "Weight", ylab = "Milage",
+    xlim = c(1,6), ylim = c(10,35),
+    main = "Weight vs Milage"
+)
+```
