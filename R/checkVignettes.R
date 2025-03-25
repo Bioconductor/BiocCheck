@@ -410,6 +410,48 @@ checkDupChunkLabels <- function(vigfiles) {
         )
 }
 
+.hasAllChunkLabels <- function(viglines, type = c("rmd", "rnw", "qmd")) {
+    type <- match.arg(type)
+    pattern <- switch(
+        type,
+        qmd = ,
+        rmd = "^```\\{r",
+        rnw = "^<<([^,>\\s]+)",
+    )
+    sub <- switch(
+        type,
+        rmd = "```\\{r\\s([^,\\}]+).*\\}",
+        rnw = "<<([^,>]+).*>>=",
+        qmd = "#\\| label:"
+    )
+    matches <- grep(pattern, viglines, value = TRUE)
+    if (!length(matches))
+        return(FALSE)
+    if (identical(type, "qmd")) {
+        labelIdx <- grep(sub, viglines)
+        length(labelIdx) >= length(matches)
+    } else {
+        all(grepl(sub, matches))
+    }
+}
+
+checkChunkLabels <- function(vigfiles) {
+    viglist <- structure(
+        vector("logical", length(vigfiles)),
+        .Names = vigfiles
+    )
+    for (vfile in vigfiles) {
+        viglines <- readLines(vfile, warn = FALSE)
+        vigext <- tolower(tools::file_ext(vfile))
+        viglist[[vfile]] <- !.hasAllChunkLabels(viglines, type = vigext)
+    }
+    if (any(viglist))
+        handleNoteFiles(
+            " Vignette(s) found with missing chunk labels",
+            messages = basename(vigfiles[viglist])
+        )
+}
+
 .OLD_INSTALL_CALLS <-
     c("BiocInstaller", "biocLite", "useDevel", "biocinstallRepos")
 
