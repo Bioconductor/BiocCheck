@@ -186,6 +186,32 @@ expect_true(
 )
 .BiocCheck$zero()
 
+## check for quarto in 'SystemRequirements' in DESCRIPTION
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    description = list(
+        VignetteBuilder = "quarto",
+        SystemRequirements = "azcopy"
+    ),
+    extraActions = function(path) {
+        vigdir <- file.path(path, "vignettes")
+        dir.create(vigdir, recursive = TRUE)
+        cat(
+            "%\\VignetteIndexEntry{A Quarto Vignette}\n",
+            "%\\VignetteEngine{quarto}\n",
+            "%\\VignetteEncoding{UTF-8}\n",
+            file = file.path(vigdir, "test.qmd")
+        )
+    }
+)
+BiocCheck:::checkVigTypeQMD(.bioctest)
+expect_true(
+    grepl(
+        pattern = "'SystemRequirements' does not list 'quarto'",
+        .BiocCheck$get("warning")[["checkVigTypeQMD"]]
+    )
+)
+
 BiocCheck:::checkVigSessionInfo(.bioctest)
 expect_true(
     any(
