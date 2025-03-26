@@ -24,9 +24,14 @@ create_test_package <-
     if (!dir.exists(pkgpath))
         dir.create(pkgpath, recursive = TRUE)
     capture.output({
-        suppressMessages(
-            usethis::create_package(
-                pkgpath, canned, rstudio = FALSE, open = FALSE
+        suppressWarnings(
+            suppressMessages(
+                usethis::create_package(
+                    path = pkgpath,
+                    fields = canned,
+                    rstudio = FALSE,
+                    open = FALSE
+                )
             )
         )
     })

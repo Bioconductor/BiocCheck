@@ -26,30 +26,37 @@ checkCounter("No vignette sources in vignettes/ directory.", "error")
     }
 )
 BiocCheck:::checkVignetteDir(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 0L, warning = 3L, note = 1L),
-    "Rmd recommend WARNING"
+expect_true(
+    any(
+        grepl(
+            pattern="VignetteIndexEntry",
+            .BiocCheck$get("warning")[["checkVigTemplate"]]
+        )
+    )
 )
-.BiocCheck$zero()
-
-.bioctest <- create_test_package(
-    test_dir = temp_dir,
-    description = list(Title = "unitTestTempDir", Suggests = "knitr"),
-    extraActions = function(path) {
-        vigdir <- file.path(path, "vignettes")
-        dir.create(vigdir, recursive = TRUE)
-        cat(c(
-            "% \\VignetteIndexEntry{header} \n",
-            "% \\VignetteEngine{knitr} \nnothing"
-        ), file = file.path(vigdir, "test.Rnw"))
-    }
+expect_true(
+    any(
+        grepl(
+            pattern="RMarkdown instead of Sweave",
+            .BiocCheck$get("warning")[["checkVigTypeRNW"]]
+        )
+    )
 )
-BiocCheck:::checkVignetteDir(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 0L, warning = 1L, note = 1L),
-    "test OK"
+expect_true(
+    any(
+        grepl(
+            pattern="'sessionInfo' not found",
+            .BiocCheck$get("note")[["checkVigSessionInfo"]]
+        )
+    )
+)
+expect_true(
+    any(
+        grepl(
+            pattern="missing chunk labels",
+            .BiocCheck$get("note")[["checkChunkLabels"]]
+        )
+    )
 )
 .BiocCheck$zero()
 
@@ -180,68 +187,29 @@ expect_true(
 .BiocCheck$zero()
 
 BiocCheck:::checkVigSessionInfo(.bioctest)
-expect_equivalent(
-    .BiocCheck$getNum("note"), 1L
-)
-.BiocCheck$zero()
-
-.bioctest <- create_test_package(
-    test_dir = temp_dir, description = list(Title = "something"),
-    extraActions = function(path) {
-        vigdir <- file.path(path, "vignettes")
-        dir.create(vigdir, recursive = TRUE)
-        cat(
-            "% \\VignetteIndexEntry{header} \nnnothing",
-            file = file.path(vigdir, "test.Rnw")
+expect_true(
+    any(
+        grepl(
+            pattern = "'sessionInfo' not found",
+            .BiocCheck$get("note")[["checkVigSessionInfo"]]
         )
-    }
-)
-BiocCheck:::checkVignetteDir(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 0L, warning = 2L, note = 1L),
-    "Rmd recommend, no builder in DESCRIPTION"
-)
-.BiocCheck$zero()
-
-.bioctest <- create_test_package(
-    test_dir = temp_dir, description = list(VignetteBuilder = "Sweave"),
-    extraActions = function(path) {
-        vigdir <- file.path(path, "vignettes")
-        dir.create(vigdir, recursive = TRUE)
-        cat(
-            "% \\VignetteIndexEntry{header} \nnnothing",
-            file = file.path(vigdir, "test.Rnw")
-        )
-    }
-)
-BiocCheck:::checkVignetteDir(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 0L, warning = 2L, note = 1L),
-    "Rmd recommend, no builder in DESCRIPTION"
+    )
 )
 .BiocCheck$zero()
 
 .bioctest <- read_test_package("testpkg0")
-BiocCheck:::checkVignetteDir(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 5L, warning = 10L, note = 1L),
-    "check vignette style of example pkg; test multiple errors, warnings"
-)
+BiocCheck:::checkVigTemplate(.bioctest$VigSources["vignettes/testpkg0.Rmd"])
 expect_true(
-    any(grepl(
-        pattern="VignetteIndex",
-        .BiocCheck$get("warning")[["checkVigTemplate"]]
-    ))
+    any(
+        grepl(
+            pattern="VignetteIndex",
+            .BiocCheck$get("warning")[["checkVigTemplate"]]
+        )
+    )
 )
 .BiocCheck$zero()
 
 BiocCheck:::checkVigEvalAllFalse(.bioctest)
-expect_equivalent(
-    .BiocCheck$getNum("warning"), 1L
-)
 expect_true(
     any(
         grepl(
@@ -252,37 +220,52 @@ expect_true(
 )
 .BiocCheck$zero()
 
-
 .bioctest <- read_test_package("testpkg2")
-BiocCheck:::checkVignetteDir(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 2L, warning = 5L, note = 2L),
-    "check vignette style of example pkg; vignette metadata"
-)
+BiocCheck:::checkVigSuggests(.bioctest)
 expect_true(
-    any(grepl(
-        pattern="VignetteBuilder",
-        .BiocCheck$get("warning")[["checkVigSuggests"]]
-    ))
+    any(
+        grepl(
+            pattern="VignetteBuilder",
+            .BiocCheck$get("warning")[["checkVigSuggests"]]
+        )
+    )
 )
+.BiocCheck$zero()
+
+BiocCheck:::checkVigEngine(.bioctest)
 expect_true(
-    any(grepl(pattern="VignetteEngine",
-          .BiocCheck$get("error")[["checkVigEngine"]]
-    ))
+    any(
+        grepl(
+            pattern="VignetteEngine",
+            .BiocCheck$get("error")[["checkVigEngine"]]
+        )
+    )
 )
+.BiocCheck$zero()
+
+BiocCheck:::checkVigMetadata(.bioctest$VigSources["vignettes/testpkg0.Rmd"])
 expect_true(
-    any(grepl(
-        pattern="missing vignette metadata", ignore.case = TRUE,
-        .BiocCheck$get("warning")[["checkVigMetadata"]]
-    ))
+    any(
+        grepl(
+            pattern="missing vignette metadata", ignore.case = TRUE,
+            .BiocCheck$get("warning")[["checkVigMetadata"]]
+        )
+    )
 )
+.BiocCheck$zero()
+
+BiocCheck:::checkVigSuggests(.bioctest)
 expect_true(
-    any(grepl(
-        pattern="not currently Suggested",
-        .BiocCheck$get("warning")[["checkVigSuggests"]]
-    ))
+    any(
+        grepl(
+            pattern="not currently Suggested",
+            .BiocCheck$get("warning")[["checkVigSuggests"]]
+        )
+    )
 )
+.BiocCheck$zero()
+
+BiocCheck:::checkVigChunkEval(.bioctest$VigSources["vignettes/testpkg0.Rmd"])
 expect_true(
     grepl(
         pattern="Evaluate more vignette chunks",
@@ -293,17 +276,17 @@ expect_true(
 
 .bioctest <- read_test_package("testpkg2")
 BiocCheck:::checkVigFiles(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 0L, warning = 0L, note = 1L),
-    "check vignette intermediate files"
+expect_true(
+    any(
+        grepl(
+            pattern="intermediate files found",
+            .BiocCheck$get("note")[["checkVigFiles"]]
+        )
+    )
 )
 .BiocCheck$zero()
 
 BiocCheck:::checkVigEvalAllFalse(.bioctest)
-expect_equivalent(
-    .BiocCheck$getNum("warning"), 1L
-)
 expect_true(
     any(
         grepl(

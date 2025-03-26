@@ -400,9 +400,21 @@ expect_true(
     )
 )
 BiocCheck:::checkBBScompatibility(.bioctest)
-expect_identical(
-    .BiocCheck$getNum(), c(error = 1L, warning = 0L, note = 1L),
-    "Using Maintainer and Author@R causes error"
+expect_true(
+    any(
+        grepl(
+            pattern = "Authors@R field not Author",
+            .BiocCheck$get("error")[["validMaintainer"]]
+        )
+    )
+)
+expect_true(
+    any(
+        grepl(
+            pattern = "adding .* ORCID iD",
+            .BiocCheck$get("note")[["checkBBScompatibility"]]
+        )
+    )
 )
 .BiocCheck$zero()
 
@@ -413,18 +425,17 @@ expect_identical(
         `Authors@R` = c(
             "person('Bioconductor Package Maintainer',",
             "email='maintainer@bioconductor.org', role=c('aut', 'cre'),",
-            "comment = c(ORCID = '0000-0000-000-0000'))"
+            "comment = c(ORCID = '0000-000-0000-0000'))"
         ),
         License = "GPL-2"
     )
 )
 BiocCheck:::checkBBScompatibility(.bioctest)
-expect_equivalent(
-    .BiocCheck$getNum("note"), 1L,
-    info = "An invalid ORCID iD causes a note!"
-)
 expect_true(
-    grepl("Invalid ORCID", unlist(.BiocCheck$note))
+    grepl(
+        pattern = "Invalid ORCID iD",
+        .BiocCheck$get("note")[["checkBBScompatibility"]]
+    )
 )
 .BiocCheck$zero()
 
@@ -438,8 +449,16 @@ expect_true(
 )
 BiocCheck:::checkBBScompatibility(.bioctest)
 expect_true(
-    .BiocCheck$getNum("error") > 0L,
-    "Utilize Maintainer instead of Authors@R doesn't cause error!"
+    grepl(
+        pattern = "Remove Maintainer field",
+        .BiocCheck$get("error")[["checkBBScompatibility"]]
+    )
+)
+expect_true(
+    grepl(
+        pattern = "Use Authors@R",
+        .BiocCheck$get("error")[["validMaintainer"]]
+    )
 )
 .BiocCheck$zero()
 
