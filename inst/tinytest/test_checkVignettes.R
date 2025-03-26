@@ -106,6 +106,48 @@ expect_true(
 )
 .BiocCheck$zero()
 
+## check for missing chunk labels in Rmd
+BiocCheck:::checkChunkLabels(
+    .bioctest$VigSources["vignettes/testpkg0.Rmd"]
+)
+expect_true(
+    any(
+        grepl(
+            pattern="missing chunk labels",
+            .BiocCheck$get("note")[["checkChunkLabels"]]
+        )
+    )
+)
+.BiocCheck$zero()
+
+## check for missing chunk labels in qmd
+BiocCheck:::checkChunkLabels(
+    .bioctest$VigSources["vignettes/testpkg0.qmd"]
+)
+expect_true(
+    any(
+        grepl(
+            pattern="missing chunk labels",
+            .BiocCheck$get("note")[["checkChunkLabels"]]
+        )
+    )
+)
+.BiocCheck$zero()
+
+## check for missing chunk labels in Rnw
+BiocCheck:::checkChunkLabels(
+    .bioctest$VigSources["vignettes/testpkg0.Rnw"]
+)
+expect_true(
+    any(
+        grepl(
+            pattern="missing chunk labels",
+            .BiocCheck$get("note")[["checkChunkLabels"]]
+        )
+    )
+)
+.BiocCheck$zero()
+
 .bioctest <- create_test_package(
     test_dir = temp_dir, description = list(VignetteBuilder = "knitr"),
     extraActions = function(path) {
