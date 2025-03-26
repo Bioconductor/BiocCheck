@@ -1111,7 +1111,6 @@ BiocCheck:::checkForVersionNumberMismatch(
 expect_equivalent(.BiocCheck$getNum("error"), 1)
 .BiocCheck$zero()
 unlink(temp_dir, recursive = TRUE)
-file.remove(newname)
 
 # checkForDirectSlotAccess ------------------------------------------------
 temp_dir <- tempfile()
