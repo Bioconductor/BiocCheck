@@ -83,11 +83,26 @@ checkCounter(
 )
 .BiocCheck$zero()
 
+## check for Rnw vignettes, warn if any
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkVigTypeRNW(.bioctest)
 expect_equivalent(
     .BiocCheck$getNum("warning"), 1L,
     info = "check for Rnw vignettes, warn if any"
+)
+.BiocCheck$zero()
+
+## check for duplicate chunk labels
+BiocCheck:::checkDupChunkLabels(
+    .bioctest$VigSources["vignettes/dupChunks.Rmd"]
+)
+expect_true(
+    any(
+        grepl(
+        pattern="duplicate chunk labels",
+        .BiocCheck$get("error")[["checkDupChunkLabels"]]
+        )
+    )
 )
 .BiocCheck$zero()
 
