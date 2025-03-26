@@ -38,6 +38,8 @@ checkVignetteDir <- function(.BiocPackage)
 
     checkDupChunkLabels(vigdircontents)
 
+    checkChunkLabels(vigdircontents)
+
     checkVigBiocInst(.BiocPackage)
 
     checkVigInstalls(.BiocPackage)
