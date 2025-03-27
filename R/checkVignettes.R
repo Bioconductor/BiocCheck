@@ -294,59 +294,113 @@ checkVigTemplate <- function(vigdircontents)
         )
 }
 
-checkVigChunkEval <- function(vigdircontents)
-{
-    chunks <- 0
-    efs <- 0
-    noneval <- 0
-    for (file in vigdircontents)
-    {
-        lines <- readLines(file, warn=FALSE)
-        vignetteType <- knitr:::detect_pattern(lines, tools::file_ext(file))
-        if (is.null(vignetteType)) {
-            chunklines <- character(0)
-            nonEvalChunk <- character(0)
-        } else {
-            chunkPattern <- knitr::all_patterns[[vignetteType]]$chunk.begin
-            chunklines <- lines[grep(chunkPattern, lines)]
-
-            # find non evaluated code chunks (```, ```r, ```R, etc.)
-            # assumes every other one for start and stop of code chunk
-            nonEvalChunk <- lines[grep("^[\t >]*```+\\s*", lines)]
-            if (length(nonEvalChunk)) {
-                nonEvalChunk <- nonEvalChunk[c(TRUE,FALSE)]
-                indx <- grep("^[\t >]*```+\\s*\\{([a-zA-Z0-9_]+.*)\\}\\s*$",
-                             nonEvalChunk)
-                if (length(indx))
-                    nonEvalChunk <- nonEvalChunk[-indx]
-            }
-        }
-        chunks <- chunks + length(chunklines) + length(nonEvalChunk)
-
-        efs <- efs +
-            length(grep("eval\\s*=\\s*F(ALSE)?", chunklines))
-
-        noneval <- noneval + length(nonEvalChunk)
-    }
-
-    totnon <- efs + noneval
-    percent <- ifelse(
-        chunks == 0 && totnon == 0,
-        0L,
-        as.integer((totnon * 100 / chunks))
+detect_non_eval_chunks <- function(lines, vignetteType) {
+    non_eval_pattern <- switch(
+        vignetteType,
+        qmd = ,
+        rmd = "^[\t >]*```+\\s*$",
+        rnw = "\\\\begin\\{verbatim\\}"
+    )
+    chunk_patterns_start <- switch(
+        vignetteType,
+        qmd = "^```\\{r\\}",
+        rmd = knitr::all_patterns[["md"]]$chunk.begin,
+        rnw = knitr::all_patterns[["rnw"]]$chunk.begin
+    )
+    chunk_patterns_end <- switch(
+        vignetteType,
+        qmd = ,
+        rmd = knitr::all_patterns[["md"]]$chunk.end,
+        rnw = knitr::all_patterns[["rnw"]]$chunk.end
     )
 
-    if (percent >= 50){
+    chunk_starts <- grep(chunk_patterns_start, lines)
+    ## find all potential chunk ends
+    chunk_ends <- grep(chunk_patterns_end, lines)
+
+    non_eval_chunk_lines <- grep(non_eval_pattern, lines)
+
+    if (vignetteType %in% c("rmd", "qmd")) {
+        matched_chunk_ends <- integer(0L)
+        irregular_non_eval_chunks <- integer(0L)
+        for (i in seq_along(chunk_starts)) {
+            # Find the next end marker after this start
+            next_end_index <- which(chunk_ends > chunk_starts[i])[1L]
+
+            if (!is.na(next_end_index)) {
+                matched_chunk_ends <-
+                    c(matched_chunk_ends, chunk_ends[next_end_index])
+                # Remove this end from further consideration
+                chunk_ends <- chunk_ends[-next_end_index]
+            }
+        }
+        irregular_non_eval_chunks <- chunk_ends
+    } else if (identical(vignetteType, "rnw")) {
+        irregular_non_eval_chunks <- grep(non_eval_pattern, lines)
+    } else {
+        stop("Unknown vignette type: ", vignetteType)
+    }
+
+    eval_false_lines <- grep("eval\\s*=\\s*F(ALSE)?", lines[chunk_starts])
+
+    list(
+        chunks = length(chunk_starts) + length(irregular_non_eval_chunks),
+        efs = length(eval_false_lines),
+        noneval = length(irregular_non_eval_chunks)
+    )
+}
+
+.EVAL_CHUNKS_SENTINEL <- list(
+    chunks = 0L,
+    efs = 0L,
+    noneval = 0L
+)
+
+checkVigChunkEval <- function(vigdircontents)
+{
+    results <- lapply(
+        vigdircontents,
+        function(file) {
+            lines <- readLines(file, warn=FALSE)
+            vigExt <- tolower(tools::file_ext(file))
+            if (!vigExt %in% c("rmd", "qmd", "rnw"))
+                .EVAL_CHUNKS_SENTINEL
+            else
+                detect_non_eval_chunks(lines, vigExt)
+        }
+    )
+
+    combined <- Reduce(
+        function(x, y) {
+            list(
+                chunks = x$chunks + y$chunks,
+                efs = x$efs + y$efs,
+                noneval = x$noneval + y$noneval
+            )
+        }, results, init = .EVAL_CHUNKS_SENTINEL
+    )
+
+    totnon <- combined$efs + combined$noneval
+    percent <-
+        if (!combined$chunks && !totnon)
+            0L
+        else
+            as.integer((totnon * 100 / combined$chunks))
+
+    if (percent >= 50) {
         handleWarning("Evaluate more vignette chunks.")
         msg <- sprintf(
             "%s out of %s code chunks = %i%% unevaluated",
             totnon,
-            chunks,
+            combined$chunks,
             percent
         )
         handleMessage(msg, indent = 8)
         handleMessage(
-            sprintf("%s non-exec code chunk(s) (e.g., '```r')", noneval),
+            sprintf(
+                "%s non-exec code chunk(s) (e.g., '```r')",
+                combined$noneval
+            ),
             indent = 8
         )
     }
