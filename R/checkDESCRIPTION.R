@@ -192,7 +192,7 @@ checkRVersionDependency <- function(.BiocPackage) {
             {
                 pkgVer <- as.package_version(verStr)
                 RVer <- package_version(
-                    paste0(getRversion()[, c(1, 2)], ".0")
+                    paste0(BiocManager:::.version_field("R"), ".0")
                 )
                 if (pkgVer < RVer)
                     handleNote(sprintf(
