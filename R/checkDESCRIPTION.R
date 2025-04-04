@@ -184,7 +184,7 @@ checkRVersionDependency <- function(.BiocPackage) {
     if ("Depends" %in% colnames(dcf)) {
         res <- cleanupDependency(dcf[, "Depends"], FALSE)
         verStr <- names(res)[res == "R"]
-        if (length(verStr)) {
+        if (isScalarCharacter(verStr)) {
             pkgVer <- package_version(verStr)
             RVer <- package_version(
                 paste0(BiocManager:::.version_field("R"), ".0")
