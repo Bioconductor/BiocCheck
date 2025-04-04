@@ -181,25 +181,18 @@ getMaintainerEmail <- function(.BiocPackage)
 
 checkRVersionDependency <- function(.BiocPackage) {
     dcf <- .BiocPackage$DESCRIPTION
-    if ("Depends" %in% colnames(dcf))
-    {
+    if ("Depends" %in% colnames(dcf)) {
         res <- cleanupDependency(dcf[, "Depends"], FALSE)
-        if ("R" %in% res)
-        {
-            ind <- which(res == "R")
-            verStr <- names(res)[ind]
-            if (nchar(verStr))
-            {
-                pkgVer <- as.package_version(verStr)
-                RVer <- package_version(
-                    paste0(BiocManager:::.version_field("R"), ".0")
+        verStr <- names(res)[res == "R"]
+        if (length(verStr)) {
+            pkgVer <- package_version(verStr)
+            RVer <- package_version(
+                paste0(BiocManager:::.version_field("R"), ".0")
+            )
+            if (pkgVer < RVer)
+                handleNote(
+                    "Update R version dependency from ", pkgVer, " to ", RVer
                 )
-                if (pkgVer < RVer)
-                    handleNote(sprintf(
-                        "Update R version dependency from %s to %s.",
-                        pkgVer, RVer
-                    ))
-            }
         }
     }
 }
