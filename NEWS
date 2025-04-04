@@ -7,10 +7,20 @@ NEW FEATURES
     functions for the `.Deprecated` / `.Defunct` check.
     o Support checking `\()` syntax as anonymous R functions.
     o Exclude comment-only lines in function lengths check (@hpages, #220)
+    o Add `checkFndPerson()` to validate Authors@R / Authors fields in the
+    `DESCRIPTION` file. A corresponding `NOTE` is shown in the vignette (#215)
+    o Refactor function length check to count only coding lines and not comment
+    lines (@hpages, #220)
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
     o Check file sizes only for source directories and in `BiocCheckGitClone`
+    (@hpages, #219)
+    o Use R version from `BiocManager:::.version_map` for
+    `checkRVersionDependency` (@helenalc, #223)
+    o Use `checkInstalled()` to verify packages listed in `Suggests:`
+    o Suppress warning in `.hasPkg()` when the package is not installed
+    o Use `INFO` messages instead of bullet points in output
 
 CHANGES IN VERSION 1.42.0
 -----------------------
