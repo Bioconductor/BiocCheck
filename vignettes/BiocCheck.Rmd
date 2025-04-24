@@ -331,6 +331,7 @@ Can be disabled with `--no-check-vignettes`.
   functions (`ERROR`).
 * Checks that there are no duplicate code chunk labels in the vignettes
   (`ERROR`).
+* Checks that all chunks have labels in vignettes (`NOTE`).
 
 **Checking whether vignette is built with 'R CMD build'...**
 
