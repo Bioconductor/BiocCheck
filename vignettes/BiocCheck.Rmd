@@ -328,7 +328,8 @@ Can be disabled with `--no-check-vignettes`.
 * Checks that vignette code contains `sessionInfo()` or `session_info()` for
   reproducibility (`NOTE`).
 * Checks that evaluated vignette code does not invoke package installation
-  functions (`ERROR`).
+  functions (`ERROR`). Function calls in the vignette that match `install.*` 
+  will produce a warning (`WARNING`).
 * Checks that there are no duplicate code chunk labels in the vignettes
   (`ERROR`).
 * Checks that all chunks have labels in vignettes (`NOTE`).
@@ -365,8 +366,8 @@ Can be disabled with `--no-check-library-calls` and `--no-check-install-self`.
 
 * **Checking library calls...** (`NOTE`)
   Check for use of functions that install or update packages. This list
-  currently includes the use of `install`, `install.packages`, `update.packages`
-  or `biocLite`.
+  currently includes the use of `install`, `install.packages`,
+  `install_packages` `update.packages` or `biocLite`.
 * **Checking for library/require of *(your package name)*...** (`ERROR`)
   It is not necessary to call `library()` or `require()` on your own
   package within code in the R directory or in man page examples. In
@@ -462,10 +463,6 @@ which result in issues of varying severity.
   should not be used in production code (though it's OK to wrap such
   calls in a conditional that evaluates to TRUE if some debugging
   option is set)  (`WARNING`).
-* **Checking for install()...**
-  The programmatic use of `install()` calls is bad practice. A
-  separation between analysis and configuration tasks keeps code
-  modular and reproducible (`ERROR`).
 * **Checking for <<-...**
   Non-local assignment using `<<-` is bad practice. It can over-write
   user-defined symbols, and introduces non-linear paths of evaluation
