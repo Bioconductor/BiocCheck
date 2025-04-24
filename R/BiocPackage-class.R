@@ -2,6 +2,8 @@
 
 #' @name BiocPackage-class
 #'
+#' @docType class
+#'
 #' @aliases BiocPackage
 #'
 #' @title A class for representing files in a Bioconductor package
@@ -83,6 +85,7 @@
 #' * `getPackageVersion`: Get the package version
 #' * `untarTarball`: Untar the source tarball
 #'
+#' @seealso \link{BiocCheck-class}, \link{Message-class}
 #' @examples
 #'
 #' # Create a BiocPackage object
