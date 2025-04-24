@@ -162,17 +162,6 @@ checkCodingPractice <- function(.BiocPackage, parsedCode)
         )
     }
 
-    # install() / install.packages() calls
-    msg_inst <- findSymbolsInRFiles(
-        .BiocPackage, .BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
-    )
-    if (length(msg_inst)) {
-        handleError(
-            "Remove install() calls (found ", length(msg_inst), " times)",
-            messages = msg_inst
-        )
-    }
-
     # <<-
     msg_da <- findSymbolsInRFiles(.BiocPackage, "<<-", "LEFT_ASSIGN")
     if (length(msg_da)) {
