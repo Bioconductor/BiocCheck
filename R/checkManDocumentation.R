@@ -102,6 +102,9 @@ checkForValueSection <- function(.BiocPackage)
     all_rds <- .read_all_rds(.BiocPackage$manSources, .BiocPackage$usesRdpack)
     all_tags <- lapply(all_rds, tools:::RdTags)
     docTypes <- mapply(docType, rd = all_rds, tags = all_tags, SIMPLIFY = FALSE)
+    usage <- vapply(
+        all_tags, function(dtag) { "\\usage" %in% dtag }, logical(1L)
+    )
     docTypes[!lengths(docTypes)] <- "fun"
     funs <- lapply(docTypes, .whichRdCheck)
     isData <- unlist(docTypes) == "data"
@@ -113,7 +116,7 @@ checkForValueSection <- function(.BiocPackage)
         SIMPLIFY = TRUE
     )
     dataOK <- ok[isData]
-    elseOK <- ok[!isData]
+    elseOK <- ok[!isData & usage]
     if (!all(dataOK)) {
         not_oks <- names(ok[isData][!dataOK])
         handleWarningFiles(

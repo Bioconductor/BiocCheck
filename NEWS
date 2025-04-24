@@ -7,6 +7,11 @@ NEW FEATURES
     field be present and list the `quarto` CLI in the DESCRIPTION file.
     o All chunks in vignettes should have labels (@vjcitn, #222)
 
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o `Rd` pages that do not have `\usage` sections are excluded from `\value`
+    checks (@hpages, #225)
+
 CHANGES IN VERSION 1.44.0
 -----------------------
 
