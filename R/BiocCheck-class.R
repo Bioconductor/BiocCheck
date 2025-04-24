@@ -2,7 +2,9 @@
 
 #' @name BiocCheck-class
 #'
-#' @title A class for composing BiocCheck reports.
+#' @docType class
+#'
+#' @title An internal class for composing BiocCheck reports
 #'
 #' @description The `BiocCheck` class provides a framework for reporting checks
 #'   based on Bioconductor guidelines. The class has several methods for working
@@ -43,27 +45,6 @@
 #' @field metadata `list()` A list of additional information relevant to the
 #'   package and its state. See details.
 #'
-#' @return A `BiocCheck` instance
-#'
-#' @keywords internal
-#' @seealso \link{Message-class}
-#'
-#' @importFrom utils tail
-#'
-#' @examples
-#'
-#' bc <- BiocCheck:::.BiocCheck
-#'
-NULL
-
-# BiocCheck-methods -------------------------------------------------------
-
-#' @name BiocCheck-methods
-#'
-#' @title A list of methods for the BiocCheck reference class
-#'
-#' @aliases add,BiocCheck-method
-#'
 #' @param ... `character()` A vector that makes up the `BiocCheck` exception
 #'   message (e.g., 'Vignette must be built by R CMD build'). The character
 #'   vector is handled with `paste0` and made into a list and appended with
@@ -94,15 +75,18 @@ NULL
 #' @param file `character(1)` A path to a JSON file for writing or reading as
 #'   created by `toJSON` and `fromJSON` `BiocCheck` methods.
 #'
+#' @importFrom BiocBaseUtils checkInstalled
+#' @importFrom utils tail
+#'
 #' @section methods:
 #'   * `add`: Include a condition to the `BiocCheck` report
+#'   * `addMetadata`: Add metadata to the `BiocCheck` object from a
+#'     `BiocPackage` object
 #'   * `getLastCheck`: Obtain the name of the last check run
 #'   * `setCheck`: Create a new element in the internal list for a check
 #'   * `get`: Extract the list of conditions raised by `BiocCheck`
 #'   * `getNum`: Tally the number of condition provided by the input
 #'   * `zero`: Reset the internal log of the condition provided
-#'   * `addMetadata`: Add metadata to the `BiocCheck` object from a
-#'     `BiocPackage` object
 #'   * `getBiocCheckDir`: Report and create the `<package>.BiocCheck`
 #'     directory as obtained from the metadata
 #'   * `composeReport`: Simplify the list structure from the `log` and
@@ -120,10 +104,15 @@ NULL
 #' @return An internal `BiocCheck` R5 Reference Class used to document
 #'   conditions such as errors, warnings, and notes
 #'
+#' @seealso \link{Message-class}, \link{BiocPackage-class}
+#'
+#' @examples
+#'
+#' bc <- BiocCheck:::.BiocCheck
+#'
+#' @exportClass BiocCheck
 NULL
 
-#' @importFrom BiocBaseUtils checkInstalled
-#' @exportClass BiocCheck
 .BiocCheck <- setRefClass("BiocCheck",
     fields = list(
         log = "list",
@@ -390,4 +379,3 @@ NULL
 
 #' @export
 .BiocCheck <- .BiocCheck()
-.messages <- .MessageCondition()
