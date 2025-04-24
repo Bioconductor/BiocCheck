@@ -531,19 +531,22 @@ checkVigInstalls <- function(.BiocPackage) {
         Symbols = .BAD_INSTALL_CALLS,
         tokenTypes = "SYMBOL_FUNCTION_CALL"
     )
+    if (length(match_return))
+        handleErrorFiles(
+            "Package installation calls found in vignette(s)",
+            messages = unlist(match_return, use.names = FALSE)
+        )
     grep_return <- findSymbolsInVignettes(
         .BiocPackage,
         Symbols = ".*install[^ed].*",
         tokenTypes = "SYMBOL_FUNCTION_CALL",
         FUN = .grepTokenTextCode
     )
-    msg_return <- c(match_return, grep_return)
-    if (length(msg_return)) {
-        handleErrorFiles(
-            "Installation calls found in vignette(s)",
-            messages = unlist(msg_return, use.names = FALSE)
+    if (length(grep_return))
+        handleWarningFiles(
+            "Potential package installation calls found in vignette(s)",
+            messages = unlist(grep_return, use.names = FALSE)
         )
-    }
 }
 
 checkTFSymbolUsage <- function(.BiocPackage) {
