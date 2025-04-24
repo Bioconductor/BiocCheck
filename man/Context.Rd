@@ -25,3 +25,4 @@ Context: a data.frame() with columns File, Line, and Context
 \description{
 Report context of events to user with a data.frame of events and locations
 }
+\keyword{internal}

@@ -16,6 +16,7 @@
 #'   YAML header occupies.
 #'
 #' @return Context: a data.frame() with columns File, Line, and Context
+#' @keywords internal
 Context <- function(file="", lines=character(), idx=logical(), offset = 0L) {
     stopifnot(
         BiocBaseUtils::isScalarCharacter(file, zchar = TRUE),
