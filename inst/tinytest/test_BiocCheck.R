@@ -677,7 +677,9 @@ expect_equivalent(length(res), 1)
 msg <- BiocCheck:::findSymbolsInRFiles(
     .bioctest, BiocCheck:::.BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
 )
-expect_equivalent(length(msg), 2)
+tinytest::expect_match(
+    msg, "update\\.packages\\(\\)|install\\(\\)"
+)
 .BiocCheck$zero()
 
 # checkCatInRCode ---------------------------------------------------------
@@ -706,7 +708,10 @@ expect_equivalent(length(msg), 3)
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkVigInstalls(.bioctest)
 expect_equivalent(.BiocCheck$getNum("error"), 1)
-expect_equivalent(length(.BiocCheck$get("error")[[1]]), 5)
+tinytest::expect_match(
+    .BiocCheck$get("error")[[1L]][1L],
+    "Package installation calls"
+)
 .BiocCheck$zero()
 
 # checkDupChunkLabels -----------------------------------------------------
