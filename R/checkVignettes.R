@@ -525,9 +525,6 @@ checkVigBiocInst <- function(.BiocPackage) {
     }
 }
 
-.BAD_INSTALL_CALLS <- c("biocLite", "install.packages", "install_packages",
-    "update.packages", "install")
-
 checkVigInstalls <- function(.BiocPackage) {
     match_return <- findSymbolsInVignettes(
         .BiocPackage,

@@ -390,20 +390,19 @@ checkIsVignetteBuilt <- function(build_output_file)
     }
 }
 
-checkPkgInstallCalls <- function(.BiocPackage, badCalls = .BAD_INSTALL_CALLS) {
+.BAD_INSTALL_CALLS <- c("biocLite", "install.packages", "install_packages",
+    "update.packages", "install")
+
+checkPkgInstallCalls <- function(.BiocPackage) {
     msg_installs <- findSymbolsInRFiles(
-        .BiocPackage, badCalls, "SYMBOL_FUNCTION_CALL"
+        .BiocPackage, .BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
     )
-    if (length(msg_installs)) {
-        handleNote(
+    if (length(msg_installs))
+        handleErrorFiles(
             "Avoid using install, biocLite, install.packages,",
             " or update.packages",
-            help_text = "Functions in files:",
             messages = msg_installs
         )
-    }
-    # for unit testing
-    invisible(msg_installs)
 }
 
 checkForLibraryRequire <- function(.BiocPackage) {
