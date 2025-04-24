@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.46.2
+-----------------------
+
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o `Rd` pages that do not have `\usage` sections are excluded from `\value`
+    checks (@hpages, #225)
+
 CHANGES IN VERSION 1.44.0
 -----------------------
 

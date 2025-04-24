@@ -504,7 +504,8 @@ RStudio. These skeletons contain comments that look like this:
 
 `BiocCheck` asks you to remove such comments (`NOTE`).
 
-* Every man page must have a non-empty `\value` section. (`WARNING`)
+* Every man page must have a non-empty `\value` section (`WARNING`). `Rd`
+  pages without `\usage` sections or documenting data sets are excluded.
 
 * man page examples examples
 
