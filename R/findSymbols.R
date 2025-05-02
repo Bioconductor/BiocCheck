@@ -141,6 +141,21 @@ findSymbolsInRFiles <-
     unlist(msg_res)
 }
 
+.VigCodeChunkNo <- function(parsedf, tokens) {
+    if (!nrow(tokens))
+        return(integer(0L))
+    sChunksInd <- .grepTokenTextCode(
+        parsedf, "COMMENT", "^## -|^### code chunk"
+    )[["line1"]]
+    chunkNo <- vector("integer", nrow(tokens))
+    for (i in seq_len(nrow(tokens))) {
+        numrow <- tokens[["line1"]][i]
+        chunkInd <- max(sChunksInd[sChunksInd < numrow])
+        chunkNo[[i]] <- match(chunkInd, sChunksInd, nomatch = 0L)
+    }
+    chunkNo
+}
+
 findSymbolsInVignettes <-
     function(.BiocPackage, Symbols, tokenTypes, FUN = .getTokenTextCode, ...)
 {
@@ -150,12 +165,18 @@ findSymbolsInVignettes <-
     for (i in seq_along(vigfiles)) {
         shortName <- shortnames[i]
         tempR <- tempfile(fileext=".R")
-        try_purl_or_tangle(input = vigfiles[i], output = tempR, quiet = TRUE)
+        try_purl_or_tangle(
+            input = vigfiles[i],
+            output = tempR,
+            quiet = TRUE,
+            documentation = 2L
+        )
         pfile <- parseFile(.BiocPackage, tempR)
         tokens <- FUN(pfile, tokenTypes, Symbols, ...)
+        chunkNos <- .VigCodeChunkNo(pfile, tokens)
         viglist[[shortName]] <- sprintf(
-            "%s (code line %d, column %d)",
-            shortName, tokens[,"line1"], tokens[,"col1"]
+            "%s (chunk no. %d, line %d, column %d)",
+            shortName, chunkNos, tokens[,"line1"], tokens[,"col1"]
         )
     }
     Filter(length, viglist)
