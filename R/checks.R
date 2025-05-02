@@ -479,24 +479,26 @@ checkFunctionLengths <- function(parsedCode, pkgname)
 
 checkNEWS <- function(pkgdir)
 {
-    newsloc <- file.path(pkgdir, c("inst", "inst", "inst", ".","."),
-                         c("NEWS.Rd", "NEWS", "NEWS.md", "NEWS.md", "NEWS"))
-    newsFnd <- newsloc[file.exists(newsloc)]
-    if (0L == length(newsFnd)){
+    newsFnd <- list.files(
+        path = pkgdir, pattern = "NEWS[\\.Rd|\\.md]*$",
+        recursive = TRUE, full.names = TRUE, include.dirs = FALSE
+    )
+    if (!length(newsFnd)) {
         handleNote(
             "Consider adding a NEWS file, so your package news will be ",
             "included in Bioconductor release announcements.")
         return()
     }
-    if (length(newsFnd) > 1L){
+    newsPath <- file.path(basename(dirname(newsFnd)), basename(newsFnd))
+    if (length(newsFnd) > 1L) {
         handleNote(
-            "More than 1  NEWS file found. ",
+            "More than one NEWS file found.",
             "See ?news for recognition ordering.",
             help_text = "Please remove one of the following: ",
-            messages = gsub(pattern=pkgdir, replacement="", newsFnd)
+            messages = newsPath
         )
     }
-    news <- head(newsFnd, 1)
+    news <- head(newsFnd, 1L)
     newsext <- tools::file_ext(news)
     newsextract <- switch(
         newsext,
@@ -505,14 +507,15 @@ checkNEWS <- function(pkgdir)
         tools:::.news_reader_default
     )
     tryCatch({
-        suppressWarnings(newsextract(news))
+        res <- suppressWarnings(newsextract(news))
+        if (is.null(res) || !inherits(res, "news_db"))
+            error("news() failed to parse news file: ", newsPath)
     }, error=function(e){
-        ## FIXME find a good reference to creating well-formed NEWS, and
-        ## reference it here.
-        ## Surprisingly, there does not seem to be one.
         handleWarning(
-            "Fix formatting of ", basename(news), ". Malformed package NEWS ",
-            "will not be included in Bioconductor release announcements."
+            "news(package='", basename(pkgdir), "') failed with news file: ",
+            newsPath, ".",
+            "\nRefer to https://contributions.bioconductor.org/news.html",
+            " to be included in Bioconductor release announcements."
         )
     })
 }
