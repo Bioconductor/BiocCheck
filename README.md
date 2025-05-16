@@ -1,6 +1,4 @@
-# [BiocCheck](https://bioconductor.org/packages/BiocCheck)
-
----
+# [BiocCheck](https://bioconductor.org/packages/BiocCheck) <a href='https://bioconductor.org/packages/BiocCheck/'><img src='https://raw.githubusercontent.com/Bioconductor/BiocStickers/devel/BiocCheck/BiocCheck.png' align="right" height="204" /></a>
 
 <!-- badges: start -->
 [![BioC status](http://www.bioconductor.org/shields/build/devel/bioc/BiocCheck.svg)](https://bioconductor.org/checkResults/devel/bioc-LATEST/BiocCheck)
