@@ -89,6 +89,7 @@ checkForPromptComments <- function(.BiocPackage)
 .whichRdCheck <- function(docType) {
     switch(
         docType,
+        internal =,
         package =,
         class = .skipRdCheck,
         data = .formatsInParsedRd,
@@ -102,12 +103,22 @@ checkForValueSection <- function(.BiocPackage)
     all_rds <- .read_all_rds(.BiocPackage$manSources, .BiocPackage$usesRdpack)
     all_tags <- lapply(all_rds, tools:::RdTags)
     docTypes <- mapply(docType, rd = all_rds, tags = all_tags, SIMPLIFY = FALSE)
-    usage <- vapply(
+    hasUsage <- vapply(
         all_tags, function(dtag) { "\\usage" %in% dtag }, logical(1L)
     )
-    docTypes[!lengths(docTypes)] <- "fun"
+    isInternal <- mapply(
+        function(rd, tags, keyword) {
+            if ("\\keyword" %in% tags)
+                "internal" %in% unlist(.tagListExtract(rd, tags, "\\keyword"))
+            else
+                FALSE
+        },
+        rd = all_rds, tags = all_tags, SIMPLIFY = TRUE
+    )
+    docTypes[isInternal] <- "internal"
+    docTypes[!lengths(docTypes) | (hasUsage & !isInternal)] <- "fun"
     funs <- lapply(docTypes, .whichRdCheck)
-    isData <- unlist(docTypes) == "data"
+    isData <- docTypes == "data"
     ok <- mapply(
         function(afun, rds, atags) {
             afun(rds, atags)
@@ -116,16 +127,16 @@ checkForValueSection <- function(.BiocPackage)
         SIMPLIFY = TRUE
     )
     dataOK <- ok[isData]
-    elseOK <- ok[!isData & usage]
+    elseOK <- ok[!isData]
     if (!all(dataOK)) {
-        not_oks <- names(ok[isData][!dataOK])
+        not_oks <- names(dataOK[!dataOK])
         handleWarningFiles(
             "Empty or missing \\format sections found in data man page(s).",
             messages = not_oks
         )
     }
     if (!all(elseOK)) {
-        not_oks <- names(ok[!isData][!elseOK])
+        not_oks <- names(elseOK[!elseOK])
         handleWarningFiles(
             "Empty or missing \\value sections found in man page(s).",
             messages = not_oks
