@@ -11,6 +11,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
 
     o `Rd` pages that do not have `\usage` sections are excluded from `\value`
     checks (@hpages, #225)
+    o `Rd` pages that have `\keyword{internal}` are excluded from `\value`
+    checks
 
 CHANGES IN VERSION 1.44.0
 -----------------------
