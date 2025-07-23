@@ -477,7 +477,7 @@ checkDupChunkLabels <- function(vigfiles) {
     sub <- switch(
         type,
         rmd = "```\\{r\\s([^,\\}]+).*\\}",
-        rnw = "<<([^,>]+).*>>=",
+        rnw = "^<<\\s*([\\w-]+)\\s*(?:,.*)?>>=$",
         qmd = "#\\| label:"
     )
     matches <- grep(pattern, viglines, value = TRUE)
