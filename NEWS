@@ -13,6 +13,10 @@ BUG FIXES AND MINOR IMPROVEMENTS
     checks (@hpages, #225)
     o `Rd` pages that have `\keyword{internal}` are excluded from `\value`
     checks
+    o Avoid overwritting `data` document types for `\value` checks
+    o Vignettes with no code chunks were incorrectly flagged in chunk label
+    checks
+    o Chunks in Rnw vignettes with no labels are now correctly identified
 
 CHANGES IN VERSION 1.44.0
 -----------------------
