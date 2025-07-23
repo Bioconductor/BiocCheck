@@ -482,7 +482,7 @@ checkDupChunkLabels <- function(vigfiles) {
     )
     matches <- grep(pattern, viglines, value = TRUE)
     if (!length(matches))
-        return(FALSE)
+        return(TRUE)
     if (identical(type, "qmd")) {
         labelIdx <- grep(sub, viglines)
         length(labelIdx) >= length(matches)
@@ -499,9 +499,9 @@ checkChunkLabels <- function(vigfiles) {
     for (vfile in vigfiles) {
         viglines <- readLines(vfile, warn = FALSE)
         vigext <- tolower(tools::file_ext(vfile))
-        viglist[[vfile]] <- !.hasAllChunkLabels(viglines, type = vigext)
+        viglist[[vfile]] <- .hasAllChunkLabels(viglines, type = vigext)
     }
-    if (any(viglist))
+    if (!all(viglist))
         handleNoteFiles(
             " Vignette(s) found with missing chunk labels",
             messages = basename(vigfiles[viglist])
