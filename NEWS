@@ -17,6 +17,7 @@ BUG FIXES AND MINOR IMPROVEMENTS
     o Vignettes with no code chunks were incorrectly flagged in chunk label
     checks
     o Chunks in Rnw vignettes with no labels are now correctly identified
+    o `sessionInfo` checks in vignettes occur only when code chunks are present
 
 CHANGES IN VERSION 1.44.0
 -----------------------
