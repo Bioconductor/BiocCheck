@@ -200,9 +200,16 @@ expect_true(
         vigdir <- file.path(path, "vignettes")
         dir.create(vigdir, recursive = TRUE)
         cat(
+            "---\n",
             "%\\VignetteIndexEntry{A Quarto Vignette}\n",
             "%\\VignetteEngine{quarto}\n",
             "%\\VignetteEncoding{UTF-8}\n",
+            "---\n\n",
+            "# Quarto Vignette\n\n",
+            "```{r}\n",
+            "print('This is a Quarto vignette')\n",
+            "```\n",
+            sep = "",
             file = file.path(vigdir, "test.qmd")
         )
     }
