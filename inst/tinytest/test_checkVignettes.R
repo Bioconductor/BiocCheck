@@ -22,7 +22,10 @@ checkCounter("No vignette sources in vignettes/ directory.", "error")
     extraActions = function(path) {
         vigdir <- file.path(path, "vignettes")
         dir.create(vigdir, recursive = TRUE)
-        cat("nothing", file = file.path(vigdir, "test.Rnw"))
+        cat(
+            "<<echo=FALSE, results=tex>>=\n## some code\n@\n",
+            file = file.path(vigdir, "test.Rnw")
+        )
     }
 )
 BiocCheck:::checkVignetteDir(.bioctest)

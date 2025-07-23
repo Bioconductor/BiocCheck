@@ -5,7 +5,7 @@
 
 \documentclass{article}
 
-<<style, echo=FALSE, results=tex>>=
+<<echo=FALSE, results=tex>>=
 BiocStyle::latex(use.unsrturl=FALSE)
 @
 
