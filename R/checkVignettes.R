@@ -629,13 +629,14 @@ checkVigSessionInfo <- function(.BiocPackage) {
         pc <- structure(
             list(parseFile(.BiocPackage, vfile)), .Names = vfile
         )
-        res <- findSymbolsInParsedCode(
-            parsedCodeList = pc,
-            symbolNames = c("sessionInfo", "session_info"),
-            tokenTypes = "SYMBOL_FUNCTION_CALL"
-        )
-        if (!length(res)) {
-            notFoundVig[[vfile]] <- TRUE
+        if (nrow(pc[[vfile]])) {
+            res <- findSymbolsInParsedCode(
+                parsedCodeList = pc,
+                symbolNames = c("sessionInfo", "session_info"),
+                tokenTypes = "SYMBOL_FUNCTION_CALL"
+            )
+            if (!length(res))
+                notFoundVig[[vfile]] <- TRUE
         }
     }
     if (any(notFoundVig)) {
