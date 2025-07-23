@@ -116,9 +116,9 @@ checkForValueSection <- function(.BiocPackage)
         rd = all_rds, tags = all_tags, SIMPLIFY = TRUE
     )
     docTypes[isInternal] <- "internal"
-    docTypes[!lengths(docTypes) | (hasUsage & !isInternal)] <- "fun"
-    funs <- lapply(docTypes, .whichRdCheck)
     isData <- docTypes == "data"
+    docTypes[!lengths(docTypes) | (hasUsage & !isInternal & !isData)] <- "fun"
+    funs <- lapply(docTypes, .whichRdCheck)
     ok <- mapply(
         function(afun, rds, atags) {
             afun(rds, atags)
