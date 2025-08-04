@@ -504,7 +504,7 @@ checkChunkLabels <- function(vigfiles) {
     if (!all(viglist))
         handleNoteFiles(
             " Vignette(s) found with missing chunk labels",
-            messages = basename(vigfiles[viglist])
+            messages = basename(vigfiles[!viglist])
         )
 }
 
