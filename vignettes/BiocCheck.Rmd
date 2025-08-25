@@ -687,7 +687,6 @@ with the `--no-check-bioc-help` option.
 
 # `BiocCheckGitClone`
 
-
 `BiocCheckGitClone` provides a few additional _Bioconductor_ package checks that
 can only should be run on a open source directory (raw Git clone) NOT a
 tarball. Reporting similarly in three categories as discussed above:
@@ -698,10 +697,16 @@ tarball. Reporting similarly in three categories as discussed above:
 
 * **NOTE**.
 
+::: { .anote }
+Developers should check packages with `BiocCheck()` within an R session
+while `BiocCheckGitClone()` is meant to run on the source package folder i.e.,
+the cloned git repository.
+:::
+
 # Using `BiocCheckGitClone`
 
-`BiocCheckGitClone` is meant to run within R on a directory containing an R package:
-
+`BiocCheckGitClone` is meant to run within R on a directory containing an R
+package:
 
 ```{r eval=FALSE}
 BiocCheckGitClone("packageDir")
