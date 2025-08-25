@@ -27,9 +27,9 @@
 #'   * `new-package`:  enable checks specific to new packages
 #'   * `no-check-bbs`: disable BBS-specific checks (for non-BioC packages).
 #'     Valid DESCRIPTION
+#'   * `no-check-bioc-help`: disable check for registration on Bioconductor
 #'   * `no-check-bioc-views`: disable biocViews-specific checks (for non-BioC
 #'     packages)
-#'   * `no-check-bioc-help`: disable check for registration on Bioconductor
 #'     mailing list and support site
 #'   * `no-check-coding-practices`: disable check for some common best coding
 #'     practices

@@ -74,9 +74,9 @@ additional analysis
 \item \code{new-package}:  enable checks specific to new packages
 \item \code{no-check-bbs}: disable BBS-specific checks (for non-BioC packages).
 Valid DESCRIPTION
+\item \code{no-check-bioc-help}: disable check for registration on Bioconductor
 \item \code{no-check-bioc-views}: disable biocViews-specific checks (for non-BioC
 packages)
-\item \code{no-check-bioc-help}: disable check for registration on Bioconductor
 mailing list and support site
 \item \code{no-check-coding-practices}: disable check for some common best coding
 practices
