@@ -22,39 +22,39 @@
 #'
 #' @section dot-options:
 #'
-#'   * `new-package`:  enable checks specific to new packages
-#'   * `no-check-dependencies`:  disable check for bad dependencies
-#'   * `no-check-deprecated`:  disable check for usage of deprecated packages
-#'   * `no-check-remotes`: disable check for usage of remote packages other
-#'     than those hosted on CRAN or Bioconductor
-#'   * `no-check-version-num`:  disable check for valid version number
-#'   * `no-check-R-ver`:  disable check for valid R version
-#'   * `no-check-pkg-size`:  disable check for package tarball size
-#'   * `no-check-file-size`:  disable check for individual file size
-#'   * `no-check-bioc-views`: disable biocViews-specific checks (for non-BioC
-#'     packages)
-#'   * `no-check-bbs`: disable BBS-specific checks (for non-BioC packages).
-#'     Valid DESCRIPTION
-#'   * `no-check-description`:  disable DESCRIPTION file checks
-#'   * `no-check-vignettes`:  disable vignette checks
-#'   * `no-check-library-calls`: disable check usage of functions that
-#'     install or update packages
-#'   * `no-check-install-self`: disable check for require or library of
-#'     itself
-#'   * `no-check-coding-practices`: disable check for some common best coding
-#'     practices
-#'   * `no-check-function-len`:  disable check for function length
-#'   * `no-check-man-doc`:  disable checks for man page documentation
-#'   * `no-check-news`:  disable checks for NEWS file
-#'   * `no-check-unit-tests`:  disable checks for unit tests
-#'   * `no-check-skip-bioc-tests`: disable check for tests that skip when on
-#'     bioc
-#'   * `no-check-formatting`:  disable checks for file formatting
-#'   * `no-check-CRAN`:  disable check for if package exists in CRAN
-#'   * `no-check-bioc-help`: disable check for registration on Bioconductor
-#'     mailing list and support site
 #'   * `build-output-file`: file containing R CMD build output, for
 #'     additional analysis
+#'   * `new-package`:  enable checks specific to new packages
+#'   * `no-check-bbs`: disable BBS-specific checks (for non-BioC packages).
+#'     Valid DESCRIPTION
+#'   * `no-check-bioc-views`: disable biocViews-specific checks (for non-BioC
+#'     packages)
+#'   * `no-check-bioc-help`: disable check for registration on Bioconductor
+#'     mailing list and support site
+#'   * `no-check-coding-practices`: disable check for some common best coding
+#'     practices
+#'   * `no-check-CRAN`:  disable check for if package exists in CRAN
+#'   * `no-check-dependencies`:  disable check for bad dependencies
+#'   * `no-check-deprecated`:  disable check for usage of deprecated packages
+#'   * `no-check-description`:  disable DESCRIPTION file checks
+#'   * `no-check-file-size`:  disable check for individual file size
+#'   * `no-check-formatting`:  disable checks for file formatting
+#'   * `no-check-function-len`:  disable check for function length
+#'   * `no-check-install-self`: disable check for require or library of
+#'     itself
+#'   * `no-check-library-calls`: disable check usage of functions that
+#'     install or update packages
+#'   * `no-check-man-doc`:  disable checks for man page documentation
+#'   * `no-check-news`:  disable checks for NEWS file
+#'   * `no-check-pkg-size`:  disable check for package tarball size
+#'   * `no-check-R-ver`:  disable check for valid R version
+#'   * `no-check-remotes`: disable check for usage of remote packages other
+#'     than those hosted on CRAN or Bioconductor
+#'   * `no-check-skip-bioc-tests`: disable check for tests that skip when on
+#'     bioc
+#'   * `no-check-unit-tests`:  disable checks for unit tests
+#'   * `no-check-version-num`:  disable check for valid version number
+#'   * `no-check-vignettes`:  disable vignette checks
 #'   * `quit-with-status`:  enable exit code option when performing check
 #'
 #' @param package The path to an R package directory or tarball (`.tar.gz`).

@@ -69,39 +69,39 @@ tarball that was created using \verb{R CMD build}.
 \section{dot-options}{
 
 \itemize{
-\item \code{new-package}:  enable checks specific to new packages
-\item \code{no-check-dependencies}:  disable check for bad dependencies
-\item \code{no-check-deprecated}:  disable check for usage of deprecated packages
-\item \code{no-check-remotes}: disable check for usage of remote packages other
-than those hosted on CRAN or Bioconductor
-\item \code{no-check-version-num}:  disable check for valid version number
-\item \code{no-check-R-ver}:  disable check for valid R version
-\item \code{no-check-pkg-size}:  disable check for package tarball size
-\item \code{no-check-file-size}:  disable check for individual file size
-\item \code{no-check-bioc-views}: disable biocViews-specific checks (for non-BioC
-packages)
-\item \code{no-check-bbs}: disable BBS-specific checks (for non-BioC packages).
-Valid DESCRIPTION
-\item \code{no-check-description}:  disable DESCRIPTION file checks
-\item \code{no-check-vignettes}:  disable vignette checks
-\item \code{no-check-library-calls}: disable check usage of functions that
-install or update packages
-\item \code{no-check-install-self}: disable check for require or library of
-itself
-\item \code{no-check-coding-practices}: disable check for some common best coding
-practices
-\item \verb{no-check-function-len}:  disable check for function length
-\item \code{no-check-man-doc}:  disable checks for man page documentation
-\item \code{no-check-news}:  disable checks for NEWS file
-\item \code{no-check-unit-tests}:  disable checks for unit tests
-\item \code{no-check-skip-bioc-tests}: disable check for tests that skip when on
-bioc
-\item \code{no-check-formatting}:  disable checks for file formatting
-\item \code{no-check-CRAN}:  disable check for if package exists in CRAN
-\item \code{no-check-bioc-help}: disable check for registration on Bioconductor
-mailing list and support site
 \item \code{build-output-file}: file containing R CMD build output, for
 additional analysis
+\item \code{new-package}:  enable checks specific to new packages
+\item \code{no-check-bbs}: disable BBS-specific checks (for non-BioC packages).
+Valid DESCRIPTION
+\item \code{no-check-bioc-views}: disable biocViews-specific checks (for non-BioC
+packages)
+\item \code{no-check-bioc-help}: disable check for registration on Bioconductor
+mailing list and support site
+\item \code{no-check-coding-practices}: disable check for some common best coding
+practices
+\item \code{no-check-CRAN}:  disable check for if package exists in CRAN
+\item \code{no-check-dependencies}:  disable check for bad dependencies
+\item \code{no-check-deprecated}:  disable check for usage of deprecated packages
+\item \code{no-check-description}:  disable DESCRIPTION file checks
+\item \code{no-check-file-size}:  disable check for individual file size
+\item \code{no-check-formatting}:  disable checks for file formatting
+\item \verb{no-check-function-len}:  disable check for function length
+\item \code{no-check-install-self}: disable check for require or library of
+itself
+\item \code{no-check-library-calls}: disable check usage of functions that
+install or update packages
+\item \code{no-check-man-doc}:  disable checks for man page documentation
+\item \code{no-check-news}:  disable checks for NEWS file
+\item \code{no-check-pkg-size}:  disable check for package tarball size
+\item \code{no-check-R-ver}:  disable check for valid R version
+\item \code{no-check-remotes}: disable check for usage of remote packages other
+than those hosted on CRAN or Bioconductor
+\item \code{no-check-skip-bioc-tests}: disable check for tests that skip when on
+bioc
+\item \code{no-check-unit-tests}:  disable checks for unit tests
+\item \code{no-check-version-num}:  disable check for valid version number
+\item \code{no-check-vignettes}:  disable vignette checks
 \item \code{quit-with-status}:  enable exit code option when performing check
 }
 }
