@@ -237,6 +237,9 @@ BiocCheckRun <-
         checkDESCRIPTIONFile(.BiocPackage)
     }
 
+    if (is.null(dots[["no-check-namespace"]]))
+        checkNAMESPACE(.BiocPackage)
+
     handleCheck("Checking .Rbuildignore...")
     checkRbuildignore(.BiocPackage)
 
