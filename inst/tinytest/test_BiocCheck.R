@@ -198,6 +198,10 @@ BiocCheck:::checkLicenseForRestrictiveUse("GPL-3.0")
 stillZero()
 .BiocCheck$zero()
 
+BiocCheck:::checkLicenseForRestrictiveUse("GPL (>= 3)")
+stillZero()
+.BiocCheck$zero()
+
 BiocCheck:::checkLicenseForRestrictiveUse("CC BY-NC-ND 4.0")
 expect_equivalent(1, .BiocCheck$getNum("error"))
 .BiocCheck$zero()
