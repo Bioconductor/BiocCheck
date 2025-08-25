@@ -18,6 +18,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
     checks
     o Chunks in Rnw vignettes with no labels are now correctly identified
     o `sessionInfo` checks in vignettes occur only when code chunks are present
+    o BiocCheck() options are now ordered alphabetically in documentation to
+    make it easier to find specific options (@Bisaloo, #229).
 
 CHANGES IN VERSION 1.44.0
 -----------------------
