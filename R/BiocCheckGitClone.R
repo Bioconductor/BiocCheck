@@ -107,6 +107,7 @@ BiocCheckGitClone <- function(package=".", ...)
     checkInstDocFolder(.BiocPackage)
 
     checkDESCRIPTION(.BiocPackage)
+    checkNAMESPACE(.BiocPackage)
     validMaintainer(.BiocPackage)
 
     handleCheck("Checking CITATION...")
