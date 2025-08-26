@@ -236,9 +236,11 @@ getAllDeprecatedPkgs <- function()
     }, character(1L))
 }
 
+.RdTags <- tools:::RdTags
+
 docType <- function(rd, tags) {
     if (missing(tags))
-        tags <- tools:::RdTags(rd)
+        tags <- .RdTags(rd)
     .tagsExtract(rd, tags, "\\docType")
 }
 

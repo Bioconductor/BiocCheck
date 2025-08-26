@@ -1235,7 +1235,7 @@ expect_false(BiocCheck:::doesManPageHaveRunnableExample(bad))
 .bioctest <- read_test_package("testpkg0")
 mans <-
     BiocCheck:::.read_all_rds(.bioctest$manSources, .bioctest$usesRdpack)
-tags <- lapply(mans, tools:::RdTags)
+tags <- lapply(mans, BiocCheck:::.RdTags)
 expect_true(!BiocCheck:::.valueInParsedRd(mans[[1]], tags[[1]]))
 expect_true(!BiocCheck:::.valueInParsedRd(mans[[2]], tags[[2]]))
 expect_true(BiocCheck:::.valueInParsedRd(mans[[3]], tags[[3]]))
@@ -1243,7 +1243,7 @@ expect_true(BiocCheck:::.valueInParsedRd(mans[[3]], tags[[3]]))
 .bioctest <- read_test_package("testpkg1")
 mans <-
     BiocCheck:::.read_all_rds(.bioctest$manSources, .bioctest$usesRdpack)
-tags <- lapply(mans, tools:::RdTags)
+tags <- lapply(mans, BiocCheck:::.RdTags)
 expect_true(!BiocCheck:::.valueInParsedRd(mans[[1]], tags[[1]]))
 expect_true(!BiocCheck:::.valueInParsedRd(mans[[2]], tags[[2]]))
 

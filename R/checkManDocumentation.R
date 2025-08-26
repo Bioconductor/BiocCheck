@@ -34,7 +34,7 @@ checkForPromptComments <- function(.BiocPackage) {
 
 .tagListExtract <- function(rd, tags, Tag) {
     if (missing(tags))
-        tags <- tools:::RdTags(rd)
+        tags <- .RdTags(rd)
     if (!Tag %in% tags)
         character(0L)
     else
@@ -98,7 +98,7 @@ checkForPromptComments <- function(.BiocPackage) {
 
 checkForValueSection <- function(.BiocPackage) {
     all_rds <- .read_all_rds(.BiocPackage$manSources, .BiocPackage$usesRdpack)
-    all_tags <- lapply(all_rds, tools:::RdTags)
+    all_tags <- lapply(all_rds, .RdTags)
     docTypes <- mapply(docType, rd = all_rds, tags = all_tags, SIMPLIFY = FALSE)
     hasUsage <- vapply(
         all_tags,
@@ -165,7 +165,7 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc) {
 
     for (manpage in manpages) {
         rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
-        tags <- tools:::RdTags(rd)
+        tags <- .RdTags(rd)
         name <- .tagsExtract(rd, tags = tags, Tag = "\\name")
         aliases <- .tagsExtract(rd, tags = tags, Tag = "\\alias")
         namesAndAliases <- c(name, aliases)
@@ -210,14 +210,14 @@ checkUsageOfDont <- function(.BiocPackage) {
     for (dx in seq_along(manpages)) {
         manpage <- manpages[dx]
         rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
-        hasExamples <- "\\examples" %in% tools:::RdTags(rd)
+        hasExamples <- "\\examples" %in% .RdTags(rd)
         if (hasExamples) {
             rdCode <- as.character(rd)
             exampleCode <- rdCode[which(rdCode == "\\examples"):length(rdCode)]
             donttest <- "\\donttest" %in% exampleCode
             dontrun <- "\\dontrun" %in% exampleCode
             ## check for the 'internal' keyword - this will be a false positive
-            keyword <- tools:::RdTags(rd) == "\\keyword"
+            keyword <- .RdTags(rd) == "\\keyword"
             internalVec <- FALSE
             if (any(keyword))
                 internalVec <- vapply(
