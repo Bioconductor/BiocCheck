@@ -92,6 +92,7 @@ itself
 \item \code{no-check-library-calls}: disable check usage of functions that
 install or update packages
 \item \code{no-check-man-doc}:  disable checks for man page documentation
+\item \code{no-check-namespace}:  disable NAMESPACE file checks
 \item \code{no-check-news}:  disable checks for NEWS file
 \item \code{no-check-pkg-size}:  disable check for package tarball size
 \item \code{no-check-R-ver}:  disable check for valid R version

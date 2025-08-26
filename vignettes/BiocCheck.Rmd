@@ -281,6 +281,14 @@ Can be disabled with `--no-check-bbs`
 [choosealicense]: https://choosealicense.com/appendix
 [SPDX License List]: https://spdx.org/licenses/
 
+## NAMESPACE checks
+
+Can be disabled with `--no-check-namespace`.
+
+* **Checking NAMESPACE...** ensures that the NAMESPACE file does not contain a
+  match all export pattern, i.e., `exportPattern("^[[:alpha:]]+")` or similar
+  (`ERROR`).
+
 ## .Rbuildignore checks
 
 * **Checking .Rbuildignore...** ensures that the 'tests' folder is

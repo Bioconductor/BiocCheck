@@ -45,6 +45,7 @@
 #'   * `no-check-library-calls`: disable check usage of functions that
 #'     install or update packages
 #'   * `no-check-man-doc`:  disable checks for man page documentation
+#'   * `no-check-namespace`:  disable NAMESPACE file checks
 #'   * `no-check-news`:  disable checks for NEWS file
 #'   * `no-check-pkg-size`:  disable check for package tarball size
 #'   * `no-check-R-ver`:  disable check for valid R version
