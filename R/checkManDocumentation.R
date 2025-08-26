@@ -209,21 +209,14 @@ checkUsageOfDont <- function(.BiocPackage)
     {
         manpage <- manpages[dx]
         rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
-        example <- unlist(lapply(rd,
-            function(x) attr(x, "Rd_tag") == "\\examples"))
-        hasExamples <- any(example)
+        hasExamples <- "\\examples" %in% tools:::RdTags(rd)
         if (hasExamples){
             rdCode <- as.character(rd)
             exampleCode <- rdCode[which(rdCode == "\\examples"):length(rdCode)]
-            donttestVec <- vapply(exampleCode, grepl, logical(1),
-                                  pattern="\\\\donttest", perl=TRUE,
-                                  USE.NAMES=FALSE)
-            dontrunVec <- vapply(exampleCode, grepl, logical(1),
-                                  pattern="\\\\dontrun", perl=TRUE,
-                                  USE.NAMES=FALSE)
+            donttest <- "\\donttest" %in% exampleCode
+            dontrun <- "\\dontrun" %in% exampleCode
             ## check for the 'internal' keyword - this will be a false positive
-            keyword <- unlist(lapply(rd,
-                function(x) attr(x, "Rd_tag") == "\\keyword"))
+            keyword <- tools:::RdTags(rd) == "\\keyword"
             if (any(keyword)) {
                 internalVec <- vapply(
                     as.character(rd[keyword]), grepl, logical(1L),
@@ -232,10 +225,10 @@ checkUsageOfDont <- function(.BiocPackage)
             } else {
                 internalVec <- FALSE
             }
-            if (any(donttestVec | dontrunVec) & !any(internalVec))
+            if ((donttest || dontrun) && !any(internalVec))
                 hasBad[dx] <- TRUE
 
-            if (any(dontrunVec) & !any(internalVec))
+            if (dontrun && !any(internalVec))
                 hasdontrun[dx] <- TRUE
         }
     }
