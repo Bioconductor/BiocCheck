@@ -162,11 +162,9 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc)
     for (manpage in manpages)
     {
         rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
-        name <-
-            unlist(rd[unlist(lapply(rd, function(x)
-                attr(x, "Rd_tag") == "\\name"))][[1]][1])
-        aliases <- unlist(lapply(rd[unlist(lapply(rd,
-            function(x) attr(x, "Rd_tag") == "\\alias"))], "[[", 1))
+        tags <- tools:::RdTags(rd)
+        name <- .tagsExtract(rd, tags = tags, Tag = "\\name")
+        aliases <- .tagsExtract(rd, tags = tags, Tag = "\\alias")
         namesAndAliases <- c(name, aliases)
         exportedTopics <- unique(namesAndAliases[namesAndAliases %in% exports])
         if (length(exportedTopics))
