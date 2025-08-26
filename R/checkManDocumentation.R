@@ -1,5 +1,4 @@
-checkManDocumentation <- function(.BiocPackage, libloc)
-{
+checkManDocumentation <- function(.BiocPackage, libloc) {
     package_dir <- .BiocPackage$sourceDir
     package_name <- .BiocPackage$packageName
     # canned man prompts
@@ -15,13 +14,12 @@ checkManDocumentation <- function(.BiocPackage, libloc)
     checkUsageOfDont(.BiocPackage)
 }
 
-checkForPromptComments <- function(.BiocPackage)
-{
+checkForPromptComments <- function(.BiocPackage) {
     manfiles <- .BiocPackage$manSources
     bad <- vapply(
         manfiles,
         function(manpage) {
-            lines <- readLines(manpage, warn=FALSE)
+            lines <- readLines(manpage, warn = FALSE)
             any(grepl("^%%\\s+~", lines))
         },
         logical(1L)
@@ -89,22 +87,25 @@ checkForPromptComments <- function(.BiocPackage)
 .whichRdCheck <- function(docType) {
     switch(
         docType,
-        internal =,
-        package =,
+        internal = ,
+        package = ,
         class = .skipRdCheck,
         data = .formatsInParsedRd,
-        fun =,
+        fun = ,
         .valueInParsedRd
     )
 }
 
-checkForValueSection <- function(.BiocPackage)
-{
+checkForValueSection <- function(.BiocPackage) {
     all_rds <- .read_all_rds(.BiocPackage$manSources, .BiocPackage$usesRdpack)
     all_tags <- lapply(all_rds, tools:::RdTags)
     docTypes <- mapply(docType, rd = all_rds, tags = all_tags, SIMPLIFY = FALSE)
     hasUsage <- vapply(
-        all_tags, function(dtag) { "\\usage" %in% dtag }, logical(1L)
+        all_tags,
+        function(dtag) {
+            "\\usage" %in% dtag
+        },
+        logical(1L)
     )
     isInternal <- mapply(
         function(rd, tags, keyword) {
@@ -113,7 +114,9 @@ checkForValueSection <- function(.BiocPackage)
             else
                 FALSE
         },
-        rd = all_rds, tags = all_tags, SIMPLIFY = TRUE
+        rd = all_rds,
+        tags = all_tags,
+        SIMPLIFY = TRUE
     )
     docTypes[isInternal] <- "internal"
     isData <- docTypes == "data"
@@ -123,7 +126,9 @@ checkForValueSection <- function(.BiocPackage)
         function(afun, rds, atags) {
             afun(rds, atags)
         },
-        afun = funs, rds = all_rds, atags = all_tags,
+        afun = funs,
+        rds = all_rds,
+        atags = all_tags,
         SIMPLIFY = TRUE
     )
     dataOK <- ok[isData]
@@ -145,8 +150,7 @@ checkForValueSection <- function(.BiocPackage)
 }
 
 # Which pages document things that are exported?
-checkExportsAreDocumented <- function(.BiocPackage, lib.loc)
-{
+checkExportsAreDocumented <- function(.BiocPackage, lib.loc) {
     pkgdir <- .BiocPackage$sourceDir
     pkgname <- .BiocPackage$packageName
     uses_rd_pack <- .BiocPackage$usesRdpack
@@ -159,21 +163,20 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc)
     exportingPagesCount <- 0L
     noExamplesCount <- 0L
 
-    for (manpage in manpages)
-    {
+    for (manpage in manpages) {
         rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
         tags <- tools:::RdTags(rd)
         name <- .tagsExtract(rd, tags = tags, Tag = "\\name")
         aliases <- .tagsExtract(rd, tags = tags, Tag = "\\alias")
         namesAndAliases <- c(name, aliases)
         exportedTopics <- unique(namesAndAliases[namesAndAliases %in% exports])
-        if (length(exportedTopics))
-        {
+        if (length(exportedTopics)) {
             exportingPagesCount <- exportingPagesCount + 1
         }
-        if (length(exportedTopics) &&
-            !doesManPageHaveRunnableExample(rd))
-        {
+        if (
+            length(exportedTopics) &&
+                !doesManPageHaveRunnableExample(rd)
+        ) {
             noExamplesCount <- noExamplesCount + 1
             badManPages <- append(badManPages, basename(manpage))
         }
@@ -181,7 +184,7 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc)
 
     ratio <- (exportingPagesCount - noExamplesCount) / exportingPagesCount
 
-    if (exportingPagesCount > 0 && ratio  < 0.8)
+    if (exportingPagesCount > 0 && ratio < 0.8)
         handleError(
             "At least 80% of man pages documenting exported objects must ",
             "have runnable examples.",
@@ -198,33 +201,32 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc)
     badManPages # for testing
 }
 
-checkUsageOfDont <- function(.BiocPackage)
-{
+checkUsageOfDont <- function(.BiocPackage) {
     manpages <- .BiocPackage$manSources
 
     hasBad <- rep(FALSE, length(manpages))
     hasdontrun <- rep(FALSE, length(manpages))
     uses_rd_pack <- .BiocPackage$usesRdpack
-    for (dx in seq_along(manpages))
-    {
+    for (dx in seq_along(manpages)) {
         manpage <- manpages[dx]
         rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
         hasExamples <- "\\examples" %in% tools:::RdTags(rd)
-        if (hasExamples){
+        if (hasExamples) {
             rdCode <- as.character(rd)
             exampleCode <- rdCode[which(rdCode == "\\examples"):length(rdCode)]
             donttest <- "\\donttest" %in% exampleCode
             dontrun <- "\\dontrun" %in% exampleCode
             ## check for the 'internal' keyword - this will be a false positive
             keyword <- tools:::RdTags(rd) == "\\keyword"
-            if (any(keyword)) {
+            internalVec <- FALSE
+            if (any(keyword))
                 internalVec <- vapply(
-                    as.character(rd[keyword]), grepl, logical(1L),
-                    pattern="internal", USE.NAMES=FALSE
+                    as.character(rd[keyword]),
+                    grepl,
+                    logical(1L),
+                    pattern = "internal",
+                    USE.NAMES = FALSE
                 )
-            } else {
-                internalVec <- FALSE
-            }
             if ((donttest || dontrun) && !any(internalVec))
                 hasBad[dx] <- TRUE
 
@@ -232,20 +234,19 @@ checkUsageOfDont <- function(.BiocPackage)
                 hasdontrun[dx] <- TRUE
         }
     }
-    if (any(hasBad)){
-        perVl <- as.character(round(length(which(hasBad))/length(hasBad)*100))
+    if (any(hasBad)) {
+        perVl <- as.character(round(
+            length(which(hasBad)) / length(hasBad) * 100
+        ))
         handleNoteFiles(
             "Usage of dontrun{} / donttest{} tags found in man page examples. ",
             paste0(perVl, "% of man pages use at least one of these tags."),
             messages = basename(manpages)[hasBad]
         )
     }
-    if (any(hasdontrun)){
+    if (any(hasdontrun))
         handleNoteFiles(
             "Use donttest{} instead of dontrun{}.",
             messages = basename(manpages)[hasdontrun]
         )
-     }
-
 }
-
