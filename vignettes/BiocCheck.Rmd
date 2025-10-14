@@ -336,7 +336,7 @@ Can be disabled with `--no-check-vignettes`.
 * Checks that vignette code contains `sessionInfo()` or `session_info()` for
   reproducibility (`NOTE`).
 * Checks that evaluated vignette code does not invoke package installation
-  functions (`ERROR`). Function calls in the vignette that match `install.*` 
+  functions (`ERROR`). Function calls in the vignette that match `install.*`
   will produce a warning (`WARNING`).
 * Checks that there are no duplicate code chunk labels in the vignettes
   (`ERROR`).
@@ -427,12 +427,12 @@ directory.
 * It is favorable to use the assignment arrow ('<-') over the equals assignment
   ('=') for clarity in the code and legibility. Any use of the `=` will be
   flagged with a `NOTE`.
-  
+
 * New submissions should not use any `.Deprecated`, `.Defunct`, `lifeCycle`,
   `deprecate_warn`, or `deprecate_stop` function calls (`WARNING`). Existing
   packages should evolve these functions after a Bioconductor release according
   to the [package guidelines][6].
-  
+
 [6]: https://contributions.bioconductor.org/deprecation.html
 
 * **Checking for T...** **Checking for F...**
@@ -608,9 +608,11 @@ These checks are run against not just R code, but the DESCRIPTION and
 NAMESPACE files as well as man pages and vignette source files.  All
 of these files allow long lines to be broken up.
 
-The output of this check includes the first 6 offending lines of code;
-see more with `BiocCheck:::checkFormatting("path/to/YourPackage",
-nlines=Inf)`.
+The output of this check includes the first few lines of offending code for
+many of the various checks.  To see the full output, users are encouraged to
+run the check locally and browse to the `BiocCheck` output folder that was
+created with the `<PackageName>.BiocCheck` naming convention. The full output
+log file is named `00BiocCheck.log`.
 
 There are several helpful packages that can be used for formatting of
 R code to particular coding standards such as  [formatR][formatR] and
