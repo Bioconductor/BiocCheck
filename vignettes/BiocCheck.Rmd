@@ -9,13 +9,13 @@ vignette: >
   % \VignetteEncoding{UTF-8}
 ---
 
-```{r,include=FALSE,results="hide",message=FALSE,warning=FALSE}
+```{r biocstyle_load, include=FALSE,results="hide",message=FALSE,warning=FALSE}
 library(BiocStyle)
 ```
 
 # `BiocCheck` Summary
 
-```{r,include=TRUE,results="hide",message=FALSE,warning=FALSE}
+```{r libs, include=TRUE,results="hide",message=FALSE,warning=FALSE}
 library(BiocCheck)
 ```
 
@@ -41,7 +41,7 @@ issues:
 `BiocCheck` is meant to run within R on a directory containing an R package, or
 a source tarball (`.tar.gz` file):
 
-```{r eval=FALSE}
+```{r usage, eval=FALSE}
 BiocCheck("<packageDirOrTarball>")
 ```
 
@@ -69,7 +69,7 @@ See the `r Biocpkg("biocthis")` package for more details.
 
 `BiocCheck` should be installed as follows:
 
-```{r, eval = FALSE}
+```{r install, eval = FALSE}
 if (!require("BiocManager", quietly = TRUE))
     install.packages("BiocManager")
 
@@ -718,7 +718,7 @@ the cloned git repository.
 `BiocCheckGitClone` is meant to run within R on a directory containing an R
 package:
 
-```{r eval=FALSE}
+```{r BiocCheckGitClone_usage, eval=FALSE}
 BiocCheckGitClone("packageDir")
 ```
 
@@ -739,7 +739,7 @@ if any of these files are present (`ERROR`)
 
 The current list of files checked are given by this internal constant:
 
-```{r}
+```{r hidden_files_exts}
 BiocCheck:::.HIDDEN_FILE_EXTS
 ```
 
@@ -783,7 +783,7 @@ for more information.
 Here is an example of a formatted `CITATION` file. See the `GenomicRanges`
 package `CITATION` file for details.
 
-```{r}
+```{r citation_example}
 library(utils)
 readCitationFile(
     system.file("CITATION", package = "GenomicRanges")
@@ -794,7 +794,7 @@ readCitationFile(
 function call. When a `doi` input is not present, a `WARNING` is emitted as most
 modern publications should have an assigned DOI.
 
-```{css, echo=FALSE}
+```{css anote_style, echo=FALSE}
 .anote {
   font-size: 10pt;
   font-style: italic;
