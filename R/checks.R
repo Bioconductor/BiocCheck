@@ -28,11 +28,11 @@ checkDeprecatedPackages <- function(.BiocPackage)
     }
 }
 
-checkPackageSize <- function(.BiocPackage, size=5){
+checkPackageSize <- function(.BiocPackage, size=10){
     pkg <- .BiocPackage$sourceDir
     pkgType <- .BiocPackage$packageType
     if (is.na(pkgType) ||  pkgType == "Software") {
-        maxSize <- size*10^6 ## 5MB
+        maxSize <- size*10^6 ## in MB
         pkgSize <- file.size(pkg)
         if (pkgSize > maxSize){
             msgs <- c(
