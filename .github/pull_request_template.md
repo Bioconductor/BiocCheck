@@ -10,7 +10,7 @@ For a successful merge, the following steps are required:
 * [ ] Add unit tests (optional but highly recommended)
 * [ ] Passing `R CMD build` & `R CMD check` on Bioconductor devel
 
-List a reviewer in the Pull Request (either @LiNk-NY, @lshep, @mtmorgan).
+List a reviewer in the Pull Request (either @LiNk-NY, @lshep).
 Reviewers will make sure to `Comment`, `Approve` or `Request changes`.
 
 We _highly_ recommend the use of the Bioconductor devel docker image described
