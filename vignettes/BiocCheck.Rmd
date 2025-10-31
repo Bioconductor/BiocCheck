@@ -156,7 +156,7 @@ Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
 
 * **Checking package size**
   Checks that the package size meets _Bioconductor_ requirements. The current
-  package size limit is 5 MB for Software packages. Experiment Data and
+  package size limit is 10 MB for Software packages. Experiment Data and
   Annotation packages are excluded from this check. This check is only run if
   checking a source tarball. (ERROR)
 
