@@ -205,7 +205,7 @@ BiocCheckRun <-
     if (is.null(dots[["no-check-pkg-size"]])){
         handleCheck("Checking package size...")
         if (.BiocPackage$isTar){
-            checkPackageSize(.BiocPackage, size=5)
+            checkPackageSize(.BiocPackage)
         } else {
             handleMessage("Skipped... only checked on source tarball", indent=4)
         }
