@@ -1,3 +1,11 @@
+CHANGES IN VERSION 1.48.0
+-----------------------
+
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o Package tarball size check updated to have a max of 10 MB (@LiNk-NY,
+    #234).
+
 CHANGES IN VERSION 1.46.0
 -----------------------
 
