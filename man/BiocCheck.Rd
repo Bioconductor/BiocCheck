@@ -104,6 +104,13 @@ bioc
 \item \code{no-check-version-num}:  disable check for valid version number
 \item \code{no-check-vignettes}:  disable vignette checks
 \item \code{quit-with-status}:  enable exit code option when performing check
+\item \code{install}: if \code{FALSE}, the package is not installed; otherwise, if not
+specified, the package is installed by default. Optionally, a
+\verb{check:<file>} key-value pair is provided to identify the name of the
+installation output file which will be copied to the \verb{<pkg>.BiocCheck}
+directory.
+\item \code{libloc}: when \code{install} is specified, the library location where the
+package is installed. By default, this is \code{.libPaths()[1]}.
 }
 }
 

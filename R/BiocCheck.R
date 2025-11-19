@@ -57,6 +57,13 @@
 #'   * `no-check-version-num`:  disable check for valid version number
 #'   * `no-check-vignettes`:  disable vignette checks
 #'   * `quit-with-status`:  enable exit code option when performing check
+#'   * `install`: if `FALSE`, the package is not installed; otherwise, if not
+#'     specified, the package is installed by default. Optionally, a
+#'     `check:<file>` key-value pair is provided to identify the name of the
+#'     installation output file which will be copied to the `<pkg>.BiocCheck`
+#'     directory.
+#'   * `libloc`: when `install` is specified, the library location where the
+#'     package is installed. By default, this is `.libPaths()[1]`.
 #'
 #' @param package The path to an R package directory or tarball (`.tar.gz`).
 #'   The `BiocCheck` function is intended to be run from the package
@@ -153,9 +160,32 @@ BiocCheckRun <-
     ## consider merging these operations into one
     cli::cli_div(theme = list(.pkg = list(color = "orange")))
     cli::cli_rule("Installing {.pkg { .BiocPackage$packageName }}")
-    package_install_dir <- installAndLoad(.BiocPackage)
-    cli::cli_alert_success("Package installed successfully")
-    libloc <- file.path(package_install_dir, "lib")
+
+    install_param <- dots[["install"]]
+    should_install <- is.null(install_param) || isFALSE(install_param)
+
+    if (should_install) {
+        package_install_dir <- .tryInstallwLoad(.BiocPackage)
+        cli::cli_alert_success("Package installed successfully")
+        libloc <- file.path(package_install_dir, "lib")
+    } else {
+        if (is.character(install_param)) {
+            split_log <- strsplit(install_param, ":")[[1L]]
+            inst_log <- utils::tail(split_log, n = 1L)
+            on.exit({
+                if (file.exists(inst_log))
+                    file.copy(
+                        from = inst_log,
+                        to = file.path(
+                            .BiocPackage$BiocCheckDir, basename(inst_log)
+                        )
+                    )
+            }, add = TRUE)
+        }
+        libloc <- dots[["libloc"]] %||% .libPaths()[1L]
+        package_install_dir <- .libPaths()[1L]
+    }
+
     isBBS <- Sys.getenv("IS_BIOC_BUILD_MACHINE")
     onBBS <- nzchar(isBBS) && identical(tolower(isBBS), "true")
     hasAdmin <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))

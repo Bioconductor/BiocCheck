@@ -75,8 +75,7 @@ handleMessage <- function(..., indent=4, exdent=6)
     cli::cli_alert_info(msg, wrap = TRUE)
 }
 
-installAndLoad <- function(.BiocPackage, install_dir = tempfile())
-{
+.tryInstallwLoad <- function(.BiocPackage, install_dir = tempfile()) {
     pkgpath <- .BiocPackage$sourceDir
     pkgname <- .BiocPackage$packageName
     if (!dir.exists(install_dir))
@@ -89,36 +88,14 @@ installAndLoad <- function(.BiocPackage, install_dir = tempfile())
     res <- callr::rcmd_safe(
         "INSTALL",
         c(
-            "--no-test-load", "--use-vanilla", lpath, pkgpath
+            "--use-vanilla", lpath, pkgpath
         ),
         env = c(callr::rcmd_safe_env(), R_LIBS_USER = r_libs_user)
     )
 
-    if (!identical(res[["status"]], 0L)) {
-        handleError(pkgpath, " must be installable.")
-    }
-    res <- callr::r(
-        function(pkgname, libdir) {
-            tryCatch({
-                loadNamespace(
-                    package = pkgname, lib.loc = libdir
-                )
-                TRUE
-            }, error = function(e) {
-                FALSE
-            })
-        },
-        args = list(pkgname = pkgname, libdir = libdir),
-        libpath = libdir,
-        cmdargs = c(
-            "--no-save", "--no-restore", "--no-site-file",
-            "--no-init-file", "--no-environ"
-        ),
-        env = c(callr::rcmd_safe_env(), R_LIBS_USER = r_libs_user)
-    )
-    if (!res) {
-        handleError(pkgpath, " must be loadable.")
-    }
+    if (!identical(res[["status"]], 0L))
+        handleError(pkgpath, " must be installable and loadable.")
+
     install_dir
 }
 
