@@ -80,6 +80,22 @@ BiocManager::install("BiocCheck")
 
 Actual `BiocCheck` output is shown below in **bold**.
 
+## Installation
+
+To skip the installation step, set the `--install` flag to `NULL` or `FALSE`.
+`BiocCheck` loads the installed package to run some of its checks. When this
+flag is set to `NULL` or `FALSE`, it will search for the package in the first
+path in the local library (i.e., `.libPaths()[1]`).
+
+Similar to `R CMD check`, the `--install` flag can optionally include a
+`check:<file>` key-value pair indicating the file where the installation log can
+be found (primarily for compiled packages) and it will be copied into the
+`<pkg>.BiocCheck` output folder.
+
+Note that `libloc` can be included along with the `--install` flag to specify
+a custom library location for package installation. By default, when not set,
+`libloc` points to the `lib` folder in the package installation directory.
+
 ## Deprecated Package Checks
 
 **Checking for deprecated package usage...**
