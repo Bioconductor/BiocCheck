@@ -179,7 +179,7 @@ BiocCheckRun <-
     cli::cli_rule("Installing {.pkg { .BiocPackage$packageName }}")
 
     install_param <- dots[["install"]]
-    should_install <- is.null(install_param) || isFALSE(install_param)
+    should_install <- is.null(install_param) || isTRUE(install_param)
 
     if (should_install) {
         package_install_dir <- .tryInstallwLoad(.BiocPackage)
