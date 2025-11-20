@@ -235,7 +235,7 @@ BiocCheckRun <-
             checkForVersionNumberMismatch(.BiocPackage)
         }
 
-        if (!is.null(dots[["new-package"]])) {
+        if (isTRUE(dots[["new-package"]])) {
             handleCheck("Checking new package version number...")
             checkNewPackageVersionNumber(.BiocPackage)
         } else if (.isNULLorFALSE(dots[["new-package"]])) {
@@ -368,7 +368,7 @@ BiocCheckRun <-
         checkIsPackageNameAlreadyInUse(package_name, "CRAN")
     }
 
-    if (!is.null(dots[["new-package"]]))
+    if (isTRUE(dots[["new-package"]]))
     {
         handleCheck("Checking if new package already exists in Bioconductor...")
         checkIsPackageNameAlreadyInUse(package_name, "BioCsoft")
