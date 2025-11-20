@@ -124,8 +124,8 @@ bioc
 \item \code{install}: if \code{FALSE}, the package is not installed; otherwise, if not
 specified, the package is installed by default. Optionally, a
 \verb{check:<file>} key-value pair is provided to identify the name of the
-installation output file which will be copied to the \verb{<pkg>.BiocCheck}
-directory.
+installation output file which will be copied to the
+\verb{<package_name>.BiocCheck} directory.
 \item \code{libloc}: when \code{install} is specified, the library location where the
 package is installed. By default, this is \code{.libPaths()[1]}.
 }

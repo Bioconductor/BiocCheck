@@ -79,8 +79,8 @@
 #'   * `install`: if `FALSE`, the package is not installed; otherwise, if not
 #'     specified, the package is installed by default. Optionally, a
 #'     `check:<file>` key-value pair is provided to identify the name of the
-#'     installation output file which will be copied to the `<pkg>.BiocCheck`
-#'     directory.
+#'     installation output file which will be copied to the
+#'     `<package_name>.BiocCheck` directory.
 #'   * `libloc`: when `install` is specified, the library location where the
 #'     package is installed. By default, this is `.libPaths()[1]`.
 #'
