@@ -400,3 +400,7 @@ doesManPageHaveRunnableExample <- function(rd)
         lines <- lines[seq(min(fm_idx), max(fm_idx))]
     lines
 }
+
+.isNULLorFALSE <- function(x) {
+    is.null(x) || isFALSE(x)
+}

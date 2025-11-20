@@ -215,12 +215,12 @@ BiocCheckRun <-
     cli::cli_rule("Running BiocCheck on {.pkg { .BiocPackage$packageName }}")
 
     # BiocCheck checks --------------------------------------------------------
-    if (is.null(dots[["no-check-deprecated"]])) {
+    if (.isNULLorFALSE(dots[["no-check-deprecated"]])) {
         handleCheck("Checking for deprecated package usage...")
         checkDeprecatedPackages(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-remotes"]])){
+    if (.isNULLorFALSE(dots[["no-check-remotes"]])){
         handleCheck("Checking for remote package usage...")
         checkRemotesUsage(.BiocPackage)
     }
@@ -228,7 +228,7 @@ BiocCheckRun <-
     handleCheck("Checking for 'LazyData: true' usage...")
     checkLazyDataUsage(.BiocPackage)
 
-    if (is.null(dots[["no-check-version-num"]])){
+    if (.isNULLorFALSE(dots[["no-check-version-num"]])){
         handleCheck("Checking version number...")
         if (!.BiocPackage$isSourceDir) {
             handleCheck("Checking for version number mismatch...")
@@ -238,18 +238,18 @@ BiocCheckRun <-
         if (!is.null(dots[["new-package"]])) {
             handleCheck("Checking new package version number...")
             checkNewPackageVersionNumber(.BiocPackage)
-        } else {
+        } else if (.isNULLorFALSE(dots[["new-package"]])) {
             handleCheck("Checking version number validity...")
             checkVersionNumber(.BiocPackage)
         }
     }
 
-    if (is.null(dots[["no-check-R-ver"]])) {
+    if (.isNULLorFALSE(dots[["no-check-R-ver"]])) {
         handleCheck("Checking R version dependency...")
         checkRVersionDependency(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-pkg-size"]])){
+    if (.isNULLorFALSE(dots[["no-check-pkg-size"]])){
         handleCheck("Checking package size...")
         if (.BiocPackage$isTar){
             checkPackageSize(.BiocPackage)
@@ -258,13 +258,13 @@ BiocCheckRun <-
         }
     }
 
-    if (is.null(dots[["no-check-file-size"]])){
+    if (.isNULLorFALSE(dots[["no-check-file-size"]])){
         handleCheck("Checking individual file sizes...")
         checkIndivFileSizes(.BiocPackage)
         checkDataFileSizes(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-bioc-views"]]))
+    if (.isNULLorFALSE(dots[["no-check-bioc-views"]]))
     {
         handleCheck("Checking biocViews...")
         result <- checkBiocViews(.BiocPackage)
@@ -276,16 +276,16 @@ BiocCheckRun <-
         }
     }
 
-    if (is.null(dots[["no-check-bbs"]])){
+    if (.isNULLorFALSE(dots[["no-check-bbs"]])){
         handleCheck("Checking build system compatibility...")
         checkBBScompatibility(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-description"]])) {
+    if (.isNULLorFALSE(dots[["no-check-description"]])) {
         checkDESCRIPTIONFile(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-namespace"]]))
+    if (.isNULLorFALSE(dots[["no-check-namespace"]]))
         checkNAMESPACE(.BiocPackage)
 
     handleCheck("Checking .Rbuildignore...")
@@ -299,7 +299,7 @@ BiocCheckRun <-
         checkInstDocFolder(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-vignettes"]])) {
+    if (.isNULLorFALSE(dots[["no-check-vignettes"]])) {
         handleCheck("Checking vignette directory...")
         checkVignetteDir(.BiocPackage)
         if ("build-output-file" %in% names(dots)) {
@@ -310,7 +310,7 @@ BiocCheckRun <-
         }
     }
 
-    if (is.null(dots[["no-check-library-calls"]])){
+    if (.isNULLorFALSE(dots[["no-check-library-calls"]])){
         handleCheck("Checking package installation calls in R code...")
         checkPkgInstallCalls(.BiocPackage)
     }
@@ -319,50 +319,50 @@ BiocCheckRun <-
     package_name <- .BiocPackage$packageName
     parsedCode <- parseFiles(.BiocPackage)
 
-    if (is.null(dots[["no-check-install-self"]])){
+    if (.isNULLorFALSE(dots[["no-check-install-self"]])){
         handleCheck(sprintf("Checking for library/require of %s...",
                             package_name))
         checkForLibraryRequire(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-coding-practices"]])){
+    if (.isNULLorFALSE(dots[["no-check-coding-practices"]])){
         handleCheck("Checking coding practice...")
         checkCodingPractice(.BiocPackage, parsedCode)
     }
 
-    if (is.null(dots[["no-check-function-len"]])){
+    if (.isNULLorFALSE(dots[["no-check-function-len"]])){
         handleCheck("Checking function lengths...")
         checkFunctionLengths(parsedCode, package_name)
     }
 
-    if (is.null(dots[["no-check-man-doc"]])){
+    if (.isNULLorFALSE(dots[["no-check-man-doc"]])){
         handleCheck("Checking man page documentation...")
         checkManDocumentation(.BiocPackage, libloc)
     }
 
-    if (is.null(dots[["no-check-news"]])){
+    if (.isNULLorFALSE(dots[["no-check-news"]])){
         handleCheck("Checking package NEWS...")
         checkNEWS(package_dir)
     }
 
-    if (is.null(dots[["no-check-unit-tests"]])){
+    if (.isNULLorFALSE(dots[["no-check-unit-tests"]])){
         handleCheck("Checking unit tests...")
         checkUnitTests(package_dir)
     }
 
-    if (is.null(dots[["no-check-skip-bioc-tests"]])){
+    if (.isNULLorFALSE(dots[["no-check-skip-bioc-tests"]])){
         handleCheck("Checking skip_on_bioc() in tests...")
         checkSkipOnBioc(package_dir)
     }
 
-    if (is.null(dots[["no-check-formatting"]])){
+    if (.isNULLorFALSE(dots[["no-check-formatting"]])){
         handleCheck(
             "Checking formatting of DESCRIPTION, NAMESPACE, ",
             "man pages, R source, and vignette source...")
         checkFormatting(.BiocPackage)
     }
 
-    if (is.null(dots[["no-check-CRAN"]]))
+    if (.isNULLorFALSE(dots[["no-check-CRAN"]]))
     {
         handleCheck("Checking if package already exists in CRAN...")
         checkIsPackageNameAlreadyInUse(package_name, "CRAN")
@@ -379,7 +379,7 @@ BiocCheckRun <-
         # checkIsPackageNameAlreadyInUse(package_name, "BioCbooks")
     }
 
-    if (is.null(dots[["no-check-bioc-help"]])) {
+    if (.isNULLorFALSE(dots[["no-check-bioc-help"]])) {
         handleCheck("Checking for bioc-devel mailing list subscription...")
         if (hasAdmin) {
             checkForBiocDevelSubscription(.BiocPackage)
