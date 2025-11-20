@@ -595,9 +595,9 @@ expect_true(
     length(BiocCheck:::.findSignalerInSignaler(rfile, .SIGNALERS_TXT)) == 4L
 )
 
-# installAndLoad ----------------------------------------------------------
+# .tryInstallwLoad --------------------------------------------------------
 .bioctest <- create_test_package()
-temppkg <- BiocCheck:::installAndLoad(.bioctest)
+temppkg <- BiocCheck:::.tryInstallwLoad(.bioctest)
 liblocation <- file.path(temppkg, "lib")
 expect_true(dir.exists(liblocation))
 expect_true(
@@ -891,7 +891,7 @@ expect_true(
 
 # checkExportsAreDocumented ------------------------------------------------
 .bioctest <- read_test_package("testpkg0")
-instdir <- BiocCheck:::installAndLoad(.bioctest)
+instdir <- BiocCheck:::.tryInstallwLoad(.bioctest)
 res <- BiocCheck:::checkExportsAreDocumented(
     .bioctest, lib.loc = file.path(instdir, "lib")
 )
@@ -1301,7 +1301,7 @@ expect_true(
 # checkUsageOfDont ---------------------------------------------------------
 ## testpkg0 should trigger this note for 2 out of 3 man pages
 .bioctest <- read_test_package("testpkg0")
-BiocCheck:::installAndLoad(.bioctest)
+BiocCheck:::.tryInstallwLoad(.bioctest)
 notemsg <- capture.output(
     BiocCheck:::checkUsageOfDont(.bioctest), type = "message"
 )
@@ -1313,7 +1313,7 @@ expect_true( any(grepl("67%", notemsg)) )
 ## testpkg1 contains a man page with keyword 'internal'
 ## this shouldn't trigger the note
 .bioctest <- read_test_package("testpkg1")
-BiocCheck:::installAndLoad(.bioctest)
+BiocCheck:::.tryInstallwLoad(.bioctest)
 BiocCheck:::checkUsageOfDont(.bioctest)
 expect_equivalent(0, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
