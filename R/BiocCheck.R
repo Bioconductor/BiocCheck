@@ -21,6 +21,12 @@
 #' `R CMD check` should always be run first for best results.
 #'
 #' @section dot-options:
+#' To use the dot-options, `BiocCheck` can be called with named arguments
+#' corresponding to the options below. Typically, these options are set to
+#' `TRUE` to disable specific checks, e.g.,
+#' \preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }. Currently,
+#' setting these options to `FALSE` has no effect as most of the code only
+#' checks whether the value is unset, i.e. `NULL`. The available options are:
 #'
 #'   * `build-output-file`: file containing R CMD build output, for
 #'     additional analysis
