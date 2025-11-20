@@ -20,6 +20,19 @@
 #' \emph{Note} that `BiocCheck` is complementary to `R CMD check`.
 #' `R CMD check` should always be run first for best results.
 #'
+#' To skip installation of the package during the check, set the
+#' `install` option to `FALSE` or `NULL`:
+#' \preformatted{
+#' BiocCheck(package, install=FALSE)
+#' ## OR
+#' BiocCheck(package, install=NULL)
+#' }
+#' To re-use an existing installation log file, set the `install` option
+#' to the name of the installation log file.
+#' For example, the following will put the `install_out.txt` log file in the
+#' `<package_name>.BiocCheck` directory:
+#' \preformatted{ BiocCheck(package, install="check:install_out.txt") }
+#'
 #' @section dot-options:
 #' To use the dot-options, `BiocCheck` can be called with named arguments
 #' corresponding to the options below. Typically, these options are set to

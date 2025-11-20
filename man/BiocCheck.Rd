@@ -65,6 +65,19 @@ tarball that was created using \verb{R CMD build}.
 
 \emph{Note} that \code{BiocCheck} is complementary to \verb{R CMD check}.
 \verb{R CMD check} should always be run first for best results.
+
+To skip installation of the package during the check, set the
+\code{install} option to \code{FALSE} or \code{NULL}:
+\preformatted{
+BiocCheck(package, install=FALSE)
+## OR
+BiocCheck(package, install=NULL)
+}
+To re-use an existing installation log file, set the \code{install} option
+to the name of the installation log file.
+For example, the following will put the \code{install_out.txt} log file in the
+\verb{<package_name>.BiocCheck} directory:
+\preformatted{ BiocCheck(package, install="check:install_out.txt") }
 }
 \section{dot-options}{
 
