@@ -101,9 +101,7 @@
 #' @param callr logical(1) Whether to use the `callr` package to run `BiocCheck`
 #'   in an isolated R session to prevent namespace collisions.
 #'
-#' @param \dots See the details section for available options. When running
-#' `BiocCheck`, options can be specified as:
-#' \preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }
+#' @param \dots See the `dot-options` details section for available options.
 #'
 #' @return `BiocCheck()` is chiefly called for the side effect of the check
 #'   reporting. The function also creates a `<package_name>.BiocCheck` folder

@@ -30,9 +30,7 @@ developers and contributors to \code{BiocCheck}.}
 \item{callr}{logical(1) Whether to use the \code{callr} package to run \code{BiocCheck}
 in an isolated R session to prevent namespace collisions.}
 
-\item{\dots}{See the details section for available options. When running
-\code{BiocCheck}, options can be specified as:
-\preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }}
+\item{\dots}{See the \code{dot-options} details section for available options.}
 }
 \value{
 \code{BiocCheck()} is chiefly called for the side effect of the check
