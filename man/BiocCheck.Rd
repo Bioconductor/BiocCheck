@@ -82,9 +82,10 @@ For example, the following will put the \code{install_out.txt} log file in the
 To use the dot-options, \code{BiocCheck} can be called with named arguments
 corresponding to the options below. Typically, these options are set to
 \code{TRUE} to disable specific checks, e.g.,
-\preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }. Currently,
-setting these options to \code{FALSE} has no effect as most of the code only
-checks whether the value is unset, i.e. \code{NULL}. The available options are:
+\preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }. Unless
+otherwise stated, these options can be left unset (i.e., \code{NULL}) to enable
+checks but \code{FALSE} can also be used to explicitly enable them. The available
+options are:
 \itemize{
 \item \code{build-output-file}: file containing \verb{R CMD build} output, for
 additional analysis
