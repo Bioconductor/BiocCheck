@@ -41,7 +41,7 @@
 #' setting these options to `FALSE` has no effect as most of the code only
 #' checks whether the value is unset, i.e. `NULL`. The available options are:
 #'
-#'   * `build-output-file`: file containing R CMD build output, for
+#'   * `build-output-file`: file containing `R CMD build` output, for
 #'     additional analysis
 #'   * `new-package`:  enable checks specific to new packages
 #'   * `no-check-bbs`: disable BBS-specific checks (for non-BioC packages).

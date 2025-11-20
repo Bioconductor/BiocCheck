@@ -88,7 +88,7 @@ corresponding to the options below. Typically, these options are set to
 setting these options to \code{FALSE} has no effect as most of the code only
 checks whether the value is unset, i.e. \code{NULL}. The available options are:
 \itemize{
-\item \code{build-output-file}: file containing R CMD build output, for
+\item \code{build-output-file}: file containing \verb{R CMD build} output, for
 additional analysis
 \item \code{new-package}:  enable checks specific to new packages
 \item \code{no-check-bbs}: disable BBS-specific checks (for non-BioC packages).
