@@ -509,7 +509,7 @@ checkNEWS <- function(pkgdir)
     tryCatch({
         res <- suppressWarnings(newsextract(news))
         if (is.null(res) || !inherits(res, "news_db"))
-            error("news() failed to parse news file: ", newsPath)
+            stop("news() failed to parse news file: ", newsPath)
     }, error=function(e){
         handleWarning(
             "news(package='", basename(pkgdir), "') failed with news file: ",
