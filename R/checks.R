@@ -737,7 +737,7 @@ checkIsPackageNameAlreadyInUse <- function(
 #' @importFrom httr2 req_body_form resp_status resp_body_html
 checkForBiocDevelSubscription <- function(.BiocPackage)
 {
-    email <- getMaintainerEmail(.BiocPackage)
+    email <- getMaintainerEmail(.BiocPackage) |> tolower()
     if (is.null(email)) {
         handleError(
             "Unable to determine maintainer email from DESCRIPTION file.",
@@ -745,7 +745,7 @@ checkForBiocDevelSubscription <- function(.BiocPackage)
         )
         return()
     }
-    if (identical(tolower(email), "maintainer@bioconductor.org")) {
+    if (identical(email, "maintainer@bioconductor.org")) {
         handleMessage("Maintainer email is ok.")
         return()
     }
@@ -790,7 +790,7 @@ checkForBiocDevelSubscription <- function(.BiocPackage)
 
 checkForSupportSiteRegistration <- function(.BiocPackage)
 {
-    email <- getMaintainerEmail(.BiocPackage)
+    email <- getMaintainerEmail(.BiocPackage) |> tolower()
     if (is.null(email)) {
         handleError(
             "Unable to determine maintainer email from DESCRIPTION file.",
@@ -837,6 +837,8 @@ checkSupportReg <- function(email){
 
 checkWatchedTag <- function(email, pkgname){
 
+    if (identical(email, "maintainer@bioconductor.org"))
+        return()
     url <- paste0("https://support.bioconductor.org/api/watched/tags/", email)
     response <- try(
         req_perform(request(url)), silent = TRUE
