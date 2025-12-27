@@ -30,6 +30,7 @@ Imports:
     callr,
     cli,
     codetools,
+    commonmark,
     graph,
     httr2,
     knitr,
@@ -37,7 +38,8 @@ Imports:
     rvest,
     stringdist,
     tools,
-    utils
+    utils,
+    xml2
 Suggests: 
     BiocStyle,
     devtools,
