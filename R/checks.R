@@ -513,7 +513,7 @@ checkNEWS <- function(pkgdir)
     }, error=function(e){
         handleWarning(
             "news(package='", basename(pkgdir), "') failed with news file: ",
-            newsPath, ".",
+            newsPath, ":", e$message,
             "\nRefer to https://contributions.bioconductor.org/news.html",
             " to be included in Bioconductor release announcements."
         )
