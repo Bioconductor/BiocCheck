@@ -394,11 +394,8 @@ doesManPageHaveRunnableExample <- function(rd)
 
 .getYAMLfront <- function(lines) {
     fm_idx <- grep("^---\\s*$", lines)
-    if (length(fm_idx) && !identical(length(fm_idx), 2L))
-        stop("More than 2 YAML front matter delimiters, i.e., '---' found")
-    if (length(fm_idx))
-        lines <- lines[seq(min(fm_idx), max(fm_idx))]
-    lines
+    if (length(fm_idx) && length(fm_idx) >= 2L)
+        lines[seq(fm_idx[1L], fm_idx[2L])]
 }
 
 .isNULLorFALSE <- function(x) {
