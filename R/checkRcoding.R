@@ -275,6 +275,45 @@ checkSingleColon <- function(.BiocPackage, avail_pkgs = character(0L)) {
     Map(seq, startHit, endHit)
 }
 
+.findMinNext <- function(tokens, after, cname = c("token", "text"), cvalue) {
+    cname <- match.arg(cname)
+    which(
+        seq_len(nrow(tokens)) > after &
+            tokens[, cname] == cvalue
+    ) |>
+        min()
+}
+
+.getSigRange <- function(tokens, signalers, bracket) {
+    opar <- which(tokens[, "text"] == bracket)
+    lapply(
+        signalers, function(x) {
+            next_opar <- opar[opar > x]
+            if (length(next_opar)) {
+                startSig <- min(next_opar)
+                parnum <- tokens[startSig, "parent"]
+                endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+            } else {
+                sigFun <- .findMinNext(
+                    tokens, x, "token", "FUNCTION"
+                )
+                parnum <- tokens[sigFun, "parent"]
+                endFun <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+
+                startSig <- .findMinNext(
+                    tokens, after = endFun, "token", "SYMBOL_FUNCTION_CALL"
+                ) |>
+                    .findMinNext(
+                        tokens, after = _, "text", "("
+                    )
+                parnum <- tokens[startSig, "parent"]
+                endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
+            }
+            seq(startSig, endSig)
+        }
+    )
+}
+
 .findSymbolRanges <-
     function(tokens, symbols, tokenType = "SYMBOL_FUNCTION_CALL", isExp = FALSE)
 {
@@ -283,11 +322,9 @@ checkSingleColon <- function(.BiocPackage, avail_pkgs = character(0L)) {
         txt %in% symbols & tokens[, "token"] == tokenType
     )
     openBracket <- if (isExp) "{" else "("
-    opar <- which(txt == openBracket)
-    startSig <- vapply(signalers, function(x) min(opar[opar > x]), numeric(1L))
-    parnum <- tokens[startSig, "parent"]
-    endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
-    Map(seq, startSig, endSig)
+    .getSigRange(
+        tokens, signalers, openBracket
+    )
 }
 
 .findInSignaler <- function(rfile, symbols, FUN, ...) {
