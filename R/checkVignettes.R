@@ -456,7 +456,7 @@ checkDupChunkLabels <- function(vigfiles) {
             if (viglist[[vfile]])
                 invisible(NULL)
             else
-                stop(e)
+                warning(e)
         })
     }
     if (any(viglist))
