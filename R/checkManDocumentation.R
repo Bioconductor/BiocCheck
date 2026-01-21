@@ -98,8 +98,6 @@ checkForPromptComments <- function(.BiocPackage) {
 
 checkForValueSection <- function(.BiocPackage) {
     all_rds <- .read_all_rds(.BiocPackage$manSources, .BiocPackage$usesRdpack)
-    if  (!length(all_rds))
-        return(invisible())
     all_tags <- lapply(all_rds, .RdTags)
     docTypes <- mapply(docType, rd = all_rds, tags = all_tags, SIMPLIFY = FALSE)
     hasUsage <- vapply(
@@ -119,7 +117,8 @@ checkForValueSection <- function(.BiocPackage) {
         rd = all_rds,
         tags = all_tags,
         SIMPLIFY = TRUE
-    )
+    ) |>
+        as.logical()
     docTypes[isInternal] <- "internal"
     isData <- docTypes == "data"
     docTypes[!lengths(docTypes) | (hasUsage & !isInternal & !isData)] <- "fun"
