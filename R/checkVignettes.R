@@ -299,19 +299,22 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         vignetteType,
         qmd = ,
         rmd = "^[\t >]*```+\\s*$",
-        rnw = "\\\\begin\\{verbatim\\}"
+        rnw = "\\\\begin\\{verbatim\\}",
+        rhtml = "^<!--\\s*begin\\.rcode.*eval\\s*=\\s*F(ALSE)?"
     )
     chunk_patterns_start <- switch(
         vignetteType,
         qmd = "^```\\{r\\}",
         rmd = knitr::all_patterns[["md"]]$chunk.begin,
-        rnw = knitr::all_patterns[["rnw"]]$chunk.begin
+        rnw = knitr::all_patterns[["rnw"]]$chunk.begin,
+        rhtml = "^<!--\\s*begin\\.rcode"
     )
     chunk_patterns_end <- switch(
         vignetteType,
         qmd = ,
         rmd = knitr::all_patterns[["md"]]$chunk.end,
-        rnw = knitr::all_patterns[["rnw"]]$chunk.end
+        rnw = knitr::all_patterns[["rnw"]]$chunk.end,
+        rhtml = "^end\\.rcode\\s*-->"
     )
 
     chunk_starts <- grep(chunk_patterns_start, lines)
@@ -335,7 +338,7 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
             }
         }
         irregular_non_eval_chunks <- chunk_ends
-    } else if (identical(vignetteType, "rnw")) {
+    } else if (vignetteType %in% c("rnw", "rhtml")) {
         irregular_non_eval_chunks <- grep(non_eval_pattern, lines)
     } else {
         stop("Unknown vignette type: ", vignetteType)
@@ -363,7 +366,7 @@ checkVigChunkEval <- function(vigdircontents)
         function(file) {
             lines <- readLines(file, warn=FALSE)
             vigExt <- tolower(tools::file_ext(file))
-            if (!vigExt %in% c("rmd", "qmd", "rnw"))
+            if (!vigExt %in% c("rmd", "qmd", "rnw", "rhtml"))
                 .EVAL_CHUNKS_SENTINEL
             else
                 detect_non_eval_chunks(lines, vigExt)
@@ -466,19 +469,23 @@ checkDupChunkLabels <- function(vigfiles) {
         )
 }
 
-.hasAllChunkLabels <- function(viglines, type = c("rmd", "rnw", "qmd")) {
+.hasAllChunkLabels <- function(
+    viglines, type = c("rmd", "rnw", "qmd", "rhtml")
+) {
     type <- match.arg(type)
     pattern <- switch(
         type,
         qmd = ,
         rmd = "^```\\{r",
         rnw = "^<<([^,>\\s]+)",
+        rhtml = "^<!--\\s*begin.rcode"
     )
     sub <- switch(
         type,
         rmd = "```\\{r\\s([^,\\}]+).*\\}",
         rnw = "^<<\\s*([\\w-]+)\\s*(?:,.*)?>>=$",
-        qmd = "#\\| label:"
+        qmd = "#\\| label:",
+        rhtml = "^<!--\\s*begin\\.rcode\\s+(?![^,]*=)([a-zA-Z0-9_-]+),?\\s*"
     )
     matches <- grep(pattern, viglines, value = TRUE)
     if (!length(matches))
@@ -487,7 +494,9 @@ checkDupChunkLabels <- function(vigfiles) {
         labelIdx <- grep(sub, viglines)
         length(labelIdx) >= length(matches)
     } else {
-        all(grepl(sub, matches))
+        all(
+            grepl(sub, matches, perl = TRUE)
+        )
     }
 }
 
