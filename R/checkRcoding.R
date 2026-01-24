@@ -268,11 +268,9 @@ checkSingleColon <- function(.BiocPackage, avail_pkgs = character(0L)) {
     found <- Reduce(`|`, found)
     hits <- which(found & tokens[, "token"] == tokenType)
     openBracket <- if (isExp) "{" else "("
-    opar <- which(txt == openBracket)
-    startHit <- vapply(hits, function(x) min(opar[opar > x]), numeric(1L))
-    parnum <- tokens[startHit, "parent"]
-    endHit <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
-    Map(seq, startHit, endHit)
+    .getSigRange(
+        tokens, hits, openBracket
+    )
 }
 
 .findMinNext <- function(tokens, after, cname = c("token", "text"), cvalue) {
@@ -284,6 +282,7 @@ checkSingleColon <- function(.BiocPackage, avail_pkgs = character(0L)) {
         min()
 }
 
+#' @importFrom BiocBaseUtils isScalarNumber
 .getSigRange <- function(tokens, signalers, bracket) {
     opar <- which(tokens[, "text"] == bracket)
     lapply(
@@ -309,7 +308,10 @@ checkSingleColon <- function(.BiocPackage, avail_pkgs = character(0L)) {
                 parnum <- tokens[startSig, "parent"]
                 endSig <- nrow(tokens) - match(parnum, rev(tokens[, "parent"]))
             }
-            seq(startSig, endSig)
+            if (!isScalarNumber(startSig) || !isScalarNumber(endSig))
+                integer(0L)
+            else
+                seq(startSig, endSig)
         }
     )
 }
