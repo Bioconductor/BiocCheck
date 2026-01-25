@@ -708,6 +708,37 @@ msg <- BiocCheck:::checkEqInAssignment(
 expect_equivalent(length(msg), 3)
 .BiocCheck$zero()
 
+
+# checkVignetteDir for Rhtml ----------------------------------------------
+temp_dir <- tempfile()
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    description = list(
+        VignetteBuilder="knitr", Suggests="knitr,rmarkdown"
+    ),
+    extraActions = function(pkgpath) {
+        vigdir <- file.path(pkgpath, "vignettes")
+        if (!dir.exists(vigdir))
+            dir.create(vigdir, recursive = TRUE)
+        file.copy(
+            system.file(
+                "testfiles", "test.Rhtml",
+                package = "BiocCheck", mustWork = TRUE
+            ),
+            file.path(vigdir, "test.Rhtml")
+        )
+    }
+)
+checkVignetteDir(.bioctest)
+expect_equivalent(
+    length(.BiocCheck$get("note")[["checkChunkLabels"]]), 3
+)
+checkCounter(
+    "Rhtml vignette missing chunk labels didn't cause note!",
+    "note"
+)
+.BiocCheck$zero()
+
 # checkVigInstalls --------------------------------------------------------
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkVigInstalls(.bioctest)

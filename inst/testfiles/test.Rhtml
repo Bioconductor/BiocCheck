@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>test</title>
+</head>
+<body>
+<!--
+%\VignetteEngine{knitr::knitr}
+%\VignetteIndexEntry{test}
+%\VignettePackage{test}
+-->
+
+<!--begin.rcode setup, results='hide', echo=FALSE, message=FALSE, warning=FALSE
+set.seed(42)
+library(knitr)
+opts_knit$set(
+    self.contained = TRUE,
+    upload.fun = image_uri
+)
+opts_chunk$set(
+    dev = 'png',
+    dpi = 300,
+    out.width = "700px",
+    out.height = "700px"
+)
+end.rcode-->
+
+<h1>test</h1>
+<h4 style='text-align:center'><em>test author</em></h4>
+
+<h2>Installation</h2>
+
+<p>Before installing, please make sure you have the latest version of R and
+<a href="http://bioconductor.org/">Bioconductor</a> installed.</p>
+
+<p>To install start R and enter:</p>
+<!--begin.rcode eval=FALSE
+if (!requireNamespace("BiocManager", quietly = TRUE))
+    install.packages("BiocManager")
+BiocManager::install("test")
+end.rcode-->
+
+<!--begin.rcode addtest
+1 + 2
+end.rcode-->
+
+<!--begin.rcode sessionInfo
+sessionInfo()
+end.rcode-->
+
+</body>
+</html>
