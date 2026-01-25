@@ -168,7 +168,7 @@ checkVigMetadata <- function(vigdircontents)
 {
     badVig <- character(0)
     vigExt <- tolower(tools::file_ext(vigdircontents))
-    dx <- which(vigExt != "rnw")
+    dx <- which(!vigExt %in% c("rnw", "rhtml"))
     vigdircontents <- vigdircontents[dx]
     for (file in vigdircontents) {
         lines <- readLines(file, n=100L, warn=FALSE)
