@@ -729,7 +729,7 @@ temp_dir <- tempfile()
         )
     }
 )
-checkVignetteDir(.bioctest)
+BiocCheck:::checkVignetteDir(.bioctest)
 expect_equivalent(
     length(.BiocCheck$get("note")[["checkChunkLabels"]]), 3
 )
