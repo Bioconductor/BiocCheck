@@ -341,11 +341,14 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
     }
 
     list(
-        total = sum(length(chunk_starts), non_eval_chunk_lines),
-        eval_false = sum(length(eval_false_lines), non_eval_chunk_lines),
-        non_eval = sum(non_eval_chunk_lines)
+        total = c(length(chunk_starts), non_eval_chunk_lines),
+        eval_false = c(length(eval_false_lines), non_eval_chunk_lines),
+        non_eval = non_eval_chunk_lines
     ) |>
-        lapply(as.integer)
+        lapply(
+            function(values)
+                as.integer(sum(values))
+        )
 }
 
 .CHUNKS_SENTINEL <- list(
