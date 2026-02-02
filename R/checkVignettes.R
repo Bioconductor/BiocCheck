@@ -300,7 +300,7 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         qmd = "^[\t >]*```+\\{\\{r\\s*\\w*\\}\\}$",
         rmd = "^[\t >]*```+\\s*$",
         rnw = "\\\\begin\\{verbatim\\}",
-        rhtml = "^<!--\\s*begin\\.rcode.*eval\\s*=\\s*F(ALSE)?"
+        rhtml = "$.^"
     )
     non_eval_chunk_lines <- grep(non_eval_pattern, lines)
     chunk_patterns_end <- switch(
@@ -312,11 +312,13 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
     )
     chunk_ends <- grep(chunk_patterns_end, lines)
 
-    for (i in seq_along(non_eval_chunk_lines)) {
-        next_end_index <-
-            which(chunk_ends > non_eval_chunk_lines[i])[1L]
-        if (!is.na(next_end_index))
-            chunk_ends <- chunk_ends[-next_end_index]
+    if (!identical(vignetteType, "rmd")) {
+        for (i in seq_along(non_eval_chunk_lines)) {
+            next_end_index <-
+                which(chunk_ends > non_eval_chunk_lines[i])[1L]
+            if (!is.na(next_end_index))
+                chunk_ends <- chunk_ends[-next_end_index]
+        }
     }
 
     chunk_patterns_start <- switch(
@@ -326,24 +328,35 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         rnw = knitr::all_patterns[["rnw"]]$chunk.begin,
         rhtml = knitr::all_patterns[["html"]]$chunk.begin
     )
-    chunk_starts <- grep(chunk_patterns_start, lines)
+    chunk_starts <- setdiff(
+        grep(chunk_patterns_start, lines), non_eval_chunk_lines
+    )
 
     for (i in seq_along(chunk_starts)) {
         next_end_index <- which(chunk_ends > chunk_starts[i])[1L]
-        if (!is.na(next_end_index))
+        if (!is.na(next_end_index)) {
+            if (identical(vignetteType, "rmd"))
+                non_eval_chunk_lines <- non_eval_chunk_lines[
+                    non_eval_chunk_lines != chunk_ends[next_end_index]
+                ]
             chunk_ends <- chunk_ends[-next_end_index]
+        }
     }
+    if (length(chunk_ends) && identical(vignetteType, "rmd"))
+        non_eval_chunk_lines <- chunk_ends[c(TRUE, FALSE)]
 
-    if (identical(vignetteType, "qmd")) {
+    eval_false_lines <- 0L
+    if (identical(vignetteType, "qmd"))
         eval_false_lines <- grep("#\\|\\s*eval\\s*:\\s*F(ALSE)?", lines, TRUE)
-    } else {
-        eval_false_lines <- non_eval_chunk_lines
-    }
+    else
+        eval_false_lines <- grep(
+            "eval\\s*=\\s*F(ALSE)?", lines[chunk_starts], TRUE
+        )
 
     list(
-        total = c(length(chunk_starts), non_eval_chunk_lines),
-        eval_false = c(length(eval_false_lines), non_eval_chunk_lines),
-        non_eval = non_eval_chunk_lines
+        total = c(length(chunk_starts), length(non_eval_chunk_lines)),
+        eval_false = length(eval_false_lines),
+        non_eval = length(non_eval_chunk_lines)
     ) |>
         lapply(
             function(values)
