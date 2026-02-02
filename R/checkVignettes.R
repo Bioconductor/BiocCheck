@@ -351,16 +351,17 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
     }
 
     list(
-        chunks = length(chunk_starts) + length(irregular_non_eval_chunks),
-        efs = length(eval_false_lines),
-        noneval = length(irregular_non_eval_chunks)
-    )
+        total = sum(length(chunk_starts), non_eval_chunk_lines),
+        eval_false = sum(length(eval_false_lines), non_eval_chunk_lines),
+        non_eval = sum(non_eval_chunk_lines)
+    ) |>
+        lapply(as.integer)
 }
 
-.EVAL_CHUNKS_SENTINEL <- list(
-    chunks = 0L,
-    efs = 0L,
-    noneval = 0L
+.CHUNKS_SENTINEL <- list(
+    total = 0L,
+    eval_false = 0L,
+    non_eval = 0L
 )
 
 checkVigChunkEval <- function(vigdircontents)
@@ -371,7 +372,7 @@ checkVigChunkEval <- function(vigdircontents)
             lines <- readLines(file, warn=FALSE)
             vigExt <- tolower(tools::file_ext(file))
             if (!vigExt %in% c("rmd", "qmd", "rnw", "rhtml"))
-                .EVAL_CHUNKS_SENTINEL
+                .CHUNKS_SENTINEL
             else
                 detect_non_eval_chunks(lines, vigExt)
         }
@@ -380,26 +381,28 @@ checkVigChunkEval <- function(vigdircontents)
     combined <- Reduce(
         function(x, y) {
             list(
-                chunks = x$chunks + y$chunks,
-                efs = x$efs + y$efs,
-                noneval = x$noneval + y$noneval
+                total = x$total + y$total,
+                eval_false = x$eval_false + y$eval_false,
+                non_eval = x$non_eval + y$non_eval
             )
-        }, results, init = .EVAL_CHUNKS_SENTINEL
+        },
+        results,
+        init = .CHUNKS_SENTINEL
     )
 
-    totnon <- combined$efs + combined$noneval
+    totnon <- combined$eval_false + combined$non_eval
     percent <-
-        if (!combined$chunks && !totnon)
+        if (!combined$total && !totnon)
             0L
         else
-            as.integer((totnon * 100 / combined$chunks))
+            as.integer((totnon * 100 / combined$total))
 
     if (percent >= 50) {
         handleWarning("Evaluate more vignette chunks.")
         msg <- sprintf(
             "%s out of %s code chunks = %i%% unevaluated",
             totnon,
-            combined$chunks,
+            combined$total,
             percent
         )
         handleMessage(msg, indent = 8)
