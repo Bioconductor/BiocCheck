@@ -302,13 +302,8 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         rnw = "\\\\begin\\{verbatim\\}",
         rhtml = "^<!--\\s*begin\\.rcode.*eval\\s*=\\s*F(ALSE)?"
     )
-    chunk_patterns_start <- switch(
-        vignetteType,
-        qmd = "^```\\{r\\}",
-        rmd = knitr::all_patterns[["md"]]$chunk.begin,
-        rnw = knitr::all_patterns[["rnw"]]$chunk.begin,
-        rhtml = "^<!--\\s*begin\\.rcode"
-    )
+    non_eval_chunk_lines <- grep(non_eval_pattern, lines)
+    ## find the end of the non-eval chunks
     chunk_patterns_end <- switch(
         vignetteType,
         qmd = ,
@@ -316,32 +311,33 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         rnw = knitr::all_patterns[["rnw"]]$chunk.end,
         rhtml = knitr::all_patterns[["html"]]$chunk.end
     )
-
-    chunk_starts <- grep(chunk_patterns_start, lines)
-    ## find all potential chunk ends
+    ## find all chunk ends
     chunk_ends <- grep(chunk_patterns_end, lines)
 
-    non_eval_chunk_lines <- grep(non_eval_pattern, lines)
+    for (i in seq_along(non_eval_chunk_lines)) {
+        # Find the next end marker after this start
+        next_end_index <-
+            which(chunk_ends > non_eval_chunk_lines[i])[1L]
+        # Remove this end from further consideration
+        if (!is.na(next_end_index))
+            assign("chunk_ends", chunk_ends[-next_end_index])
+    }
 
-    if (vignetteType %in% c("rmd", "qmd")) {
-        matched_chunk_ends <- integer(0L)
-        irregular_non_eval_chunks <- integer(0L)
-        for (i in seq_along(chunk_starts)) {
-            # Find the next end marker after this start
-            next_end_index <- which(chunk_ends > chunk_starts[i])[1L]
+    chunk_patterns_start <- switch(
+        vignetteType,
+        qmd =  "^[\t >]*```+\\s*\\{r",
+        rmd = knitr::all_patterns[["md"]]$chunk.begin,
+        rnw = knitr::all_patterns[["rnw"]]$chunk.begin,
+        rhtml = knitr::all_patterns[["html"]]$chunk.begin
+    )
+    chunk_starts <- grep(chunk_patterns_start, lines)
 
-            if (!is.na(next_end_index)) {
-                matched_chunk_ends <-
-                    c(matched_chunk_ends, chunk_ends[next_end_index])
-                # Remove this end from further consideration
-                chunk_ends <- chunk_ends[-next_end_index]
-            }
+    for (i in seq_along(chunk_starts)) {
+        # Find the next end marker after this start
+        next_end_index <- which(chunk_ends > chunk_starts[i])[1L]
+        if (!is.na(next_end_index)) {
+            assign("chunk_ends", chunk_ends[-next_end_index])
         }
-        irregular_non_eval_chunks <- chunk_ends
-    } else if (vignetteType %in% c("rnw", "rhtml")) {
-        irregular_non_eval_chunks <- grep(non_eval_pattern, lines)
-    } else {
-        stop("Unknown vignette type: ", vignetteType)
     }
 
     if (identical(vignetteType, "qmd")) {
