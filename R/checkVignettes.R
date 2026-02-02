@@ -344,7 +344,11 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         stop("Unknown vignette type: ", vignetteType)
     }
 
-    eval_false_lines <- grep("eval\\s*=\\s*F(ALSE)?", lines[chunk_starts])
+    if (identical(vignetteType, "qmd")) {
+        eval_false_lines <- grep("#\\|\\s*eval\\s*:\\s*F(ALSE)?", lines, TRUE)
+    } else {
+        eval_false_lines <- non_eval_chunk_lines
+    }
 
     list(
         chunks = length(chunk_starts) + length(irregular_non_eval_chunks),
