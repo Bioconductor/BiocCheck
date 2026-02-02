@@ -316,7 +316,7 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         next_end_index <-
             which(chunk_ends > non_eval_chunk_lines[i])[1L]
         if (!is.na(next_end_index))
-            assign("chunk_ends", chunk_ends[-next_end_index])
+            chunk_ends <- chunk_ends[-next_end_index]
     }
 
     chunk_patterns_start <- switch(
@@ -330,9 +330,8 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
 
     for (i in seq_along(chunk_starts)) {
         next_end_index <- which(chunk_ends > chunk_starts[i])[1L]
-        if (!is.na(next_end_index)) {
-            assign("chunk_ends", chunk_ends[-next_end_index])
-        }
+        if (!is.na(next_end_index))
+            chunk_ends <- chunk_ends[-next_end_index]
     }
 
     if (identical(vignetteType, "qmd")) {
