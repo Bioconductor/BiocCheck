@@ -314,7 +314,7 @@ detect_non_eval_chunks <- function(lines, vignetteType) {
         qmd = ,
         rmd = knitr::all_patterns[["md"]]$chunk.end,
         rnw = knitr::all_patterns[["rnw"]]$chunk.end,
-        rhtml = "^end\\.rcode\\s*-->"
+        rhtml = knitr::all_patterns[["html"]]$chunk.end
     )
 
     chunk_starts <- grep(chunk_patterns_start, lines)
