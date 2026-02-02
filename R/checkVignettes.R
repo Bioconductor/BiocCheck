@@ -297,7 +297,7 @@ checkVigTemplate <- function(vigdircontents)
 detect_non_eval_chunks <- function(lines, vignetteType) {
     non_eval_pattern <- switch(
         vignetteType,
-        qmd = ,
+        qmd = "^[\t >]*```+\\{\\{r\\s*\\w*\\}\\}$",
         rmd = "^[\t >]*```+\\s*$",
         rnw = "\\\\begin\\{verbatim\\}",
         rhtml = "^<!--\\s*begin\\.rcode.*eval\\s*=\\s*F(ALSE)?"
