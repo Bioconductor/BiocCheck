@@ -61,7 +61,7 @@ vignette also provides detailed explanations of all the checks performed by
 where \code{package} points to the source directory or the \code{.tar.gz}
 tarball that was created using \verb{R CMD build}.
 
-\emph{Note} that \code{BiocCheck} is complementary to \verb{R CMD check}.
+\strong{Note} that \code{BiocCheck} is complementary to \verb{R CMD check}.
 \verb{R CMD check} should always be run first for best results.
 
 To skip installation of the package during the check, set the

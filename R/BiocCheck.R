@@ -17,7 +17,7 @@
 #' where `package` points to the source directory or the `.tar.gz`
 #' tarball that was created using `R CMD build`.
 #'
-#' \emph{Note} that `BiocCheck` is complementary to `R CMD check`.
+#' **Note** that `BiocCheck` is complementary to `R CMD check`.
 #' `R CMD check` should always be run first for best results.
 #'
 #' To skip installation of the package during the check, set the
