@@ -45,7 +45,7 @@ cli_note <- function(...) {
 #'
 #' @importFrom BiocBaseUtils selectSome
 #'
-#' @seealso \link{BiocCheck-class} \link{BiocPackage-class}
+#' @seealso [BiocCheck-class], [BiocPackage-class]
 #'
 #' @return `.MessageCondition`: An internal `R5` Reference Class to handle
 #'   messages and their conditions, e.g., for errors, warnings, or notes.

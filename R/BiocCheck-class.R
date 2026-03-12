@@ -104,7 +104,7 @@
 #' @return An internal `BiocCheck` R5 Reference Class used to document
 #'   conditions such as errors, warnings, and notes
 #'
-#' @seealso \link{Message-class}, \link{BiocPackage-class}
+#' @seealso [Message-class], [BiocPackage-class]
 #'
 #' @examples
 #'

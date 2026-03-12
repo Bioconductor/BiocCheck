@@ -45,6 +45,6 @@ with conditions raised by a check}
 }
 
 \seealso{
-\link{BiocCheck-class} \link{BiocPackage-class}
+\linkS4class{BiocCheck}, \linkS4class{BiocPackage}
 }
 \keyword{internal}

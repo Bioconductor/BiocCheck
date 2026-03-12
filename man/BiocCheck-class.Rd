@@ -117,5 +117,5 @@ bc <- BiocCheck:::.BiocCheck
 
 }
 \seealso{
-\link{Message-class}, \link{BiocPackage-class}
+\linkS4class{Message}, \linkS4class{BiocPackage}
 }

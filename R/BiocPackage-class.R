@@ -85,7 +85,7 @@
 #' * `getPackageVersion`: Get the package version
 #' * `untarTarball`: Untar the source tarball
 #'
-#' @seealso \link{BiocCheck-class}, \link{Message-class}
+#' @seealso [BiocCheck-class], [Message-class]
 #' @examples
 #'
 #' # Create a BiocPackage object

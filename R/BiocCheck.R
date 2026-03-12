@@ -117,7 +117,7 @@
 #' @author Dan Tenenbaum, Lori Shepherd, and Marcel Ramos
 #'
 #' @references \url{https://contributions.bioconductor.org}
-#' @seealso \link{BiocCheck-class}, \link{Message-class}
+#' @seealso [BiocCheck-class], [Message-class]
 #'
 #' @examples
 #'

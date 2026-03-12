@@ -109,6 +109,6 @@ if (dir.exists(packageDirectory))
 
 }
 \seealso{
-\link{BiocCheck-class}, \link{Message-class}
+\linkS4class{BiocCheck}, \linkS4class{Message}
 }
 \keyword{internal}

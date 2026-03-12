@@ -57,7 +57,7 @@ hidden_file_data <- data.frame(
 #' @author Lori Shepherd
 #'
 #' @references \url{https://contributions.bioconductor.org}
-#' @seealso \link{BiocCheck-class}
+#' @seealso [BiocCheck-class]
 #'
 #' @examples
 #'
