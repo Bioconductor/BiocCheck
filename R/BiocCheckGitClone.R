@@ -33,8 +33,8 @@ hidden_file_data <- data.frame(
 #' writing Bioconductor software. This function should only be run on a source
 #' directory and not on a tarball.
 #'
-#' `BiocCheckGitClone` is called within R with, as \preformatted{
-#' BiocCheckGitClone(<package>) } where `package` is the source directory
+#' `BiocCheckGitClone` is called within R with, as
+#' `BiocCheckGitClone("package")` where `package` is the source directory
 #' containing the `R` package.
 #'
 #' @param package A directory containing an R source package. Not a package tar

@@ -36,8 +36,8 @@ Bioconductor package guidelines and best practices. See
 writing Bioconductor software. This function should only be run on a source
 directory and not on a tarball.
 
-\code{BiocCheckGitClone} is called within R with, as \preformatted{
-BiocCheckGitClone(<package>) } where \code{package} is the source directory
+\code{BiocCheckGitClone} is called within R with, as
+\code{BiocCheckGitClone("package")} where \code{package} is the source directory
 containing the \code{R} package.
 }
 \examples{

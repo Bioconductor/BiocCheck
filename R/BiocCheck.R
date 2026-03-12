@@ -13,8 +13,8 @@
 #' vignette also provides detailed explanations of all the checks performed by
 #' `BiocCheck`.
 #'
-#' `BiocCheck` is called within R with \preformatted{ BiocCheck(<package>)
-#' } where `package` points to the source directory or the `.tar.gz`
+#' `BiocCheck` is called within R with `BiocCheck("package")`
+#' where `package` points to the source directory or the `.tar.gz`
 #' tarball that was created using `R CMD build`.
 #'
 #' \emph{Note} that `BiocCheck` is complementary to `R CMD check`.
@@ -31,13 +31,13 @@
 #' to the name of the installation log file.
 #' For example, the following will put the `install_out.txt` log file in the
 #' `<package_name>.BiocCheck` directory:
-#' \preformatted{ BiocCheck(package, install="check:install_out.txt") }
+#' `BiocCheck(package, install="check:install_out.txt")`
 #'
 #' @section dot-options:
 #' To use the dot-options, `BiocCheck` can be called with named arguments
 #' corresponding to the options below. Typically, these options are set to
 #' `TRUE` to disable specific checks, e.g.,
-#' \preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }. Unless
+#' `BiocCheck(package, 'no-check-vignettes'=TRUE)`. Unless
 #' otherwise stated, these options can be left unset (i.e., `NULL`) to enable
 #' checks but `FALSE` can also be used to explicitly enable them. The available
 #' options are:

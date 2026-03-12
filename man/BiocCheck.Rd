@@ -57,8 +57,8 @@ can be seen in the vignette and pages in the \code{references} section. The
 vignette also provides detailed explanations of all the checks performed by
 \code{BiocCheck}.
 
-\code{BiocCheck} is called within R with \preformatted{ BiocCheck(<package>)
-} where \code{package} points to the source directory or the \code{.tar.gz}
+\code{BiocCheck} is called within R with \code{BiocCheck("package")}
+where \code{package} points to the source directory or the \code{.tar.gz}
 tarball that was created using \verb{R CMD build}.
 
 \emph{Note} that \code{BiocCheck} is complementary to \verb{R CMD check}.
@@ -75,14 +75,14 @@ To re-use an existing installation log file, set the \code{install} option
 to the name of the installation log file.
 For example, the following will put the \code{install_out.txt} log file in the
 \verb{<package_name>.BiocCheck} directory:
-\preformatted{ BiocCheck(package, install="check:install_out.txt") }
+\code{BiocCheck(package, install="check:install_out.txt")}
 }
 \section{dot-options}{
 
 To use the dot-options, \code{BiocCheck} can be called with named arguments
 corresponding to the options below. Typically, these options are set to
 \code{TRUE} to disable specific checks, e.g.,
-\preformatted{ BiocCheck(package, `no-check-vignettes`=TRUE) }. Unless
+\code{BiocCheck(package, 'no-check-vignettes'=TRUE)}. Unless
 otherwise stated, these options can be left unset (i.e., \code{NULL}) to enable
 checks but \code{FALSE} can also be used to explicitly enable them. The available
 options are:
