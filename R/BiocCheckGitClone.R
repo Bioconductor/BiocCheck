@@ -29,7 +29,7 @@ hidden_file_data <- data.frame(
 #'
 #' `BiocCheckGitClone()` reviews R packages for adherence with
 #' Bioconductor package guidelines and best practices. See
-#' \url{https://contributions.bioconductor.org} for the latest guidance for
+#' <https://contributions.bioconductor.org> for the latest guidance for
 #' writing Bioconductor software. This function should only be run on a source
 #' directory and not on a tarball.
 #'
@@ -56,7 +56,7 @@ hidden_file_data <- data.frame(
 #'
 #' @author Lori Shepherd
 #'
-#' @references \url{https://contributions.bioconductor.org}
+#' @references <https://contributions.bioconductor.org>
 #' @seealso [BiocCheck-class]
 #'
 #' @examples

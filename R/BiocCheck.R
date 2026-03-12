@@ -7,7 +7,7 @@
 #'
 #' `BiocCheck()` reviews R packages for adherence with Bioconductor
 #' package guidelines and best practices. See
-#' \url{https://contributions.bioconductor.org} for the latest guidance for
+#' <https://contributions.bioconductor.org> for the latest guidance for
 #' writing Bioconductor software. Some rationale behind these best practices
 #' can be seen in the vignette and pages in the `references` section. The
 #' vignette also provides detailed explanations of all the checks performed by
@@ -116,7 +116,7 @@
 #'
 #' @author Dan Tenenbaum, Lori Shepherd, and Marcel Ramos
 #'
-#' @references \url{https://contributions.bioconductor.org}
+#' @references <https://contributions.bioconductor.org>
 #' @seealso [BiocCheck-class], [Message-class]
 #'
 #' @examples
