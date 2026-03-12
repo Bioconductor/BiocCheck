@@ -22,11 +22,11 @@
 #'
 #' To skip installation of the package during the check, set the
 #' `install` option to `FALSE` or `NULL`:
-#' \preformatted{
+#' ```r
 #' BiocCheck(package, install=FALSE)
 #' ## OR
 #' BiocCheck(package, install=NULL)
-#' }
+#' ```
 #' To re-use an existing installation log file, set the `install` option
 #' to the name of the installation log file.
 #' For example, the following will put the `install_out.txt` log file in the

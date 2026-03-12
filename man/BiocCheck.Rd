@@ -66,11 +66,12 @@ tarball that was created using \verb{R CMD build}.
 
 To skip installation of the package during the check, set the
 \code{install} option to \code{FALSE} or \code{NULL}:
-\preformatted{
-BiocCheck(package, install=FALSE)
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{BiocCheck(package, install=FALSE)
 ## OR
 BiocCheck(package, install=NULL)
-}
+}\if{html}{\out{</div>}}
+
 To re-use an existing installation log file, set the \code{install} option
 to the name of the installation log file.
 For example, the following will put the \code{install_out.txt} log file in the
