@@ -175,7 +175,7 @@ checkCodingPractice <- function(.BiocPackage, parsedCode)
     msg_env <-
         findSymbolsInRFiles(.BiocPackage, "Sys.setenv", "SYMBOL_FUNCTION_CALL")
     if (length(msg_env)) {
-        handleError(
+        handleWarning(
             "Avoid 'Sys.setenv' (found ", length(msg_env), " times)",
             messages = msg_env
         )

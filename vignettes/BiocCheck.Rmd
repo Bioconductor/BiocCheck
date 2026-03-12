@@ -493,7 +493,9 @@ which result in issues of varying severity.
   that are difficult to debug (`NOTE`).
 * **Checking for Sys.setenv calls...**
   Packages should not modify system environment variables with the
-  `Sys.setenv` function (`ERROR`).
+  `Sys.setenv()` function unless, in rare instances, the package has
+  to configure the environment for subsequent `system2()` calls
+  (`WARNING`).
 * **Checking for suppressWarnings/Messages...**
   The excessive use of `suppressWarnings` and `suppressMessages` is
   problematic as it usually indicates a larger underlying issue with
