@@ -179,7 +179,7 @@ checkVigMetadata <- function(vigdircontents)
      if (length(badVig) != 0L){
         handleWarning(
             "Vignette(s) missing Vignette metadata. See ",
-            "http://r-pkgs.had.co.nz/vignettes.html",
+            "https://r-pkgs.org/vignettes.html",
             help_text = "Update the following files:",
             messages = badVig
         )
