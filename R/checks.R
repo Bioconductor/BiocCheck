@@ -809,12 +809,13 @@ checkForSupportSiteRegistration <- function(.BiocPackage)
 }
 
 #' @importFrom httr2 req_perform request resp_body_json
-checkSupportReg <- function(email){
-
-    url <- paste0("https://support.bioconductor.org/api/email/", email)
-    response <- try(
-        req_perform(request(url)), silent = TRUE
-    )
+checkSupportReg <- function(email) {
+    response <- paste0(
+        "https://support.bioconductor.org/api/email/",
+        URLencode(email, reserved = TRUE)
+    ) |> request() |>
+        req_perform() |>
+        try(silent = TRUE)
     response_error <- inherits(response, "try-error")
     result <- !response_error && resp_body_json(response)
     if (response_error) {
@@ -834,13 +835,14 @@ checkSupportReg <- function(email){
 }
 
 checkWatchedTag <- function(email, pkgname){
-
     if (identical(email, "maintainer@bioconductor.org"))
         return()
-    url <- paste0("https://support.bioconductor.org/api/watched/tags/", email)
-    response <- try(
-        req_perform(request(url)), silent = TRUE
-    )
+    response <- paste0(
+        "https://support.bioconductor.org/api/watched/tags/",
+        URLencode(email, reserved = TRUE)
+    ) |> request() |>
+        req_perform() |>
+        try(silent = TRUE)
     if (inherits(response, "try-error")) {
         handleMessage(
             "Unable to find your email in the Support Site:",
