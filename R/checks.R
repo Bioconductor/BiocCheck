@@ -703,13 +703,13 @@ checkIsPackageNameAlreadyInUse <- function(
         CRAN = sprintf(
             "%s/src/contrib/PACKAGES", BiocManager::repositories()[repo]
         ),
-        BioCsoft = "http://bioconductor.org/packages/devel/bioc/VIEWS",
+        BioCsoft = "https://bioconductor.org/packages/devel/bioc/VIEWS",
         BioCann =
-            "http://bioconductor.org/packages/devel/data/annotation/VIEWS",
+            "https://bioconductor.org/packages/devel/data/annotation/VIEWS",
         BioCexp =
-            "http://bioconductor.org/packages/devel/data/experiment/VIEWS",
+            "https://bioconductor.org/packages/devel/data/experiment/VIEWS",
         BioCworkflows =
-            "http://bioconductor.org/packages/devel/workflows/VIEWS",
+            "https://bioconductor.org/packages/devel/workflows/VIEWS",
         BioCbooks =
             "https://bioconductor.org/packages/devel/books/VIEWS"
     )
