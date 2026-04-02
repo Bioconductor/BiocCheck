@@ -421,3 +421,30 @@ doesManPageHaveRunnableExample <- function(rd)
 .isNULLorFALSE <- function(x) {
     is.null(x) || isFALSE(x)
 }
+
+is_valid_author_tree <- function(x) {
+    if (is.null(x) || is.atomic(x))
+        return(TRUE)
+
+    if (is.symbol(x) && !nzchar(as.character(x)))
+        return(TRUE)
+
+    if (is.symbol(x))
+        return(as.character(x) %in% c("c", "person"))
+
+    if (is.call(x)) {
+        func_name <-
+            if (is.call(x[[1L]])) deparse(x[[1L]]) else as.character(x[[1L]])
+
+        if (!func_name %in% c("c", "person"))
+            return(FALSE)
+
+        args <- as.list(x[-1L])
+        return(
+            all(
+                vapply(args, is_valid_author_tree, logical(1L))
+            )
+        )
+    }
+    FALSE
+}
