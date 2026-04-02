@@ -1,6 +1,6 @@
 Package: BiocCheck
 Title: Bioconductor-specific package checks
-Version: 1.47.21
+Version: 1.47.22
 Date: 2026-04-02
 Authors@R: c(
     person("Bioconductor", "Package Maintainer", ,
