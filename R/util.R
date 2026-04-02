@@ -4,35 +4,45 @@
 #' @importFrom codetools walkCode findGlobals
 NULL
 
-.msg <- function(..., appendLF=TRUE, indent=0, exdent=2)
+.msg <- function(..., appendLF = TRUE, indent = 0, exdent = 2)
 {
     contents <- list(...)
     txt <- if (length(contents) != 1L) do.call(sprintf, contents) else contents
-    message(paste(strwrap(txt, indent=indent, exdent=exdent), collapse="\n"),
-        appendLF=appendLF)
+    message(
+        paste(strwrap(txt, indent = indent, exdent = exdent), collapse = "\n"),
+        appendLF = appendLF
+    )
 }
 
-.stop <- function(...) stop(noquote(sprintf(...)), call.=FALSE)
+.stop <- function(...) stop(noquote(sprintf(...)), call. = FALSE)
 
 handleCondition <-
     function(
-        ..., condition, help_text = character(0L),
-        messages = character(0L), nframe = 2L
+        ...,
+        condition,
+        help_text = character(0L),
+        messages = character(0L),
+        nframe = 2L
     )
 {
     msg <- list(paste0(...))
     if (!tolower(condition) %in% c("warning", "error", "note"))
-        stop("<Internal> Designate input with 'warning', 'error', or 'note'.")
+        stop(
+            "<Internal> Designate input with 'warning', 'error', or 'note'."
+        )
     cl <- sys.call(sys.parent(n = nframe))[[1L]]
     ml <- structure(msg, .Names = tail(as.character(cl), 1L))
     .BiocCheck$add(
-        ml, condition = condition, help_text = help_text, messages = messages
+        ml,
+        condition = condition,
+        help_text = help_text,
+        messages = messages
     )
     .BiocCheck$log
 }
 
 #' @importFrom cli symbol
-handleCheck <- function(..., appendLF=TRUE)
+handleCheck <- function(..., appendLF = TRUE)
 {
     msg <- paste0(...)
     .BiocCheck$setCheck(msg)
@@ -69,7 +79,7 @@ handleNoteFiles <- function(..., help_text = "Found in files:") {
     handleCondition(..., help_text = help_text, condition = "note")
 }
 
-handleMessage <- function(..., indent=4, exdent=6)
+handleMessage <- function(..., indent = 4, exdent = 6)
 {
     msg <- paste0(...)
     cli::cli_alert_info(msg, wrap = TRUE)
@@ -83,12 +93,14 @@ handleMessage <- function(..., indent=4, exdent=6)
     dir.create(libdir <- file.path(install_dir, "lib"))
     file.create(stderr <- file.path(install_dir, "install.stderr"))
 
-    r_libs_user <- paste(c(libdir, .libPaths()), collapse=.Platform$path.sep)
+    r_libs_user <- paste(c(libdir, .libPaths()), collapse = .Platform$path.sep)
     lpath <- paste0("--library=", libdir)
     res <- callr::rcmd_safe(
         "INSTALL",
         c(
-            "--use-vanilla", lpath, pkgpath
+            "--use-vanilla",
+            lpath,
+            pkgpath
         ),
         env = c(callr::rcmd_safe_env(), R_LIBS_USER = r_libs_user)
     )
@@ -103,7 +115,7 @@ handleMessage <- function(..., indent=4, exdent=6)
 # or LinkingTo field and returns a named character
 # vector of Bioconductor dependencies, where the names
 # are version specifiers or blank.
-cleanupDependency <- function(input, remove.R=TRUE)
+cleanupDependency <- function(input, remove.R = TRUE)
 {
     if (is.null(input)) return(character(0))
     if (!nchar(input)) return(character(0))
@@ -115,10 +127,10 @@ cleanupDependency <- function(input, remove.R=TRUE)
     res <- strsplit(output, ",")[[1]]
     for (i in seq_along(nms))
     {
-        if(grepl(">=", nms[i], fixed=TRUE))
+        if (grepl(">=", nms[i], fixed = TRUE))
         {
             tmp <- gsub(".*>=", "", nms[i])
-            tmp <- gsub(")", "", tmp, fixed=TRUE)
+            tmp <- gsub(")", "", tmp, fixed = TRUE)
             namevec[i] <- tmp
         } else {
             namevec[i] <- ''
@@ -148,13 +160,21 @@ get_status_file_cache <- function(url) {
         bfcdownload(x = bfc, rid = bquery[["rid"]], ask = FALSE)
 
     bfcrpath(
-        bfc, rnames = url, exact = TRUE, download = TRUE, rtype = "web"
+        bfc,
+        rnames = url,
+        exact = TRUE,
+        download = TRUE,
+        rtype = "web"
     )
 }
 
 .STATUS_FILE_FIELDS <- c(
-    "Package", "Version", "Maintainer", "MaintainerEmail",
-    "PackageStatus", "UnsupportedPlatforms"
+    "Package",
+    "Version",
+    "Maintainer",
+    "MaintainerEmail",
+    "PackageStatus",
+    "UnsupportedPlatforms"
 )
 
 .SENTINEL_PACKAGE_STATUS <- matrix(
@@ -163,15 +183,17 @@ get_status_file_cache <- function(url) {
 )
 
 .try_read_dcf <- function(file) {
-    pkg_status <- try({
-        read.dcf(
-            file, all = TRUE, fields = .STATUS_FILE_FIELDS
-        )
-    }, silent = TRUE)
-    if (is(pkg_status, "try-error"))
-        .SENTINEL_PACKAGE_STATUS
-    else
-        pkg_status
+    pkg_status <- try(
+        {
+            read.dcf(
+                file,
+                all = TRUE,
+                fields = .STATUS_FILE_FIELDS
+            )
+        },
+        silent = TRUE
+    )
+    if (is(pkg_status, "try-error")) .SENTINEL_PACKAGE_STATUS else pkg_status
 }
 
 get_status_from_dcf <- function(status_file) {
@@ -206,11 +228,15 @@ getAllDeprecatedPkgs <- function()
 .getDirFiles <- function(fpaths) {
     if (!BiocBaseUtils::isCharacter(fpaths, zchar = TRUE, na.ok = TRUE))
         stop("<internal> 'fpaths' input must be a character vector")
-    vapply(fpaths, function(fpath) {
-        if (nzchar(fpath) && !is.na(fpath))
-            fpath <- file.path(basename(dirname(fpath)), basename(fpath))
-        fpath
-    }, character(1L))
+    vapply(
+        fpaths,
+        function(fpath) {
+            if (nzchar(fpath) && !is.na(fpath))
+                fpath <- file.path(basename(dirname(fpath)), basename(fpath))
+            fpath
+        },
+        character(1L)
+    )
 }
 
 .RdTags <- tools:::RdTags
@@ -225,18 +251,25 @@ getBadDeps <- function(pkgdir, lib.loc)
 {
     cmd <- file.path(Sys.getenv("R_HOME"), "bin", "R")
     oldquotes <- getOption("useFancyQuotes")
-    on.exit(options(useFancyQuotes=oldquotes))
-    options(useFancyQuotes=FALSE)
-    args <- sprintf("-q --vanilla --no-echo -f %s --args %s",
-        system.file("script", "checkBadDeps.R", package="BiocCheck"),
-        paste(dQuote(pkgdir), dQuote(lib.loc)))
-    system2(cmd, args, stdout=TRUE, stderr=FALSE,
-        env="R_DEFAULT_PACKAGES=NULL")
+    on.exit(options(useFancyQuotes = oldquotes))
+    options(useFancyQuotes = FALSE)
+    args <- sprintf(
+        "-q --vanilla --no-echo -f %s --args %s",
+        system.file("script", "checkBadDeps.R", package = "BiocCheck"),
+        paste(dQuote(pkgdir), dQuote(lib.loc))
+    )
+    system2(
+        cmd,
+        args,
+        stdout = TRUE,
+        stderr = FALSE,
+        env = "R_DEFAULT_PACKAGES=NULL"
+    )
 }
 
 getVigEngine <- function(vignetteFile) {
-    lines <- readLines(vignetteFile, n=100L, warn=FALSE)
-    vigEngine <- grep(lines, pattern="VignetteEngine", value = TRUE)
+    lines <- readLines(vignetteFile, n = 100L, warn = FALSE)
+    vigEngine <- grep(lines, pattern = "VignetteEngine", value = TRUE)
     vigEngine <- trimws(vigEngine)
     gsub("%\\s*\\\\VignetteEngine\\{(.*)\\}", "\\1", vigEngine)
 }
@@ -285,11 +318,11 @@ getParent <- function(view, biocViewsVocab)
 )
 
 getFunctionLengths <- function(df) {
-    df <- df[df$terminal & df$parent > -1,]
+    df <- df[df$terminal & df$parent > -1, ]
 
     # Identify comment-only lines
     is_comment_only_line <- df$token == "COMMENT" &
-        !(duplicated(df$line1) | duplicated(df$line1, fromLast=TRUE))
+        !(duplicated(df$line1) | duplicated(df$line1, fromLast = TRUE))
 
     # Create a lookup table for comment-only lines
     comment_lines <- unique(df$line1[is_comment_only_line])
@@ -307,17 +340,20 @@ getFunctionLengths <- function(df) {
 
     for (i in seq_len(nrow(funcRows))) {
         funcRowId <- as.integer(rownames(funcRows)[i])
-        funcRow <- funcRows[as.character(funcRowId),]
+        funcRow <- funcRows[as.character(funcRowId), ]
         funcStartLine <- funcRow$line1 # this might get updated later
         funcLines <- NULL
         funcName <- "_anonymous_"
 
         # attempt to get function name
         if (funcRowId >= 3) {
-            up1 <- lst[[as.character(funcRowId -1)]]
-            up2 <- lst[[as.character(funcRowId -2)]]
-            if (up1$token %in% c("EQ_ASSIGN", "LEFT_ASSIGN", "EQ_SUB") &&
-                up2$token %in% c("SYMBOL", "SYMBOL_SUB")) {
+            up1 <- lst[[as.character(funcRowId - 1)]]
+            up2 <- lst[[as.character(funcRowId - 2)]]
+            if (
+                up1$token %in%
+                    c("EQ_ASSIGN", "LEFT_ASSIGN", "EQ_SUB") &&
+                    up2$token %in% c("SYMBOL", "SYMBOL_SUB")
+            ) {
                 funcName <- up2$text
                 funcStartLine <- up2$line1
             }
@@ -352,7 +388,7 @@ getFunctionLengths <- function(df) {
         function_lines <-
             all_lines[all_lines >= funcStartLine & all_lines <= endLine]
         function_comment_lines <- comment_lines[
-            comment_lines >= funcStartLine &  comment_lines <= endLine
+            comment_lines >= funcStartLine & comment_lines <= endLine
         ]
         coding_line_count <- length(
             setdiff(function_lines, function_comment_lines)
@@ -374,16 +410,20 @@ getFunctionLengths <- function(df) {
 
 doesManPageHaveRunnableExample <- function(rd)
 {
-    hasExamples <- any(unlist(lapply(rd,
-        function(x) attr(x, "Rd_tag") == "\\examples")))
-    if (!hasExamples) return(FALSE)
+    hasExamples <-
+        lapply(rd, function(x) attr(x, "Rd_tag") == "\\examples") |>
+        unlist() |>
+        any()
+
+    if (!hasExamples)
+        return(FALSE)
 
     ex <- character()
-    tc <- textConnection("ex", "w", local=TRUE)
+    tc <- textConnection("ex", "w", local = TRUE)
     tools::Rd2ex(rd, commentDontrun = TRUE, commentDonttest = TRUE, out = tc)
     close(tc)
 
-    if(!length(ex))
+    if (!length(ex))
         return(FALSE)
 
     parsed <- try(parse(text = ex), silent = TRUE)
