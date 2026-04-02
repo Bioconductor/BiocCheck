@@ -3,8 +3,3 @@
 + Coding Practice
    - if/while () & vs &&, | vs || ? (if/while/etc...  should be || / &&  not single)
    - ??Make sure every (non-trivial) class has a show() method or at least display the #/% of classes that don't.
-
-+ NEWS 
-   o formatting  (??? needs work ???)
-
-+ unit test coverage amount? 
