@@ -81,9 +81,12 @@ cli_note <- function(...) {
                 clifun(
                     head(unlist(alerttitle, use.names = FALSE), 1L)
                 )
+                id <- cli::cli_div(theme = list(div = list("margin-left" = 2L)))
                 if (identical(length(comps), 3L))
                     cli::cli_text(unlist(alerttitle, use.names = FALSE)[2L])
-                cli::cli_bullets(dotlist)
+                for (item in dotlist)
+                    cli::cli_li(item)
+                cli::cli_end(id)
             }
             .self$msg
         },
