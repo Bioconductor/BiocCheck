@@ -789,6 +789,12 @@ file is therefore checked in its raw original form.
    contributors. This checks that Authors@R is utilized and that there are no
    instances of Author or Maintainer in the DESCRIPTION (`ERROR`)
 
+## NAMESPACE checks
+
+* **Checking NAMESPACE...**
+   Ensures that the NAMESPACE file does not contain a match all export pattern,
+   i.e., `exportPattern("^[[:alpha:]]+")` (`ERROR`).
+
 ## CITATION checks
 
 **Checking that CITATION file is correctly formatted**
