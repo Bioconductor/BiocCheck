@@ -764,20 +764,20 @@ BiocCheck:::.HIDDEN_FILE_EXTS
 These files may be included in your personal directories but should be added to
 a `.gitignore` file so they are not Git tracked.
 
-## Description Check
+## DESCRIPTION checks
 
 **Checking DESCRIPTION**
 
-Default R CMD build behavior will format the DESCRIPTION file; After this occurs,
-it is hard to determine certain aspects of the original DESCRIPTION file. An
-example would be how the Authors and Maintainers are specified. The DESCRIPTION
-file is therefore checked in its raw original form.
+Default R CMD build behavior will format the DESCRIPTION file; After this
+occurs, it is hard to determine certain aspects of the original DESCRIPTION
+file. An example would be how the Authors and Maintainers are specified. The
+DESCRIPTION file is therefore checked in its raw original form.
 
 *  **Checking if DESCRIPTION is well formatted**
    The DESCRIPTION file must be properly formatted and able to be read in with
    `read.dcf()` in order to function properly on the Bioconductor build
-   machines. This check attempts to `read.dcf("DESCRIPTION")` and throws an ERROR
-   if mal-formatted. (`ERROR`)
+   machines. This check attempts to `read.dcf("DESCRIPTION")` and throws an
+   ERROR if mal-formatted. (`ERROR`)
 
 * **Checking for remote package usage...**
    The `Remotes` field is not allowed in Bioconductor packages as dependencies
