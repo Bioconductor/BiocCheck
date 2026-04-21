@@ -779,6 +779,10 @@ file is therefore checked in its raw original form.
    machines. This check attempts to `read.dcf("DESCRIPTION")` and throws an ERROR
    if mal-formatted. (`ERROR`)
 
+* **Checking for remote package usage...**
+   The `Remotes` field is not allowed in Bioconductor packages as dependencies
+   must be from CRAN or Bioconductor. (`ERROR`)
+
 *  **Checking for valid maintainer**
    While in the past using the Author and Maintainer fields were acceptable, R
    has moved towards using the `Authors@R` standard for listing package

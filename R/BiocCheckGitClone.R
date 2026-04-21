@@ -107,6 +107,10 @@ BiocCheckGitClone <- function(package=".", ...)
     checkInstDocFolder(.BiocPackage)
 
     checkDESCRIPTION(.BiocPackage)
+
+    handleCheck("Checking for remote package usage...")
+    checkRemotesUsage(.BiocPackage)
+
     checkNAMESPACE(.BiocPackage)
     validMaintainer(.BiocPackage)
 
