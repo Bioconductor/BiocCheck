@@ -28,18 +28,19 @@ checkDeprecatedPackages <- function(.BiocPackage)
     }
 }
 
-checkPackageSize <- function(.BiocPackage, size = 10) {
+checkPackageSize <- function(.BiocPackage, size = 10L) {
     pkg <- .BiocPackage$sourceDir
     pkgType <- .BiocPackage$packageType
     if (is.na(pkgType) ||  pkgType == "Software") {
-        maxSize <- size * 10^6 ## in MB
+        mb <- 1e+6L
+        maxSize <- size * mb ## in MB
         pkgSize <- file.size(pkg)
         if (pkgSize > maxSize) {
             msgs <- c(
                 paste0("Package Size: ",
-                       as.character(round(pkgSize / (10^6), 2)), " MB"),
+                       as.character(round(pkgSize / mb, 2L)), " MB"),
                 paste0("Size Requirement: ",
-                       sprintf("%.2f", round(maxSize / (10^6), 2)), " MB")
+                       sprintf("%.2f", round(maxSize / mb, 2L)), " MB")
             )
             handleError(
                 "Package tarball exceeds the Bioconductor size requirement.",
@@ -49,7 +50,7 @@ checkPackageSize <- function(.BiocPackage, size = 10) {
     }
 }
 
-.MAX_FILE_SIZE <- 5*10^6 ## 5MB
+.MAX_FILE_SIZE <- 5e+6L ## 5MB in bytes
 .DATA_DIRS <- c("data", file.path("inst", "extdata"), "data-raw")
 
 .filter_data <- function(filedf, for_data = FALSE) {
@@ -188,7 +189,7 @@ checkBiocViews <- function(.BiocPackage)
     parents <- Filter(nzchar, parents)
 
     handleCheck("Checking that biocViews come from the same category...")
-    if (length(unique(parents)) > 1)
+    if (length(unique(parents)) > 1L)
     {
         handleWarning("Use biocViews from one category only ",
             "(one of Software, ExperimentData, AnnotationData, Workflow)")
@@ -204,7 +205,7 @@ checkBiocViews <- function(.BiocPackage)
         terms <- c(badViews, nodes(biocViewsVocab))
         distmat <- stringdistmatrix(terms, useNames = "strings", method = "lv")
         distmat <- as.matrix(distmat)
-        distmat <- distmat > 0 & distmat < 3
+        distmat <- distmat > 0L & distmat < 3L
         distmat[badViews, badViews] <- FALSE
 
         suggestedViews <- vapply(badViews, function(view) {
@@ -217,7 +218,7 @@ checkBiocViews <- function(.BiocPackage)
                 msg <- paste0(msg, ": Did you mean", alt, "?")
             }
             msg
-        }, character(1))
+        }, character(1L))
 
         handleWarning(
             "Invalid BiocViews term(s):", messages = unlist(suggestedViews)
@@ -260,11 +261,11 @@ checkBiocViews <- function(.BiocPackage)
             package."
 
         # values chosen sensibly in a data-driven manner
-        if (nchar(desc_field) < 50 || desc_words < 20)
+        if (nchar(desc_field) < 50L || desc_words < 20L)
             handleWarning(
                 "Description field in the DESCRIPTION file is too concise"
             )
-        else if (desc_sentences < 3)
+        else if (desc_sentences < 3L)
             handleNote(paste(strwrap(msg), collapse = "\n"))
     }
 }
@@ -315,9 +316,9 @@ checkBBScompatibility <- function(.BiocPackage)
             return()
         }
         maint <- vapply(
-            people, function(person) { "cre" %in% person$role }, logical(1)
+            people, function(person) { "cre" %in% person$role }, logical(1L)
         )
-        if (sum(maint) > 1) {
+        if (sum(maint) > 1L) {
             handleError("Designate only one maintainer with Authors@R [cre].")
         }
         if (!any(maint)) {
@@ -416,7 +417,7 @@ checkForLibraryRequire <- function(.BiocPackage) {
     plural <- !identical(nrow(data), 1L)
     mverb <- if (plural) "are" else "is"
     if (!plural)
-        fnoun <- substr(fnoun, 1, nchar(fnoun) - 1)
+        fnoun <- substr(fnoun, 1L, nchar(fnoun) - 1L)
     paste(
         "There", mverb, nrow(data), fnoun, "greater than 50 lines."
     )
@@ -449,9 +450,9 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     df <- do.call(rbind, dflist)
     if (length(df) && nrow(df)) {
         df <- df[order(-df[["length"]]), ]
-        h <- df[df[["length"]] > 50,]
+        h <- df[df[["length"]] > 50L, ]
         if (nrow(h)) {
-            fn_msg <- apply(head(h, n = 5), 1L, function(row) {
+            fn_msg <- apply(head(h, n = 5L), 1L, function(row) {
                 sprintf(
                     "%s() (%s): %s lines",
                     row['functionName'], row['filename'], row['length']
@@ -551,7 +552,7 @@ checkSkipOnBioc <- function(pkgdir)
         if ("skip_on_bioc" %in% unlist(tokens)) {
             basename(testfile)
         } else NA_character_
-    }, character(1))
+    }, character(1L))
     msg <- paste(msg[!is.na(msg)], collapse = " ")
     if (nzchar(msg)) {
         handleNote("skip_on_bioc() found in testthat files: ", msg)
@@ -561,7 +562,7 @@ checkSkipOnBioc <- function(pkgdir)
 .lineReport <- function(linedf) {
     paste0(
         linedf[, "File"], "#L", linedf[, "Line"], " ",
-        substr(linedf[, "Context"], 1, 40), " ..."
+        substr(linedf[, "Context"], 1L, 40L), " ..."
     )
 }
 
@@ -577,7 +578,7 @@ checkSkipOnBioc <- function(pkgdir)
     lines
 }
 
-checkFormatting <- function(.BiocPackage, nlines = 6)
+checkFormatting <- function(.BiocPackage, nlines = 6L)
 {
     rfiles <- .BiocPackage$RSources
     vigfiles <- .BiocPackage$VigSources
@@ -591,13 +592,13 @@ checkFormatting <- function(.BiocPackage, nlines = 6)
 
     for (file in files)
     {
-        if (file.exists(file) && file.info(file)$size == 0)
+        if (file.exists(file) && file.info(file)$size == 0L)
         {
             handleNote("Add content to the empty file ",
                 .getDirFiles(file))
         }
 
-        if (file.exists(file) && file.info(file)$size > 0)
+        if (file.exists(file) && file.info(file)$size > 0L)
         {
             lines <- readLines(file, warn = FALSE)
             offset <- 0L
@@ -617,7 +618,7 @@ checkFormatting <- function(.BiocPackage, nlines = 6)
 
             res <- regexpr("^([ ]+)", lines)
             match.length <- attr(res, "match.length")
-            idx <- (match.length != -1L) & (match.length %% 4 != 0)
+            idx <- (match.length != -1L) & (match.length %% 4L != 0L)
             indent <- rbind(indent, Context(file, lines, idx, offset))
         }
     }
@@ -627,7 +628,7 @@ checkFormatting <- function(.BiocPackage, nlines = 6)
         ok <- FALSE
         msg <- sprintf(
             "Consider shorter lines; %s lines (%i%%) are > 80 characters long.",
-            n, round((n / totallines) * 100))
+            n, round((n / totallines) * 100L))
         msgs <- .lineReport(long)
         handleNote(
             msg,
@@ -641,7 +642,7 @@ checkFormatting <- function(.BiocPackage, nlines = 6)
         ok <- FALSE
         msg <- sprintf(
             "Consider 4 spaces instead of tabs; %s lines (%i%%) contain tabs.",
-            n, round((n / totallines) * 100))
+            n, round((n / totallines) * 100L))
         msgs <- .lineReport(tab)
         handleNote(msg,
             help_text = "First few lines:",
@@ -655,7 +656,7 @@ checkFormatting <- function(.BiocPackage, nlines = 6)
         msgs <- .lineReport(indent)
         handleNote(
             "Consider multiples of 4 spaces for line indents; ", n, " lines",
-            " (", round((n / totallines) * 100), "%) are not.",
+            " (", round((n / totallines) * 100L), "%) are not.",
             help_text = "First few lines:",
             messages = msgs
         )
@@ -748,7 +749,7 @@ checkForBiocDevelSubscription <- function(.BiocPackage)
             "Unable to connect to the Bioc-devel mailing list:",
             "\n  ", conditionMessage(attr(response, "condition")))
         return()
-    } else if (resp_status(response) >= 300) {
+    } else if (resp_status(response) >= 300L) {
         handleMessage(
             "Unable to connect to the Bioc-devel mailing list:",
             "\n  status code ", resp_status(response))
