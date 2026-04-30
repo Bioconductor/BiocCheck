@@ -19,7 +19,7 @@ checkDeprecatedPackages <- function(.BiocPackage)
         )
     }
     logVec <- allDeprecated %in% allDepends
-    if (any(logVec)){
+    if (any(logVec)) {
         handleError(
             "Package dependency in the DESCRIPTION is 'Deprecated'.",
             help_text = "Do not use the following package(s):",
@@ -32,14 +32,14 @@ checkPackageSize <- function(.BiocPackage, size = 10) {
     pkg <- .BiocPackage$sourceDir
     pkgType <- .BiocPackage$packageType
     if (is.na(pkgType) ||  pkgType == "Software") {
-        maxSize <- size*10^6 ## in MB
+        maxSize <- size * 10^6 ## in MB
         pkgSize <- file.size(pkg)
         if (pkgSize > maxSize) {
             msgs <- c(
                 paste0("Package Size: ",
-                       as.character(round(pkgSize/(10^6),2)), " MB"),
+                       as.character(round(pkgSize / (10^6), 2)), " MB"),
                 paste0("Size Requirement: ",
-                       sprintf("%.2f", round(maxSize/(10^6),2)), " MB")
+                       sprintf("%.2f", round(maxSize / (10^6), 2)), " MB")
             )
             handleError(
                 "Package tarball exceeds the Bioconductor size requirement.",
@@ -202,13 +202,13 @@ checkBiocViews <- function(.BiocPackage)
         badViews <- views[!(views %in% nodes(biocViewsVocab))]
 
         terms <- c(badViews, nodes(biocViewsVocab))
-        distmat <- stringdistmatrix(terms, useNames="strings", method="lv")
+        distmat <- stringdistmatrix(terms, useNames = "strings", method = "lv")
         distmat <- as.matrix(distmat)
         distmat <- distmat > 0 & distmat < 3
         distmat[badViews, badViews] <- FALSE
 
         suggestedViews <- vapply(badViews, function(view) {
-            alt <- colnames(distmat)[distmat[view,]]
+            alt <- colnames(distmat)[distmat[view, ]]
             msg <- shQuote(view)
             if (length(alt)) {
                 alt <- shQuote(alt)
@@ -265,7 +265,7 @@ checkBiocViews <- function(.BiocPackage)
                 "Description field in the DESCRIPTION file is too concise"
             )
         else if (desc_sentences < 3)
-            handleNote(paste(strwrap(msg), collapse="\n"))
+            handleNote(paste(strwrap(msg), collapse = "\n"))
     }
 }
 
@@ -347,7 +347,7 @@ checkBBScompatibility <- function(.BiocPackage)
                     )
                     return()
                 }
-                fullname <- paste(person$given, person$family, collapse=" ")
+                fullname <- paste(person$given, person$family, collapse = " ")
                 if (!nzchar(fullname))
                     return()
                 break
@@ -448,10 +448,10 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     dflist <- Filter(nrow, dflist)
     df <- do.call(rbind, dflist)
     if (length(df) && nrow(df)) {
-        df <- df[order(-df[["length"]]),]
+        df <- df[order(-df[["length"]]), ]
         h <- df[df[["length"]] > 50,]
         if (nrow(h)) {
-            fn_msg <- apply(head(h, n=5), 1L, function(row) {
+            fn_msg <- apply(head(h, n = 5), 1L, function(row) {
                 sprintf(
                     "%s() (%s): %s lines",
                     row['functionName'], row['filename'], row['length']
@@ -460,7 +460,7 @@ checkFunctionLengths <- function(parsedCode, pkgname)
             handleNote(
                 "The recommended function length is 50 lines or less. ",
                 .nline_report(h),
-                help_text = "The longest 5 functions are:" ,
+                help_text = "The longest 5 functions are:",
                 messages = fn_msg
             )
         }
@@ -500,7 +500,7 @@ checkNEWS <- function(pkgdir)
         res <- suppressWarnings(newsextract(news))
         if (is.null(res) || !inherits(res, "news_db"))
             stop("news() failed to parse news file: ", newsPath)
-    }, error=function(e){
+    }, error=function(e) {
         handleWarning(
             "news(package='", basename(pkgdir), "') failed with news file: ",
             newsPath, ":", e$message,
@@ -546,8 +546,8 @@ checkSkipOnBioc <- function(pkgdir)
         return()
 
     testfiles <- dir(testdir, pattern = "\\.[Rr]$", full.names = TRUE)
-    msg <- vapply(testfiles, function(testfile){
-        tokens <- getParseData(parse(testfile, keep.source=TRUE))
+    msg <- vapply(testfiles, function(testfile) {
+        tokens <- getParseData(parse(testfile, keep.source = TRUE))
         if ("skip_on_bioc" %in% unlist(tokens)) {
             basename(testfile)
         } else NA_character_
@@ -577,7 +577,7 @@ checkSkipOnBioc <- function(pkgdir)
     lines
 }
 
-checkFormatting <- function(.BiocPackage, nlines=6)
+checkFormatting <- function(.BiocPackage, nlines = 6)
 {
     rfiles <- .BiocPackage$RSources
     vigfiles <- .BiocPackage$VigSources
@@ -599,11 +599,11 @@ checkFormatting <- function(.BiocPackage, nlines=6)
 
         if (file.exists(file) && file.info(file)$size > 0)
         {
-            lines <- readLines(file, warn=FALSE)
+            lines <- readLines(file, warn = FALSE)
             offset <- 0L
             totallines <- totallines + length(lines)
 
-            n <- nchar(lines, allowNA=TRUE)
+            n <- nchar(lines, allowNA = TRUE)
             idx <- !is.na(n) & (n > 80L)
             long <- rbind(long, Context(file, lines, idx, offset))
 
@@ -714,7 +714,7 @@ checkIsPackageNameAlreadyInUse <- function(
             )
         )
 
-    isDuplicate <- tolower(pkgName) %in% tolower(dcf[,"Package"])
+    isDuplicate <- tolower(pkgName) %in% tolower(dcf[, "Package"])
     if (isDuplicate && identical(repo, "CRAN"))
         handleWarning(msg)
     else if (isDuplicate)
@@ -791,7 +791,7 @@ checkForSupportSiteRegistration <- function(.BiocPackage)
     }
     accountExists <- checkSupportReg(email)
 
-    if (accountExists){
+    if (accountExists) {
         pkgname <- tolower(.BiocPackage$packageName)
         checkWatchedTag(email, pkgname)
     }
@@ -803,7 +803,8 @@ checkSupportReg <- function(email) {
     response <- paste0(
         "https://support.bioconductor.org/api/email/",
         URLencode(email, reserved = TRUE)
-    ) |> request() |>
+    ) |>
+        request() |>
         req_perform() |>
         try(silent = TRUE)
     response_error <- inherits(response, "try-error")
@@ -824,13 +825,14 @@ checkSupportReg <- function(email) {
     result
 }
 
-checkWatchedTag <- function(email, pkgname){
+checkWatchedTag <- function(email, pkgname) {
     if (identical(email, "maintainer@bioconductor.org"))
         return()
     response <- paste0(
         "https://support.bioconductor.org/api/watched/tags/",
         URLencode(email, reserved = TRUE)
-    ) |> request() |>
+    ) |>
+        request() |>
         req_perform() |>
         try(silent = TRUE)
     if (inherits(response, "try-error")) {
