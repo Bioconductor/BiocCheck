@@ -429,7 +429,7 @@ expect_true(
         `Authors@R` = c(
             "person('Bioconductor Package Maintainer',",
             "email='maintainer@bioconductor.org', role=c('aut', 'cre'),",
-            "comment = c(ORCID = '0000-000-0000-0000'))"
+            "comment = c(ORCID = '0000-0000-0000-0001'))"
         ),
         License = "GPL-2"
     )
@@ -473,7 +473,7 @@ expect_true(
         `Authors@R` = c(
             "c(person('Bioconductor Package Maintainer',",
             "email='maintainer@bioconductor.org', role=c('aut', 'cre'),",
-            "comment = c(ORCID = '0000-0000-000-0000')),",
+            "comment = c(ORCID = '0000-0000-0000-0001')),",
             "person('Joe', 'Blow', email='joe@blow.com', role='cre'))"
         ),
         License = "GPL-2"
