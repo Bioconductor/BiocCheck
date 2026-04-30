@@ -50,7 +50,7 @@ checkPackageSize <- function(.BiocPackage, size = 10) {
 }
 
 .MAX_FILE_SIZE <- 5*10^6 ## 5MB
-.DATA_DIRS <- c("data", "inst/extdata", "data-raw")
+.DATA_DIRS <- c("data", file.path("inst", "extdata"), "data-raw")
 
 .filter_data <- function(filedf, for_data = FALSE) {
     files <- filedf[["path"]]
@@ -152,10 +152,8 @@ checkBiocCheckOutputFolder <- function(.BiocPackage) {
 }
 
 checkInstDocFolder <- function(.BiocPackage) {
-    pkgdir <- .BiocPackage$sourceDir
-    alldirs <- list.dirs(pkgdir, full.names = FALSE)
-    instdocfiles <- list.files(file.path(pkgdir, "inst/doc"))
-    if ("inst/doc" %in% alldirs && length(instdocfiles))
+    instDoc <- file.path(.BiocPackage$sourceDir, "inst", "doc")
+    if (dir.exists(instDoc) && length(list.files(instDoc)))
         handleError(
             "Remove 'inst/doc' folder from the package source"
         )
