@@ -690,8 +690,9 @@ checkIsPackageNameAlreadyInUse <- function(
 
     repo.url <- switch(
         repo,
-        CRAN = sprintf(
-            "%s/src/contrib/PACKAGES", BiocManager::repositories()[repo]
+        CRAN = paste(
+            BiocManager::repositories()[repo],
+            "src", "contrib", "PACKAGES", sep = "/"
         ),
         BioCsoft = "https://bioconductor.org/packages/devel/bioc/VIEWS",
         BioCann =
