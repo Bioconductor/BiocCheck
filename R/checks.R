@@ -245,7 +245,7 @@ checkBiocViews <- function(.BiocPackage)
             recommended)
         invalid <- TRUE
     }
-    return(invalid)
+    invalid
 }
 
 .conciseDescription <- function(.BiocPackage) {
