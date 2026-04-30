@@ -197,17 +197,11 @@ checkBiocViews <- function(.BiocPackage)
         return(TRUE)
     }
     branch <- unique(parents)
-    # TODO: Fix this
-    if (interactive())
-        env <- environment()
-    else
-        env <- .GlobalEnv
 
     handleCheck("Checking biocViews validity...")
     if (!all(views %in% nodes(biocViewsVocab)))
     {
         badViews <- views[!(views %in% nodes(biocViewsVocab))]
-        badViewsVec <- paste(badViews, collapse=", ")
 
         terms <- c(badViews, nodes(biocViewsVocab))
         distmat <- stringdistmatrix(terms, useNames="strings", method="lv")
@@ -316,7 +310,6 @@ checkBBScompatibility <- function(.BiocPackage)
     }
     validMaintainer(.BiocPackage)
 
-    maintainer <- NULL
     if ("Authors@R" %in% colnames(dcf)) {
         people <- .PersonsFromDCF(dcf)
         if (is.null(people) || !inherits(people, "person")) {
@@ -359,7 +352,6 @@ checkBBScompatibility <- function(.BiocPackage)
                 fullname <- paste(person$given, person$family, collapse=" ")
                 if (!nzchar(fullname))
                     return()
-                maintainer <- sprintf("%s <%s>", trimws(fullname), email)
                 break
             }
         }
@@ -589,7 +581,6 @@ checkSkipOnBioc <- function(pkgdir)
 
 checkFormatting <- function(.BiocPackage, nlines=6)
 {
-    pkgname <- .BiocPackage$packageName
     rfiles <- .BiocPackage$RSources
     vigfiles <- .BiocPackage$VigSources
     manfiles <- if (!.BiocPackage$usesRoxygen) .BiocPackage$manSources
