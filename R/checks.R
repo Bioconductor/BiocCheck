@@ -156,7 +156,7 @@ checkInstDocFolder <- function(.BiocPackage) {
     instDoc <- file.path(.BiocPackage$sourceDir, "inst", "doc")
     if (dir.exists(instDoc) && length(list.files(instDoc)))
         handleError(
-            "Remove 'inst/doc' folder from the package source"
+            "Remove 'doc' folder from the package source"
         )
 }
 
@@ -292,7 +292,7 @@ checkBBScompatibility <- function(.BiocPackage)
         return()
     }
     pkgNameFromDir <- basename(pkgdir)
-    handleCheck("Checking that Package field matches directory/tarball name...")
+    handleCheck("Checking if 'Package:' field matches directory / tarball...")
     if (dcf[, "Package"] != pkgNameFromDir)
     {
         handleError(
@@ -522,7 +522,7 @@ checkUnitTests <- function(pkgdir)
     if (dir.exists(tests_dir) && (!cond))
     {
         handleError(
-            "Add a .R or .Rin file in tests/ directory or unit tests will ",
+            "Add a .R or .Rin file in 'tests' directory or unit tests will ",
             "not be run by R CMD check. See ",
             "https://contributions.bioconductor.org/tests.html")
         return()
