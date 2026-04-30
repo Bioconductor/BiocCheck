@@ -1,3 +1,4 @@
+## source("inst/tinytest/helpers.R")
 source("helpers.R")
 
 library(devtools)
@@ -429,7 +430,7 @@ expect_true(
         `Authors@R` = c(
             "person('Bioconductor Package Maintainer',",
             "email='maintainer@bioconductor.org', role=c('aut', 'cre'),",
-            "comment = c(ORCID = '0000-0000-0000-0001'))"
+            "comment = c(ORCID = '0000-0000-0000-000J'))"
         ),
         License = "GPL-2"
     )
@@ -480,10 +481,10 @@ expect_true(
     )
 )
 BiocCheck:::checkBBScompatibility(.bioctest)
-## ERROR: More than one maintainer & NOTE: Include ORCID iD
+## ERROR: More than one maintainer
 expect_identical(
     .BiocCheck$getNum(c("error", "warning", "note")),
-    c(error = 2L, warning = 0L, note = 1L)
+    c(error = 2L, warning = 0L, note = 0L)
 )
 .BiocCheck$zero()
 
