@@ -429,26 +429,31 @@ checkFunctionLengths <- function(parsedCode, pkgname)
     if (!length(parsedCode))
         return(invisible())
     fileNames <- .getDirFiles(names(parsedCode))
-    dflist <- structure(
-        vector("list", length(names(parsedCode))),
-        .Names = fileNames
-    )
     names(parsedCode) <- fileNames
-    for (filename in names(parsedCode)) {
-        pc <- parsedCode[[filename]]
-        res <- getFunctionLengths(pc)
-        functionNames <- names(res)
-        mt <- do.call(rbind, res)
-        fname <- if (is.null(functionNames)) character(0L) else filename
-        df <- cbind.data.frame(
-            filename = fname, functionName = functionNames, mt,
-            row.names = NULL
-        )
-        dflist[[filename]] <- df
-    }
-    dflist <- Filter(nrow, dflist)
+
+    dflist <- lapply(
+        fileNames,
+        function(filename) {
+            res <- getFunctionLengths(parsedCode[[filename]])
+            functionNames <- names(res)
+            if (!length(functionNames))
+                return(NULL)
+            mt <- do.call(rbind, res)
+            cbind.data.frame(
+                filename = filename,
+                functionName = functionNames,
+                mt,
+                row.names = NULL
+            )
+        }
+    )
+
+    dflist <- Filter(Negate(is.null), dflist)
+    if (!length(dflist))
+        return(invisible())
+
     df <- do.call(rbind, dflist)
-    if (length(df) && nrow(df)) {
+    if (nrow(df)) {
         df <- df[order(-df[["length"]]), ]
         h <- df[df[["length"]] > 50L, ]
         if (nrow(h)) {

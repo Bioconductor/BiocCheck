@@ -300,92 +300,93 @@ getParent <- function(view, biocViewsVocab)
 getFunctionLengths <- function(df) {
     df <- df[df$terminal & df$parent > -1, ]
 
-    # Identify comment-only lines
-    is_comment_only_line <- df$token == "COMMENT" &
-        !(duplicated(df$line1) | duplicated(df$line1, fromLast = TRUE))
-
-    # Create a lookup table for comment-only lines
-    comment_lines <- unique(df$line1[is_comment_only_line])
-
-    all_lines <- unique(df$line1)
+    # Pre-compute line sets once
+    all_lines_vec <- sort(unique(df$line1))
+    is_comment_only <- df$token == "COMMENT" &
+        !duplicated(df$line1) & !duplicated(df$line1, fromLast = TRUE)
+    comment_line_set <- unique(df$line1[is_comment_only])
 
     rownames(df) <- NULL
-    max <- nrow(df)
-    res <- list()
-    funcRows <- df[df$token %in% c("FUNCTION", "'\\\\'"), ]
-    lst <- lapply(split(df, rownames(df)), as.list)
 
-    if (!nrow(funcRows))
+    funcIdx <- which(df$token %in% c("FUNCTION", "'\\\\'"))
+    if (!length(funcIdx))
         return(.FUNCTION_LENGTHS_SENTINEL)
 
-    for (i in seq_len(nrow(funcRows))) {
-        funcRowId <- as.integer(rownames(funcRows)[i])
-        funcRow <- funcRows[as.character(funcRowId), ]
-        funcStartLine <- funcRow$line1 # this might get updated later
-        funcLines <- NULL
+    parents <- df$parent # vectorised access
+    line1v <- df$line1
+    line2v <- df$line2
+    tokenv <- df$token
+    textv <- df$text
+    maxRow <- nrow(df)
+
+    res <- vector("list", length(funcIdx))
+
+    for (k in seq_along(funcIdx)) {
+        i <- funcIdx[k]
+        funcParent <- parents[i]
+        funcStartLine <- line1v[i]
         funcName <- "_anonymous_"
 
-        # attempt to get function name
-        if (funcRowId >= 3) {
-            up1 <- lst[[as.character(funcRowId - 1)]]
-            up2 <- lst[[as.character(funcRowId - 2)]]
-            if (
-                up1$token %in%
-                    c("EQ_ASSIGN", "LEFT_ASSIGN", "EQ_SUB") &&
-                    up2$token %in% c("SYMBOL", "SYMBOL_SUB")
-            ) {
-                funcName <- up2$text
-                funcStartLine <- up2$line1
+        # Attempt to get function name (look back 2 rows)
+        if (i >= 3L) {
+            tok_up1 <- tokenv[i - 1L]
+            tok_up2 <- tokenv[i - 2L]
+            if (tok_up1 %in% c("EQ_ASSIGN", "LEFT_ASSIGN", "EQ_SUB") &&
+                tok_up2 %in% c("SYMBOL", "SYMBOL_SUB")) {
+                funcName <- textv[i - 2L]
+                funcStartLine <- line1v[i - 2L]
             }
         }
 
-        findFunctionEnd <- function() {
-            parent_level <- funcRow$parent
-            last_valid_row <- NULL
+        # Find end row: first row after i where parent > funcParent
+        # (i.e. we've risen back out of the function body)
+        tail_parents <- parents[seq(i + 1L, maxRow)]
+        exit_offset  <- which(tail_parents > funcParent)
 
-            for (j in seq((funcRowId + 1), max)) {
-                curr_row <- lst[[as.character(j)]]
-                if (curr_row$parent > parent_level) {
-                    return(j - 1)
-                }
-                if (curr_row$parent > 0) {
-                    last_valid_row <- j
-                }
-                if (j == max) {
-                    return(max)
-                }
-            }
-            return(last_valid_row)
-        }
+        end_row_id <-
+            if (length(exit_offset))
+                (i + exit_offset[1L]) - 1L # last row still inside the function
+            else
+                maxRow
 
-        # Get end line and calculate metrics
-        end_row_id <- findFunctionEnd()
-        end_row <- lst[[as.character(end_row_id)]]
-        endLine <- end_row$line2
-        funcLines <- endLine - (funcStartLine - 1)
+        endLine   <- line2v[end_row_id]
+        funcLines <- endLine - funcStartLine + 1L
 
-        # Count coding lines
-        function_lines <-
-            all_lines[all_lines >= funcStartLine & all_lines <= endLine]
-        function_comment_lines <- comment_lines[
-            comment_lines >= funcStartLine & comment_lines <= endLine
+        # Count coding lines (non-comment lines in range)
+        fn_lines <- all_lines_vec[
+            all_lines_vec >= funcStartLine & all_lines_vec <= endLine
         ]
-        coding_line_count <- length(
-            setdiff(function_lines, function_comment_lines)
-        )
+        fn_cmt_lines <- comment_line_set[
+            comment_line_set >= funcStartLine & comment_line_set <= endLine
+        ]
+        coding_lines <- length(fn_lines) - length(fn_cmt_lines)
 
-        # Store results
         if (funcName == "_anonymous_")
             funcName <- paste0(funcName, ".", funcStartLine)
 
-        res[[funcName]] <- c(
+        res[[k]] <- list(
+            name = funcName,
             length = funcLines,
             startLine = funcStartLine,
             endLine = endLine,
-            codingLines = coding_line_count
+            codingLines = coding_lines
         )
     }
-    res
+
+    # Build named list in the original return format
+    out <- lapply(
+        res,
+        function(x) {
+            c(
+                length = x$length,
+                startLine = x$startLine,
+                endLine = x$endLine,
+                codingLines = x$codingLines
+            )
+        }
+    )
+    names(out) <- vapply(res, `[[`, character(1L), "name")
+    out
 }
 
 doesManPageHaveRunnableExample <- function(rd)
