@@ -6,9 +6,6 @@
 \alias{.BiocPackage}
 \alias{BiocPackage}
 \title{A class for representing files in a Bioconductor package}
-\format{
-An object of class \code{BiocPackage} of length 1.
-}
 \usage{
 .BiocPackage
 }
@@ -109,6 +106,6 @@ if (dir.exists(packageDirectory))
 
 }
 \seealso{
-\linkS4class{BiocCheck}, \linkS4class{Message}
+\link[=BiocCheck-class]{BiocCheck}, \link[=Message-class]{Message}
 }
 \keyword{internal}

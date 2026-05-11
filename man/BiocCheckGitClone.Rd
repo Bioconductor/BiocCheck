@@ -50,7 +50,7 @@ BiocCheckGitClone(packageDir, `quit-with-status`=FALSE)
 \url{https://contributions.bioconductor.org}
 }
 \seealso{
-\linkS4class{BiocCheck}
+\link[=BiocCheck-class]{BiocCheck}
 }
 \author{
 Lori Shepherd

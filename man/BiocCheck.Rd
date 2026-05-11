@@ -143,7 +143,7 @@ BiocCheck(packageDir, `quit-with-status`=FALSE)
 \url{https://contributions.bioconductor.org}
 }
 \seealso{
-\linkS4class{BiocCheck}, \linkS4class{Message}
+\link[=BiocCheck-class]{BiocCheck}, \link[=Message-class]{Message}
 }
 \author{
 Dan Tenenbaum, Lori Shepherd, and Marcel Ramos
