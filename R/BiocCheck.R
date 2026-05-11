@@ -134,16 +134,24 @@ BiocCheck <- function(
 ) {
     if (callr) {
         callr::r(
-            function(...) { BiocCheck:::BiocCheckRun(...) },
+            function(...) {
+                BiocCheck:::BiocCheckRun(...)
+            },
             args = list(
-                package = package, checkDir = checkDir, debug = debug, ...
+                package = package,
+                checkDir = checkDir,
+                debug = debug,
+                ...
             ),
             cmdargs = c("--no-echo", "--no-save", "--no-restore"),
             show = TRUE
         )
     } else {
         BiocCheckRun(
-            package = package, checkDir = checkDir, debug = debug, ...
+            package = package,
+            checkDir = checkDir,
+            debug = debug,
+            ...
         )
     }
 }
@@ -162,7 +170,7 @@ BiocCheckRun <-
 
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))
-        dots <- dots[[1]]               # command line args come as list
+        dots <- dots[[1]] # command line args come as list
 
     oldwarn <- getOption("warn")
     oldwidth <- getOption("cli.width")
@@ -172,7 +180,8 @@ BiocCheckRun <-
     options(warn = 1, cli.width = 80)
 
     .BiocPackage <- .BiocPackage$initialize(
-        packageDir = package, checkDir = checkDir
+        packageDir = package,
+        checkDir = checkDir
     )
 
     ## consider merging these operations into one
@@ -195,7 +204,8 @@ BiocCheckRun <-
                     file.copy(
                         from = inst_log,
                         to = file.path(
-                            .BiocPackage$BiocCheckDir, basename(inst_log)
+                            .BiocPackage$BiocCheckDir,
+                            basename(inst_log)
                         )
                     )
             }, add = TRUE)
@@ -209,11 +219,14 @@ BiocCheckRun <-
     hasAdmin <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
 
     .BiocCheck$addMetadata(
-        BiocPackage = .BiocPackage, installDir = package_install_dir
+        BiocPackage = .BiocPackage,
+        installDir = package_install_dir
     )
     cli::cli_rule("{.pkg { .BiocPackage$packageName }} session metadata")
     .BiocCheck$show_meta()
-    cli::cli_rule("Running BiocCheck on {.pkg { .BiocPackage$packageName }}")
+    cli::cli_rule(
+        "Running BiocCheck on {.pkg { .BiocPackage$packageName }}"
+    )
 
     # BiocCheck checks --------------------------------------------------------
     if (.isNULLorFALSE(dots[["no-check-deprecated"]])) {
@@ -221,7 +234,7 @@ BiocCheckRun <-
         checkDeprecatedPackages(.BiocPackage)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-remotes"]])){
+    if (.isNULLorFALSE(dots[["no-check-remotes"]])) {
         handleCheck("Checking for remote package usage...")
         checkRemotesUsage(.BiocPackage)
     }
@@ -229,7 +242,7 @@ BiocCheckRun <-
     handleCheck("Checking for 'LazyData: true' usage...")
     checkLazyDataUsage(.BiocPackage)
 
-    if (.isNULLorFALSE(dots[["no-check-version-num"]])){
+    if (.isNULLorFALSE(dots[["no-check-version-num"]])) {
         handleCheck("Checking version number...")
         if (!.BiocPackage$isSourceDir) {
             handleCheck("Checking for version number mismatch...")
@@ -250,34 +263,35 @@ BiocCheckRun <-
         checkRVersionDependency(.BiocPackage)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-pkg-size"]])){
+    if (.isNULLorFALSE(dots[["no-check-pkg-size"]])) {
         handleCheck("Checking package size...")
-        if (.BiocPackage$isTar){
+        if (.BiocPackage$isTar) {
             checkPackageSize(.BiocPackage)
         } else {
-            handleMessage("Skipped... only checked on source tarball", indent=4)
+            handleMessage(
+                "Skipped... only checked on source tarball",
+                indent = 4
+            )
         }
     }
 
-    if (.isNULLorFALSE(dots[["no-check-file-size"]])){
+    if (.isNULLorFALSE(dots[["no-check-file-size"]])) {
         handleCheck("Checking individual file sizes...")
         checkIndivFileSizes(.BiocPackage)
         checkDataFileSizes(.BiocPackage)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-bioc-views"]]))
-    {
+    if (.isNULLorFALSE(dots[["no-check-bioc-views"]])) {
         handleCheck("Checking biocViews...")
         result <- checkBiocViews(.BiocPackage)
-        if(result)
-        {
+        if (result) {
             cli::cli_alert_info(
                 "Search 'biocViews' at https://contributions.bioconductor.org"
             )
         }
     }
 
-    if (.isNULLorFALSE(dots[["no-check-bbs"]])){
+    if (.isNULLorFALSE(dots[["no-check-bbs"]])) {
         handleCheck("Checking build system compatibility...")
         checkBBScompatibility(.BiocPackage)
     }
@@ -311,7 +325,7 @@ BiocCheckRun <-
         }
     }
 
-    if (.isNULLorFALSE(dots[["no-check-library-calls"]])){
+    if (.isNULLorFALSE(dots[["no-check-library-calls"]])) {
         handleCheck("Checking package installation calls in R code...")
         checkPkgInstallCalls(.BiocPackage)
     }
@@ -320,58 +334,61 @@ BiocCheckRun <-
     package_name <- .BiocPackage$packageName
     parsedCode <- parseFiles(.BiocPackage)
 
-    if (.isNULLorFALSE(dots[["no-check-install-self"]])){
-        handleCheck(sprintf("Checking for library/require of %s...",
-                            package_name))
+    if (.isNULLorFALSE(dots[["no-check-install-self"]])) {
+        handleCheck(sprintf(
+            "Checking for library/require of %s...",
+            package_name
+        ))
         checkForLibraryRequire(.BiocPackage)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-coding-practices"]])){
+    if (.isNULLorFALSE(dots[["no-check-coding-practices"]])) {
         handleCheck("Checking coding practice...")
         checkCodingPractice(.BiocPackage, parsedCode)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-function-len"]])){
+    if (.isNULLorFALSE(dots[["no-check-function-len"]])) {
         handleCheck("Checking function lengths...")
         checkFunctionLengths(parsedCode, package_name)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-man-doc"]])){
+    if (.isNULLorFALSE(dots[["no-check-man-doc"]])) {
         handleCheck("Checking man page documentation...")
         checkManDocumentation(.BiocPackage, libloc)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-news"]])){
+    if (.isNULLorFALSE(dots[["no-check-news"]])) {
         handleCheck("Checking package NEWS...")
         checkNEWS(package_dir)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-unit-tests"]])){
+    if (.isNULLorFALSE(dots[["no-check-unit-tests"]])) {
         handleCheck("Checking unit tests...")
         checkUnitTests(package_dir)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-skip-bioc-tests"]])){
+    if (.isNULLorFALSE(dots[["no-check-skip-bioc-tests"]])) {
         handleCheck("Checking skip_on_bioc() in tests...")
         checkSkipOnBioc(package_dir)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-formatting"]])){
+    if (.isNULLorFALSE(dots[["no-check-formatting"]])) {
         handleCheck(
             "Checking formatting of DESCRIPTION, NAMESPACE, ",
-            "man pages, R source, and vignette source...")
+            "man pages, R source, and vignette source..."
+        )
         checkFormatting(.BiocPackage)
     }
 
-    if (.isNULLorFALSE(dots[["no-check-CRAN"]]))
-    {
+    if (.isNULLorFALSE(dots[["no-check-CRAN"]])) {
         handleCheck("Checking if package already exists in CRAN...")
         checkIsPackageNameAlreadyInUse(package_name, "CRAN")
     }
 
-    if (isTRUE(dots[["new-package"]]))
-    {
-        handleCheck("Checking if new package already exists in Bioconductor...")
+    if (isTRUE(dots[["new-package"]])) {
+        handleCheck(
+            "Checking if new package already exists in Bioconductor..."
+        )
         checkIsPackageNameAlreadyInUse(package_name, "BioCsoft")
         checkIsPackageNameAlreadyInUse(package_name, "BioCann")
         checkIsPackageNameAlreadyInUse(package_name, "BioCexp")
@@ -398,7 +415,11 @@ BiocCheckRun <-
     }
 
     cli::cli_rule(
-        left = paste0("BiocCheck v", packageVersion("BiocCheck"), " results")
+        left = paste0(
+            "BiocCheck v",
+            packageVersion("BiocCheck"),
+            " results"
+        )
     )
     cli::cli_text(
         paste0(
