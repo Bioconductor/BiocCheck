@@ -888,16 +888,16 @@ df <- getParseData(parse(file, keep.source = TRUE))
 res <- BiocCheck:::getFunctionLengths(df)
 res0 <- tibble::tribble(
     ~length, ~startLine, ~endLine, ~codingLines,
-    2,          1,        2,            2,
-    1,          3,        3,            1,
-    1,          6,        6,            1,
-    5,          9,       13,            4,
-    4,         16,       19,            4,
-    6,         23,       28,            3,
-    1,         31,       31,            1,
-    1,         33,       33,            1,
-    6,         35,       40,            2,
-    7,         44,       50,            4
+    2L,       1L,         2L,      2L,
+    1L,       3L,         3L,      1L,
+    1L,       6L,         6L,      1L,
+    5L,       9L,        13L,      4L,
+    4L,      16L,        19L,      4L,
+    6L,      23L,        28L,      3L,
+    1L,      31L,        31L,      1L,
+    1L,      33L,        33L,      1L,
+    6L,      35L,        40L,      2L,
+    7L,      44L,        50L,      4L
 )
 res0 <- apply(res0, 1L, force, simplify = FALSE)
 names(res0) <- c(
