@@ -70,24 +70,17 @@ checkPackageSize <- function(.BiocPackage, size = 10L) {
 
 .in_data <- function(f) { f %in% .DATA_DIRS }
 
-.hasPkg <- function(pkg) {
-    suppressWarnings({
-        nzchar(system.file(package = pkg))
-    })
-}
-
 .findLargeFiles <- function(.BiocPackage, data_only) {
+    isSourceDir <- .BiocPackage$isSourceDir
     pkgdir <- .BiocPackage$sourceDir
-    gitignore <- file.exists(file.path(pkgdir, ".gitignore"))
-    sourceDir <- .BiocPackage$isSourceDir && !.BiocPackage$isTar
-    if (.hasPkg("gert") && gitignore && sourceDir) {
+    if (requireNamespace("gert", quietly = TRUE) && .BiocPackage$isGitClone) {
         fileinfo <- gert::git_ls(repo = pkgdir)
         fileinfo <- .filter_data(fileinfo, for_data = data_only)
         files <- unlist(
             fileinfo[fileinfo[["filesize"]] > .MAX_FILE_SIZE, "path"]
         )
         file.path(pkgdir, files)
-    } else if (sourceDir) {
+    } else if (isSourceDir) {
         folders <- list.dirs(pkgdir, full.names = FALSE, recursive = TRUE)
         decision <- if (data_only) force else Negate
         folders <- Filter(decision(.in_data), folders)

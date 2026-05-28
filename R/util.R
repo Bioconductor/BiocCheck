@@ -449,3 +449,69 @@ is_valid_author_tree <- function(x) {
     }
     FALSE
 }
+
+#' Identify whether the package directory is a live git clone
+#'
+#' This is a heuristic to determine whether the package source directory was
+#' created by `R CMD build` (i.e. an untarred tarball) or is a live git clone.
+#'
+#' @details Does `sourceDir` look like it came from an untarred tarball
+#' (produced by `R CMD build`) rather than a live git clone?
+#'
+#' Negative indicators — artifacts created by `R CMD build`:
+#'   build/vignette.rds  created when vignettes are pre-built
+#'   doc/                vignette output directory added to the tarball
+#'
+#' Positive indicators — files typically found in source directories:
+#'   .git            presence of a .git directory is a strong positive signal
+#'   .Rbuildignore   excluded from the tarball by default
+#'   .gitignore      excluded from the tarball by default
+#'
+#' @returns `TRUE` if the directory appears to be a live git clone.
+#'
+#' @noRd
+#' @keywords internal
+.isGitClone <- function(sourceDir) {
+    sourceDir <- normalizePath(sourceDir)
+    if (requireNamespace("gert", quietly = TRUE))
+        identical(
+            try(
+                {
+                    gert::git_find(sourceDir) |> basename()
+                },
+                silent = TRUE
+            ),
+            basename(sourceDir)
+        )
+    else
+        dir.exists(file.path(sourceDir, ".git"))
+}
+
+#' @noRd
+#' @keywords internal
+.isSourceDir <- function(sourceDir) {
+    sourceDir <- normalizePath(sourceDir)
+    isdir <- file.info(sourceDir)[["isdir"]]
+    if (!isdir)
+        return(FALSE)
+
+    is_clone <- .isGitClone(sourceDir)
+    if (is_clone)
+        return(TRUE)
+
+    has_vignette_rds <-
+        file.exists(file.path(sourceDir, "build", "vignette.rds"))
+    has_doc_dir <- dir.exists(file.path(sourceDir, "doc"))
+    has_rbuildignore <- file.exists(file.path(sourceDir, ".Rbuildignore"))
+    has_gitignore <- file.exists(file.path(sourceDir, ".gitignore"))
+
+    # Strong negative: build artifacts only R CMD build would create
+    if (has_vignette_rds || has_doc_dir)
+        FALSE
+    # Strong positive: developer files stripped during the build
+    else if (has_rbuildignore || has_gitignore)
+        TRUE
+    # Ambiguous (e.g. no vignettes, no .gitignore): assume source directory
+    else
+        TRUE
+}

@@ -105,6 +105,7 @@
         isValid = "logical",
         isTar = "logical",
         isSourceDir = "logical",
+        isGitClone = "logical",
         isInfrastructure = "logical",
         usesRoxygen = "logical",
         usesRdpack = "logical",
@@ -130,7 +131,8 @@
                 packageDir <- normalizePath(packageDir)
                 .self[["isTar"]] <- grepl("\\.tar\\.[gx]z$", packageDir)
                 .self[["isSourceDir"]] <-
-                    !.self$isTar && file.info(packageDir)[["isdir"]]
+                    !.self$isTar && .isSourceDir(packageDir)
+                .self[["isGitClone"]] <- .isGitClone(packageDir)
                 .self$getPackageDir(packageDir)
                 .self$getRSources()
                 .self$getVigSources()
