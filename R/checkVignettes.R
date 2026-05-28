@@ -219,9 +219,9 @@ checkVigEngine <- function(.BiocPackage)
         # check for missing engine in DESCRIPTION
         if (any(!res)) {
             handleError(
-                "'VignetteEngine' specified but not in the DESCRIPTION.",
+                "'VignetteEngine' in vignette but not in the DESCRIPTION.",
                 help_text =
-                    "Add 'VignetteEngine' to DESCRIPTION from the following:",
+                    "Add 'VignetteBuilder' value to DESCRIPTION based on:",
                 messages = names(res[!res])
             )
         }
