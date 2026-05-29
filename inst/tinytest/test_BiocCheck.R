@@ -1115,12 +1115,12 @@ if (connect) {
     BiocCheck:::checkSupportReg("foo@bar.com")
     expect_equivalent(.BiocCheck$getNum("warning"), 1)
     .BiocCheck$zero()
-    ## api is case insensitivy
+    ## api is not case sensitive
     BiocCheck:::checkSupportReg("lori.shePhErd@roswellpark.org")
     expect_true(stillZero())
 
-
-    # tags
+    .BiocCheck$zero()
+    ## tag check for existing package
     BiocCheck:::checkWatchedTag(
         "lori.shepherd@roswellpark.org", "biocfilecache"
     )
@@ -1135,7 +1135,7 @@ if (connect) {
         "lori.shePherd@rosWellpark.org", "biocfilecache"
     )
     expect_true(stillZero())
-    ## check tag is case insenstive
+    ## check tag is not case senstive
     BiocCheck:::checkWatchedTag(
         "lori.shepherd@rosWellpark.org", "bioCfiLecache"
     )
