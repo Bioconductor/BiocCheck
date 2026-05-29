@@ -804,7 +804,7 @@ checkForSupportSiteRegistration <- function(.BiocPackage)
     }
 }
 
-#' @importFrom httr2 req_perform request resp_body_json
+#' @importFrom httr2 req_perform request resp_body_json req_timeout
 #' @importFrom utils URLencode
 checkSupportReg <- function(email) {
     response <- paste0(
@@ -812,21 +812,23 @@ checkSupportReg <- function(email) {
         URLencode(email, reserved = TRUE)
     ) |>
         request() |>
+        req_timeout(15L) |>
         req_perform() |>
         try(silent = TRUE)
+
     response_error <- inherits(response, "try-error")
     result <- !response_error && resp_body_json(response)
     if (response_error) {
-        handleError(
-            "Unable to find your email in the Support Site:",
+        handleWarning(
+            "Unable to retrieve email info from the Support Site:",
             "\n  ", conditionMessage(attr(response, "condition"))
         )
     } else if (resp_body_json(response)) {
         handleMessage("Maintainer is registered at support site.")
     } else {
         handleError(
-            "Register your email account in the Support Site; ",
-            "visit https://support.bioconductor.org/accounts/signup/"
+            "Register your email account on the Support Site at ",
+            "https://support.bioconductor.org/accounts/signup/"
         )
     }
     result
