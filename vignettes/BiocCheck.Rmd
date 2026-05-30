@@ -697,18 +697,20 @@ with the `--no-check-bioc-help` option.
 
 **Checking for support site registration...**
 
-* Check that the package maintainer is register at our
+* Check that the package maintainer is registered on the Bioconductor
   [support site][10] using the same email address that is in the
-  `Maintainer` field of their package `DESCRIPTION` file (`ERROR`).
-  This can be disabled with the `--no-check-bioc-help` option.
+  `Authors@R` field of their package's `DESCRIPTION` file. Users will
+  be notified if the email is [not registered][11] (`ERROR`); if connection
+  issues are encountered, a `WARNING` will be issued. This check can be
+  disabled with the `--no-check-bioc-help` option.
 
-  The main place people ask questions about _Bioconductor_ packages is
-  the support site.  Please [register][11] and then include
-  your package name in the list of watched tags.
-  When a question is asked and tagged with your package name, you'll
-  get an email.
-
-* Package name is in support site watched tags is now a requirement.
+  The support site is the main forum for _Bioconductor_ package-related topics
+  and questions. Therefore, it is important for maintainers to register
+  their package name as a 'Watched Tag' on the support site in order to receive
+  email notifications whenever users ask questions about the package.
+  `BiocCheck` will cross-check the maintainer's 'Watched Tags' with
+  the current package and produce an `ERROR` if the package name is not in the
+  list of watched tags. 
 
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/
