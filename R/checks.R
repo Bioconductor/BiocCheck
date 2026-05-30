@@ -837,16 +837,19 @@ checkSupportReg <- function(email) {
 checkWatchedTag <- function(email, pkgname) {
     if (identical(email, "maintainer@bioconductor.org"))
         return()
+
     response <- paste0(
         "https://support.bioconductor.org/api/watched/tags/",
         URLencode(email, reserved = TRUE)
     ) |>
         request() |>
+        req_timeout(15L) |>
         req_perform() |>
         try(silent = TRUE)
+
     if (inherits(response, "try-error")) {
         handleMessage(
-            "Unable to find your email in the Support Site:",
+            "Unable to retrieve 'Watched Tags' profile from the Support Site:",
             "\n  ", conditionMessage(attr(response, "condition"))
         )
     } else {
@@ -854,11 +857,16 @@ checkWatchedTag <- function(email, pkgname) {
         taglist <- unlist(strsplit(alltags, split = ","))
         tags <- tolower(taglist)
         if (tolower(pkgname) %in% tags)
-            handleMessage("Package is in the Support Site Watched Tags.")
+            handleMessage(
+                sQuote(pkgname, FALSE),
+                " is already in your 'Watched Tags' on the Support Site."
+            )
         else
             handleError(
-                "Add package to Watched Tags in your Support Site profile; ",
-                "visit https://support.bioconductor.org/accounts/edit/profile"
+                "The ", sQuote(pkgname, FALSE), " tag must be added to your ",
+                "'Watched Tags' in your Support Site profile ",
+                "to receive email notifications for tagged questions: ",
+                "https://support.bioconductor.org/accounts/edit/profile"
             )
     }
 }
