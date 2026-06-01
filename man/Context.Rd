@@ -7,12 +7,12 @@
 Context(file = "", lines = character(), idx = logical(), offset = 0L)
 }
 \arguments{
-\item{file}{character(1) full path (including package name) of file being
+\item{file}{\code{character(1)} full path (including package name) of file being
 summarized.}
 
-\item{lines}{character() vector of text lines in file}
+\item{lines}{\code{character()} vector of text lines in file}
 
-\item{idx}{logical() same length as \code{lines} indicating lines in which
+\item{idx}{\code{logical()} same length as \code{lines} indicating lines in which
 event occurs}
 
 \item{offset}{\code{integer(1)} The number of lines to add to the 'Line' column

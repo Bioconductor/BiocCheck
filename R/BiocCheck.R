@@ -99,8 +99,8 @@
 #' `'<package_name>.BiocCheck'` folder). This option is only relevant to
 #' developers and contributors to `BiocCheck`.
 #'
-#' @param callr logical(1) Whether to use the `callr` package to run `BiocCheck`
-#'   in an isolated R session to prevent namespace collisions.
+#' @param callr `logical(1)` Whether to use the `callr` package to run
+#'   `BiocCheck` in an isolated R session to prevent namespace collisions.
 #'
 #' @param \dots See the `dot-options` details section for available options.
 #'

@@ -27,8 +27,8 @@ each condition raised by \code{BiocCheck} in the written log (i.e., in the
 \code{'<package_name>.BiocCheck'} folder). This option is only relevant to
 developers and contributors to \code{BiocCheck}.}
 
-\item{callr}{logical(1) Whether to use the \code{callr} package to run \code{BiocCheck}
-in an isolated R session to prevent namespace collisions.}
+\item{callr}{\code{logical(1)} Whether to use the \code{callr} package to run
+\code{BiocCheck} in an isolated R session to prevent namespace collisions.}
 
 \item{\dots}{See the \code{dot-options} details section for available options.}
 }
