@@ -423,7 +423,7 @@ doesManPageHaveRunnableExample <- function(rd)
     is.null(x) || isFALSE(x)
 }
 
-is_valid_author_tree <- function(x) {
+.is_valid_author_tree <- function(x) {
     if (is.null(x) || is.atomic(x))
         return(TRUE)
 
@@ -443,7 +443,7 @@ is_valid_author_tree <- function(x) {
         args <- as.list(x[-1L])
         return(
             all(
-                vapply(args, is_valid_author_tree, logical(1L))
+                vapply(args, .is_valid_author_tree, logical(1L))
             )
         )
     }

@@ -131,7 +131,7 @@ checkVersionNumber <- function(.BiocPackage)
     env[["c"]] <- c
     env[["person"]] <- utils::person
     pp <- parse(text = dcf[, field], keep.source = FALSE)
-    if (is_valid_author_tree(pp[[1L]])) {
+    if (.is_valid_author_tree(pp[[1L]])) {
         eval(pp, env)
     } else {
         handleError("Malformed 'Authors@R' field in DESCRIPTION")
