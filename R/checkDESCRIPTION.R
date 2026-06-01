@@ -60,6 +60,8 @@ checkForVersionNumberMismatch <- function(.BiocPackage)
 {
     if (!.BiocPackage$isTar)
         return()
+
+    handleCheck("Checking for version number mismatch...")
     tarfilename <- .BiocPackage$tarFilename
     ver <- tail(unlist(strsplit(tarfilename, "_|\\.tar\\.[xg]z")), 1L)
     dcf <- .BiocPackage$DESCRIPTION

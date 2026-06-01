@@ -244,10 +244,7 @@ BiocCheckRun <-
 
     if (.isNULLorFALSE(dots[["no-check-version-num"]])) {
         handleCheck("Checking version number...")
-        if (!.BiocPackage$isSourceDir) {
-            handleCheck("Checking for version number mismatch...")
-            checkForVersionNumberMismatch(.BiocPackage)
-        }
+        checkForVersionNumberMismatch(.BiocPackage)
 
         if (isTRUE(dots[["new-package"]])) {
             handleCheck("Checking new package version number...")
