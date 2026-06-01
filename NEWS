@@ -1,3 +1,26 @@
+CHANGES IN VERSION 1.50.0
+-----------------------
+
+NEW FEATURES
+
+    o Identify whether package source directories are live git clones or
+    untarred build directories, and adjust check behavior accordingly
+    o Add timeout (15s) and convert connection/timeout issues to warnings
+    (instead of errors) for support site registration and watched tags checks
+    o Update vignette engine checks to recommend VignetteBuilder instead of
+    VignetteEngine in the DESCRIPTION file (@LiNk-NY, #246).
+
+BUG FIXES AND MINOR IMPROVEMENTS
+
+    o Optimize `getFunctionLengths` and `checkFunctionLengths` using vectorized
+    operations for faster execution
+    o Support and update testing for roxygen2 version 8
+    o Improve ORCID checker to correctly validate invalid check-sum characters
+    o Resolve path linter false positives and use `file.path` for portable
+    path construction
+    o Clean up code style, remove redundant `return()` calls, and update
+    parameter type documentation
+
 CHANGES IN VERSION 1.48.0
 -----------------------
 
