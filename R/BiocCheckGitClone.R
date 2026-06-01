@@ -69,14 +69,14 @@ BiocCheckGitClone <- function(package=".", ...)
 {
     .BiocCheck$zero()
     package <- normalizePath(package)
-    if (!dir.exists(package))
-        .stop("Package directory does not exist")
-    .BiocPackage <- .BiocPackage$initialize(package)
-    if (.BiocPackage$isTar)
+
+    .BiocPackage <- .BiocPackage$initialize(
+        packageDir = package,
+        checkDir = dirname(package)
+    )
+
+    if (!.BiocPackage$isSourceDir)
         .stop("Run 'BiocCheckGitClone' on the Git-cloned package directory.")
-    # be careful here:
-    if (identical(.Platform$OS.type, "windows"))
-        package <- gsub("\\\\", "/", package)
 
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))

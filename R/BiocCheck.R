@@ -162,15 +162,20 @@ BiocCheckRun <-
 {
     .BiocCheck$zero()
     package <- normalizePath(package)
-    if (!file.exists(package) || !isScalarCharacter(package))
-        .stop("Package directory or tarball provided does not exist.")
-    # be careful here:
-    if (identical(.Platform$OS.type, "windows"))
-        package <- gsub("\\\\", "/", package)
+
+    .BiocPackage <- .BiocPackage$initialize(
+        packageDir = package,
+        checkDir = checkDir
+    )
+
+    if (!.BiocPackage$isSourceDir && !.BiocPackage$isTar)
+        .stop(
+            "Run 'BiocCheck' on a package source directory or source tarball."
+        )
 
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))
-        dots <- dots[[1]] # command line args come as list
+        dots <- dots[[1]]               # command line args come as list
 
     oldwarn <- getOption("warn")
     oldwidth <- getOption("cli.width")
@@ -178,11 +183,6 @@ BiocCheckRun <-
         options(warn = oldwarn, cli.width = oldwidth)
     })
     options(warn = 1, cli.width = 80)
-
-    .BiocPackage <- .BiocPackage$initialize(
-        packageDir = package,
-        checkDir = checkDir
-    )
 
     ## consider merging these operations into one
     cli::cli_div(theme = list(.pkg = list(color = "orange")))
