@@ -14,9 +14,25 @@ ru_valid_version <- function(.BiocPackage) {
         jsonlite::fromJSON()
 
     mini_ver <- ru_meta[["_bioc"]]
+    if (is.null(mini_ver)) {
+        handleError(
+            "No Bioconductor information in r-universe for package: ", pkg_name
+        )
+        return(invisible(NULL))
+    }
+
+    matched_ver <- match(bioc_ver, mini_ver[["bioc"]])
+
+    if (is.na(matched_ver)) {
+        handleError(
+            "No version in r-universe matches Bioconductor version: ",
+            bioc_ver
+        )
+        return(invisible(NULL))
+    }
 
     ru_version <- mini_ver[
-        match(bioc_ver, mini_ver[["bioc"]]),
+        matched_ver,
         "version"
     ] |>
         as.character()
