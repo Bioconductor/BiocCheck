@@ -44,8 +44,8 @@ ru_valid_version <- function(.BiocPackage) {
         )
     } else {
         handleError(
-            "Version mismatch with r-universe (", version_name, "): ",
-            "version in r-universe: ", ru_version, "; package version: ",
+            "Package version mismatch with r-universe (", version_name, "): ",
+            "r-universe version: ", ru_version, "; package version: ",
             pkg_version
         )
     }
