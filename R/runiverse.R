@@ -1,20 +1,15 @@
 .BIOC_UNIVERSE_URL <- "https://bioc.r-universe.dev/api/packages"
 
-## compare version in the r-universe with current package version
-ru_valid_version <- function(.BiocPackage) {
-    handleCheck("Checking for version number mismatch with r-universe...")
-
-    pkg_version <- .BiocPackage$packageVersion
+.get_runi_meta <- function(.BiocPackage) {
     pkg_name <- .BiocPackage$packageName
-    version_name <- BiocManager:::.version_field("BiocStatus") |>
-        as.character()
-    bioc_ver <- BiocManager::version() |> as.character()
-
-    ru_meta <- glue::glue(
+    glue::glue(
         .BIOC_UNIVERSE_URL, "/{pkg_name}"
     ) |>
         jsonlite::fromJSON()
+}
 
+.get_ru_version <- function(.BiocPackage) {
+    ru_meta <- .get_runi_meta(.BiocPackage)
     mini_ver <- ru_meta[["_bioc"]]
     if (is.null(mini_ver)) {
         handleError(
@@ -23,6 +18,7 @@ ru_valid_version <- function(.BiocPackage) {
         return(invisible(NULL))
     }
 
+    bioc_ver <- BiocManager::version() |> as.character()
     matched_ver <- match(bioc_ver, mini_ver[["bioc"]])
 
     if (is.na(matched_ver)) {
@@ -33,11 +29,18 @@ ru_valid_version <- function(.BiocPackage) {
         return(invisible(NULL))
     }
 
-    ru_version <- mini_ver[
-        matched_ver,
-        "version"
-    ] |>
+    mini_ver[matched_ver, "version"] |>
         as.character()
+}
+
+## compare version in the r-universe with current package version
+ru_valid_version <- function(.BiocPackage) {
+    handleCheck("Checking for version number mismatch with r-universe...")
+
+    pkg_version <- .BiocPackage$packageVersion
+    version_name <- BiocManager:::.version_field("BiocStatus") |>
+        as.character()
+    ru_version <- .get_ru_version(.BiocPackage)
 
     if (identical(pkg_version, ru_version)) {
         handleMessage(
