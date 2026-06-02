@@ -52,3 +52,37 @@ ru_valid_version <- function(.BiocPackage) {
         )
     }
 }
+
+check_ru_status <- function(.BiocPackage) {
+    pkg_name <- .BiocPackage$packageName
+    bioc_ver <- BiocManager::version() |> as.character()
+
+    rver <- BiocManager:::.version_field("R")
+    rver[, 3L] <- 0L
+
+    results <- glue::glue(
+        .BIOC_UNIVERSE_URL, "/{pkg_name}"
+    ) |>
+        rjsoncons::j_pivot(
+            path = "_jobs[]", as = "data.frame"
+        )
+    ruver <- results[["r"]] |> as.package_version()
+    prop_cond <- ruver == rver &
+        !results[["config"]] %in% c("bioc-checks", "wasm-release")
+
+    statuses <- results[prop_cond, "check", drop = FALSE] |>
+        unlist() |>
+        unname()
+
+    if (!any(statuses %in% c("ERROR", "FAIL"))) {
+        handleMessage(
+            "No 'ERROR' or 'FAIL' statuses in r-universe for package: ",
+            pkg_name
+        )
+    } else {
+        handleError(
+            "'ERROR' or 'FAIL' status found in r-universe for package: ",
+            pkg_name
+        )
+    }
+}
