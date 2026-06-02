@@ -101,6 +101,32 @@ check_ru_ver_bump <- function(.BiocPackage) {
             )
 }
 
+.filter_unsupported <- function(results, .BiocPackage) {
+    desc_field <- "Config/Bioconductor/UnsupportedPlatforms"
+    desc <- .BiocPackage$DESCRIPTION
+    fields <- colnames(desc)
+    if (!desc_field %in% fields)
+        return(results)
+    plats <- strsplit(unsupplat, ",\\s+")[[1L]] |>
+        gsub("macosx", "macos", x = _)
+    unsupported <- lapply(
+        plats, startsWith, x = results[["config"]]
+    ) |>
+        Reduce(`|`, x = _)
+    results[!unsupported, , drop = FALSE]
+}
+
+.filter_other_checks <- function(results) {
+    other_checks <- c("bioc-checks", "wasm-release")
+    results[!results[["config"]] %in% other_checks, , drop = FALSE]
+}
+
+.filter_r_ver <- function(results) {
+    rver <- BiocManager:::.version_field("R")
+    rver[, 3L] <- 0L
+    results[results[["r"]] == rver, , drop = FALSE]
+}
+
 check_ru_status <- function(.BiocPackage) {
     pkg_name <- .BiocPackage$packageName
     bioc_ver <- BiocManager::version() |> as.character()
@@ -113,24 +139,24 @@ check_ru_status <- function(.BiocPackage) {
     ) |>
         rjsoncons::j_pivot(
             path = "_jobs[]", as = "data.frame"
-        )
-    ruver <- results[["r"]] |> as.package_version()
-    prop_cond <- ruver == rver &
-        !results[["config"]] %in% c("bioc-checks", "wasm-release")
+        ) |>
+        .filter_r_ver() |>
+        .filter_other_checks() |>
+        .filter_unsupported(.BiocPackage)
 
-    statuses <- results[prop_cond, "check", drop = FALSE] |>
+    statuses <- results[["check"]] |>
         unlist() |>
         unname()
 
-    if (!any(statuses %in% c("ERROR", "FAIL"))) {
+    if (!any(statuses %in% c("ERROR", "FAIL", "CANCELLED"))) {
         handleMessage(
-            "No 'ERROR' or 'FAIL' statuses in r-universe for package: ",
-            pkg_name
+            "No 'ERROR', 'FAIL', or 'CANCELLED' status in r-universe",
+            " for package: ", pkg_name
         )
     } else {
         handleError(
-            "'ERROR' or 'FAIL' status found in r-universe for package: ",
-            pkg_name
+            "'ERROR', 'FAIL', or 'CANCELLED' status found in r-universe",
+            "for package: ", pkg_name
         )
     }
 }
