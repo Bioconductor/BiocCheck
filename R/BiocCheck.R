@@ -198,6 +198,12 @@ BiocCheckRun <-
     } else {
         if (is.character(install_param)) {
             split_log <- strsplit(install_param, ":")[[1L]]
+            stopifnot(
+                identical(
+                    "check",
+                    utils::head(split_log, n = 1L)
+                )
+            )
             inst_log <- utils::tail(split_log, n = 1L)
             on.exit({
                 if (file.exists(inst_log))
