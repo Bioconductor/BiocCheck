@@ -6,6 +6,8 @@ ru_valid_version <- function(.BiocPackage) {
 
     pkg_version <- .BiocPackage$packageVersion
     pkg_name <- .BiocPackage$packageName
+    version_name <- BiocManager:::.version_field("BiocStatus") |>
+        as.character()
     bioc_ver <- BiocManager::version() |> as.character()
 
     ru_meta <- glue::glue(
