@@ -56,6 +56,51 @@ ru_valid_version <- function(.BiocPackage) {
     }
 }
 
+.check_incremental <- function(version1, version2) {
+    version1 <- as.package_version(version1)
+    version2 <- as.package_version(version2)
+
+    if (version1 <= version2)
+        return(FALSE)
+
+    version2[, 3L] <- as.numeric(version2[, 3L]) + 1L
+
+    identical(
+        version1, version2
+    )
+}
+
+.check_major_increment <- function(version1, version2) {
+    version1 <- as.package_version(version1)
+    version2 <- as.package_version(version2)
+
+    if (version1 <= version2)
+        return(FALSE)
+
+    version1[, 2L] == '99' &&
+        identical(version1[, 1L], version2[, 1L])
+}
+
+check_ru_ver_bump <- function(.BiocPackage) {
+    handleCheck(
+        "Checking for valid version bump compared to r-universe version..."
+    )
+
+    pkg_version <- .BiocPackage$packageVersion
+    version_name <- BiocManager:::.version_field("BiocStatus") |>
+        as.character()
+    ru_version <- .get_ru_version(.BiocPackage)
+
+    .check_incremental(pkg_version, ru_version) ||
+        .check_major_increment(pkg_version, ru_version) ||
+            handleError(
+                "Version bump is not valid compared to r-universe (",
+                version_name, "): ",
+                "r-universe version: ", ru_version, "; package version: ",
+                pkg_version
+            )
+}
+
 check_ru_status <- function(.BiocPackage) {
     pkg_name <- .BiocPackage$packageName
     bioc_ver <- BiocManager::version() |> as.character()
