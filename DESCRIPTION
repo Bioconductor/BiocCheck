@@ -35,6 +35,7 @@ Imports:
     httr2,
     knitr,
     methods,
+    rjsoncons,
     rvest,
     stringdist,
     tools,
