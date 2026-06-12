@@ -156,10 +156,13 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc) {
     pkgname <- .BiocPackage$packageName
     uses_rd_pack <- .BiocPackage$usesRdpack
     manpages <- .BiocPackage$manSources
+
+    already_loaded <- isNamespaceLoaded(pkgname)
     pkg_ns <- loadNamespace(pkgname, lib.loc = lib.loc)
     exports <- getNamespaceExports(pkg_ns)
-    ## attempt to unload package namespace
-    try(unloadNamespace(pkg_ns), silent = TRUE)
+    if (!already_loaded)
+        try(unloadNamespace(pkg_ns), silent = TRUE)
+
     badManPages <- character(0)
     exportingPagesCount <- 0L
     noExamplesCount <- 0L
