@@ -2,6 +2,7 @@
 .Rhistory
 .RData
 BiocCheck.Rproj
+*.BiocCheck
 vignettes/*.md
 vignettes/*.R
 vignettes/*.html
