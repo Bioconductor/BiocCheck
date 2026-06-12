@@ -132,6 +132,21 @@ BiocCheck <- function(
     callr = FALSE,
     ...
 ) {
+    if (is.character(package)) {
+        packagePath <- normalizePath(package)
+        package <- .BiocPackage$initialize(
+            packageDir = packagePath,
+            checkDir = dirname(packagePath)
+        )
+    } else if (!is(package, "BiocPackage")) {
+        .stop(
+            "Invalid 'package' argument: must be a character path or ",
+            "an object of class 'BiocPackage'."
+        )
+    }
+
+    .BiocCheck$zero()
+
     if (callr) {
         callr::r(
             function(...) {
@@ -139,7 +154,6 @@ BiocCheck <- function(
             },
             args = list(
                 package = package,
-                checkDir = checkDir,
                 debug = debug,
                 ...
             ),
@@ -149,7 +163,6 @@ BiocCheck <- function(
     } else {
         BiocCheckRun(
             package = package,
-            checkDir = checkDir,
             debug = debug,
             ...
         )
@@ -158,35 +171,25 @@ BiocCheck <- function(
 
 #' @importFrom BiocBaseUtils isScalarCharacter
 BiocCheckRun <-
-    function(package, checkDir, debug, ...)
+    function(package, debug, ...)
 {
-    .BiocCheck$zero()
-    package <- normalizePath(package)
-
-    .BiocPackage <- .BiocPackage$initialize(
-        packageDir = package,
-        checkDir = checkDir
-    )
+    if (!is(package, "BiocPackage"))
+        .BiocPackage <- .BiocPackage$initialize(
+            packageDir = package,
+            checkDir = dirname(package)
+        )
 
     if (!.BiocPackage$isSourceDir && !.BiocPackage$isTar)
         .stop(
             "Run 'BiocCheck' on a package source directory or source tarball."
         )
 
+    cli::cli_div(theme = list(.pkg = list(color = "orange")))
+    cli::cli_rule("Installing {.pkg { .BiocPackage$packageName }}")
+
     dots <- list(...)
     if (length(dots) == 1L && is.list(dots[[1]]))
         dots <- dots[[1]]               # command line args come as list
-
-    oldwarn <- getOption("warn")
-    oldwidth <- getOption("cli.width")
-    on.exit({
-        options(warn = oldwarn, cli.width = oldwidth)
-    })
-    options(warn = 1, cli.width = 80)
-
-    ## consider merging these operations into one
-    cli::cli_div(theme = list(.pkg = list(color = "orange")))
-    cli::cli_rule("Installing {.pkg { .BiocPackage$packageName }}")
 
     install_param <- dots[["install"]]
     should_install <- is.null(install_param) || isTRUE(install_param)
@@ -220,9 +223,12 @@ BiocCheckRun <-
         package_install_dir <- .libPaths()[1L]
     }
 
-    isBBS <- Sys.getenv("IS_BIOC_BUILD_MACHINE")
-    onBBS <- nzchar(isBBS) && identical(tolower(isBBS), "true")
-    hasAdmin <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
+    oldwarn <- getOption("warn")
+    oldwidth <- getOption("cli.width")
+    on.exit({
+        options(warn = oldwarn, cli.width = oldwidth)
+    })
+    options(warn = 1, cli.width = 80)
 
     .BiocCheck$addMetadata(
         BiocPackage = .BiocPackage,
@@ -230,10 +236,23 @@ BiocCheckRun <-
     )
     cli::cli_rule("{.pkg { .BiocPackage$packageName }} session metadata")
     .BiocCheck$show_meta()
+
+    if (.BiocPackage$isGitClone)
+        .BiocCheck <- BiocCheckGitClone(.BiocPackage, dots)
+
+    .BiocCheck <- BiocCheckSource(.BiocPackage, debug, dots)
+
+    BiocCheckResults(.BiocCheck, dots)
+}
+
+BiocCheckSource <- function(.BiocPackage, debug, dots) {
+    isBBS <- Sys.getenv("IS_BIOC_BUILD_MACHINE")
+    onBBS <- nzchar(isBBS) && identical(tolower(isBBS), "true")
+    hasAdmin <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
+
     cli::cli_rule(
         "Running BiocCheck on {.pkg { .BiocPackage$packageName }}"
     )
-
     # BiocCheck checks --------------------------------------------------------
     if (.isNULLorFALSE(dots[["no-check-deprecated"]])) {
         handleCheck("Checking for deprecated package usage...")
@@ -311,11 +330,6 @@ BiocCheckRun <-
 
     handleCheck("Checking for stray BiocCheck output folders...")
     checkBiocCheckOutputFolder(.BiocPackage)
-
-    if (!.BiocPackage$isTar) {
-        handleCheck("Checking for inst/doc folders...")
-        checkInstDocFolder(.BiocPackage)
-    }
 
     if (.isNULLorFALSE(dots[["no-check-vignettes"]])) {
         handleCheck("Checking vignette directory...")
@@ -417,12 +431,16 @@ BiocCheckRun <-
         checkForSupportSiteRegistration(.BiocPackage)
     }
 
+    .BiocCheck$report(debug, onBBS)
+
+    return(.BiocCheck)
+}
+
+BiocCheckResults <- function(.BiocCheck, dots) {
+
+    # BiocCheck results -------------------------------------------------------
     cli::cli_rule(
-        left = paste0(
-            "BiocCheck v",
-            packageVersion("BiocCheck"),
-            " results"
-        )
+        left = paste0("BiocCheck v", packageVersion("BiocCheck"), " results")
     )
     cli::cli_text(
         paste0(
@@ -439,13 +457,10 @@ BiocCheckRun <-
         )
     )
 
-    .BiocCheck$report(debug, onBBS)
-
     if (isTRUE(dots[["quit-with-status"]])) {
         errcode <- as.integer(.BiocCheck$getNum("error") > 0)
         q("no", errcode)
     }
 
     return(.BiocCheck)
-
 }

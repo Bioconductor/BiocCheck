@@ -67,75 +67,29 @@ hidden_file_data <- data.frame(
 #' @export BiocCheckGitClone
 BiocCheckGitClone <- function(package=".", ...)
 {
-    .BiocCheck$zero()
-    package <- normalizePath(package)
+    if (!is(package, "BiocPackage"))
+        .BiocPackage <- .BiocPackage$initialize(
+            packageDir = package,
+            checkDir = dirname(package)
+        )
 
-    .BiocPackage <- .BiocPackage$initialize(
-        packageDir = package,
-        checkDir = dirname(package)
+    cli::cli_rule(
+        "Running Git clone checks on {.pkg { .BiocPackage$packageName }}"
     )
-
-    if (!.BiocPackage$isSourceDir)
-        .stop("Run 'BiocCheckGitClone' on the Git-cloned package directory.")
-
-    dots <- list(...)
-    if (length(dots) == 1L && is.list(dots[[1]]))
-        dots <- dots[[1]]               # command line args come as list
-
-    oldwarn <- getOption("warn")
-    oldwidth <- getOption("cli.width")
-    on.exit({
-        options(warn = oldwarn, cli.width = oldwidth)
-    })
-    options(warn = 1, cli.width = 80)
-
-    .BiocCheck$addMetadata(.BiocPackage)
-    .BiocCheck$show_meta()
-
     # BiocCheck checks --------------------------------------------------------
     handleCheck("Checking valid files...")
     checkBadFiles(.BiocPackage)
 
-    handleCheck("Checking individual file sizes...")
-    checkIndivFileSizes(.BiocPackage)
-    checkDataFileSizes(.BiocPackage)
-
-    handleCheck("Checking for stray BiocCheck output folders...")
-    checkBiocCheckOutputFolder(.BiocPackage)
-
     handleCheck("Checking for inst/doc folders...")
     checkInstDocFolder(.BiocPackage)
 
+    handleCheck("Checking if DESCRIPTION is well formatted...")
     checkDESCRIPTION(.BiocPackage)
 
-    handleCheck("Checking for remote package usage...")
-    checkRemotesUsage(.BiocPackage)
-
-    checkNAMESPACE(.BiocPackage)
     validMaintainer(.BiocPackage)
 
     handleCheck("Checking CITATION...")
     checkForCitationFile(.BiocPackage)
-
-    # BiocCheck results -------------------------------------------------------
-    cli::cli_rule(
-        left = paste0("BiocCheck v", packageVersion("BiocCheck"), " results")
-    )
-    cli::cli_text(
-        paste0(
-            "{symbol$cross} { .BiocCheck$getNum('error') } ERRORS | ",
-            "{symbol$warning} { .BiocCheck$getNum('warning') } WARNINGS | ",
-            "{symbol$info} { .BiocCheck$getNum('note') } NOTES\n"
-        )
-    )
-    cli::cli_alert_info(
-        "\nFor more details, run\n  browseVignettes(package = 'BiocCheck')"
-    )
-
-    if (isTRUE(dots[["quit-with-status"]])) {
-        errcode <- as.integer(.BiocCheck$getNum("error") > 0)
-        q("no", errcode)
-    }
 
     return(.BiocCheck)
 }
