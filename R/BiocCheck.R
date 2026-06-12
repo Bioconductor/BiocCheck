@@ -179,6 +179,8 @@ BiocCheckRun <-
             packageDir = package,
             checkDir = dirname(package)
         )
+    else
+        .BiocPackage <- package
 
     if (!.BiocPackage$isSourceDir && !.BiocPackage$isTar)
         .stop(

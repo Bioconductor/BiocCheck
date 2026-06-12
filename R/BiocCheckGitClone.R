@@ -70,6 +70,8 @@ BiocCheckGitClone <- function(package=".", ...)
             packageDir = package,
             checkDir = dirname(package)
         )
+    else
+        .BiocPackage <- package
 
     cli::cli_rule(
         "Running Git clone checks on {.pkg { .BiocPackage$packageName }}"
