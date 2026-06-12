@@ -313,7 +313,7 @@ Can be disabled with `--no-check-namespace`.
 ## BiocCheck output folder check
 
 * **Checking for stray BiocCheck output folders...** ensures that the
-  `<package_name>.BiocCheck` folder byproduct when running `BiocCheck(".")`
+  `<packageName>.BiocCheck` folder byproduct when running `BiocCheck(".")`
   locally does not get included in the package directory (`ERROR`).
 
 ## Check for inst/doc folder
