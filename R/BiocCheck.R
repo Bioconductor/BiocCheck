@@ -30,7 +30,7 @@
 #' To re-use an existing installation log file, set the `install` option
 #' to the name of the installation log file.
 #' For example, the following will put the `install_out.txt` log file in the
-#' `<package_name>.BiocCheck` directory:
+#' `<packageName>.BiocCheck` directory:
 #' `BiocCheck(package, install="check:install_out.txt")`
 #'
 #' @section dot-options:
@@ -81,23 +81,24 @@
 #'     specified, the package is installed by default. Optionally, a
 #'     `check:<file>` key-value pair is provided to identify the name of the
 #'     installation output file which will be copied to the
-#'     `<package_name>.BiocCheck` directory.
+#'     `<packageName>.BiocCheck` directory.
 #'   * `libloc`: when `install` is specified, the library location where the
 #'     package is installed. By default, this is `.libPaths()[1]`.
 #'
-#' @param package The path to an R package directory or tarball (`.tar.gz`).
-#'   The `BiocCheck` function is intended to be run from the package
-#'   directory; therefore, the current working directory (given by `getwd()`)
-#'   is the default.
+#' @param package `character(1)` or `.BiocPackage` Either a path to the R
+#'   package source directory or its tarball (`.tar.gz`) or an object of class
+#'   `BiocPackage`. The `BiocCheck` function is designed to run from within the
+#'   base source package directory by default (`getwd()`).
 #'
-#' @param checkDir The directory where the `BiocCheck` output directory will be
-#'   stored. By default, it will be placed in the same directory as the package
-#'   directory i.e., `dirname(pkg_dir)`.
+#' @param checkDir `character(1)` The directory where the `BiocCheck` output
+#'   directory `'<packageName>.BiocCheck'` should be placed. By default, it will
+#'   be created in the same directory as the package directory i.e.,
+#'   `dirname(package)`.
 #'
-#' @param debug Whether to append the names of functions that correspond to
-#' each condition raised by `BiocCheck` in the written log (i.e., in the
-#' `'<package_name>.BiocCheck'` folder). This option is only relevant to
-#' developers and contributors to `BiocCheck`.
+#' @param debug `logical(1)` Whether to append the names of functions that
+#'   correspond to each condition raised by `BiocCheck` in the written log
+#'   (i.e., in the `'<packageName>.BiocCheck'` folder). This option is only
+#'   relevant to developers and contributors to `BiocCheck`.
 #'
 #' @param callr `logical(1)` Whether to use the `callr` package to run
 #'   `BiocCheck` in an isolated R session to prevent namespace collisions.
@@ -105,7 +106,7 @@
 #' @param \dots See the `dot-options` details section for available options.
 #'
 #' @return `BiocCheck()` is chiefly called for the side effect of the check
-#'   reporting. The function also creates a `<package_name>.BiocCheck` folder
+#'   reporting. The function also creates a `<packageName>.BiocCheck` folder
 #'   and returns a `BiocCheck` reference class with three main list elements:
 #'
 #' * **error**: Items to address before the package can be accepted

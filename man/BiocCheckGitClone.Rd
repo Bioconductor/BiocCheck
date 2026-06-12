@@ -10,8 +10,7 @@ BiocCheckGitClone(package = ".", ...)
 \item{package}{A directory containing an R source package. Not a package tar
 ball.}
 
-\item{\dots}{Currently, only \code{quit-with-status} is available.  See
-\code{BiocCheck}}
+\item{\dots}{Additional arguments, not currently used.}
 }
 \value{
 \code{BiocCheckGitClone()} is chiefly called for the side effect of the

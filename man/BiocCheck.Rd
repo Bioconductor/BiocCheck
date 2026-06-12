@@ -13,19 +13,20 @@ BiocCheck(
 )
 }
 \arguments{
-\item{package}{The path to an R package directory or tarball (\code{.tar.gz}).
-The \code{BiocCheck} function is intended to be run from the package
-directory; therefore, the current working directory (given by \code{getwd()})
-is the default.}
+\item{package}{\code{character(1)} or \code{.BiocPackage} Either a path to the R
+package source directory or its tarball (\code{.tar.gz}) or an object of class
+\code{BiocPackage}. The \code{BiocCheck} function is designed to run from within the
+base source package directory by default (\code{getwd()}).}
 
-\item{checkDir}{The directory where the \code{BiocCheck} output directory will be
-stored. By default, it will be placed in the same directory as the package
-directory i.e., \code{dirname(pkg_dir)}.}
+\item{checkDir}{\code{character(1)} The directory where the \code{BiocCheck} output
+directory \code{'<packageName>.BiocCheck'} should be placed. By default, it will
+be created in the same directory as the package directory i.e.,
+\code{dirname(package)}.}
 
-\item{debug}{Whether to append the names of functions that correspond to
-each condition raised by \code{BiocCheck} in the written log (i.e., in the
-\code{'<package_name>.BiocCheck'} folder). This option is only relevant to
-developers and contributors to \code{BiocCheck}.}
+\item{debug}{\code{logical(1)} Whether to append the names of functions that
+correspond to each condition raised by \code{BiocCheck} in the written log
+(i.e., in the \code{'<packageName>.BiocCheck'} folder). This option is only
+relevant to developers and contributors to \code{BiocCheck}.}
 
 \item{callr}{\code{logical(1)} Whether to use the \code{callr} package to run
 \code{BiocCheck} in an isolated R session to prevent namespace collisions.}
@@ -34,7 +35,7 @@ developers and contributors to \code{BiocCheck}.}
 }
 \value{
 \code{BiocCheck()} is chiefly called for the side effect of the check
-reporting. The function also creates a \verb{<package_name>.BiocCheck} folder
+reporting. The function also creates a \verb{<packageName>.BiocCheck} folder
 and returns a \code{BiocCheck} reference class with three main list elements:
 \itemize{
 \item \strong{error}: Items to address before the package can be accepted
@@ -75,7 +76,7 @@ BiocCheck(package, install=NULL)
 To re-use an existing installation log file, set the \code{install} option
 to the name of the installation log file.
 For example, the following will put the \code{install_out.txt} log file in the
-\verb{<package_name>.BiocCheck} directory:
+\verb{<packageName>.BiocCheck} directory:
 \code{BiocCheck(package, install="check:install_out.txt")}
 }
 \section{dot-options}{
@@ -127,7 +128,7 @@ bioc
 specified, the package is installed by default. Optionally, a
 \verb{check:<file>} key-value pair is provided to identify the name of the
 installation output file which will be copied to the
-\verb{<package_name>.BiocCheck} directory.
+\verb{<packageName>.BiocCheck} directory.
 \item \code{libloc}: when \code{install} is specified, the library location where the
 package is installed. By default, this is \code{.libPaths()[1]}.
 }

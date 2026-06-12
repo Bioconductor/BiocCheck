@@ -40,9 +40,7 @@ hidden_file_data <- data.frame(
 #' @param package A directory containing an R source package. Not a package tar
 #' ball.
 #'
-#' @param \dots Currently, only `quit-with-status` is available.  See
-#' `BiocCheck`
-#'
+#' @param \dots Additional arguments, not currently used.
 #'
 #' @return `BiocCheckGitClone()` is chiefly called for the side effect of the
 #'   check reporting. The function returns a `BiocCheck` reference class with
