@@ -5,6 +5,8 @@ library(devtools)
 library(tinytest)
 
 # checkVersionNumber ------------------------------------------------------
+cli::cli_h3("checkVersionNumber")
+
 temp_dir <- tempdir()
 .bioctest <- create_test_package(
     test_dir = temp_dir, description = list(Version = "lkjgfhfdlkgjhdflkgj")
@@ -30,6 +32,7 @@ unlink(temp_dir, recursive = TRUE)
 
 
 # checkNewPackageVersionNumber --------------------------------------------
+cli::cli_h3("checkNewPackageVersionNumber")
 
 temppkgdir <- tempfile()
 .bioctest <- create_test_package(
@@ -64,6 +67,7 @@ expect_true(stillZero())
 
 
 # checkRbuildIgnore -------------------------------------------------------
+cli::cli_h3("checkRbuildIgnore")
 
 rbuildfile <- file.path(UNIT_TEST_TEMPDIR, ".Rbuildignore")
 if (!dir.exists(UNIT_TEST_TEMPDIR))
@@ -87,6 +91,8 @@ expect_identical(
 )
 
 # checkBiocCheckOutputFolder ----------------------------------------------
+cli::cli_h3("checkBiocCheckOutputFolder")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(test_dir = temp_dir)
 check_folder <- file.path(
@@ -99,6 +105,8 @@ expect_equivalent(.BiocCheck$getNum("error"), 1L)
 unlink(temp_dir, recursive = TRUE)
 
 # checkInstDocFolder ------------------------------------------------------
+cli::cli_h3("checkInstDocFolder")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(test_dir = temp_dir)
 inst_dir <- file.path(.bioctest$sourceDir, "inst", "doc")
@@ -114,6 +122,8 @@ expect_equivalent(.BiocCheck$getNum("error"), 1L)
 unlink(temp_dir, recursive = TRUE)
 
 # checkBiocViews ----------------------------------------------------------
+cli::cli_h3("checkBiocViews")
+
 .BiocCheck$zero()
 temp_dir <- tempfile()
 
@@ -159,6 +169,8 @@ expect_equivalent(
 unlink(temp_dir, recursive = TRUE)
 
 # checkBadFiles -----------------------------------------------------------
+cli::cli_h3("checkBadFiles")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir,
@@ -173,6 +185,8 @@ expect_equivalent(1, .BiocCheck$getNum("error"))
 unlink(temp_dir, recursive = TRUE)
 
 # checkSystemCalls --------------------------------------------------------
+cli::cli_h3("checkSystemCalls")
+
 .bioctest <- read_test_package("testpkg0")
 msg <- BiocCheck:::findSymbolsInRFiles(
     .bioctest, "system", "SYMBOL_FUNCTION_CALL"
@@ -181,6 +195,8 @@ expect_match(msg, "system\\(\\) in R/bad_coding\\.R.*")
 .BiocCheck$zero()
 
 # check T / F usage -------------------------------------------------------
+cli::cli_h3("check T / F usage")
+
 msg <- BiocCheck:::findSymbolsInRFiles(
     .bioctest, c("T", "F"), "SYMBOL", notLookback = "$"
 )
@@ -193,6 +209,8 @@ expect_equivalent(
 .BiocCheck$zero()
 
 # checkLicenseForRestrictiveUse -------------------------------------------
+cli::cli_h3("checkLicenseForRestrictiveUse")
+
 BiocCheck:::checkLicenseForRestrictiveUse("GPL-3.0")
 stillZero()
 .BiocCheck$zero()
@@ -218,6 +236,8 @@ expect_equivalent(1, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
 
 # analyze_licenses --------------------------------------------------------
+cli::cli_h3("analyze_licenses")
+
 licensedb <- gsub(
     "$R_HOME", Sys.getenv("R_HOME"),
     BiocCheck:::.LICENSE_DB_LOCATION, fixed = TRUE
@@ -235,6 +255,7 @@ expect_equivalent(0, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
 
 # checkIndivFileSizes -----------------------------------------------------
+cli::cli_h3("checkIndivFileSizes")
 
 .findLargeFiles_org <- BiocCheck:::.findLargeFiles
 .findLargeFiles <- function(...) {
@@ -255,6 +276,7 @@ unlink(temp_dir, recursive = TRUE)
 assignInNamespace('.findLargeFiles', .findLargeFiles_org, "BiocCheck")
 
 # checkBBScompatibility ---------------------------------------------------
+cli::cli_h3("checkBBScompatibility")
 
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
@@ -526,6 +548,8 @@ expect_equivalent(.BiocCheck$getNum("warning"), 1)
 unlink(temp_dir, recursive = TRUE)
 
 # checkUnitTests ----------------------------------------------------------
+cli::cli_h3("checkUnitTests")
+
 BiocCheck:::checkUnitTests(UNIT_TEST_TEMPDIR)
 expect_equivalent(.BiocCheck$getNum("note"), 1)
 .BiocCheck$zero()
@@ -547,6 +571,8 @@ expect_equivalent(.BiocCheck$getNum("note"), 1)
 .BiocCheck$zero()
 
 # check coding practice ---------------------------------------------------
+cli::cli_h3("check coding practice")
+
 .bioctest <- read_test_package("testpkg0")
 msg_sapply <- BiocCheck:::checkSapply(.bioctest)
 expect_equivalent(length(msg_sapply), 1)
@@ -570,6 +596,8 @@ res <- BiocCheck:::findSymbolsInVignettes(.bioctest, c("T", "F"), "SYMBOL")
 expect_equivalent(length(res), 1)
 
 # findPasteInSignaler -----------------------------------------------------
+cli::cli_h3("findPasteInSignaler")
+
 rfile <- tempfile()
 writeLines(c(
     "message(paste('foo', 'bar'))",
@@ -582,6 +610,8 @@ expect_true(
 )
 
 # findSignalerInSignaler --------------------------------------------------
+cli::cli_h3("findSignalerInSignaler")
+
 .SIGNALERS_TXT <- c("message", "warning", "stop")
 rfile <- tempfile()
 writeLines(c(
@@ -595,6 +625,8 @@ expect_true(
 )
 
 # .tryInstallwLoad --------------------------------------------------------
+cli::cli_h3(".tryInstallwLoad")
+
 .bioctest <- create_test_package()
 temppkg <- BiocCheck:::.tryInstallwLoad(.bioctest)
 liblocation <- file.path(temppkg, "lib")
@@ -613,6 +645,8 @@ unloadNamespace(testloadEnv)
 unlink(temppkg, recursive = TRUE)
 
 # packageName -------------------------------------------------------------
+cli::cli_h3("packageName")
+
 ## test tarball rename
 .bioctest <- create_test_package(description = list(Version = "0.99.0"))
 oldname <- devtools::build(.bioctest$sourceDir)
@@ -634,6 +668,8 @@ expect_identical(
 file.remove(newname)
 
 # checkDeprecatedPackages -------------------------------------------------
+cli::cli_h3("checkDeprecatedPackages")
+
 temp_dir <- tempfile()
 
 .bioctest <- create_test_package(
@@ -645,6 +681,8 @@ checkCounter("Depending on multicore didn't cause error!")
 unlink(temp_dir, recursive = TRUE)
 
 # parseFile ---------------------------------------------------------------
+cli::cli_h3("parseFile")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir,
@@ -665,6 +703,8 @@ expect_true(all(c("2", "+", "1") %in% incl[, "text"]))
 unlink(temp_dir, recursive = TRUE)
 
 # checkForBrowser ---------------------------------------------------------
+cli::cli_h3("checkForBrowser")
+
 .bioctest <- read_test_package("testpkg0")
 parsedCode <- BiocCheck:::parseFiles(.bioctest)
 res <- BiocCheck:::findSymbolsInParsedCode(
@@ -676,6 +716,8 @@ expect_equivalent(length(res), 1)
 .BiocCheck$zero()
 
 # findSymbolsInRFiles -----------------------------------------------------
+cli::cli_h3("findSymbolsInRFiles")
+
 .bioctest <- read_test_package("testpkg0")
 msg <- BiocCheck:::findSymbolsInRFiles(
     .bioctest, BiocCheck:::.BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
@@ -686,12 +728,16 @@ expect_match(
 .BiocCheck$zero()
 
 # checkCatInRCode ---------------------------------------------------------
+cli::cli_h3("checkCatInRCode")
+
 .bioctest <- read_test_package("testpkg0")
 msg <- BiocCheck:::checkCatInRCode(.bioctest, c("cat", "print"))
 expect_equivalent(length(msg), 9)
 .BiocCheck$zero()
 
 # checkDepDefInRCode ------------------------------------------------------
+cli::cli_h3("checkDepDefInRCode")
+
 .bioctest <- read_test_package("testpkg0")
 msg <- BiocCheck:::findSymbolsInRFiles(
     .bioctest, c(".Deprecated", ".Defunct"), "SYMBOL_FUNCTION_CALL"
@@ -700,6 +746,8 @@ expect_equivalent(length(msg), 2L)
 .BiocCheck$zero()
 
 # checkEqInAssignment -----------------------------------------------------
+cli::cli_h3("checkEqInAssignment")
+
 .bioctest <- read_test_package("testpkg0")
 msg <- BiocCheck:::checkEqInAssignment(
     .bioctest, symbol = "=", tokenType = "EQ_ASSIGN"
@@ -709,6 +757,8 @@ expect_equivalent(length(msg), 3)
 
 
 # checkVignetteDir for Rhtml ----------------------------------------------
+cli::cli_h3("checkVignetteDir for Rhtml")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir,
@@ -739,6 +789,8 @@ checkCounter(
 .BiocCheck$zero()
 
 # checkVigInstalls --------------------------------------------------------
+cli::cli_h3("checkVigInstalls")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkVigInstalls(.bioctest)
 expect_equivalent(.BiocCheck$getNum("error"), 1)
@@ -749,6 +801,8 @@ expect_match(
 .BiocCheck$zero()
 
 # checkDupChunkLabels -----------------------------------------------------
+cli::cli_h3("checkDupChunkLabels")
+
 vigfile <-  system.file(
     "testpackages", "testpkg0", "vignettes", "dupChunks.Rmd",
     package="BiocCheck", mustWork = TRUE
@@ -760,18 +814,24 @@ expect_equivalent(
 checkCounter("Duplicate chunk labels didn't cause error!")
 
 # checkTFSymbolUsage ------------------------------------------------------
+cli::cli_h3("checkTFSymbolUsage")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkTFSymbolUsage(.bioctest)
 expect_equivalent(.BiocCheck$getNum("warning"), 1)
 .BiocCheck$zero()
 
 # checkVigSessionInfo -----------------------------------------------------
+cli::cli_h3("checkVigSessionInfo")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkVigSessionInfo(.bioctest)
 expect_equivalent(.BiocCheck$getNum("note"), 1)
 .BiocCheck$zero()
 
 # checkForInstall ---------------------------------------------------------
+cli::cli_h3("checkForInstall")
+
 .bioctest <- read_test_package("testpkg0")
 parsedCode <- BiocCheck:::parseFiles(.bioctest)
 res <- BiocCheck:::findSymbolInParsedCode(
@@ -780,12 +840,16 @@ res <- BiocCheck:::findSymbolInParsedCode(
 expect_equivalent(res, 2)
 
 # checkVigBiocInst --------------------------------------------------------
+cli::cli_h3("checkVigBiocInst")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkVigBiocInst(.bioctest)
 expect_true(.BiocCheck$getNum("warning") == 1)
 .BiocCheck$zero()
 
 # checkClassNEEQLookup ----------------------------------------------------
+cli::cli_h3("checkClassNEEQLookup")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir,
@@ -811,6 +875,8 @@ expect_identical(4L, length(match))
 unlink(temp_dir, recursive = TRUE)
 
 # checkDESCRIPTIONfile ----------------------------------------------------
+cli::cli_h3("checkDESCRIPTIONfile")
+
 dcf <- matrix("https://example.com", dimnames = list(NULL, "URL"))
 BiocCheck:::checkDESCfields(dcf)
 expect_equivalent(.BiocCheck$getNum("note"), 1)
@@ -854,6 +920,8 @@ expect_equivalent(.BiocCheck$getNum("error"), 1)
 .BiocCheck$zero()
 
 # remotesUsage ------------------------------------------------------------
+cli::cli_h3("remotesUsage")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkRemotesUsage(.BiocPackage = .bioctest)
 expect_equivalent(1, BiocCheck:::.BiocCheck$getNum("error"))
@@ -865,12 +933,16 @@ expect_equivalent(0, BiocCheck:::.BiocCheck$getNum("error"))
 .BiocCheck$zero()
 
 # LazyDataUsage -----------------------------------------------------------
+cli::cli_h3("LazyDataUsage")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkLazyDataUsage(.bioctest)
 expect_equivalent(1, BiocCheck:::.BiocCheck$getNum("note"))
 .BiocCheck$zero()
 
 # checkForLibraryRequire -------------------------------------------------
+cli::cli_h3("checkForLibraryRequire")
+
 .bioctest <- read_test_package("testpkg0")
 msg <- BiocCheck:::checkForLibraryRequire(.bioctest)
 expect_equivalent(1L, .BiocCheck$getNum("warning"))
@@ -878,6 +950,8 @@ expect_equivalent(length(msg), 14L)
 .BiocCheck$zero()
 
 # getFunctionLengths ------------------------------------------------------
+cli::cli_h3("getFunctionLengths")
+
 file <- system.file(
     "testpackages", "testpkg0", "R", "parseme.R",
     package = "BiocCheck"
@@ -905,6 +979,8 @@ names(res0) <- c(
 expect_identical(res0, res)
 
 # getFunctionLengths2 -----------------------------------------------------
+cli::cli_h3("getFunctionLengths2")
+
 ## 1 function is greater than 50 lines long
 .bioctest <- read_test_package("testpkg0")
 parsedCode <- BiocCheck:::parseFiles(.bioctest)
@@ -920,6 +996,8 @@ expect_true(
 .BiocCheck$zero()
 
 # checkExportsAreDocumented ------------------------------------------------
+cli::cli_h3("checkExportsAreDocumented")
+
 .bioctest <- read_test_package("testpkg0")
 instdir <- BiocCheck:::.tryInstallwLoad(.bioctest)
 res <- BiocCheck:::checkExportsAreDocumented(
@@ -932,6 +1010,8 @@ expect_equivalent(2, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
 
 # checkNEWS ---------------------------------------------------------------
+cli::cli_h3("checkNEWS")
+
 BiocCheck:::checkNEWS(system.file("testpackages", "testpkg0",
     package="BiocCheck"))
 expect_equivalent(1, .BiocCheck$getNum("note"))
@@ -954,18 +1034,24 @@ expect_equivalent(1, .BiocCheck$getNum("warning"))
 .BiocCheck$zero()
 
 # checkFormatting ---------------------------------------------------------
+cli::cli_h3("checkFormatting")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkFormatting(.bioctest)
 expect_equivalent(3, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
 
 # checkForPromptComments -------------------------------------------------
+cli::cli_h3("checkForPromptComments")
+
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkForPromptComments(.bioctest)
 expect_equivalent(1, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
 
 # getPkgType -------------------------------------------------------------
+cli::cli_h3("getPkgType")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir, description = list(Foo = "bar")
@@ -1007,6 +1093,8 @@ expect_identical(.bioctest$packageType, NA_character_)
 unlink(temp_dir, recursive = TRUE)
 
 # checkForBiocDevelSubscription -------------------------------------------
+cli::cli_h3("checkForBiocDevelSubscription")
+
 if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
 
     temp_dir <- tempfile()
@@ -1095,6 +1183,8 @@ if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
 }
 
 # checkForSupportSiteRegistration ----------------------------------------
+cli::cli_h3("checkForSupportSiteRegistration")
+
 connect <- suppressWarnings(
     tryCatch({
         readBin("https://support.bioconductor.org", n=1L, what="raw")
@@ -1142,6 +1232,8 @@ if (connect) {
 }
 
 # checkForVersionNumberMismatch -------------------------------------------
+cli::cli_h3("checkForVersionNumberMismatch")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir,
@@ -1171,6 +1263,8 @@ expect_equivalent(.BiocCheck$getNum("error"), 1)
 unlink(temp_dir, recursive = TRUE)
 
 # checkForDirectSlotAccess ------------------------------------------------
+cli::cli_h3("checkForDirectSlotAccess")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir,
@@ -1216,6 +1310,8 @@ expect_equivalent(.BiocCheck$getNum("note"), 0)
 unlink(temp_dir, recursive = TRUE)
 
 # checkRVersionDependency -------------------------------------------------
+cli::cli_h3("checkRVersionDependency")
+
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
     test_dir = temp_dir,
@@ -1251,6 +1347,8 @@ expect_equivalent(.BiocCheck$getNum("note"), 0)
 unlink(temp_dir, recursive = TRUE)
 
 # doesManPageHaveRunnableExample -------------------------------------------
+cli::cli_h3("doesManPageHaveRunnableExample")
+
 good <- tools::parse_Rd(system.file("testpackages", "testpkg0", "man",
         "has-devel.Rd", package = "BiocCheck"))
 
@@ -1262,6 +1360,8 @@ expect_true(BiocCheck:::doesManPageHaveRunnableExample(good))
 expect_false(BiocCheck:::doesManPageHaveRunnableExample(bad))
 
 # checkForValueSection ----------------------------------------------------
+cli::cli_h3("checkForValueSection")
+
 .bioctest <- read_test_package("testpkg0")
 mans <-
     BiocCheck:::.read_all_rds(.bioctest$manSources, .bioctest$usesRdpack)
@@ -1278,6 +1378,8 @@ expect_true(!BiocCheck:::.valueInParsedRd(mans[[1]], tags[[1]]))
 expect_true(!BiocCheck:::.valueInParsedRd(mans[[2]], tags[[2]]))
 
 # packageAlreadyExists -----------------------------------------------------
+cli::cli_h3("packageAlreadyExists")
+
 .BiocCheck$zero()
 nerrors <- 0L
 BiocCheck:::checkIsPackageNameAlreadyInUse("GenomicRanges", "CRAN")
@@ -1315,6 +1417,8 @@ expect_equivalent(.BiocCheck$getNum("error"), nerrors)
 .BiocCheck$zero()
 
 # BiocCheckReporters -------------------------------------------------------
+cli::cli_h3("BiocCheckReporters")
+
 pkgdir <- system.file("testpackages", package="BiocCheck")
 hypo_checkdir <- file.path(pkgdir, "hypoPkg.BiocCheck")
 oldCheckDir <- .BiocCheck$metadata$BiocCheckDir
@@ -1329,6 +1433,8 @@ expect_true(
 .BiocCheck$metadata$BiocCheckDir <- oldCheckDir
 
 # checkUsageOfDont ---------------------------------------------------------
+cli::cli_h3("checkUsageOfDont")
+
 ## testpkg0 should trigger this note for 2 out of 3 man pages
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::.tryInstallwLoad(.bioctest)
@@ -1349,6 +1455,8 @@ expect_equivalent(0, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
 
 # checkORCID ---------------------------------------------------------------
+cli::cli_h3("checkORCID")
+
 orcid <- c(
     "0000-0001-6197-3471",
     "0000-0001-6197-347X",
@@ -1371,6 +1479,8 @@ expect_identical(
 )
 
 # getDirFiles --------------------------------------------------------------
+cli::cli_h3("getDirFiles")
+
 vigfiles <- list.files(
     system.file(
         "testpackages", "testpkg0", "vignettes", package="BiocCheck"

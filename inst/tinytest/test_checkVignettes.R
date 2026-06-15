@@ -4,6 +4,8 @@ library(devtools)
 library(tinytest)
 
 # vignettes0 --------------------------------------------------------------
+cli::cli_h3("vignettes0")
+
 .BiocCheck$zero()
 temp_dir <- tempfile()
 .bioctest <- create_test_package(
