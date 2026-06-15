@@ -208,7 +208,7 @@ BiocCheckRun <-
     if (should_install) {
         package_install_dir <- .tryInstallwLoad(.BiocPackage)
         cli::cli_alert_success("Package installed successfully")
-        libloc <- file.path(package_install_dir, "lib")
+        dots[["libloc"]] <- file.path(package_install_dir, "lib")
     } else {
         if (is.character(install_param)) {
             split_log <- strsplit(install_param, ":")[[1L]]
@@ -230,7 +230,7 @@ BiocCheckRun <-
                     )
             }, add = TRUE)
         }
-        libloc <- dots[["libloc"]] %||% .libPaths()[1L]
+        dots[["libloc"]] <- dots[["libloc"]] %||% .libPaths()[1L]
         package_install_dir <- .libPaths()[1L]
     }
 
@@ -382,7 +382,7 @@ BiocCheckSource <- function(.BiocPackage, debug, dots) {
 
     if (.isNULLorFALSE(dots[["no-check-man-doc"]])) {
         handleCheck("Checking man page documentation...")
-        checkManDocumentation(.BiocPackage, libloc)
+        checkManDocumentation(.BiocPackage, dots[["libloc"]])
     }
 
     if (.isNULLorFALSE(dots[["no-check-news"]])) {
