@@ -177,9 +177,7 @@ unlink(temp_dir, recursive = TRUE)
 msg <- BiocCheck:::findSymbolsInRFiles(
     .bioctest, "system", "SYMBOL_FUNCTION_CALL"
 )
-## use tinytest:: until fixed in
-## https://github.com/markvanderloo/tinytest/issues/124
-tinytest::expect_match(msg, "system\\(\\) in R/bad_coding\\.R.*")
+expect_match(msg, "system\\(\\) in R/bad_coding\\.R.*")
 .BiocCheck$zero()
 
 # check T / F usage -------------------------------------------------------
@@ -682,7 +680,7 @@ expect_equivalent(length(res), 1)
 msg <- BiocCheck:::findSymbolsInRFiles(
     .bioctest, BiocCheck:::.BAD_INSTALL_CALLS, "SYMBOL_FUNCTION_CALL"
 )
-tinytest::expect_match(
+expect_match(
     msg, "update\\.packages\\(\\)|install\\(\\)"
 )
 .BiocCheck$zero()
@@ -744,7 +742,7 @@ checkCounter(
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkVigInstalls(.bioctest)
 expect_equivalent(.BiocCheck$getNum("error"), 1)
-tinytest::expect_match(
+expect_match(
     .BiocCheck$get("error")[[1L]][1L],
     "Package installation calls"
 )
