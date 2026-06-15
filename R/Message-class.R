@@ -1,11 +1,11 @@
-cli_warning <- function(...) {
-    cli::cli_div(theme = list(.warning = list(color = "orange")))
-    cli::cli_alert_warning(paste0("{.warning WARNING: ", ..., "}"), wrap = TRUE)
-}
-
 cli_error <- function(...) {
     cli::cli_div(theme = list(.error = list(color = "red")))
     cli::cli_alert_danger(paste0("{.error ERROR: ", ..., "}"), wrap = TRUE)
+}
+
+cli_warning <- function(...) {
+    cli::cli_div(theme = list(.warning = list(color = "orange")))
+    cli::cli_alert_warning(paste0("{.warning WARNING: ", ..., "}"), wrap = TRUE)
 }
 
 cli_note <- function(...) {

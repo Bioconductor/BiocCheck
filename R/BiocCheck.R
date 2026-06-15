@@ -187,7 +187,15 @@ BiocCheckRun <-
             "Run 'BiocCheck' on a package source directory or source tarball."
         )
 
-    cli::cli_div(theme = list(.pkg = list(color = "orange")))
+    cli::cli_div(
+        theme = list(
+            .pkg = list(color = "green", `font-weight` = "bold"),
+            .error = list(color = "red"),
+            .warning = list(color = "orange"),
+            .note = list(color = "blue"),
+            .version = list(color = "yellow", `font-style` = "italic")
+        )
+    )
     cli::cli_rule("Installing {.pkg { .BiocPackage$packageName }}")
 
     dots <- list(...)
@@ -254,7 +262,7 @@ BiocCheckSource <- function(.BiocPackage, debug, dots) {
     hasAdmin <- nzchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))
 
     cli::cli_rule(
-        "Running BiocCheck on {.pkg { .BiocPackage$packageName }}"
+        "Running {.pkg BiocCheck} on {.pkg { .BiocPackage$packageName }}"
     )
     # BiocCheck checks --------------------------------------------------------
     if (.isNULLorFALSE(dots[["no-check-deprecated"]])) {
@@ -443,20 +451,30 @@ BiocCheckResults <- function(.BiocCheck, dots) {
 
     # BiocCheck results -------------------------------------------------------
     cli::cli_rule(
-        left = paste0("BiocCheck v", packageVersion("BiocCheck"), " results")
+        left = paste(
+            "{.pkg BiocCheck}",
+            "{.version v{ packageVersion('BiocCheck') }}",
+            "results"
+        )
     )
     cli::cli_text(
-        paste0(
-            "{symbol$cross} { .BiocCheck$getNum('error') } ERRORS | ",
-            "{symbol$warning} { .BiocCheck$getNum('warning') } WARNINGS | ",
-            "{symbol$info} { .BiocCheck$getNum('note') } NOTES\n"
+        paste(
+            "{.error {symbol$cross}}",
+                "{ .BiocCheck$getNum('error') }",
+                "{.error ERRORS } |",
+            "{.warning {symbol$warning}}",
+                "{ .BiocCheck$getNum('warning') }",
+                "{.warning WARNINGS } |",
+            "{.note {symbol$info}}",
+                "{ .BiocCheck$getNum('note') }",
+                "{.note NOTES }\n"
         )
     )
     cli::cli_alert_info(
-        paste0(
+        paste(
             "\nSee the { .BiocPackage$packageName }.BiocCheck folder and run\n",
-            "  browseVignettes(package = 'BiocCheck')\n",
-            "  for details."
+            " {.code browseVignettes(package = 'BiocCheck')}\n",
+            " for details."
         )
     )
 
