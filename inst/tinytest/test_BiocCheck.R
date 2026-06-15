@@ -920,7 +920,7 @@ expect_equivalent(.BiocCheck$getNum("error"), 1)
 .BiocCheck$zero()
 
 # remotesUsage ------------------------------------------------------------
-cli::cli_h3("remotesUsage")
+cli::cli_h3("checkRemotesUsage")
 
 .bioctest <- read_test_package("testpkg0")
 BiocCheck:::checkRemotesUsage(.BiocPackage = .bioctest)

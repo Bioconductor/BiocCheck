@@ -8,5 +8,6 @@ Depends: R (>= 3.1.0), jsonlite
 License: GPL-2
 LazyData: true
 Imports: devtools, tools
-Remotes:
+Remotes: myPackage
+Additional_repositories: myOtherPackage
 VignetteBuilder: knitr
