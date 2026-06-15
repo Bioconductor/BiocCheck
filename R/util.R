@@ -150,7 +150,7 @@ get_deprecated_status_db_url <- function(version) {
 }
 
 #' @importFrom BiocFileCache BiocFileCache bfcquery bfcneedsupdate bfcdownload
-#'   bfcrpath
+#' @importFrom BiocFileCache bfcrpath
 get_status_file_cache <- function(url) {
     cache <- tools::R_user_dir("BiocCheck", "cache")
     bfc <- BiocFileCache(cache, ask = FALSE)

@@ -22,7 +22,7 @@ cli_note <- function(...) {
 #' @title A lower level Message helper class for BiocCheck
 #'
 #' @aliases setMessage,Message-method setCondition,Message-method
-#'   getCondition,Message-method
+#' @aliases getCondition,Message-method
 #'
 #' @field msg `list()` A list of character messages usually grown with `append`
 #'   with conditions raised by a check

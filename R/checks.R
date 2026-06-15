@@ -1,6 +1,6 @@
 #' @importFrom tools file_path_sans_ext file_ext parse_Rd Rd2ex
 #' @importFrom utils capture.output data getParseData head packageDescription
-#'   packageVersion globalVariables readCitationFile
+#' @importFrom utils packageVersion globalVariables readCitationFile
 #' @importFrom stringdist stringdistmatrix
 #' @importFrom knitr purl
 #' @importFrom BiocManager available install repositories version
