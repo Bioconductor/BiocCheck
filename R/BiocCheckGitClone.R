@@ -1,5 +1,5 @@
 .HIDDEN_FILE_EXTS <- c(
-    ".renviron", ".rprofile", ".rproj", ".rhistory",
+    ".renviron", ".rprofile", ".rhistory",
     ".rapp.history", ".o", ".sl", ".so", ".dylib", ".a", ".dll", ".def",
     ".ds_store", "unsrturl.bst", ".log", ".aux", ".backups", ".cproject",
     ".directory", ".dropbox", ".exrc", ".gdb.history", ".gitattributes",
@@ -16,7 +16,7 @@
 # https://github.com/wch/r-source/blob/trunk/src/library/tools/R/check.R#L4025
 hidden_file_data <- data.frame(
     file_ext = .HIDDEN_FILE_EXTS,
-    hidden_only = c(TRUE, TRUE, FALSE, TRUE,
+    hidden_only = c(TRUE, TRUE, TRUE,
         TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
         TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
         FALSE, FALSE, FALSE, FALSE, TRUE,
