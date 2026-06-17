@@ -101,12 +101,12 @@ check_ru_ver_bump <- function(.BiocPackage) {
             )
 }
 
-.filter_unsupported <- function(results, .BiocPackage) {
+.filter_unsupported <- function(results, desc) {
     desc_field <- "Config/Bioconductor/UnsupportedPlatforms"
-    desc <- .BiocPackage$DESCRIPTION
     fields <- colnames(desc)
     if (!desc_field %in% fields)
         return(results)
+    unsupplat <- desc[, desc_field]
     plats <- strsplit(unsupplat, ",\\s+")[[1L]] |>
         gsub("macosx", "macos", x = _)
     unsupported <- lapply(
@@ -142,7 +142,7 @@ check_ru_status <- function(.BiocPackage) {
         ) |>
         .filter_r_ver() |>
         .filter_other_checks() |>
-        .filter_unsupported(.BiocPackage)
+        .filter_unsupported(.BiocPackage$DESCRIPTION)
 
     statuses <- results[["check"]] |>
         unlist() |>
