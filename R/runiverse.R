@@ -160,3 +160,12 @@ check_ru_status <- function(.BiocPackage) {
         )
     }
 }
+
+.validate_status <- function(statuses) {
+    valid_statuses <- c("ERROR", "FAIL", "CANCELLED", "WARNING", "NOTE", "OK")
+    if (!all(statuses %in% valid_statuses))
+        handleWarning(
+            "Invalid status found in r-universe checks: ",
+            paste(statuses, collapse = ", ")
+        )
+}
