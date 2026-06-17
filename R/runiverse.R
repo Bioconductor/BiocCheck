@@ -148,16 +148,28 @@ check_ru_status <- function(.BiocPackage) {
         unlist() |>
         unname()
 
-    if (!any(statuses %in% c("ERROR", "FAIL", "CANCELLED"))) {
-        handleMessage(
-            "No 'ERROR', 'FAIL', or 'CANCELLED' status in r-universe",
-            " for package: ", pkg_name
+    .validate_status(statuses)
+
+    status_rules <- data.frame(
+        status = c("ERROR", "FAIL", "CANCELLED", "WARNING", "NOTE", "OK"),
+        handler = c(
+            rep("handleError", 3L),
+            rep("handleMessage", 3L)
         )
-    } else {
-        handleError(
-            "'ERROR', 'FAIL', or 'CANCELLED' status found in r-universe",
-            "for package: ", pkg_name
-        )
+    )
+
+    matched <-
+        status_rules[status_rules[["status"]] %in% statuses, , drop = FALSE]
+
+    if (nrow(matched)) {
+        handler <- get(matched[1L, "handler"], mode = "function")
+        sQuote(matched[["status"]], FALSE) |>
+            paste(... = _, collapse = ", ") |>
+            handler(
+                ... = _,
+                " status found in r-universe checks for package: ",
+                pkg_name
+            )
     }
 }
 
