@@ -12,6 +12,9 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Removed the `*.Rproj` file from the list of bad files in
+    `BiocCheckGitClone` and added `.positai` and `.claude` directories
+    (@lshep & @LiNK-NY, #249)
     o When identifying bad files from the internal list, directories were not
     properly 'grep'ed. Directories are now correctly identified and filtered out
     via `.gitignore` in `BiocCheckGitClone`.
