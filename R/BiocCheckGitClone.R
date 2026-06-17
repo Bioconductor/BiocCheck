@@ -8,7 +8,7 @@
 )
 
 .HIDDEN_PATH_COMPONENTS <- c(
-    ".rproj.user", ".settings"
+    ".rproj.user", ".settings", ".positai", ".claude"
 )
 
 # taken from
