@@ -1,10 +1,14 @@
 .HIDDEN_FILE_EXTS <- c(
-    ".renviron", ".rprofile", ".rproj", ".rproj.user", ".rhistory",
+    ".renviron", ".rprofile", ".rproj", ".rhistory",
     ".rapp.history", ".o", ".sl", ".so", ".dylib", ".a", ".dll", ".def",
     ".ds_store", "unsrturl.bst", ".log", ".aux", ".backups", ".cproject",
     ".directory", ".dropbox", ".exrc", ".gdb.history", ".gitattributes",
-    ".gitmodules", ".hgtags", ".project", ".seed", ".settings",
+    ".gitmodules", ".hgtags", ".project", ".seed",
     ".tm_properties", ".rdata"
+)
+
+.HIDDEN_PATH_COMPONENTS <- c(
+    ".rproj.user", ".settings"
 )
 
 # taken from
@@ -12,11 +16,11 @@
 # https://github.com/wch/r-source/blob/trunk/src/library/tools/R/check.R#L4025
 hidden_file_data <- data.frame(
     file_ext = .HIDDEN_FILE_EXTS,
-    hidden_only = c(TRUE, TRUE, FALSE, TRUE, TRUE,
+    hidden_only = c(TRUE, TRUE, FALSE, TRUE,
         TRUE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE, FALSE,
         TRUE, TRUE, FALSE, FALSE, FALSE, FALSE,
         FALSE, FALSE, FALSE, FALSE, TRUE,
-        TRUE, FALSE, TRUE, FALSE, FALSE,
+        TRUE, FALSE, TRUE, FALSE,
         FALSE, TRUE)
 )
 
@@ -94,6 +98,30 @@ BiocCheckGitClone <- function(package=".", ...)
     return(.BiocCheck)
 }
 
+filter_gitignore <- function(paths, patterns, package_dir) {
+    patterns <- sub("^/", "", patterns)
+    ignored <- logical(length(paths))
+    for (pat in patterns) {
+        is_dir <- dir.exists(file.path(package_dir, pat)) ||
+            dir.exists(file.path(package_dir, gsub("\\*", "", pat)))
+
+        if (is_dir) {
+            dir_expr <- paste0(
+                "(^|/)", gsub("\\.", "\\\\.", pat), "(/|$)"
+            )
+            ignored <- ignored | grepl(dir_expr, paths, TRUE)
+        } else {
+            file_expr <- utils::glob2rx(pat)
+            if (grepl("/", pat)) {
+                ignored <- ignored | grepl(file_expr, paths, TRUE)
+            } else {
+                ignored <- ignored | grepl(file_expr, basename(paths), TRUE)
+            }
+        }
+    }
+    paths[!ignored]
+}
+
 # Checks for BiocCheckGitClone --------------------------------------------
 
 checkBadFiles <- function(.BiocPackage) {
@@ -103,21 +131,36 @@ checkBadFiles <- function(.BiocPackage) {
         swith, "\\", hidden_file_data[["file_ext"]], "$", collapse = "|"
     )
 
-    fls <- dir(package_dir, recursive=TRUE, all.files=TRUE)
-    flist <- split(fls, startsWith(fls, "inst"))
-    warns <- grep(ext_expr, ignore.case = TRUE, flist[['TRUE']], value = TRUE)
-    errs <- grep(ext_expr, ignore.case = TRUE, flist[['FALSE']], value = TRUE)
+    path_expr <- paste0(
+        "(^|/)", gsub("\\.", "\\\\.", .HIDDEN_PATH_COMPONENTS), "(/|$)",
+        collapse = "|"
+    )
 
-    ## use gitignore to filter out false positives
-    gitignore <- file.path(package_dir, ".gitignore")
-    if (file.exists(gitignore)) {
-        gitignore <- readLines(gitignore)
-        filter_expr <- paste0(utils::glob2rx(gitignore), collapse = "|")
-        ignored <- grep(
-            filter_expr, ignore.case = TRUE, flist[["FALSE"]], value = TRUE
-        )
-        errs <- errs[!errs %in% ignored]
+    fls <- if (
+        requireNamespace("gert", quietly = TRUE) && .BiocPackage$isGitClone
+    ) {
+        gert::git_ls(package_dir)[["path"]]
+    } else {
+        all_fls <- dir(package_dir, recursive = TRUE, all.files = TRUE)
+        gitignore_path <- file.path(package_dir, ".gitignore")
+        if (file.exists(gitignore_path)) {
+            patterns <- readLines(gitignore_path, warn = FALSE)
+            patterns <- patterns[nzchar(patterns) & !startsWith(patterns, "#")]
+            all_fls <- filter_gitignore(all_fls, patterns, package_dir)
+        }
+        all_fls
     }
+    flist <- split(fls, startsWith(fls, "inst"))
+
+    match_bad <-  function(paths) {
+        by_ext <- grep(ext_expr, paths, ignore.case = TRUE, value = TRUE)
+        by_comp <- grep(path_expr, paths, ignore.case = TRUE, value = TRUE)
+        union(by_ext, by_comp)
+    }
+
+    warns <- match_bad(flist[["TRUE"]])
+    errs <- match_bad(flist[["FALSE"]])
+
     if (length(warns)) {
         handleWarning(
             "System files in '/inst' should not be Git tracked.",
