@@ -180,7 +180,8 @@ temp_dir <- tempfile()
     }
 )
 BiocCheck:::checkBadFiles(.bioctest)
-expect_equivalent(1, .BiocCheck$getNum("error"))
+## *.Rproj files no longer trigger error
+expect_equivalent(0, .BiocCheck$getNum("error"))
 .BiocCheck$zero()
 unlink(temp_dir, recursive = TRUE)
 
