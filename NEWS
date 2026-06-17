@@ -12,6 +12,9 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o When identifying bad files from the internal list, directories were not
+    properly 'grep'ed. Directories are now correctly identified and filtered out
+    via `.gitignore` in `BiocCheckGitClone`.
     o Optimize `getFunctionLengths` and `checkFunctionLengths` using vectorized
     operations for faster execution
     o Support and update testing for roxygen2 version 8
