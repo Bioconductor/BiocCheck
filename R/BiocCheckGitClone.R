@@ -196,7 +196,7 @@ checkForCitationFile <- function(.BiocPackage) {
                 "package."
             )
     } else {
-        handleNote(
+        handleMessage(
             "(Optional) CITATION file not found. Only include a CITATION ",
             "file if there is a preprint or publication for this Bioconductor ",
             "package. Note that Bioconductor packages are not required to ",

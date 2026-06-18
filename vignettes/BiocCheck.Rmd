@@ -840,7 +840,8 @@ Note that `citEntry()` should be updated to `bibentry()` as seen with
 Bioconductor packages are not required to have a `CITATION` file but it is
 useful both for users and for tracking Bioconductor project-wide metrics.
 Maintainers should update the `CITATION` file once a preprint or publication is
-released. Packages that do not have a `CITATION` file are flagged with a `NOTE`.
+released. Packages that do not have a `CITATION` file are presented with an
+informative message.
 
 # Expanding `BiocCheck`
 
