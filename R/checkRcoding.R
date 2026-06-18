@@ -194,6 +194,15 @@ checkCodingPractice <- function(.BiocPackage, parsedCode)
             messages = msg_supp
         )
     }
+
+    # S4 class show method
+    msg_show <- checkS4ClassShowMethod(.BiocPackage)
+    if (length(msg_show)) {
+        handleWarning(
+            "Provide a show() method for each S4 class",
+            messages = msg_show
+        )
+    }
 }
 
 checkSapply <- function(.BiocPackage) {
@@ -242,6 +251,36 @@ checkSingleColon <- function(.BiocPackage, avail_pkgs = character(0L)) {
         )
     }, framelist = colon_pres)
     msg_sc <- unlist(msg_sc)
+}
+
+checkS4ClassShowMethod <- function(.BiocPackage) {
+    if (!.BiocPackage$isInstalled)
+        return(character(0L))
+
+    ns <- loadNamespace(
+        .BiocPackage$packageName, lib.loc = .BiocPackage$installDir
+    )
+    nse <- getNamespaceExports(ns) |>
+        gsub(".__C__", "", x = _, fixed = TRUE)
+
+    pkgCls <- getClasses(
+        getNamespace(.BiocPackage$packageName)
+    )
+
+    classes <- intersect(pkgCls, nse)
+    eligClass <- Filter(
+        function(x) {
+            isClass(x) && !isVirtualClass(x) && isS4(getClass(x))
+        },
+        classes
+    )
+
+    Filter(
+        function(x) {
+            is(selectMethod("show", x), "derivedDefaultMethod")
+        },
+        eligClass
+    )
 }
 
 .filtTokens <-
@@ -424,13 +463,13 @@ checkEqInAssignment <-
 checkPasteInSignaler <- function(.BiocPackage) {
     rfiles <- .BiocPackage$RSources
     pasteSig <- lapply(rfiles, .findPasteInSignaler)
-    pasteSig <- unlist(pasteSig)
+    unlist(pasteSig)
 }
 
 checkSignalerInSignaler <- function(.BiocPackage) {
     rfiles <- .BiocPackage$RSources
     sisig <- lapply(rfiles, .findSignalerInSignaler, symbols = .SIGNALERS_TXT)
-    sisig <- unlist(sisig)
+    unlist(sisig)
 }
 
 .checkValidNEEQPattern <- function(tokens, eqnums) {

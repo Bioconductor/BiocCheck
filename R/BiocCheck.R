@@ -206,9 +206,9 @@ BiocCheckRun <-
     should_install <- is.null(install_param) || isTRUE(install_param)
 
     if (should_install) {
-        package_install_dir <- .tryInstallwLoad(.BiocPackage)
+        .BiocPackage$install()
         cli::cli_alert_success("Package installed successfully")
-        dots[["libloc"]] <- file.path(package_install_dir, "lib")
+        dots[["libloc"]] <- .BiocPackage$installDir
     } else {
         if (is.character(install_param)) {
             split_log <- strsplit(install_param, ":")[[1L]]
@@ -231,7 +231,12 @@ BiocCheckRun <-
             }, add = TRUE)
         }
         dots[["libloc"]] <- dots[["libloc"]] %||% .libPaths()[1L]
-        package_install_dir <- .libPaths()[1L]
+        .BiocPackage$installDir <- .libPaths()[1L]
+        .BiocPackage$isInstalled <-  system.file(
+            package = .BiocPackage$packageName,
+            lib.loc = .libPaths()[1L]
+        ) |>
+            nzchar()
     }
 
     oldwarn <- getOption("warn")
@@ -243,7 +248,7 @@ BiocCheckRun <-
 
     .BiocCheck$addMetadata(
         BiocPackage = .BiocPackage,
-        installDir = package_install_dir
+        installDir = .BiocPackage$installDir
     )
     cli::cli_rule("{.pkg { .BiocPackage$packageName }} session metadata")
     .BiocCheck$show_meta()
