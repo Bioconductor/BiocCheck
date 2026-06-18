@@ -296,8 +296,10 @@ checkFndPerson <- function(dcf) {
     handleCheck("Checking for 'fnd' role in Authors@R...")
     field <- if ("Authors@R" %in% colnames(dcf)) "Authors@R" else "Author"
     people <- .PersonsFromDCF(dcf, field, .dreturn = "")
-    msg <- "No 'fnd' role found in Authors@R. If the work is supported
-        by a grant, consider adding the 'fnd' role to the list of authors."
+    msg <- paste(
+        "No 'fnd' role found in 'Authors@R'. If the work is supported by a",
+        "grant, consider adding the 'fnd' role to the list of authors."
+    )
     if (!any(grepl("fnd", people, fixed = TRUE)))
-        handleNote(msg)
+        handleMessage(msg)
 }

@@ -292,7 +292,8 @@ Can be disabled with `--no-check-bbs`
   the package depends on any Bioconductor software packages in the `Depends:`
   and `Imports:` fields; if none (`WARNING`).
 * **Checking for 'fnd' role in Authors@R...** Checks to see if the `Authors@R`
-  field has a person or organization with the `fnd` (funder) role (`NOTE`).
+  or `Author` field has a person or organization with the `fnd` (funder) role
+  (`message`).
 
 [choosealicense]: https://choosealicense.com/appendix
 [SPDX License List]: https://spdx.org/licenses/

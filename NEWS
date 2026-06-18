@@ -12,6 +12,8 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Missing `fnd` role in `Authors@R` or `Author` fields does not produce a
+    `NOTE` but rather an informative message (@lshep, #251).
     o Missing `CITATION` files produce a message rather than a `NOTE`
     (@lshep, #250).
     o Removed the `*.Rproj` file from the list of bad files in
