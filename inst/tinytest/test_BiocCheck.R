@@ -1214,6 +1214,9 @@ if (connect) {
         "lori.shepherd@roswellpark.org", "biocfilecache"
     )
     expect_true(stillZero())
+
+    .BiocCheck$zero()
+    ## tag check for non-existing package
     BiocCheck:::checkWatchedTag(
         "lori.shepherd@roswellpark.org", "unwatchedpackage"
     )
@@ -1224,6 +1227,8 @@ if (connect) {
         "lori.shePherd@rosWellpark.org", "biocfilecache"
     )
     expect_true(stillZero())
+
+    .BiocCheck$zero()
     ## check tag is not case senstive
     BiocCheck:::checkWatchedTag(
         "lori.shepherd@rosWellpark.org", "bioCfiLecache"
