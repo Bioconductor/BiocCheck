@@ -85,32 +85,6 @@ handleMessage <- function(..., indent = 4, exdent = 6)
     cli::cli_alert_info(msg, wrap = TRUE)
 }
 
-.tryInstallwLoad <- function(.BiocPackage, install_dir = tempfile()) {
-    pkgpath <- .BiocPackage$sourceDir
-    pkgname <- .BiocPackage$packageName
-    if (!dir.exists(install_dir))
-        dir.create(install_dir)
-    dir.create(libdir <- file.path(install_dir, "lib"))
-    file.create(stderr <- file.path(install_dir, "install.stderr"))
-
-    r_libs_user <- paste(c(libdir, .libPaths()), collapse = .Platform$path.sep)
-    lpath <- paste0("--library=", libdir)
-    res <- callr::rcmd_safe(
-        "INSTALL",
-        c(
-            "--use-vanilla",
-            lpath,
-            pkgpath
-        ),
-        env = c(callr::rcmd_safe_env(), R_LIBS_USER = r_libs_user)
-    )
-
-    if (!identical(res[["status"]], 0L))
-        handleError(pkgpath, " must be installable and loadable.")
-
-    install_dir
-}
-
 # Takes as input the value of an Imports, Depends,
 # or LinkingTo field and returns a named character
 # vector of Bioconductor dependencies, where the names
