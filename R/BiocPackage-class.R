@@ -107,6 +107,8 @@
         isSourceDir = "logical",
         isGitClone = "logical",
         isInfrastructure = "logical",
+        isInstalled = "logical",
+        installDir = "character",
         usesRoxygen = "logical",
         usesRdpack = "logical",
         DESCRIPTION = "matrix",
@@ -133,6 +135,7 @@
                 .self[["isSourceDir"]] <-
                     !.self$isTar && .isSourceDir(packageDir)
                 .self[["isGitClone"]] <- .isGitClone(packageDir)
+                .self[["isInstalled"]] <- FALSE
                 .self$getPackageDir(packageDir)
                 .self$getRSources()
                 .self$getVigSources()
@@ -146,6 +149,35 @@
                 .self$findRoxygen()
             }
             callSuper(...)
+        },
+        install = function(install_dir = tempfile()) {
+            pkgpath <- .self[["sourceDir"]]
+            pkgname <- .self[["packageName"]]
+
+            if (!dir.exists(install_dir))
+                dir.create(install_dir)
+
+            dir.create(libdir <- file.path(install_dir, "lib"))
+            file.create(stderr <- file.path(install_dir, "install.stderr"))
+
+            r_libs_user <-
+                paste(c(libdir, .libPaths()), collapse = .Platform$path.sep)
+
+            res <- callr::rcmd_safe(
+                "INSTALL",
+                c(
+                    "--use-vanilla",
+                    paste0("--library=", libdir),
+                    pkgpath
+                ),
+                env = c(callr::rcmd_safe_env(), R_LIBS_USER = r_libs_user)
+            )
+
+            if (!identical(res[["status"]], 0L))
+                warning(pkgpath, " must be installable and loadable.")
+
+            .self[["isInstalled"]] <- TRUE
+            .self[["installDir"]] <- libdir
         },
         getPackageDir = function(packageDir) {
             if (.self[["isTar"]]) {
