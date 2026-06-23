@@ -596,6 +596,13 @@ expect_equivalent(length(msg_sc), testval)
 res <- BiocCheck:::findSymbolsInVignettes(.bioctest, c("T", "F"), "SYMBOL")
 expect_equivalent(length(res), 1)
 
+.bioctest <- read_test_package("testpkg0")
+dir.create(tempdir <- tempfile())
+.bioctest$install(install_dir = tempdir)
+msg_show <- BiocCheck:::checkS4ClassShowMethod(.bioctest)
+expect_identical(msg_show, "classB")
+unlink(tempdir, recursive = TRUE)
+
 # findPasteInSignaler -----------------------------------------------------
 cli::cli_h3("findPasteInSignaler")
 
