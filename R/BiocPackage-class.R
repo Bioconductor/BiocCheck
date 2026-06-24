@@ -70,6 +70,7 @@
 #' @section methods:
 #'
 #' * `initialize`: Initialize a `BiocPackage` object
+#' * `install`: Install the package to a temporary directory
 #' * `getPackageDir`: Get the package directory
 #' * `getRSources`: Get the R source files
 #' * `getVigSources`: Get the vignette source files

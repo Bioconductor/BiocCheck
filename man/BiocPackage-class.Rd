@@ -76,6 +76,7 @@ BiocCheck logs are written}
 
 \itemize{
 \item \code{initialize}: Initialize a \code{BiocPackage} object
+\item \code{install}: Install the package to a temporary directory
 \item \code{getPackageDir}: Get the package directory
 \item \code{getRSources}: Get the R source files
 \item \code{getVigSources}: Get the vignette source files
