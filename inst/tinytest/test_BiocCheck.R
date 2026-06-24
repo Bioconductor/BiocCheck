@@ -1198,27 +1198,30 @@ if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
 # checkForSupportSiteRegistration ----------------------------------------
 cli::cli_h3("checkForSupportSiteRegistration")
 
-connect <- suppressWarnings(
-    tryCatch({
-        readBin("https://support.bioconductor.org", n=1L, what="raw")
-        TRUE
-    }, error = function(...) {
-        FALSE
-    })
-)
+mock_path <- system.file("tinytest/mocks", package = "BiocCheck")
+if (mock_path == "" || !dir.exists(mock_path)) {
+    mock_path <- "mocks"
+}
+httptest2::.mockPaths(mock_path)
 
-if (connect) {
-
+httptest2::with_mock_api({
     # Email registration
     .BiocCheck$zero()
     BiocCheck:::checkSupportReg("lori.shepherd@roswellpark.org")
     expect_true(stillZero())
+
     BiocCheck:::checkSupportReg("foo@bar.com")
     expect_equivalent(.BiocCheck$getNum("warning"), 1)
+
     .BiocCheck$zero()
     ## api is not case sensitive
     BiocCheck:::checkSupportReg("lori.shePhErd@roswellpark.org")
     expect_true(stillZero())
+
+    .BiocCheck$zero()
+    ## check when API returns 200 with FALSE
+    BiocCheck:::checkSupportReg("unregistered@bar.com")
+    expect_equivalent(.BiocCheck$getNum("error"), 1)
 
     .BiocCheck$zero()
     ## tag check for existing package
@@ -1233,6 +1236,7 @@ if (connect) {
         "lori.shepherd@roswellpark.org", "unwatchedpackage"
     )
     expect_equivalent(.BiocCheck$getNum("error"), 1)
+
     .BiocCheck$zero()
     ## email is case insensitive
     BiocCheck:::checkWatchedTag(
@@ -1246,8 +1250,7 @@ if (connect) {
         "lori.shepherd@rosWellpark.org", "bioCfiLecache"
     )
     expect_true(stillZero())
-
-}
+})
 
 # checkForVersionNumberMismatch -------------------------------------------
 cli::cli_h3("checkForVersionNumberMismatch")
