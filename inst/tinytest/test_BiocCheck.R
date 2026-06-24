@@ -625,16 +625,19 @@ expect_true(
     length(BiocCheck:::.findSignalerInSignaler(rfile, .SIGNALERS_TXT)) == 4L
 )
 
-# .tryInstallwLoad --------------------------------------------------------
-cli::cli_h3(".tryInstallwLoad")
+# .BiocPackage install method ---------------------------------------------
+cli::cli_h3(".BiocPackage install method")
 
 .bioctest <- create_test_package()
-temppkg <- BiocCheck:::.tryInstallwLoad(.bioctest)
-liblocation <- file.path(temppkg, "lib")
+.bioctest$install()
+
+liblocation <- .bioctest$installDir
 expect_true(dir.exists(liblocation))
 expect_true(
     identical(
-        readLines(file.path(temppkg, "install.stderr")),
+        readLines(
+            file.path(dirname(liblocation), "install.stderr")
+        ),
         character(0L)
     )
 )
@@ -643,7 +646,9 @@ testloadEnv <- try(
 )
 expect_true(is.environment(testloadEnv))
 unloadNamespace(testloadEnv)
-unlink(temppkg, recursive = TRUE)
+.bioctest$installDir |>
+    dirname() |>
+    unlink(recursive = TRUE)
 
 # packageName -------------------------------------------------------------
 cli::cli_h3("packageName")
@@ -1000,9 +1005,9 @@ expect_true(
 cli::cli_h3("checkExportsAreDocumented")
 
 .bioctest <- read_test_package("testpkg0")
-instdir <- BiocCheck:::.tryInstallwLoad(.bioctest)
+instdir <- .bioctest$install()
 res <- BiocCheck:::checkExportsAreDocumented(
-    .bioctest, lib.loc = file.path(instdir, "lib")
+    .bioctest, lib.loc = instdir
 )
 expect_equivalent(1, .BiocCheck$getNum("error"))
 .BiocCheck$zero()
@@ -1443,7 +1448,7 @@ cli::cli_h3("checkUsageOfDont")
 
 ## testpkg0 should trigger this note for 2 out of 3 man pages
 .bioctest <- read_test_package("testpkg0")
-BiocCheck:::.tryInstallwLoad(.bioctest)
+.bioctest$install()
 notemsg <- capture.output(
     BiocCheck:::checkUsageOfDont(.bioctest), type = "message"
 )
@@ -1455,7 +1460,6 @@ expect_true( any(grepl("67%", notemsg)) )
 ## testpkg1 contains a man page with keyword 'internal'
 ## this shouldn't trigger the note
 .bioctest <- read_test_package("testpkg1")
-BiocCheck:::.tryInstallwLoad(.bioctest)
 BiocCheck:::checkUsageOfDont(.bioctest)
 expect_equivalent(0, .BiocCheck$getNum("note"))
 .BiocCheck$zero()
