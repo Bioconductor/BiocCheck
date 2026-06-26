@@ -250,11 +250,14 @@ Can be disabled with `--no-check-bbs`
 * **Checking for Version field...**
   Checks to make sure a `Version` field is present in the DESCRIPTION
   file (`ERROR`).
-* **Checking for valid maintainer...**
-  Checks to make sure the DESCRIPTION file has a valid `Authors@R` field which
-  resolves to a valid `Maintainer` (`ERROR`).
+* **Checking for valid use of maintainer fields...**
+  Checks to make sure the `DESCRIPTION` file does not have both `Authors@R`
+  and `Author`/`Maintainer` fields (`ERROR`). Using the `Authors@R` field
+  is encouraged; for justification see the [DESCRIPTION checks](#descchecks)
+  section. If only the `Author` and `Maintainer` fields are present,
+  `BiocCheck` will produce a `NOTE` encouraging the use of `Authors@R`.
 
-  A valid `Authors@R` field consists of:
+  Note that a valid `Authors@R` field consists of:
     * A valid R object of class `person`.
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
@@ -767,7 +770,7 @@ BiocCheck:::.HIDDEN_FILE_EXTS
 These files may be included in your personal directories but should be added to
 a `.gitignore` file so they are not Git tracked.
 
-## DESCRIPTION checks
+## DESCRIPTION checks {#descchecks}
 
 **Checking DESCRIPTION**
 
@@ -786,11 +789,16 @@ DESCRIPTION file is therefore checked in its raw original form.
    The `Remotes` field is not allowed in Bioconductor packages as dependencies
    must be from CRAN or Bioconductor. (`ERROR`)
 
-*  **Checking for valid maintainer**
-   While in the past using the Author and Maintainer fields were acceptable, R
-   has moved towards using the `Authors@R` standard for listing package
-   contributors. This checks that Authors@R is utilized and that there are no
-   instances of Author or Maintainer in the DESCRIPTION (`ERROR`)
+*  **Checking for valid use of maintainer fields**
+   Using the `Authors@R` field over the `Author` and `Maintainer` fields is
+   encouraged. The reason is that the `Authors@R` field allows for more
+   flexibility in specifying the roles of contributors to the package, such as
+   authors, maintainers, and funders. It also allows for the inclusion of ORCID
+   identifiers, which can help with tracking contributions from different
+   institutions. An error is emitted if both the `Authors@R` field and either
+   the `Author` or `Maintainer` fields are present in the `DESCRIPTION` file
+   (`ERROR`). Using `Author` and `Maintainer` fields still results in a `NOTE`
+   but is not an error (`NOTE`).
 
 ## NAMESPACE checks
 
