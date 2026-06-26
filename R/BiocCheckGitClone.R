@@ -90,10 +90,8 @@ BiocCheckGitClone <- function(package=".", ...)
     handleCheck("Checking if DESCRIPTION is well formatted...")
     checkDESCRIPTION(.BiocPackage)
 
+    handleCheck("Checking for valid use of maintainer fields...")
     validMaintainer(.BiocPackage)
-
-    handleCheck("Checking CITATION...")
-    checkForCitationFile(.BiocPackage)
 
     return(.BiocCheck)
 }

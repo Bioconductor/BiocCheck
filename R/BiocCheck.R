@@ -333,6 +333,9 @@ BiocCheckSource <- function(.BiocPackage, debug, dots) {
         checkDESCRIPTIONFile(.BiocPackage)
     }
 
+    handleCheck("Checking CITATION...")
+    checkForCitationFile(.BiocPackage)
+
     if (.isNULLorFALSE(dots[["no-check-namespace"]]))
         checkNAMESPACE(.BiocPackage)
 
