@@ -8,7 +8,6 @@ checkDESCRIPTION <- function(.BiocPackage) {
 validMaintainer <- function(.BiocPackage) {
     if (.BiocPackage$isTar)
         return()
-    handleCheck("Checking for valid maintainer...")
     dcf <- .BiocPackage$DESCRIPTION
     authr <- "Authors@R" %in% colnames(dcf)
     autmain <- c("Author","Maintainer") %in% colnames(dcf)
