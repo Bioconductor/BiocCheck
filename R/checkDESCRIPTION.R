@@ -13,10 +13,14 @@ validMaintainer <- function(.BiocPackage) {
     autmain <- c("Author","Maintainer") %in% colnames(dcf)
     if (authr && any(autmain))
         handleError(
-            "Use Authors@R field not Author/Maintainer fields. Do not use both."
+            "Use either 'Authors@R' or 'Author' and 'Maintainer' fields. ",
+            "Do not use both."
         )
     else if (any(autmain))
-        handleError("Do not use Author/Maintainer fields. Use Authors@R.")
+        handleNote(
+            "Consider using 'Authors@R' over the 'Author' and ",
+            "'Maintainer' fields."
+        )
 }
 
 checkDESCRIPTIONFile <- function(.BiocPackage) {
