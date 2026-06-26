@@ -182,11 +182,6 @@ BiocCheckRun <-
     else
         .BiocPackage <- package
 
-    if (!.BiocPackage$isSourceDir && !.BiocPackage$isTar)
-        .stop(
-            "Run 'BiocCheck' on a package source directory or source tarball."
-        )
-
     cli::cli_div(
         theme = list(
             .pkg = list(color = "green", `font-weight` = "bold"),
