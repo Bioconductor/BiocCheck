@@ -809,6 +809,7 @@ checkForSupportSiteRegistration <- function(.BiocPackage)
 }
 
 #' @importFrom httr2 req_perform request resp_body_json
+#' @importFrom utils URLencode
 checkSupportReg <- function(email) {
     response <- paste0(
         "https://support.bioconductor.org/api/email/",
