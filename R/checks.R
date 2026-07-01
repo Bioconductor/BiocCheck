@@ -320,15 +320,7 @@ checkBBScompatibility <- function(.BiocPackage)
         }
         for (person in people) {
             if ("cre" %in% person$role) {
-                if ("ORCID" %in% names(person$comment)) {
-                    orcid <- person$comment[["ORCID"]]
-                    validID <- .checkORCID(orcid)
-                    if (!validID)
-                        handleNote(
-                            "Invalid ORCID iD for ",
-                            person$given, " ", person$family
-                        )
-                } else {
+                if (!"ORCID" %in% names(person$comment)) {
                     handleNote(
                         "Consider adding the maintainer's ORCID iD in",
                         " 'Authors@R' with 'comment=c(ORCID=\"...\")'"

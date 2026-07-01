@@ -448,27 +448,6 @@ expect_true(
     test_dir = temp_dir,
     description = list(
         Version = "0.99.0",
-        `Authors@R` = c(
-            "person('Bioconductor Package Maintainer',",
-            "email='maintainer@bioconductor.org', role=c('aut', 'cre'),",
-            "comment = c(ORCID = '0000-0000-0000-000J'))"
-        ),
-        License = "GPL-2"
-    )
-)
-BiocCheck:::checkBBScompatibility(.bioctest)
-expect_true(
-    grepl(
-        pattern = "Invalid ORCID iD",
-        .BiocCheck$get("note")[["checkBBScompatibility"]]
-    )
-)
-.BiocCheck$zero()
-
-.bioctest <- create_test_package(
-    test_dir = temp_dir,
-    description = list(
-        Version = "0.99.0",
         Maintainer = "Joe Blow <joe@blow.com>",
         License = "GPL-2"
     )
@@ -495,7 +474,7 @@ expect_true(
         `Authors@R` = c(
             "c(person('Bioconductor Package Maintainer',",
             "email='maintainer@bioconductor.org', role=c('aut', 'cre'),",
-            "comment = c(ORCID = '0000-0000-0000-0001')),",
+            "comment = c(ORCID = '0000-0002-1825-0097')),",
             "person('Joe', 'Blow', email='joe@blow.com', role='cre'))"
         ),
         License = "GPL-2"
