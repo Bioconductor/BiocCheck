@@ -429,7 +429,7 @@ BiocCheck:::checkBBScompatibility(.bioctest)
 expect_true(
     any(
         grepl(
-            pattern = "Authors@R field not Author",
+            pattern = "'Authors@R' or 'Author' and 'Maintainer'",
             .BiocCheck$get("error")[["validMaintainer"]]
         )
     )
@@ -482,8 +482,8 @@ expect_true(
 )
 expect_true(
     grepl(
-        pattern = "Use Authors@R",
-        .BiocCheck$get("error")[["validMaintainer"]]
+        pattern = "'Authors@R' over the 'Author' and 'Maintainer'",
+        .BiocCheck$get("note")[["validMaintainer"]]
     )
 )
 .BiocCheck$zero()
