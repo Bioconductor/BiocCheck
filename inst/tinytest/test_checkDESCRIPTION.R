@@ -58,4 +58,36 @@ expect_true(
     stillZero()
 )
 
+# test checkValidDESCfields -----------------------------------------------
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    extraActions = function(pkgdir) {
+        desc <- file.path(pkgdir, "DESCRIPTION")
+        writeLines(c(
+            "Package: foo",
+            "Version: 0.99.0",
+            "License: GPL-2",
+            "Config/test/val: yes"
+        ), desc)
+    }
+)
+BiocCheck:::checkValidDESCfields(.bioctest)
+expect_true(stillZero())
+
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    extraActions = function(pkgdir) {
+        desc <- file.path(pkgdir, "DESCRIPTION")
+        writeLines(c(
+            "Package: foo",
+            "Version: 0.99.0",
+            "License: GPL-2",
+            "Bugreport: http://bugs",
+            "biocviews: Software"
+        ), desc)
+    }
+)
+BiocCheck:::checkValidDESCfields(.bioctest)
+checkCounter("Unknown or non-standard DESCRIPTION field(s)", "warning")
+
 unlink(temp_dir, recursive = TRUE)

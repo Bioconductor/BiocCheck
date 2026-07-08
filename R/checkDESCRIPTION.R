@@ -27,6 +27,7 @@ checkDESCRIPTIONFile <- function(.BiocPackage) {
     dcf <- .BiocPackage$DESCRIPTION
 
     checkLicenseForRestrictiveUse(dcf[, "License"])
+    checkValidDESCfields(.BiocPackage)
     checkRecDESCfields(dcf)
     checkBiocDepsDESC(dcf)
     checkPinnedDeps(dcf)
@@ -305,4 +306,56 @@ checkFndPerson <- function(dcf) {
     )
     if (!any(grepl("fnd", people, fixed = TRUE)))
         handleMessage(msg)
+}
+
+checkValidDESCfields <- function(.BiocPackage) {
+    handleCheck("Checking validity of DESCRIPTION fields...")
+    if (!.BiocPackage$isValid)
+        return(invisible())
+
+    dcf <- .BiocPackage$DESCRIPTION
+
+    present_fields <- colnames(dcf)
+
+    known_fields <- c(
+        tools:::.get_standard_DESCRIPTION_fields(),
+        c("RoxygenNote", "Video")
+    )
+
+    is_config_field <- grepl("^Config/", present_fields)
+    fields_to_check <- present_fields[!is_config_field]
+
+    bad_fields <- fields_to_check[!(fields_to_check %in% known_fields)]
+
+    if (length(bad_fields)) {
+        terms <- c(bad_fields, known_fields)
+        distmat <- stringdist::stringdistmatrix(
+            terms, useNames = "strings", method = "lv"
+        )
+        distmat <- as.matrix(distmat)
+
+        distmat <- distmat > 0L & distmat < 3L
+        distmat[bad_fields, bad_fields] <- FALSE
+
+        suggestedFields <- vapply(
+            bad_fields,
+            function(field) {
+                alt <- colnames(distmat)[distmat[field, ]]
+                msg <- shQuote(field)
+                if (length(alt)) {
+                    alt <- shQuote(alt)
+                    oneof <- if (length(alt) > 1L) "one of" else ""
+                    alt <- paste(oneof, paste(alt, collapse = ", "))
+                    msg <- paste0(msg, ": Did you mean ", alt, "?")
+                }
+                msg
+            },
+            character(1L)
+        )
+
+        handleWarning(
+            "Unknown or non-standard DESCRIPTION field(s):",
+            messages = suggestedFields
+        )
+    }
 }
