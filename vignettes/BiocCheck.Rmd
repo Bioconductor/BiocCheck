@@ -24,17 +24,17 @@ practices, analyzing packages and reporting three categories of
 issues:
 
 * **ERROR**. This means the package is missing something critical and
-  it cannot be accepted into _Bioconductor_ until the issue is
-  fixed. (`BiocCheck` will continue past an `ERROR`, thus it is
-  possible to have more than one, but it will exit with an error code
-  if run from the OS command line.)
+    it cannot be accepted into _Bioconductor_ until the issue is
+    fixed. (`BiocCheck` will continue past an `ERROR`, thus it is
+    possible to have more than one, but it will exit with an error code
+    if run from the OS command line.)
 * **WARNING**. These issues almost always need to be addressed before
-  the package is added to _Bioconductor_. In the weeks leading up to a
-  _Bioconductor_ release we will ask package authors to fix these
-  issues.
+    the package is added to _Bioconductor_. In the weeks leading up to a
+    _Bioconductor_ release we will ask package authors to fix these
+    issues.
 * **NOTE**: Not necessarily something bad, just something we wanted to
-  point out. package authors don't need to take action on these, but
-  they can.
+    point out. package authors don't need to take action on these, but
+    they can.
 
 # Using `BiocCheck`
 
@@ -137,29 +137,29 @@ Can be disabled with `--no-check-version-num` and `--no-check-R-ver`.
 **Checking version number...**
 
 * **Checking for version number mismatch...**
-  Checks that the package version specified in your package tarball
-  (if you are checking a tarball) matches the value of the `Version:`
-  field in your `DESCRIPTION` file.  If it doesn't, it usually means
-  you did not build the tarball with `R CMD build`. (`ERROR`)
+    Checks that the package version specified in your package tarball
+    (if you are checking a tarball) matches the value of the `Version:`
+    field in your `DESCRIPTION` file.  If it doesn't, it usually means
+    you did not build the tarball with `R CMD build`. (`ERROR`)
 * **Checking new package version number...**
-  Checks that the pre-release version for an potential _Bioconductor_
-  package uses a `99` 'y' version in the `x.y.z` versioning scheme
-  (`ERROR`). Package versions starting with a non-zero value will
-  get flagged with a warning. Typical new package submissions
-  start with a zero 'x' version (e.g., `0.99.*`; `WARNING`). This
-  is only done if the `--new-package` option is supplied. An 'x' nonzero will
-  only be accepted if the package was pre-released or published under such a
-  case.
+    Checks that the pre-release version for an potential _Bioconductor_
+    package uses a `99` 'y' version in the `x.y.z` versioning scheme
+    (`ERROR`). Package versions starting with a non-zero value will
+    get flagged with a warning. Typical new package submissions
+    start with a zero 'x' version (e.g., `0.99.*`; `WARNING`). This
+    is only done if the `--new-package` option is supplied. An 'x' nonzero
+    will only be accepted if the package was pre-released or published under
+    such a case.
 * **Checking version number validity...**
-  Checks for a valid version, that format is correct and that version
-  number is appropriate for this version of _Bioconductor_ (`ERROR`).
+    Checks for a valid version, that format is correct and that version
+    number is appropriate for this version of _Bioconductor_ (`ERROR`).
 * **Checking R Version dependency...**
-  If you specify an R version in the `Depends:` field of your
-  `DESCRIPTION` file, `BiocCheck` checks to make sure that the R
-  version specified matches the version currently used in
-  _Bioconductor_. This helps to prevent mixing of Bioconductor release and
-  devel versions (esp. when R versions differ) which is a frequent source of
-  confusion and errors (`NOTE`).
+    If you specify an R version in the `Depends:` field of your
+    `DESCRIPTION` file, `BiocCheck` checks to make sure that the R
+    version specified matches the version currently used in
+    _Bioconductor_. This helps to prevent mixing of Bioconductor release and
+    devel versions (esp. when R versions differ) which is a frequent source of
+    confusion and errors (`NOTE`).
 
 For more information on package versions, see the
 [Version Numbering HOWTO][1].
@@ -171,15 +171,15 @@ For more information on package versions, see the
 Can be disabled with `--no-check-pkg-size` and `--no-check-file-size`.
 
 * **Checking package size**
-  Checks that the package size meets _Bioconductor_ requirements. The current
-  package size limit is 10 MB for Software packages. Experiment Data and
-  Annotation packages are excluded from this check. This check is only run if
-  checking a source tarball. (ERROR)
+    Checks that the package size meets _Bioconductor_ requirements. The current
+    package size limit is 10 MB for Software packages. Experiment Data and
+    Annotation packages are excluded from this check. This check is only run if
+    checking a source tarball. (ERROR)
 
 * **Checking individual file sizes**
-  The current size limit for all individual files is 5 MB. Checks inspect both
-  package-wide files and data files found in the `data`, `inst/extdata`, and
-  `data-raw` folders. (WARNING)
+    The current size limit for all individual files is 5 MB. Checks inspect both
+    package-wide files and data files found in the `data`, `inst/extdata`, and
+    `data-raw` folders. (WARNING)
 
 It may be necessary to remove large files from your Git history; see
 [Remove Large Data Files and Clean Git Tree][2]
@@ -197,23 +197,23 @@ biocViews is a concept unique to _Bioconductor_).
 Can be disabled with `--no-check-bioc-views`
 
 * **Checking that biocViews are present...**
-  Checks that a `biocViews` field is present in the DESCRIPTION file
-  (`ERROR`).
+    Checks that a `biocViews` field is present in the DESCRIPTION file
+    (`ERROR`).
 * **Checking package type based on biocViews**
-  Gives an indication if the package is identified as a Software, Annotation,
-  Experiment, or Workflow package.
+    Gives an indication if the package is identified as a Software, Annotation,
+    Experiment, or Workflow package.
 * **Checking for non-trivial biocViews...**
-  Checks that biocViews are more specific than the top-level terms
-  Software, AnnotationData, or ExperimentData (`ERROR`).
+    Checks that biocViews are more specific than the top-level terms
+    Software, AnnotationData, or ExperimentData (`ERROR`).
 * **Checking biocViews validity...**
-  Checks for valid views and displays invalid ones. Note that
-  biocViews are case-sensitive (`WARNING`).
+    Checks for valid views and displays invalid ones. Note that
+    biocViews are case-sensitive (`WARNING`).
 * **Checking that biocViews come from the same category...**
-  Checks that all views come from the same parent (one of Software,
-  AnnotationData, ExperimentData) (`WARNING`).
+    Checks that all views come from the same parent (one of Software,
+    AnnotationData, ExperimentData) (`WARNING`).
 * **Checking for recommended biocViews...**
-  Uses the `recommendBiocViews()` function from `biocViews` to
-  automatically suggest some biocViews for your package.
+    Uses the `recommendBiocViews()` function from `biocViews` to
+    automatically suggest some biocViews for your package.
 
 More information about biocViews is available in the
 [Using biocViews HOWTO][3].
@@ -232,70 +232,70 @@ Can be disabled with `--no-check-bbs`
 **Checking build system compatibility...**
 
 * **Checking for blank lines in DESCRIPTION...**
-  Checks to make sure there are no blank lines in the DESCRIPTION
-  file (`ERROR`).
+    Checks to make sure there are no blank lines in the DESCRIPTION
+    file (`ERROR`).
 * **Checking if DESCRIPTION is well formatted...**
-   Checks if the DESCRIPTION can be parsed with read.dcf (`ERROR`)
+    Checks if the DESCRIPTION can be parsed with read.dcf (`ERROR`)
 * **Checking Description: field length...**
-  Checks that the Description field in the DESCRIPTION file has a minimum
-  * number of characters (`WARNING` if less than 50)
-  * number of words (`WARNING` if less than 20)
-  * number of sentences (`NOTE` if less than 3)
+    Checks that the Description field in the DESCRIPTION file has a minimum
+    * number of characters (`WARNING` if less than 50)
+    * number of words (`WARNING` if less than 20)
+    * number of sentences (`NOTE` if less than 3)
 * **Checking for whitespace in DESCRIPTION field names...**
-  Checks to make sure there is no whitespace in DESCRIPTION file field
-  names (`ERROR`).
+    Checks to make sure there is no whitespace in DESCRIPTION file field
+    names (`ERROR`).
 * **Checking that Package field matches dir/tarball name...**
-  Checks to make sure that `Package` field of DESCRIPTION file matches
-  directory or tarball name (`ERROR`).
+    Checks to make sure that `Package` field of DESCRIPTION file matches
+    directory or tarball name (`ERROR`).
 * **Checking for Version field...**
-  Checks to make sure a `Version` field is present in the DESCRIPTION
-  file (`ERROR`).
+    Checks to make sure a `Version` field is present in the DESCRIPTION
+    file (`ERROR`).
 * **Checking for valid use of maintainer fields...**
-  Checks to make sure the `DESCRIPTION` file does not have both `Authors@R`
-  and `Author`/`Maintainer` fields (`ERROR`). Using the `Authors@R` field
-  is encouraged; for justification see the [DESCRIPTION checks](#descchecks)
-  section. If only the `Author` and `Maintainer` fields are present,
-  `BiocCheck` will produce a `NOTE` encouraging the use of `Authors@R`.
+    Checks to make sure the `DESCRIPTION` file does not have both `Authors@R`
+    and `Author`/`Maintainer` fields (`ERROR`). Using the `Authors@R` field
+    is encouraged; for justification see the [DESCRIPTION checks](#descchecks)
+    section. If only the `Author` and `Maintainer` fields are present,
+    `BiocCheck` will produce a `NOTE` encouraging the use of `Authors@R`.
 
-  Note that a valid `Authors@R` field consists of:
+Note that a valid `Authors@R` field consists of:
     * A valid R object of class `person`.
     * Only one person with the `cre` (creator) role.
     * That person must have a syntactically valid email address.
     * That person must have either `family` or `given` name defined.
 
-  Suggests that the maintainer provide an [ORCID iD][] in the `Authors@R`
-  field as an argument in the person function, e.g., `comment = c(ORCID = ...)`
-  (`NOTE`).
+Suggests that the maintainer provide an [ORCID iD][] in the `Authors@R`
+field as an argument in the person function, e.g., `comment = c(ORCID = ...)`
+(`NOTE`).
 
 [ORCID iD]: https://orcid.org/
 
 ## DESCRIPTION checks
 
 * **Checking License: for restrictive use...**
-  Checks to make sure that the `License:` in the `DESCRIPTION` file does not
-  restrict use, e.g., to academic-use only (`ERROR`). Licenses are compared to
-  R's internal database provided at `r BiocCheck:::.LICENSE_DB_LOCATION` and
-  read with `read.dcf`. Licenses not listed in the database or with spelling
-  deviations e.g., `GPL-3.0` vs `GPL-3` are flagged with a `NOTE`. A `NOTE` is
-  also generated if the license is not a valid SPDX license identifier (with the
-  exception of those already in the database file) or if the license cannot be
-  verified in the database. A `NOTE` is also generated if the `License:` field
-  is malformed, or the database cannot be located. We also recommend developers
-  to browse to the [choosealicense][] to find a suitable license for their
-  package as well as the [SPDX License List][] website.
+    Checks to make sure that the `License:` in the `DESCRIPTION` file does not
+    restrict use, e.g., to academic-use only (`ERROR`). Licenses are compared to
+    R's internal database provided at `r BiocCheck:::.LICENSE_DB_LOCATION` and
+    read with `read.dcf`. Licenses not listed in the database or with spelling
+    deviations e.g., `GPL-3.0` vs `GPL-3` are flagged with a `NOTE`. A `NOTE` is
+    also generated if the license is not a valid SPDX license identifier (with
+    the exception of those already in the database file) or if the license
+    cannot be verified in the database. A `NOTE` is also generated if the
+    `License:` field is malformed, or the database cannot be located. We also
+    recommend developers to browse to the [choosealicense][] to find a suitable
+    license for their package as well as the [SPDX License List][] website.
 * **Checking for pinned package versions...**
-  Ensures that maintainers are not indicating a specific dependency version
-  using `==` in the `DESCRIPTION` file (`ERROR`).
+    Ensures that maintainers are not indicating a specific dependency version
+    using `==` in the `DESCRIPTION` file (`ERROR`).
 * **Checking for recommended fields in DESCRIPTION...** Looks through the
-  `DESCRIPTION` file to see whether recommended fields i.e., 'URL', 'Date' and
-  'BugReports' are populated (`NOTE`). `Date` field is checked for the format
-  `YYYY-MM-DD`.
+    `DESCRIPTION` file to see whether recommended fields i.e., 'URL', 'Date' and
+    'BugReports' are populated (`NOTE`). `Date` field is checked for the format
+    `YYYY-MM-DD`.
 * **Checking for Bioconductor software dependencies...** Checks to see if
-  the package depends on any Bioconductor software packages in the `Depends:`
-  and `Imports:` fields; if none (`WARNING`).
+    the package depends on any Bioconductor software packages in the `Depends:`
+    and `Imports:` fields; if none (`WARNING`).
 * **Checking for 'fnd' role in Authors@R...** Checks to see if the `Authors@R`
-  or `Author` field has a person or organization with the `fnd` (funder) role
-  (`message`).
+    or `Author` field has a person or organization with the `fnd` (funder) role
+    (`message`).
 
 [choosealicense]: https://choosealicense.com/appendix
 [SPDX License List]: https://spdx.org/licenses/
@@ -305,26 +305,26 @@ Can be disabled with `--no-check-bbs`
 Can be disabled with `--no-check-namespace`.
 
 * **Checking NAMESPACE...** ensures that the NAMESPACE file does not contain a
-  match all export pattern, i.e., `exportPattern("^[[:alpha:]]+")` or similar
-  (`ERROR`).
+    match all export pattern, i.e., `exportPattern("^[[:alpha:]]+")` or similar
+    (`ERROR`).
 
 ## .Rbuildignore checks
 
 * **Checking .Rbuildignore...** ensures that the 'tests' folder is
-  not accidentally added to the `.Rbuildignore` file (`ERROR`).
+    not accidentally added to the `.Rbuildignore` file (`ERROR`).
 
 ## BiocCheck output folder check
 
 * **Checking for stray BiocCheck output folders...** ensures that the
-  `<packageName>.BiocCheck` folder byproduct when running `BiocCheck(".")`
-  locally does not get included in the package directory (`ERROR`).
+    `<packageName>.BiocCheck` folder byproduct when running `BiocCheck(".")`
+    locally does not get included in the package directory (`ERROR`).
 
 ## Check for inst/doc folder
 
 * **Checking for inst/doc folders...** ensures that there are no pre-built
-  vignettes and their products in the _source_ package directory. Vignettes are
-  built when running `R CMD build`; therefore, `inst/doc` folder is not needed
-  (`ERROR`).
+    vignettes and their products in the _source_ package directory. Vignettes
+    are built when running `R CMD build`; therefore, `inst/doc` folder is not
+    needed (`ERROR`).
 
 ## Vignette Checks
 
@@ -334,31 +334,32 @@ Can be disabled with `--no-check-vignettes`.
 
 * Checks that the `vignettes` directory exists (`ERROR`).
 * Checks that the `vignettes` directory only contains vignette sources
-  *(*.Rmd, *.qmd, *.Rnw, *.Rrst, .Rhtml, *.Rtex) (`ERROR`).
+    with file extensions `.Rmd`, `.qmd`, `.Rnw`, `.Rrst`, `.Rhtml`, or `.Rtex`
+    otherwise (`ERROR`).
 * Checks for `.Rnw` vignettes, if any found, suggest RMarkdown (`.Rmd`)
-  vignettes instead (`WARNING`)
+    vignettes instead (`WARNING`)
 * Checks for `.qmd` vignettes, if any found, a 'SystemRequirements' field
-  must be present in the `DESCRIPTION` file (`WARNING`). The field should
-  list `quarto` as a system requirement.
+    must be present in the `DESCRIPTION` file (`WARNING`). The field should
+    list `quarto` as a system requirement.
 * Checks whether, while checking a directory (not a tarball), vignette
-  sources exist in inst/doc (`ERROR`).
+    sources exist in inst/doc (`ERROR`).
 * Checks that vignetteBuidler/vignetteEngine are listed in, minimally, Suggests
-  field of DESCRIPTION file (`WARNING`)
+    field of DESCRIPTION file (`WARNING`)
 * Checks that vignetteBuilder in DESCRIPTION and VignetteEngine in vignette
-  are compatible (`ERROR`)
+    are compatible (`ERROR`)
 * Checks whether vignette title is still using template value (`WARNING`)
 * Checks whether the number of `eval=FALSE` chunks is more than 50% of
-  the total (`WARNING`).
+    the total (`WARNING`).
 * Checks whether the global vignette code option is set to `eval=FALSE`.
-  The majority of vignette code is expected to be evaluated (`WARNING`)
+    The majority of vignette code is expected to be evaluated (`WARNING`)
 * Checks for any legacy `BiocInstaller` code (`WARNING`)
 * Checks that vignette code contains `sessionInfo()` or `session_info()` for
-  reproducibility (`NOTE`).
+    reproducibility (`NOTE`).
 * Checks that evaluated vignette code does not invoke package installation
-  functions (`ERROR`). Function calls in the vignette that match `install.*`
-  will produce a warning (`WARNING`).
+    functions (`ERROR`). Function calls in the vignette that match `install.*`
+    will produce a warning (`WARNING`).
 * Checks that there are no duplicate code chunk labels in the vignettes
-  (`ERROR`).
+    (`ERROR`).
 * Checks that all chunks have labels in vignettes (`NOTE`).
 
 **Checking whether vignette is built with 'R CMD build'...**
@@ -392,13 +393,13 @@ information.
 Can be disabled with `--no-check-library-calls` and `--no-check-install-self`.
 
 * **Checking library calls...** (`NOTE`)
-  Check for use of functions that install or update packages. This list
-  currently includes the use of `install`, `install.packages`,
-  `install_packages` `update.packages` or `biocLite`.
+    Check for use of functions that install or update packages. This list
+    currently includes the use of `install`, `install.packages`,
+    `install_packages` `update.packages` or `biocLite`.
 * **Checking for library/require of *(your package name)*...** (`ERROR`)
-  It is not necessary to call `library()` or `require()` on your own
-  package within code in the R directory or in man page examples. In
-  these contexts, your package is already loaded.
+    It is not necessary to call `library()` or `require()` on your own
+    package within code in the R directory or in man page examples. In
+    these contexts, your package is already loaded.
 
 ## Coding Practices Checks
 
@@ -410,65 +411,65 @@ Checks to see whether certain programming practices are found in the R
 directory.
 
 * We recommend that `vapply()` be used instead of `sapply()`. Problems
-  arise when the `X` argument to `sapply()` has length 0; the return
-  type is then a `list()` rather than a vector or array. (`NOTE`)
+    arise when the `X` argument to `sapply()` has length 0; the return
+    type is then a `list()` rather than a vector or array. (`NOTE`)
 
 * We recommend that `seq_len()` or `seq_along()` be used instead of
-  `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
-  which may be an unexpected or unwanted result (`NOTE`).
+    `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
+    which may be an unexpected or unwanted result (`NOTE`).
 
 * Single colon typos are checked for when a user inputs 'package:function'
-  instead of using double colons ('::') to import a function (`ERROR`).
+    instead of using double colons ('::') to import a function (`ERROR`).
 
 * Users should not download data from external hosting platforms. This
-  means avoiding references to major platforms such as GitHub, GitLab,
-  and BitBucket. For the same reason we do not import GitHub packages,
-  external data can be unstable and not well maintained. Maintainers
-  should re-use data already available in Bioconductor or contribute
-  an `ExperimentHub`, `AnnotationHub` or similar package (`ERROR`).
+    means avoiding references to major platforms such as GitHub, GitLab,
+    and BitBucket. For the same reason we do not import GitHub packages,
+    external data can be unstable and not well maintained. Maintainers
+    should re-use data already available in Bioconductor or contribute
+    an `ExperimentHub`, `AnnotationHub` or similar package (`ERROR`).
 
 * A package should not download files at the time of loading or attaching
-  i.e., using `library`. Using `download.file` and `download` should be avoided
-  and when found, an `ERROR` will be emitted.
+    i.e., using `library`. Using `download.file` and `download` should be
+    avoided and when found, an `ERROR` will be emitted.
 
 * `paste` and `paste0` function calls within signaling functions such as
-  `message`, `warning`, and `stop` are redundant and should be avoided
-  (`NOTE`). `paste` calls with the `collapse` argument are ignored.
+    `message`, `warning`, and `stop` are redundant and should be avoided
+    (`NOTE`). `paste` calls with the `collapse` argument are ignored.
 
 * When notifying users, `message` should be used. When `cat` and `print` are
-  used, users will get a note saying that these should only be used in show
-  methods for classes (`NOTE`).
+    used, users will get a note saying that these should only be used in show
+    methods for classes (`NOTE`).
 
 * `message`, `warn*`, and `error` keywords should not be included in
-  signal condition functions: `message`, `warning`, and `stop`. This is
-  redundant and should be avoided (`NOTE`).
+    signal condition functions: `message`, `warning`, and `stop`. This is
+    redundant and should be avoided (`NOTE`).
 
 * It is favorable to use the assignment arrow ('<-') over the equals assignment
-  ('=') for clarity in the code and legibility. Any use of the `=` will be
-  flagged with a `NOTE`.
+    ('=') for clarity in the code and legibility. Any use of the `=` will be
+    flagged with a `NOTE`.
 
 * New submissions should not use any `.Deprecated`, `.Defunct`, `lifeCycle`,
-  `deprecate_warn`, or `deprecate_stop` function calls (`WARNING`). Existing
-  packages should evolve these functions after a Bioconductor release according
-  to the [package guidelines][6].
+    `deprecate_warn`, or `deprecate_stop` function calls (`WARNING`). Existing
+    packages should evolve these functions after a Bioconductor release
+    according to the [package guidelines][6].
 
 [6]: https://contributions.bioconductor.org/deprecation.html
 
 * **Checking for T...** **Checking for F...**
-  It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
-  is because `T` and `F` are ordinary variables whose value can be
-  altered, leading to unexpected results, whereas the value of `TRUE`
-  and `FALSE` cannot be changed  (`WARNING`).
+    It is bad practice to use `T` and `F` for `TRUE` and `FALSE`.  This
+    is because `T` and `F` are ordinary variables whose value can be
+    altered, leading to unexpected results, whereas the value of `TRUE`
+    and `FALSE` cannot be changed  (`WARNING`).
 
 * Avoid class membership checks with `class()` / `is()` and `==` / `!=`.
-  Developers should use `is(x, 'class')` for S4 classes. (`WARNING`)
+    Developers should use `is(x, 'class')` for S4 classes. (`WARNING`)
 
 * Use `system2()` over `system()`. 'system2' is a more portable and
-  flexible interface than 'system'.(`NOTE`)
+    flexible interface than 'system'.(`NOTE`)
 
 * Use of `set.seed()` in R code.  The `set.seed` should not be set in
-  R functions directly. The user should always have the option for
-  the set.seed and know when it is being invoked. (`WARNING`)
+    R functions directly. The user should always have the option for
+    the set.seed and know when it is being invoked. (`WARNING`)
 
 **Checking parsed R code in R directory, examples, vignettes...**
 
@@ -477,32 +478,32 @@ evaluated man page and vignette examples to look for various symbols,
 which result in issues of varying severity.
 
 * **Checking for direct slot access...**
-  `BiocCheck` checks for direct slot access (via `@` or `slot()`) to
-  S4 objects in vignette and example code. This code should **always**
-  use accessors to interact with S4 classes. Since you may be using S4
-  classes (which don't provide accessors) from another package, the
-  severity is only `NOTE`. But if the S4 object is defined in your
-  package, it's **mandatory** to write accessors for it and to use
-  them (instead of direct slot access) in all vignette and example
-  code (`NOTE`).
+    `BiocCheck` checks for direct slot access (via `@` or `slot()`) to
+    S4 objects in vignette and example code. This code should **always**
+    use accessors to interact with S4 classes. Since you may be using S4
+    classes (which don't provide accessors) from another package, the
+    severity is only `NOTE`. But if the S4 object is defined in your
+    package, it's **mandatory** to write accessors for it and to use
+    them (instead of direct slot access) in all vignette and example
+    code (`NOTE`).
 * **Checking for browser()...**
-  `browser()` causes the command-line R debugger to be invoked, and
-  should not be used in production code (though it's OK to wrap such
-  calls in a conditional that evaluates to TRUE if some debugging
-  option is set)  (`WARNING`).
+    `browser()` causes the command-line R debugger to be invoked, and
+    should not be used in production code (though it's OK to wrap such
+    calls in a conditional that evaluates to TRUE if some debugging
+    option is set)  (`WARNING`).
 * **Checking for <<-...**
-  Non-local assignment using `<<-` is bad practice. It can over-write
-  user-defined symbols, and introduces non-linear paths of evaluation
-  that are difficult to debug (`NOTE`).
+    Non-local assignment using `<<-` is bad practice. It can over-write
+    user-defined symbols, and introduces non-linear paths of evaluation
+    that are difficult to debug (`NOTE`).
 * **Checking for Sys.setenv calls...**
-  Packages should not modify system environment variables with the
-  `Sys.setenv()` function unless, in rare instances, the package has
-  to configure the environment for subsequent `system2()` calls
-  (`WARNING`).
+    Packages should not modify system environment variables with the
+    `Sys.setenv()` function unless, in rare instances, the package has
+    to configure the environment for subsequent `system2()` calls
+    (`WARNING`).
 * **Checking for suppressWarnings/Messages...**
-  The excessive use of `suppressWarnings` and `suppressMessages` is
-  problematic as it usually indicates a larger underlying issue with
-  the fragility of the package codebase (`NOTE`).
+    The excessive use of `suppressWarnings` and `suppressMessages` is
+    problematic as it usually indicates a larger underlying issue with
+    the fragility of the package codebase (`NOTE`).
 
 ## Function length checking
 
@@ -535,7 +536,7 @@ RStudio. These skeletons contain comments that look like this:
 `BiocCheck` asks you to remove such comments (`NOTE`).
 
 * Every man page must have a non-empty `\value` section (`WARNING`). `Rd`
-  pages without `\usage` sections or documenting data sets are excluded.
+    pages without `\usage` sections or documenting data sets are excluded.
 
 * man page examples examples
 
@@ -549,12 +550,12 @@ programming and help ensure that your code does what you say it does.
 
 * Checks that at least 80% of man pages must have runnable examples (`ERROR`).
 * Checks that, if more than 80% of the man pages have runnable
-  examples, but some are still missing, `BiocCheck` lists the missing
-  ones and asks you to add runnable examples to them (`NOTE`).
+    examples, but some are still missing, `BiocCheck` lists the missing
+    ones and asks you to add runnable examples to them (`NOTE`).
 * Check the usage of `dontrun` or `donttest`. Use of these functions is not
-  recommended and shoud be justified (`NOTE`). If exception is made the
-  recommended usage is to use donttest over dontrun (`NOTE`) as donttest
-  requires valid R code.
+    recommended and shoud be justified (`NOTE`). If exception is made the
+    recommended usage is to use donttest over dontrun (`NOTE`) as donttest
+    requires valid R code.
 
 ## NEWS checks
 
@@ -612,7 +613,7 @@ Finds flag for skipping tests in the bioconductor environment (`NOTE`)
 Can be disabled with `--no-check-formatting`.
 
 **Checking formatting of DESCRIPTION, NAMESPACE, man pages, R source,
-  and vignette source...**
+    and vignette source...**
 
 There is no 100% correct way to format code. These checks adhere to the
 [_Bioconductor_ Style Guide][8] (`NOTE`).
@@ -669,30 +670,29 @@ verify that your code runs as intended after you re-format your code.
 ## Duplication checks
 
 * **Checking if package already exists in CRAN...**
-  This can be disabled with the `--no-check-CRAN` option. A package with the
-  same name (case differences are ignored) cannot exist on CRAN. Packages
-  submitted to Bioconductor must be removed from CRAN before the next
-  Bioconductor release (`WARNING`).
+    This can be disabled with the `--no-check-CRAN` option. A package with the
+    same name (case differences are ignored) cannot exist on CRAN. Packages
+    submitted to Bioconductor must be removed from CRAN before the next
+    Bioconductor release (`WARNING`).
 
 * **Checking if new package already exists in _Bioconductor_...**
-  Only run if the `--new-package` flag is turned on.  A package
-  with the same name (case differences are ignored) cannot  exist in
-  _Bioconductor_ (`ERROR`).
+    Only run if the `--new-package` flag is turned on.  A package
+    with the same name (case differences are ignored) cannot  exist in
+    _Bioconductor_ (`ERROR`).
 
 ## bioc-devel Subscription Check
 
 **Checking for bioc-devel mailing list subscription...**
 
-This only applies if `BiocCheck` is run on the _Bioconductor_ build
-machines, because this step requires special authorization. This can be disabled
-with the `--no-check-bioc-help` option.
+This only applies if `BiocCheck` is run on the _Bioconductor_ build machines,
+because this step requires special authorization. This can be disabled with the
+`--no-check-bioc-help` option.
 
 * Check that the email address in the Maintainer (or Authors@R) field
-  is subscribed to the bioc-devel mailing list (`ERROR`).
+    is subscribed to the bioc-devel mailing list (`ERROR`).
 
-  All maintainers must subscribe to the bioc-devel mailing list, with
-  the email address used in the DESCRIPTION file.  You can subscribe
-  [here][9].
+All maintainers must subscribe to the bioc-devel mailing list, with the email
+address used in the DESCRIPTION file. You can subscribe [here][9].
 
 [9]: https://stat.ethz.ch/mailman/listinfo/bioc-devel
 
@@ -701,19 +701,19 @@ with the `--no-check-bioc-help` option.
 **Checking for support site registration...**
 
 * Check that the package maintainer is registered on the Bioconductor
-  [support site][10] using the same email address that is in the
-  `Authors@R` field of their package's `DESCRIPTION` file. Users will
-  be notified if the email is [not registered][11] (`ERROR`); if connection
-  issues are encountered, a `WARNING` will be issued. This check can be
-  disabled with the `--no-check-bioc-help` option.
+    [support site][10] using the same email address that is in the
+    `Authors@R` field of their package's `DESCRIPTION` file. Users will
+    be notified if the email is [not registered][11] (`ERROR`); if connection
+    issues are encountered, a `WARNING` will be issued. This check can be
+    disabled with the `--no-check-bioc-help` option.
 
-  The support site is the main forum for _Bioconductor_ package-related topics
-  and questions. Therefore, it is important for maintainers to register
-  their package name as a 'Watched Tag' on the support site in order to receive
-  email notifications whenever users ask questions about the package.
-  `BiocCheck` will cross-check the maintainer's 'Watched Tags' with
-  the current package and produce an `ERROR` if the package name is not in the
-  list of watched tags. 
+The support site is the main forum for _Bioconductor_ package-related topics
+and questions. Therefore, it is important for maintainers to register their
+package name as a 'Watched Tag' on the support site in order to receive
+email notifications whenever users ask questions about the package.
+`BiocCheck` will cross-check the maintainer's 'Watched Tags' with the
+current package and produce an `ERROR` if the package name is not in the
+list of watched tags.
 
 [10]: https://support.bioconductor.org
 [11]: https://support.bioconductor.org/accounts/signup/
@@ -745,10 +745,6 @@ package:
 BiocCheckGitClone("packageDir")
 ```
 
-# Installing `BiocCheckGitClone`
-
-Please see previous Installing `BiocCheck` section.
-
 # Interpreting `BiocCheckGitClone` output
 
 Actual `BiocCheckGitClone` output is shown below in **bold**.
@@ -779,31 +775,31 @@ file. An example would be how the Authors and Maintainers are specified. The
 DESCRIPTION file is therefore checked in its raw original form.
 
 *  **Checking if DESCRIPTION is well formatted**
-   The DESCRIPTION file must be properly formatted and able to be read in with
-   `read.dcf()` in order to function properly on the Bioconductor build
-   machines. This check attempts to `read.dcf("DESCRIPTION")` and throws an
-   ERROR if mal-formatted. (`ERROR`)
+    The DESCRIPTION file must be properly formatted and able to be read in with
+    `read.dcf()` in order to function properly on the Bioconductor build
+    machines. This check attempts to `read.dcf("DESCRIPTION")` and throws an
+    ERROR if mal-formatted. (`ERROR`)
 
 * **Checking for remote package usage...**
-   The `Remotes` field is not allowed in Bioconductor packages as dependencies
-   must be from CRAN or Bioconductor. (`ERROR`)
+    The `Remotes` field is not allowed in Bioconductor packages as dependencies
+    must be from CRAN or Bioconductor. (`ERROR`)
 
 *  **Checking for valid use of maintainer fields**
-   Using the `Authors@R` field over the `Author` and `Maintainer` fields is
-   encouraged. The reason is that the `Authors@R` field allows for more
-   flexibility in specifying the roles of contributors to the package, such as
-   authors, maintainers, and funders. It also allows for the inclusion of ORCID
-   identifiers, which can help with tracking contributions from different
-   institutions. An error is emitted if both the `Authors@R` field and either
-   the `Author` or `Maintainer` fields are present in the `DESCRIPTION` file
-   (`ERROR`). Using `Author` and `Maintainer` fields still results in a `NOTE`
-   but is not an error (`NOTE`).
+    Using the `Authors@R` field over the `Author` and `Maintainer` fields is
+    encouraged. The reason is that the `Authors@R` field allows for more
+    flexibility in specifying the roles of contributors to the package, such as
+    authors, maintainers, and funders. It also allows for the inclusion of ORCID
+    identifiers, which can help with tracking contributions from different
+    institutions. An error is emitted if both the `Authors@R` field and either
+    the `Author` or `Maintainer` fields are present in the `DESCRIPTION` file
+    (`ERROR`). Using `Author` and `Maintainer` fields still results in a `NOTE`
+    but is not an error (`NOTE`).
 
 ## NAMESPACE checks
 
 * **Checking NAMESPACE...**
-   Ensures that the NAMESPACE file does not contain a match all export pattern,
-   i.e., `exportPattern("^[[:alpha:]]+")` (`ERROR`).
+    Ensures that the NAMESPACE file does not contain a match all export pattern,
+    i.e., `exportPattern("^[[:alpha:]]+")` (`ERROR`).
 
 ## CITATION checks
 
@@ -834,9 +830,9 @@ modern publications should have an assigned DOI.
 
 ```{css anote_style, echo=FALSE}
 .anote {
-  font-size: 10pt;
-  font-style: italic;
-  font-family: times,serif;
+    font-size: 10pt;
+    font-style: italic;
+    font-family: times,serif;
 }
 ```
 
