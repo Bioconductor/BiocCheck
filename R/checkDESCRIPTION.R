@@ -26,8 +26,9 @@ validMaintainer <- function(.BiocPackage) {
 checkDESCRIPTIONFile <- function(.BiocPackage) {
     dcf <- .BiocPackage$DESCRIPTION
 
+    checkValidDESCfields(dcf)
+
     checkLicenseForRestrictiveUse(dcf[, "License"])
-    checkValidDESCfields(.BiocPackage)
     checkRecDESCfields(dcf)
     checkBiocDepsDESC(dcf)
     checkPinnedDeps(dcf)
@@ -308,12 +309,8 @@ checkFndPerson <- function(dcf) {
         handleMessage(msg)
 }
 
-checkValidDESCfields <- function(.BiocPackage) {
+checkValidDESCfields <- function(dcf) {
     handleCheck("Checking validity of DESCRIPTION fields...")
-    if (!.BiocPackage$isValid)
-        return(invisible())
-
-    dcf <- .BiocPackage$DESCRIPTION
 
     present_fields <- colnames(dcf)
 
