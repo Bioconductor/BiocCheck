@@ -210,7 +210,7 @@ BiocCheckRun <-
     should_install <- is.null(install_param) || isTRUE(install_param)
 
     if (should_install) {
-        .BiocPackage$install()
+        .BiocPackage$inst_setup()
         cli::cli_alert_success("Package installed successfully")
         dots[["libloc"]] <- .BiocPackage$installDir
     } else {

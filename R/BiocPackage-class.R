@@ -151,7 +151,7 @@
             }
             callSuper(...)
         },
-        install = function(install_dir = tempfile()) {
+        inst_setup = function(install_dir = tempfile()) {
             pkgpath <- .self[["sourceDir"]]
             pkgname <- .self[["packageName"]]
 

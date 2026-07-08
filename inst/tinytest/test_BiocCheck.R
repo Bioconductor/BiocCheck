@@ -577,7 +577,7 @@ expect_equivalent(length(res), 1)
 
 .bioctest <- read_test_package("testpkg0")
 dir.create(tempdir <- tempfile())
-.bioctest$install(install_dir = tempdir)
+.bioctest$inst_setup(install_dir = tempdir)
 msg_show <- BiocCheck:::checkS4ClassShowMethod(.bioctest)
 expect_identical(msg_show, "classB")
 unlink(tempdir, recursive = TRUE)
@@ -615,7 +615,7 @@ expect_true(
 cli::cli_h3(".BiocPackage install method")
 
 .bioctest <- create_test_package()
-.bioctest$install()
+.bioctest$inst_setup()
 
 liblocation <- .bioctest$installDir
 expect_true(dir.exists(liblocation))
@@ -991,7 +991,7 @@ expect_true(
 cli::cli_h3("checkExportsAreDocumented")
 
 .bioctest <- read_test_package("testpkg0")
-instdir <- .bioctest$install()
+instdir <- .bioctest$inst_setup()
 res <- BiocCheck:::checkExportsAreDocumented(
     .bioctest, lib.loc = instdir
 )
@@ -1434,7 +1434,7 @@ cli::cli_h3("checkUsageOfDont")
 
 ## testpkg0 should trigger this note for 2 out of 3 man pages
 .bioctest <- read_test_package("testpkg0")
-.bioctest$install()
+.bioctest$inst_setup()
 notemsg <- capture.output(
     BiocCheck:::checkUsageOfDont(.bioctest), type = "message"
 )
