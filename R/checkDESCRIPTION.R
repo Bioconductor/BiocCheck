@@ -1,4 +1,4 @@
-checkDESCRIPTION <- function(.BiocPackage) {
+checkReadDESCRIPTION <- function(.BiocPackage) {
     if (!.BiocPackage$isValid) {
         handleError("DESCRIPTION is malformed.")
         handleMessage(.BiocPackage$readError)

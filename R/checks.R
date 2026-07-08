@@ -276,7 +276,7 @@ checkBBScompatibility <- function(.BiocPackage)
     pkgdir <- .BiocPackage$sourceDir
 
     handleCheck("Checking for proper Description: field...")
-    checkDESCRIPTION(.BiocPackage)
+    checkReadDESCRIPTION(.BiocPackage)
 
     handleCheck("Checking for whitespace in DESCRIPTION field names...")
     if (any(grepl("\\s", colnames(dcf))))
