@@ -120,6 +120,15 @@
 #' @references <https://contributions.bioconductor.org>
 #' @seealso [BiocCheck-class], [Message-class]
 #'
+#' @usage
+#' BiocCheck(
+#'    package = getwd(),
+#'    checkDir = dirname(package),
+#'    debug = FALSE,
+#'    callr = FALSE,
+#'    ...
+#' )
+#'
 #' @examples
 #'
 #' packageDir <- system.file("testpackages", "testpkg0", package="BiocCheck")

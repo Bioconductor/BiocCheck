@@ -5,11 +5,11 @@
 \title{Check a package's adherence with the Bioconductor Package Guidelines}
 \usage{
 BiocCheck(
-  package = getwd(),
-  checkDir = dirname(package),
-  debug = FALSE,
-  callr = FALSE,
-  ...
+   package = getwd(),
+   checkDir = dirname(package),
+   debug = FALSE,
+   callr = FALSE,
+   ...
 )
 }
 \arguments{
