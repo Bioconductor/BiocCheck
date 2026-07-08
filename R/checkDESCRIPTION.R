@@ -27,7 +27,7 @@ checkDESCRIPTIONFile <- function(.BiocPackage) {
     dcf <- .BiocPackage$DESCRIPTION
 
     checkLicenseForRestrictiveUse(dcf[, "License"])
-    checkDESCfields(dcf)
+    checkRecDESCfields(dcf)
     checkBiocDepsDESC(dcf)
     checkPinnedDeps(dcf)
     checkFndPerson(dcf)
@@ -238,7 +238,7 @@ checkLicenseForRestrictiveUse <- function(license) {
     }
 }
 
-checkDESCfields <- function(dcf) {
+checkRecDESCfields <- function(dcf) {
     handleCheck("Checking for recommended DESCRIPTION fields...")
     fields <- c("URL", "BugReports")
     if ("Date" %in% colnames(dcf)) {

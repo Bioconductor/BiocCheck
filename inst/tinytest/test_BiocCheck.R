@@ -866,16 +866,16 @@ match <- BiocCheck:::checkClassNEEQLookup(.bioctest)
 expect_identical(4L, length(match))
 unlink(temp_dir, recursive = TRUE)
 
-# checkDESCRIPTIONfile ----------------------------------------------------
-cli::cli_h3("checkDESCRIPTIONfile")
+# checkDESCRIPTIONFile ----------------------------------------------------
+cli::cli_h3("checkDESCRIPTIONFile")
 
 dcf <- matrix("https://example.com", dimnames = list(NULL, "URL"))
-BiocCheck:::checkDESCfields(dcf)
+BiocCheck:::checkRecDESCfields(dcf)
 expect_equivalent(.BiocCheck$getNum("note"), 1)
 .BiocCheck$zero()
 
 dcf <- matrix("https://example.com", dimnames = list(NULL, "BugReports"))
-BiocCheck:::checkDESCfields(dcf)
+BiocCheck:::checkRecDESCfields(dcf)
 expect_equivalent(.BiocCheck$getNum("note"), 1)
 .BiocCheck$zero()
 
@@ -883,7 +883,7 @@ dcf <- matrix(
     c("https://example.com", "https://example.com"), nrow = 1,
     dimnames = list(NULL, c("BugReports", "URL"))
 )
-BiocCheck:::checkDESCfields(dcf)
+BiocCheck:::checkRecDESCfields(dcf)
 expect_equivalent(.BiocCheck$getNum("note"), 0)
 .BiocCheck$zero()
 
