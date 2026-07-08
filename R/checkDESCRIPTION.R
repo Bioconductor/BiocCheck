@@ -5,6 +5,29 @@ checkReadDESCRIPTION <- function(.BiocPackage) {
     }
 }
 
+checkDescFieldLength <- function(dcf) {
+    handleCheck("Checking for proper Description: field...")
+
+    if ("Description" %in% colnames(dcf)) {
+        desc_field <- dcf[, "Description"]
+        desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
+        desc_sentences <- length(
+            strsplit(desc_field, split = "[.!?][[:space:]]+")[[1L]]
+        )
+        msg <- "The Description field in the DESCRIPTION is made up of less
+            than 3 sentences. Provide a more detailed description of the
+            package."
+
+        # values chosen sensibly in a data-driven manner
+        if (nchar(desc_field) < 50L || desc_words < 20L)
+            handleWarning(
+                "Description field in the DESCRIPTION file is too concise"
+            )
+        else if (desc_sentences < 3L)
+            handleNote(paste(strwrap(msg), collapse = "\n"))
+    }
+}
+
 validMaintainer <- function(.BiocPackage) {
     if (.BiocPackage$isTar)
         return()
@@ -30,6 +53,8 @@ checkDESCRIPTIONFile <- function(.BiocPackage) {
 
     checkLicenseForRestrictiveUse(dcf[, "License"])
     checkRecDESCfields(dcf)
+
+    checkDescFieldLength(dcf)
     checkBiocDepsDESC(dcf)
     checkPinnedDeps(dcf)
     checkFndPerson(dcf)

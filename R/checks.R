@@ -241,42 +241,16 @@ checkBiocViews <- function(.BiocPackage)
     invalid
 }
 
-checkDescFieldLength <- function(.BiocPackage) {
-    dcf <- .BiocPackage$DESCRIPTION
-    if ("Description" %in% colnames(dcf)) {
-        desc_field <- dcf[, "Description"]
-        desc_words <- lengths(strsplit(desc_field, split = "[[:space:]]+"))
-        desc_sentences <- length(
-            strsplit(desc_field, split = "[.!?][[:space:]]+")[[1L]]
-        )
-        msg <- "The Description field in the DESCRIPTION is made up of less
-            than 3 sentences. Provide a more detailed description of the
-            package."
-
-        # values chosen sensibly in a data-driven manner
-        if (nchar(desc_field) < 50L || desc_words < 20L)
-            handleWarning(
-                "Description field in the DESCRIPTION file is too concise"
-            )
-        else if (desc_sentences < 3L)
-            handleNote(paste(strwrap(msg), collapse = "\n"))
-    }
-}
-
 .checkORCID <- function(orcid)
 {
     re <- "^[0-9]{4}-[0-9]{4}-[0-9]{4}-[0-9]{3}[0-9X]$"
     grepl(re, orcid)
 }
 
-
 checkBBScompatibility <- function(.BiocPackage)
 {
     dcf <- .BiocPackage$DESCRIPTION
     pkgdir <- .BiocPackage$sourceDir
-
-    handleCheck("Checking for proper Description: field...")
-    checkReadDESCRIPTION(.BiocPackage)
 
     handleCheck("Checking for whitespace in DESCRIPTION field names...")
     if (any(grepl("\\s", colnames(dcf))))
