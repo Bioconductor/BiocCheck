@@ -241,7 +241,7 @@ checkBiocViews <- function(.BiocPackage)
     invalid
 }
 
-.conciseDescription <- function(.BiocPackage) {
+checkDescFieldLength <- function(.BiocPackage) {
     dcf <- .BiocPackage$DESCRIPTION
     if ("Description" %in% colnames(dcf)) {
         desc_field <- dcf[, "Description"]

@@ -306,7 +306,7 @@ expect_error({
 }, info = "Blank line in DESCRIPTION doesn't cause error")
 
 .bioctest <- read_test_package("testpkg0")
-BiocCheck:::.conciseDescription(.bioctest)
+BiocCheck:::checkDescFieldLength(.bioctest)
 checkCounter(
     "Description field in the DESCRIPTION file is too concise",
     "warning"
@@ -324,7 +324,7 @@ checkCounter(
         License = "GPL-2"
     )
 )
-BiocCheck:::.conciseDescription(.bioctest)
+BiocCheck:::checkDescFieldLength(.bioctest)
 checkCounter(
     "The Description field in the DESCRIPTION is less than two sentences",
     "note"
