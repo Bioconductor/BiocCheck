@@ -82,16 +82,19 @@ checkVigFiles <- function(.BiocPackage) {
     )
 
     if (length(allvigfiles) != 0) {
-        badFiles <- unlist(lapply(vigs,
-                           FUN = function(x, allvigfiles){
-                               vl <- tools::file_path_sans_ext(x)
-                               badext <- c(".tex", ".html", ".pdf",
-                                           ".aux", ".log")
-                               ext <- paste0(vl, badext)
-                               fnd <- intersect(allvigfiles, ext)
-                               fnd
-                           },
-                           allvigfiles = allvigfiles))
+        badFiles <- unlist(
+            lapply(
+                vigs,
+                FUN = function(x, allvigfiles) {
+                    vl <- tools::file_path_sans_ext(x)
+                    badext <- c(".tex", ".html", ".pdf", ".aux", ".log")
+                    ext <- paste0(vl, badext)
+                    fnd <- intersect(allvigfiles, ext)
+                    fnd
+                },
+                allvigfiles = allvigfiles
+            )
+        )
         if (length(badFiles) != 0){
             handleNote(
                 "Potential intermediate files found:",
@@ -176,7 +179,7 @@ checkVigMetadata <- function(vigdircontents)
         if (length(idx) == 0L)
             badVig <- c(badVig, basename(file))
     }
-     if (length(badVig) != 0L){
+    if (length(badVig) != 0L) {
         handleWarning(
             "Vignette(s) missing Vignette metadata. See ",
             "https://r-pkgs.org/vignettes.html",

@@ -79,9 +79,9 @@ checkRemotesUsage <- function(.BiocPackage)
     restricted_fields <- c("Remotes", "Additional_repositories")
     if (any(restricted_fields %in% colnames(dcf)))
         handleError(
-           "Package dependencies must be on CRAN or Bioconductor.",
-           " Remove 'Remotes:' and/or 'Additional_repositories:' fields",
-           " from DESCRIPTION"
+            "Package dependencies must be on CRAN or Bioconductor.",
+            " Remove 'Remotes:' and/or 'Additional_repositories:' fields",
+            " from DESCRIPTION"
         )
 }
 

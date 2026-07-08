@@ -37,10 +37,16 @@ checkPackageSize <- function(.BiocPackage, size = 10L) {
         pkgSize <- file.size(pkg)
         if (pkgSize > maxSize) {
             msgs <- c(
-                paste0("Package Size: ",
-                       as.character(round(pkgSize / mb, 2L)), " MB"),
-                paste0("Size Requirement: ",
-                       sprintf("%.2f", round(maxSize / mb, 2L)), " MB")
+                paste0(
+                    "Package Size: ",
+                    as.character(round(pkgSize / mb, 2L)),
+                    " MB"
+                ),
+                paste0(
+                    "Size Requirement: ",
+                    sprintf("%.2f", round(maxSize / mb, 2L)),
+                    " MB"
+                )
             )
             handleError(
                 "Package tarball exceeds the Bioconductor size requirement.",
