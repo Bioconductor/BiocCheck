@@ -28,6 +28,12 @@ checkDescFieldLength <- function(dcf) {
     }
 }
 
+checkWSinDESCfields <- function(dcf) {
+    handleCheck("Checking for whitespace in DESCRIPTION field names...")
+    if (any(grepl("\\s", colnames(dcf))))
+        handleError("Remove whitespace from DESCRIPTION field names.")
+}
+
 validMaintainer <- function(.BiocPackage) {
     if (.BiocPackage$isTar)
         return()
@@ -60,6 +66,7 @@ checkDESCRIPTIONFile <- function(.BiocPackage) {
     checkLicenseForRestrictiveUse(dcf[, "License"])
     checkRecDESCfields(dcf)
 
+    checkWSinDESCfields(dcf)
     checkDescFieldLength(dcf)
     checkBiocDepsDESC(dcf)
     checkPinnedDeps(dcf)

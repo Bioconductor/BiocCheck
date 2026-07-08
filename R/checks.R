@@ -252,12 +252,6 @@ checkBBScompatibility <- function(.BiocPackage)
     dcf <- .BiocPackage$DESCRIPTION
     pkgdir <- .BiocPackage$sourceDir
 
-    handleCheck("Checking for whitespace in DESCRIPTION field names...")
-    if (any(grepl("\\s", colnames(dcf))))
-    {
-        handleError("Remove whitespace from DESCRIPTION field names.")
-        return()
-    }
     pkgNameFromDir <- basename(pkgdir)
     handleCheck("Checking if 'Package:' field matches directory / tarball...")
     if (dcf[, "Package"] != pkgNameFromDir)
