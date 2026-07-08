@@ -87,7 +87,7 @@ BiocCheckGitClone <- function(package=".", ...)
     handleCheck("Checking for inst/doc folders...")
     checkInstDocFolder(.BiocPackage)
 
-    handleCheck("Checking if DESCRIPTION is well formatted...")
+    handleCheck("Checking DESCRIPTION readability...")
     checkReadDESCRIPTION(.BiocPackage)
 
     handleCheck("Checking for valid use of maintainer fields...")

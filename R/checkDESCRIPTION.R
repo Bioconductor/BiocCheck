@@ -47,6 +47,12 @@ validMaintainer <- function(.BiocPackage) {
 }
 
 checkDESCRIPTIONFile <- function(.BiocPackage) {
+    handleCheck("Checking DESCRIPTION readability...")
+    if (!.BiocPackage$isValid)
+        .stop(
+            "DESCRIPTION file is malformed. Cannot check DESCRIPTION fields."
+        )
+
     dcf <- .BiocPackage$DESCRIPTION
 
     checkValidDESCfields(dcf)
