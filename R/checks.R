@@ -763,7 +763,8 @@ checkForSupportSiteRegistration <- function(.BiocPackage)
     }
 }
 
-#' @importFrom httr2 req_perform request resp_body_json req_timeout
+#' @importFrom httr2 req_perform request resp_body_json req_timeout req_error
+#' @importFrom httr2 resp_status
 #' @importFrom utils URLencode
 checkSupportReg <- function(email) {
     response <- paste0(
@@ -772,17 +773,28 @@ checkSupportReg <- function(email) {
     ) |>
         request() |>
         req_timeout(15L) |>
+        req_error(is_error = function(resp) FALSE) |>
         req_perform() |>
         try(silent = TRUE)
 
     response_error <- inherits(response, "try-error")
-    result <- !response_error && resp_body_json(response)
+    if (!response_error) {
+        status <- resp_status(response)
+        if (status != 200L && status != 404L) {
+            response_error <- TRUE
+            attr(response, "condition") <-
+                simpleError(paste("HTTP status", status))
+            class(response) <- "try-error"
+        }
+    }
+
+    result <- !response_error && (resp_status(response) == 200L)
     if (response_error) {
         handleWarning(
             "Unable to retrieve email info from the Support Site:",
             "\n  ", conditionMessage(attr(response, "condition"))
         )
-    } else if (resp_body_json(response)) {
+    } else if (result) {
         handleMessage("Maintainer is registered at support site.")
     } else {
         handleError(
@@ -803,10 +815,22 @@ checkWatchedTag <- function(email, pkgname) {
     ) |>
         request() |>
         req_timeout(15L) |>
+        req_error(is_error = function(resp) FALSE) |>
         req_perform() |>
         try(silent = TRUE)
 
-    if (inherits(response, "try-error")) {
+    response_error <- inherits(response, "try-error")
+    if (!response_error) {
+        status <- resp_status(response)
+        if (status != 200L) {
+            response_error <- TRUE
+            attr(response, "condition") <-
+                simpleError(paste("HTTP status", status))
+            class(response) <- "try-error"
+        }
+    }
+
+    if (response_error) {
         handleMessage(
             "Unable to retrieve 'Watched Tags' profile from the Support Site:",
             "\n  ", conditionMessage(attr(response, "condition"))
