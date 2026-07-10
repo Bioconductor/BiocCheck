@@ -176,7 +176,8 @@ temp_dir <- tempfile()
 
         # Create R folder and code
         rdir <- file.path(path, "R")
-        dir.create(rdir, recursive = TRUE)
+        if (!dir.exists(rdir))
+            dir.create(rdir, recursive = TRUE)
         cat("fun1 <- function() { 1 }\n", file = file.path(rdir, "fun1.R"))
         cat("fun2 <- function() { 2 }\n", file = file.path(rdir, "fun2.R"))
 
