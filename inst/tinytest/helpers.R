@@ -67,3 +67,16 @@ stillZero <- function()
         c(note = 0L, warning = 0L, error = 0L)
     )
 }
+
+support_site_reachable <-
+    function(url = "https://support.bioconductor.org")
+{
+  out <- try(
+    curl::curl_fetch_memory(
+      url,
+      handle = curl::new_handle(timeout_ms = 3000L)
+    ),
+    silent = TRUE
+  )
+  !inherits(out, "try-error")
+}

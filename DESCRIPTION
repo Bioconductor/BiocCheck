@@ -42,6 +42,7 @@ Imports:
     xml2
 Suggests: 
     BiocStyle,
+    curl,
     devtools,
     gert,
     jsonlite,

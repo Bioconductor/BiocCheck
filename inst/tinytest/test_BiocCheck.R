@@ -1177,14 +1177,7 @@ if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
 # checkForSupportSiteRegistration ----------------------------------------
 cli::cli_h3("checkForSupportSiteRegistration")
 
-connect <- suppressWarnings(
-    tryCatch({
-        readBin("https://support.bioconductor.org", n=1L, what="raw")
-        TRUE
-    }, error = function(...) {
-        FALSE
-    })
-)
+connect <- support_site_reachable()
 
 if (connect) {
 
