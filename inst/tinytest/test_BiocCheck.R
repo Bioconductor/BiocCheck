@@ -1193,7 +1193,7 @@ if (connect) {
     BiocCheck:::checkSupportReg("lori.shepherd@roswellpark.org")
     expect_true(stillZero())
     BiocCheck:::checkSupportReg("foo@bar.com")
-    expect_equivalent(.BiocCheck$getNum("warning"), 1)
+    expect_equivalent(.BiocCheck$getNum("error"), 1)
     .BiocCheck$zero()
     ## api is not case sensitive
     BiocCheck:::checkSupportReg("lori.shePhErd@roswellpark.org")
