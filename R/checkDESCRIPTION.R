@@ -357,7 +357,7 @@ checkValidDESCfields <- function(dcf) {
         c("RoxygenNote", "Video")
     )
 
-    is_config_field <- grepl("^Config/", present_fields)
+    is_config_field <- grepl("^Remote|Config/", present_fields)
     fields_to_check <- present_fields[!is_config_field]
 
     bad_fields <- fields_to_check[!(fields_to_check %in% known_fields)]
