@@ -414,7 +414,7 @@ checkCatInRCode <-
 {
     rfiles <- .BiocPackage$RSources
     parsedCodes <- lapply(
-        structure(rfiles, .Names = rfiles), parseFile,
+        structure(rfiles, names = rfiles), parseFile,
         .BiocPackage = .BiocPackage
     )
     parsedCodes <- lapply(parsedCodes, .filtersetMethodRanges)
@@ -432,7 +432,7 @@ checkEqInAssignment <-
 {
     rfiles <- .BiocPackage$RSources
     parsedCodes <- lapply(
-        structure(rfiles, .Names = rfiles), parseFile,
+        structure(rfiles, names = rfiles), parseFile,
         .BiocPackage = .BiocPackage
     )
     msg_res <- findSymbolsInParsedCode(
@@ -541,7 +541,7 @@ checkExternalData <- function(.BiocPackage) {
 checkOnAttachLoadCalls <- function(.BiocPackage) {
     rfiles <- .BiocPackage$RSources
     parsedCodes <- lapply(
-        structure(rfiles, .Names = rfiles), parseFile,
+        structure(rfiles, names = rfiles), parseFile,
         .BiocPackage = .BiocPackage
     )
     parsedCodes <- lapply(parsedCodes, function(tokens) {

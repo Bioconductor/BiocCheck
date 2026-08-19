@@ -77,7 +77,7 @@ findSymbolsInParsedCode <-
     )
 {
     matches <- structure(vector("list", length(parsedCodeList)),
-        .Names = names(parsedCodeList))
+        names = names(parsedCodeList))
     allcombos <- expand.grid(
         tokenTypes = tokenTypes,
         symbolNames = symbolNames,
@@ -129,7 +129,7 @@ findSymbolsInRFiles <-
 {
     rfiles <- .BiocPackage$RSources
     parsedCodes <- lapply(
-        structure(rfiles, .Names = rfiles), parseFile,
+        structure(rfiles, names = rfiles), parseFile,
         .BiocPackage = .BiocPackage
     )
     msg_res <- findSymbolsInParsedCode(
@@ -161,7 +161,7 @@ findSymbolsInVignettes <-
 {
     vigfiles <- .BiocPackage$VigSources
     shortnames <- .getDirFiles(vigfiles)
-    viglist <- structure(vector("list", length(vigfiles)), .Names = shortnames)
+    viglist <- structure(vector("list", length(vigfiles)), names = shortnames)
     for (i in seq_along(vigfiles)) {
         shortName <- shortnames[i]
         tempR <- tempfile(fileext=".R")

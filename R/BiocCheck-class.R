@@ -142,7 +142,7 @@ NULL
                 "<Internal> Input to '$add' must be a list" = is.list(mlist)
             )
             ins <- Filter(length, list(mlist, help_text, messages))
-            nist <- structure(list(ins), .Names = names(mlist))
+            nist <- structure(list(ins), names = names(mlist))
             .messages$setMessage(nist, condition = condition)
             .self[[condition]] <- append(.self[[condition]], nist)
             .self$log[[checkName]] <- append(.self$log[[checkName]], nist)
