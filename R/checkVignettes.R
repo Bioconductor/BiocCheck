@@ -431,7 +431,7 @@ checkVigEvalAllFalse <- function(.BiocPackage) {
     vigfiles <- .BiocPackage$VigSources
     shortnames <- .getDirFiles(vigfiles)
     viglist <- structure(
-        vector("logical", length(vigfiles)), .Names = shortnames
+        vector("logical", length(vigfiles)), names = shortnames
     )
     for (i in seq_along(vigfiles)) {
         shortName <- shortnames[i]
@@ -464,7 +464,7 @@ checkVigEvalAllFalse <- function(.BiocPackage) {
 checkDupChunkLabels <- function(vigfiles) {
     viglist <- structure(
         vector("logical", length(vigfiles)),
-        .Names = vigfiles
+        names = vigfiles
     )
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
@@ -521,7 +521,7 @@ checkDupChunkLabels <- function(vigfiles) {
 checkChunkLabels <- function(vigfiles) {
     viglist <- structure(
         vector("logical", length(vigfiles)),
-        .Names = vigfiles
+        names = vigfiles
     )
     for (vfile in vigfiles) {
         viglines <- readLines(vfile, warn = FALSE)
@@ -626,7 +626,7 @@ try_purl_or_tangle <- function(input, output, quiet, ...) {
 checkVigClassUsage <- function(.BiocPackage) {
     vigfiles <- .BiocPackage$VigSources
     viglist <- structure(
-        vector("list", length(vigfiles)), .Names = basename(vigfiles)
+        vector("list", length(vigfiles)), names = basename(vigfiles)
     )
     for (vfile in vigfiles) {
         tempR <- tempfile(fileext=".R")
@@ -650,11 +650,11 @@ checkVigClassUsage <- function(.BiocPackage) {
 checkVigSessionInfo <- function(.BiocPackage) {
     vigfiles <- .BiocPackage$VigSources
     notFoundVig <- structure(
-        vector("logical", length(vigfiles)), .Names = vigfiles
+        vector("logical", length(vigfiles)), names = vigfiles
     )
     for (vfile in vigfiles) {
         pc <- structure(
-            list(parseFile(.BiocPackage, vfile)), .Names = vfile
+            list(parseFile(.BiocPackage, vfile)), names = vfile
         )
         if (nrow(pc[[vfile]])) {
             res <- findSymbolsInParsedCode(

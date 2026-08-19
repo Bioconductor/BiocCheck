@@ -30,7 +30,7 @@ parseFiles <- function(.BiocPackage)
     manfiles <- .BiocPackage$manSources
     vigfiles <- .BiocPackage$VigSources
     files <- c(rfiles, manfiles, vigfiles)
-    parsedCode <- structure(vector("list", length(files)), .Names = files)
+    parsedCode <- structure(vector("list", length(files)), names = files)
     for (file in files)
     {
         df <- parseFile(.BiocPackage, file)

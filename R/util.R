@@ -31,7 +31,7 @@ handleCondition <-
             "<Internal> Designate input with 'warning', 'error', or 'note'."
         )
     cl <- sys.call(sys.parent(n = nframe))[[1L]]
-    ml <- structure(msg, .Names = tail(as.character(cl), 1L))
+    ml <- structure(msg, names = tail(as.character(cl), 1L))
     .BiocCheck$add(
         ml,
         condition = condition,
