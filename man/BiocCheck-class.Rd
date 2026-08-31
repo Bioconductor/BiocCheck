@@ -32,7 +32,11 @@ Bioconductor Build System (BBS). This is helpful for avoiding the creation
 of folders in the BBS.}
 
 \item{file}{\code{character(1)} A path to a JSON file for writing or reading as
-created by \code{toJSON} and \code{fromJSON} \code{BiocCheck} methods.}
+created by \code{toJSON} and \code{fromJSON} \code{BiocCheck} methods. When \code{NULL},
+\code{toJSON} returns the JSON as a character string instead of writing it.}
+
+\item{text}{\code{character()} The plain text report, as included in the \code{text}
+element of the JSON output. Defaults to the output of \code{composeReport}.}
 }
 \value{
 An internal \code{BiocCheck} R5 Reference Class used to document
@@ -80,6 +84,12 @@ purposes.}
 
 \item{\code{error,warning,note}}{\code{list()} Finer extraction of each condition type}
 
+\item{\code{entries}}{\code{list()} A flat list of records, one per condition raised,
+each with the \code{severity}, the originating check function (\code{checkFun}), the
+check title (\code{check}), the \code{message}, any \code{help_text} and \code{details}, and
+the file \code{locations} when the check reports them. This is the
+machine-readable form written to \verb{00BiocCheck.json}.}
+
 \item{\code{metadata}}{\code{list()} A list of additional information relevant to the
 package and its state. See details.}
 }}
@@ -94,15 +104,18 @@ package and its state. See details.}
 \item \code{setCheck}: Create a new element in the internal list for a check
 \item \code{get}: Extract the list of conditions raised by \code{BiocCheck}
 \item \code{getNum}: Tally the number of condition provided by the input
+\item \code{getStatus}: The worst condition raised, i.e., one of \code{error},
+\code{warning}, \code{note}, or \code{ok} when nothing was raised
 \item \code{zero}: Reset the internal log of the condition provided
 \item \code{getBiocCheckDir}: Report and create the \verb{<package>.BiocCheck}
 directory as obtained from the metadata
 \item \code{composeReport}: Simplify the list structure from the \code{log} and
 provide a character vector of conditions raised
-\item \code{report}: Write the \verb{00BiocCheck.log} report into the \code{BiocCheck}
-folder
-\item \code{toJSON}: Write a JSON file to the location indicated with the
-conditions raised
+\item \code{report}: Write the \verb{00BiocCheck.log} and \verb{00BiocCheck.json} reports
+into the \code{BiocCheck} folder
+\item \code{toJSON}: Write (or return) the machine-readable report: the
+\code{metadata}, a \code{summary} count of each condition, the overall \code{status},
+the \code{entries}, and the plain \code{text} report
 \item \code{fromJSON}: Read a JSON file from the location indicated with the
 output of previous conditions raised in the check
 \item \code{show}: Display the information in the class. Currently empty.

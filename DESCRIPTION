@@ -1,7 +1,7 @@
 Package: BiocCheck
 Title: Bioconductor-specific package checks
-Version: 1.49.30
-Date: 2026-07-27
+Version: 1.49.31
+Date: 2026-08-31
 Authors@R: c(
     person("Bioconductor", "Package Maintainer", ,
         "maintainer@bioconductor.org", "aut"),
@@ -33,6 +33,7 @@ Imports:
     commonmark,
     graph,
     httr2,
+    jsonlite,
     knitr,
     methods,
     rvest,
@@ -45,7 +46,6 @@ Suggests:
     curl,
     devtools,
     gert,
-    jsonlite,
     rmarkdown,
     tinytest,
     usethis

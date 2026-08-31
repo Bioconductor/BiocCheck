@@ -51,6 +51,20 @@ BiocManager::install("Bioconductor/BiocAddins")
 
 Then, in RStudio, click on the "Addins" menu, and select "Run BiocCheck".
 
+## Machine-readable output
+
+Each run writes both `00BiocCheck.log` and `00BiocCheck.json` to the
+`<PackageName>.BiocCheck` folder. The JSON report contains the text output
+along with a `summary` count of the errors, warnings, and notes, an overall
+`status`, and one structured record per condition raised, so that continuous
+integration jobs and other tools do not have to parse the text output:
+
+```sh
+jq -e '.summary.error == 0' MyPackage.BiocCheck/00BiocCheck.json
+```
+
+See `vignette("BiocCheck")` for the schema.
+
 ## Documentation
 
 The `BiocCheck` package contains a vignette that describes the package

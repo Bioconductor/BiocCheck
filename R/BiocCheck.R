@@ -107,7 +107,9 @@
 #'
 #' @return `BiocCheck()` is chiefly called for the side effect of the check
 #'   reporting. The function also creates a `<packageName>.BiocCheck` folder
-#'   and returns a `BiocCheck` reference class with three main list elements:
+#'   with the `00BiocCheck.log` text report and the `00BiocCheck.json`
+#'   machine-readable report (see the vignette for the JSON schema), and
+#'   returns a `BiocCheck` reference class with three main list elements:
 #'
 #' * **error**: Items to address before the package can be accepted
 #'
