@@ -61,7 +61,7 @@ parsing the text output:
 ```json
 {
   "metadata": { "Package": "MyPackage", "PackageVersion": "0.99.0",
-                "BiocVersion": "3.23", "BiocCheckVersion": "1.50.0", "...": "" },
+                "BiocVersion": "3.23", "...": "" },
   "summary": { "error": 1, "warning": 2, "note": 5 },
   "status": "error",
   "entries": [
@@ -69,7 +69,7 @@ parsing the text output:
       "severity": "warning",
       "checkFun": "checkFormatting",
       "check": "Checking formatting of DESCRIPTION, NAMESPACE, ...",
-      "message": "Consider shorter lines; 3 lines (1%) are > 80 characters long.",
+      "message": "Consider shorter lines; 3 lines (1%) are > 80 chars.",
       "help_text": "First few lines:",
       "details": ["R/foo.R#L12 x <- some_very_long_call( ..."],
       "locations": [ { "file": "R/foo.R", "line": 12 } ]

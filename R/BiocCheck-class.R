@@ -42,11 +42,12 @@
 #'
 #' @field error,warning,note `list()` Finer extraction of each condition type
 #'
-#' @field entries `list()` A flat list of records, one per condition raised,
-#'   each with the `severity`, the originating check function (`checkFun`), the
-#'   check title (`check`), the `message`, any `help_text` and `details`, and
-#'   the file `locations` when the check reports them. This is the
-#'   machine-readable form written to `00BiocCheck.json`.
+#' @field entries `list()` A flat list of records, one per
+#'   condition raised, each with the `severity`, the
+#'   originating check function (`checkFun`), the check title
+#'   (`check`), the `message`, any `help_text` and `details`,
+#'   and the file `locations` when reported by the check. This
+#'   is the machine-readable form written to `00BiocCheck.json`.
 #'
 #' @field metadata `list()` A list of additional information relevant to the
 #'   package and its state. See details.
@@ -79,11 +80,13 @@
 #'   of folders in the BBS.
 #'
 #' @param file `character(1)` A path to a JSON file for writing or reading as
-#'   created by `toJSON` and `fromJSON` `BiocCheck` methods. When `NULL`,
-#'   `toJSON` returns the JSON as a character string instead of writing it.
+#'   created by `toJSON` and `fromJSON` `BiocCheck` methods.
+#'   When `NULL`, `toJSON` returns the JSON as a character
+#'   string instead of writing it.
 #'
-#' @param text `character()` The plain text report, as included in the `text`
-#'   element of the JSON output. Defaults to the output of `composeReport`.
+#' @param text `character()` The plain text report, as included
+#'   in the `text` element of the JSON output. Defaults to the
+#'   output of `composeReport`.
 #'
 #' @importFrom BiocBaseUtils checkInstalled
 #' @importFrom jsonlite read_json toJSON
@@ -104,11 +107,11 @@
 #'     directory as obtained from the metadata
 #'   * `composeReport`: Simplify the list structure from the `log` and
 #'     provide a character vector of conditions raised
-#'   * `report`: Write the `00BiocCheck.log` and `00BiocCheck.json` reports
-#'     into the `BiocCheck` folder
-#'   * `toJSON`: Write (or return) the machine-readable report: the
-#'     `metadata`, a `summary` count of each condition, the overall `status`,
-#'     the `entries`, and the plain `text` report
+#'   * `report`: Write the `00BiocCheck.log` and
+#'     `00BiocCheck.json` reports into the `BiocCheck` folder
+#'   * `toJSON`: Write (or return) the machine-readable report:
+#'     the `metadata`, a `summary` count of each condition, the
+#'     overall `status`, the `entries`, and the `text` report
 #'   * `fromJSON`: Read a JSON file from the location indicated with the
 #'     output of previous conditions raised in the check
 #'   * `show`: Display the information in the class. Currently empty.
