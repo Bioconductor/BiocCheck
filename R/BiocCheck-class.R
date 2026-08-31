@@ -42,6 +42,13 @@
 #'
 #' @field error,warning,note `list()` Finer extraction of each condition type
 #'
+#' @field entries `list()` A flat list of records, one per
+#'   condition raised, each with the `severity`, the
+#'   originating check function (`checkFun`), the check title
+#'   (`check`), the `message`, any `help_text` and `details`,
+#'   and the file `locations` when reported by the check. This
+#'   is the machine-readable form written to `00BiocCheck.json`.
+#'
 #' @field metadata `list()` A list of additional information relevant to the
 #'   package and its state. See details.
 #'
@@ -74,8 +81,15 @@
 #'
 #' @param file `character(1)` A path to a JSON file for writing or reading as
 #'   created by `toJSON` and `fromJSON` `BiocCheck` methods.
+#'   When `NULL`, `toJSON` returns the JSON as a character
+#'   string instead of writing it.
+#'
+#' @param text `character()` The plain text report, as included
+#'   in the `text` element of the JSON output. Defaults to the
+#'   output of `composeReport`.
 #'
 #' @importFrom BiocBaseUtils checkInstalled
+#' @importFrom jsonlite read_json toJSON
 #' @importFrom utils tail
 #'
 #' @section methods:
@@ -86,15 +100,18 @@
 #'   * `setCheck`: Create a new element in the internal list for a check
 #'   * `get`: Extract the list of conditions raised by `BiocCheck`
 #'   * `getNum`: Tally the number of condition provided by the input
+#'   * `getStatus`: The worst condition raised, i.e., one of `error`,
+#'     `warning`, `note`, or `ok` when nothing was raised
 #'   * `zero`: Reset the internal log of the condition provided
 #'   * `getBiocCheckDir`: Report and create the `<package>.BiocCheck`
 #'     directory as obtained from the metadata
 #'   * `composeReport`: Simplify the list structure from the `log` and
 #'     provide a character vector of conditions raised
-#'   * `report`: Write the `00BiocCheck.log` report into the `BiocCheck`
-#'     folder
-#'   * `toJSON`: Write a JSON file to the location indicated with the
-#'     conditions raised
+#'   * `report`: Write the `00BiocCheck.log` and
+#'     `00BiocCheck.json` reports into the `BiocCheck` folder
+#'   * `toJSON`: Write (or return) the machine-readable report:
+#'     the `metadata`, a `summary` count of each condition, the
+#'     overall `status`, the `entries`, and the `text` report
 #'   * `fromJSON`: Read a JSON file from the location indicated with the
 #'     output of previous conditions raised in the check
 #'   * `show`: Display the information in the class. Currently empty.
@@ -122,6 +139,8 @@ NULL
         error = "list",
         warning = "list",
         note = "list",
+        # flat, machine-readable record of every condition raised
+        entries = "list",
         metadata = "list"
     ),
     methods = list(
@@ -146,6 +165,10 @@ NULL
             .messages$setMessage(nist, condition = condition)
             .self[[condition]] <- append(.self[[condition]], nist)
             .self$log[[checkName]] <- append(.self$log[[checkName]], nist)
+            .self$entries <- c(
+                .self$entries,
+                list(.entry(mlist, checkName, condition, help_text, messages))
+            )
         },
         addMetadata = function(BiocPackage, ...) {
             args <- list(...)
@@ -203,6 +226,10 @@ NULL
             for (condition in conditions) {
                 .self[[condition]] <- list()
             }
+            .self$entries <- Filter(
+                function(entry) !entry[["severity"]] %in% conditions,
+                .self$entries
+            )
         },
         getBiocCheckDir = function() {
             bioccheck_dir <- .self$metadata$BiocCheckDir
@@ -227,17 +254,47 @@ NULL
             writeLines(
                 outputs, con = file.path(bioccheck_dir, "00BiocCheck.log")
             )
+            .self$toJSON(
+                file = file.path(bioccheck_dir, "00BiocCheck.json"),
+                text = outputs
+            )
         },
-        toJSON = function(file) {
-            out <- Filter(length, .self$log)
-            checkInstalled("jsonlite")
-            jlog <- jsonlite::toJSON(out, auto_unbox = FALSE)
-            jsonlite::write_json(jlog, file)
+        getStatus = function() {
+            counts <- .self$getNum()
+            worst <- names(counts)[counts > 0L]
+            if (length(worst)) worst[[1L]] else "ok"
+        },
+        toJSON = function(file = NULL, text = .self$composeReport()) {
+            payload <- list(
+                ## an empty list would serialize as '[]' rather than '{}'
+                metadata = if (length(.self$metadata))
+                    .self$metadata
+                else
+                    structure(list(), names = character(0L)),
+                summary = as.list(.self$getNum()),
+                status = .self$getStatus(),
+                entries = .self$entries,
+                ## some conditions embed newlines; split so that 'text'
+                ## matches the '00BiocCheck.log' file line for line
+                text = as.list(
+                    strsplit(
+                        paste(text, collapse = "\n"), "\n", fixed = TRUE
+                    )[[1L]]
+                )
+            )
+            json <- jsonlite::toJSON(
+                payload, auto_unbox = TRUE, pretty = TRUE, null = "null"
+            )
+            if (is.null(file))
+                json
+            else
+                writeLines(json, con = file)
         },
         fromJSON = function(file) {
-            checkInstalled("jsonlite")
-            infile <- jsonlite::read_json(file)[[1]]
-            .self[["log"]] <- jsonlite::fromJSON(infile, simplifyVector = FALSE)
+            payload <- jsonlite::read_json(file, simplifyVector = FALSE)
+            .self$metadata <- payload[["metadata"]]
+            .self$entries <- payload[["entries"]]
+            payload
         },
         show = function() {
             invisible()
@@ -253,6 +310,49 @@ NULL
         }
     )
 )
+
+## The two location formats emitted by the checks, i.e., '.lineReport' and
+## sprintf("%s (line %d, column %d)"), the latter optionally prefixed with the
+## symbol found, e.g., "sapply() in R/foo.R (line 3, column 5)". Parsed once
+## here so that consumers of the JSON report never have to parse them. Chunk
+## locations in vignettes are skipped: their lines are relative to the chunk.
+.locPatterns <- c(
+    "^([^[:space:]]+)#L([0-9]+)",
+    "([^[:space:]]+) \\(line ([0-9]+), column ([0-9]+)\\)$"
+)
+
+.parseLocations <- function(messages) {
+    messages <- as.character(messages)
+    for (pattern in .locPatterns) {
+        hits <- grepl(pattern, messages)
+        if (!any(hits))
+            next
+        parts <- regmatches(messages[hits], regexec(pattern, messages[hits]))
+        parts <- do.call(rbind, parts)
+        res <- data.frame(
+            file = parts[, 2L], line = as.integer(parts[, 3L])
+        )
+        if (ncol(parts) > 3L)
+            res[["column"]] <- as.integer(parts[, 4L])
+        return(res)
+    }
+    NULL
+}
+
+## one flat, machine-readable record per condition raised. 'checkFun' is the
+## stable identifier for downstream tools; 'check' is the human-readable title.
+.entry <- function(mlist, checkName, condition, help_text, messages) {
+    list(
+        severity = condition,
+        checkFun = names(mlist),
+        check = checkName,
+        message = paste(unlist(mlist, use.names = FALSE), collapse = " "),
+        help_text = if (length(help_text))
+            paste(help_text, collapse = " "),
+        details = I(as.character(messages)),
+        locations = .parseLocations(messages)
+    )
+}
 
 .flattenElement <- function(listElem) {
     debugFun <- names(listElem)

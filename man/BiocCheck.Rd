@@ -36,7 +36,9 @@ relevant to developers and contributors to \code{BiocCheck}.}
 \value{
 \code{BiocCheck()} is chiefly called for the side effect of the check
 reporting. The function also creates a \verb{<packageName>.BiocCheck} folder
-and returns a \code{BiocCheck} reference class with three main list elements:
+with the \verb{00BiocCheck.log} text report and the \verb{00BiocCheck.json}
+machine-readable report (see the vignette for the JSON schema), and
+returns a \code{BiocCheck} reference class with three main list elements:
 \itemize{
 \item \strong{error}: Items to address before the package can be accepted
 \item \strong{warning}: Strongly suggested items that may require attention

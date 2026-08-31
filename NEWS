@@ -13,6 +13,12 @@ NEW FEATURES
     non-standard fields in the `DESCRIPTION` file.
     o Add check for S4 classes to verify they provide a non-derived default
     `show()` method.
+    o Write a machine-readable `00BiocCheck.json` report next to
+    `00BiocCheck.log` in the `<PackageName>.BiocCheck` folder. It includes the
+    session metadata, a `summary` count of the errors, warnings, and notes, the
+    overall `status`, one structured `entries` record per condition raised
+    (with the originating check function and file locations where reported),
+    and the plain text report. See the vignette for the schema.
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
@@ -28,6 +34,11 @@ BUG FIXES AND MINOR IMPROVEMENTS
     via `.gitignore` in `BiocCheckGitClone`.
     o Optimize `getFunctionLengths` and `checkFunctionLengths` using vectorized
     operations for faster execution
+    o Coding practice checks now report file paths relative to the package
+    directory, e.g., `R/foo.R`, rather than the file name alone.
+    o The `toJSON` and `fromJSON` methods of the `BiocCheck` class no longer
+    doubly encode the report; `toJSON` returns the JSON when no `file` is
+    given.
     o Support and update testing for roxygen2 version 8
     o Improve ORCID checker to correctly validate invalid check-sum characters
     o Resolve path linter false positives and use `file.path` for portable
