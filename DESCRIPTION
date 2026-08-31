@@ -33,6 +33,7 @@ Imports:
     commonmark,
     graph,
     httr2,
+    jsonlite,
     knitr,
     methods,
     rvest,
@@ -45,7 +46,6 @@ Suggests:
     curl,
     devtools,
     gert,
-    jsonlite,
     rmarkdown,
     tinytest,
     usethis

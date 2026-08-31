@@ -222,7 +222,7 @@ check1toN <- function(.BiocPackage) {
         tokens <- tokens[ tokens[,"text"] == "1", , drop=FALSE]
         sprintf(
             "%s (line %d, column %d)",
-            basename(rfile), tokens[,"line1"], tokens[,"col1"]
+            .getDirFiles(rfile), tokens[,"line1"], tokens[,"col1"]
         )
     })
     msg_seq <- unlist(msg_seq)
@@ -231,7 +231,7 @@ check1toN <- function(.BiocPackage) {
 checkSingleColon <- function(.BiocPackage, avail_pkgs = character(0L)) {
 
     rfiles <- .BiocPackage$RSources
-    names(rfiles) <- basename(rfiles)
+    names(rfiles) <- .getDirFiles(rfiles)
     colon_pres <- lapply(rfiles, function(rfile) {
         tokens <- getParseData(parse(rfile, keep.source = TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
@@ -502,7 +502,7 @@ getClassNEEQLookup <- function(rfile) {
 
 checkClassNEEQLookup <- function(.BiocPackage) {
     rfiles <- .BiocPackage$RSources
-    names(rfiles) <- basename(rfiles)
+    names(rfiles) <- .getDirFiles(rfiles)
     NEEQ_pres <- lapply(rfiles, getClassNEEQLookup)
     NEEQ_pres <- Filter(nrow, NEEQ_pres)
     msg_neeq <- lapply(names(NEEQ_pres), function(rfile, framelist) {
@@ -532,7 +532,7 @@ checkExternalData <- function(.BiocPackage) {
 
         sprintf(
             "%s (line %d, column %d)",
-            basename(rfile), tokens[,"line1"], tokens[,"col1"]
+            .getDirFiles(rfile), tokens[,"line1"], tokens[,"col1"]
         )
     })
     unlist(msg_eda)

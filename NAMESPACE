@@ -46,6 +46,10 @@ importFrom(httr2,
   resp_body_json,
   resp_status
 )
+importFrom(jsonlite,
+  read_json,
+  toJSON
+)
 importFrom(knitr,purl)
 importFrom(stringdist,stringdistmatrix)
 importFrom(tools,

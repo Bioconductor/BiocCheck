@@ -50,6 +50,64 @@ BiocCheck("<packageDirOrTarball>")
 Note that the `--new-package` option is turned on in the Single Package
 Builder (SPB) during the new package submission process.
 
+# Machine-readable output
+
+Alongside the `00BiocCheck.log` text report, `BiocCheck` writes a
+`00BiocCheck.json` file to the `<PackageName>.BiocCheck` folder. It contains
+everything in the text report plus structured fields, so that continuous
+integration jobs, editors, and other tools can act on the results without
+parsing the text output:
+
+```json
+{
+  "metadata": { "Package": "MyPackage", "PackageVersion": "0.99.0",
+                "BiocVersion": "3.23", "BiocCheckVersion": "1.50.0", "...": "" },
+  "summary": { "error": 1, "warning": 2, "note": 5 },
+  "status": "error",
+  "entries": [
+    {
+      "severity": "warning",
+      "checkFun": "checkFormatting",
+      "check": "Checking formatting of DESCRIPTION, NAMESPACE, ...",
+      "message": "Consider shorter lines; 3 lines (1%) are > 80 characters long.",
+      "help_text": "First few lines:",
+      "details": ["R/foo.R#L12 x <- some_very_long_call( ..."],
+      "locations": [ { "file": "R/foo.R", "line": 12 } ]
+    }
+  ],
+  "text": ["* Checking formatting of DESCRIPTION, NAMESPACE, ...", "..."]
+}
+```
+
+* `summary` tallies the conditions raised and `status` is the most severe of
+  them, i.e., one of `error`, `warning`, `note`, or `ok`.
+* `entries` has one record per condition raised. `checkFun` is the name of the
+  function that raised it and is the stable identifier to key on; `check` is
+  the human-readable title, which may be reworded between releases.
+* `help_text` and `locations` are `null` when the check does not report them.
+  `locations` are file paths relative to the package directory; the `column`
+  element is present only for checks that report one.
+* `text` is the `00BiocCheck.log` report, line by line.
+
+The same information is available from the object returned by `BiocCheck()`,
+without reading the file:
+
+```{r json, eval = FALSE}
+bc <- BiocCheck("<packageDirOrTarball>")
+bc$getStatus()
+bc$getNum()
+bc$entries[[1]]
+jsonlite::fromJSON(bc$toJSON())
+```
+
+To fail a job when a package raises errors, either use the JSON summary or the
+`quit-with-status` option, which exits with a non-zero status when errors are
+present:
+
+```sh
+jq -e '.summary.error == 0' MyPackage.BiocCheck/00BiocCheck.json
+```
+
 # When should `BiocCheck` be run
 
 `BiocCheck` should always be run after `R CMD check`.
@@ -634,7 +692,8 @@ The output of this check includes the first few lines of offending code for
 many of the various checks.  To see the full output, users are encouraged to
 run the check locally and browse to the `BiocCheck` output folder that was
 created with the `<PackageName>.BiocCheck` naming convention. The full output
-log file is named `00BiocCheck.log`.
+log file is named `00BiocCheck.log` and its machine-readable counterpart
+`00BiocCheck.json`.
 
 There are several helpful packages that can be used for formatting of
 R code to particular coding standards such as  [formatR][formatR] and
