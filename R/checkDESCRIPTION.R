@@ -354,7 +354,7 @@ checkValidDESCfields <- function(dcf) {
 
     known_fields <- c(
         tools:::.get_standard_DESCRIPTION_fields(),
-        c("RoxygenNote", "Video")
+        c("RoxygenNote", "Video", "BiocType")
     )
 
     is_config_field <- grepl("^Remote|Config/", present_fields)
