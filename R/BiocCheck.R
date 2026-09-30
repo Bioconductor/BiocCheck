@@ -314,6 +314,9 @@ BiocCheckSource <- function(.BiocPackage, debug, dots) {
                 "Skipped... only checked on source tarball",
                 indent = 4
             )
+            cli::cli_alert(
+                "Package tarball may not exceed 10MB"
+            )
         }
     }
 

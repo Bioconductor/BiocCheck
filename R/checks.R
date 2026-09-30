@@ -28,35 +28,49 @@ checkDeprecatedPackages <- function(.BiocPackage)
     }
 }
 
-checkPackageSize <- function(.BiocPackage, size = 10L) {
-    pkg <- .BiocPackage$sourceDir
+checkPackageSize <- function(.BiocPackage, size = 10L, sizeLimit = 100L) {
+    pkg <- .BiocPackage$tarFilename
     pkgType <- .BiocPackage$packageType
-    if (is.na(pkgType) ||  pkgType == "Software") {
-        mb <- 1e+6L
-        maxSize <- size * mb ## in MB
-        pkgSize <- file.size(pkg)
-        if (pkgSize > maxSize) {
-            msgs <- c(
-                paste0(
-                    "Package Size: ",
-                    as.character(round(pkgSize / mb, 2L)),
-                    " MB"
-                ),
-                paste0(
-                    "Size Requirement: ",
-                    sprintf("%.2f", round(maxSize / mb, 2L)),
-                    " MB"
-                )
+    mb <- 1024L * 1024L
+    maxSize <- size * mb ## in MB
+    hardLimit <- sizeLimit * mb
+    pkgSize <- file.size(pkg)
+    if (pkgSize > maxSize) {
+        msgs <- c(
+            paste0(
+                "Package Size: ",
+                as.character(round(pkgSize / mb, 2L)),
+                " MB"
+            ),
+            paste0(
+                "Size Requirement: ",
+                sprintf("%.2f", round(maxSize / mb, 2L)),
+                " MB"
+            )
+        )
+        handleError(
+            "Package tarball exceeds the Bioconductor size requirement.",
+            messages = msgs
+        )
+        cli::cli_alert_info(
+            "An exception may be requested but packages may not exceed 100MB"
+        )
+
+        if (pkgSize > hardLimit) {
+            msgs = paste0(
+                        "RUniverse Size Requirement: ",
+                        sprintf("%.2f", round(hardLimit / mb, 2L)),
+                        " MB"
             )
             handleError(
-                "Package tarball exceeds the Bioconductor size requirement.",
+                "Package tarball exceeds the RUniverse maximum size requirement.",
                 messages = msgs
             )
         }
     }
 }
 
-.MAX_FILE_SIZE <- 5e+6L ## 5MB in bytes
+.MAX_FILE_SIZE <- 5L * 1024L * 1024L  ## 5MB in bytes 5e+6L
 .DATA_DIRS <- c("data", file.path("inst", "extdata"), "data-raw")
 
 .filter_data <- function(filedf, for_data = FALSE) {
@@ -86,27 +100,33 @@ checkPackageSize <- function(.BiocPackage, size = 10L) {
             fileinfo[fileinfo[["filesize"]] > .MAX_FILE_SIZE, "path"]
         )
         file.path(pkgdir, files)
-    } else if (isSourceDir) {
+    } else {
         folders <- list.dirs(pkgdir, full.names = FALSE, recursive = TRUE)
         decision <- if (data_only) force else Negate
         folders <- Filter(decision(.in_data), folders)
         files <- list.files(
             file.path(pkgdir, folders), full.names = TRUE, recursive = TRUE
         )
+        files <- unique(normalizePath(files))
         filesizes <- file.size(files)
         files[filesizes > .MAX_FILE_SIZE]
-    }
+    } 
 }
 
 checkIndivFileSizes <- function(.BiocPackage)
 {
     largefiles <- .findLargeFiles(.BiocPackage, data_only = FALSE)
-    if (length(largefiles))
+    if (length(largefiles)){
         handleWarning(
             "Package files exceed the 5MB size limit.",
             help_text = "Files over the limit: ",
             messages = largefiles
         )
+        cli::cli_alert_info(
+            "A large file exception may be requested but files may not exceed 100MB"
+        )
+
+    }
 }
 
 checkDataFileSizes <- function(.BiocPackage) {
