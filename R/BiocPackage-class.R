@@ -246,6 +246,9 @@
             parents <- vapply(views, getParent, character(1L), biocViewsVocab)
             u <- unique(parents)
             type <- if (identical(length(u), 1L)) u else NA_character_
+            dcf <- .self[["DESCRIPTION"]]
+            if ("BiocType" %in% colnames(dcf))
+                type <- dcf[, "BiocType"]
             .self[["packageType"]] <- type
         },
         readDESCRIPTION = function() {

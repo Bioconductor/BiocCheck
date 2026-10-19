@@ -33,42 +33,89 @@ checkPackageSize <- function(.BiocPackage, size = 10L, sizeLimit = 100L) {
     pkgType <- .BiocPackage$packageType
     mb <- 1024L * 1024L
     maxSize <- size * mb ## in MB
-    hardLimit <- sizeLimit * mb
+    hardLimit <- sizeLimit * mb  ## software pkgs
+    gb <- 1024L * mb ## 1 GB hard limit for non software
     pkgSize <- file.size(pkg)
-    if (pkgSize > maxSize) {
-        msgs <- c(
-            paste0(
-                "Package Size: ",
-                as.character(round(pkgSize / mb, 2L)),
-                " MB"
-            ),
-            paste0(
-                "Size Requirement: ",
-                sprintf("%.2f", round(maxSize / mb, 2L)),
-                " MB"
-            )
-        )
-        handleError(
-            "Package tarball exceeds the Bioconductor size requirement.",
-            messages = msgs
-        )
-        cli::cli_alert_info(
-            "An exception may be requested but packages may not exceed 100MB"
-        )
 
-        if (pkgSize > hardLimit) {
+    if (is.na(pkgType) || pkgType == "Software"){
+        if (pkgSize > maxSize) {
+            msgs <- c(
+                paste0(
+                    "Package Size: ",
+                    as.character(round(pkgSize / mb, 2L)),
+                    " MB"
+                ),
+                paste0(
+                    "Size Requirement: ",
+                    sprintf("%.2f", round(maxSize / mb, 2L)),
+                    " MB"
+                )
+            )
+            handleError(
+                "Package tarball exceeds the Bioconductor size requirement.",
+                messages = c(
+                    "An exception may be requested but packages may not exceed 100MB",
+                    msgs)
+            )
+        }
+        if (pkgSize >  hardLimit){
             msgs = paste0(
-                        "RUniverse Size Requirement: ",
-                        sprintf("%.2f", round(hardLimit / mb, 2L)),
-                        " MB"
+                "RUniverse Size Requirement: ",
+                sprintf("%.2f", round(hardLimit / mb, 2L)),
+                " MB"
             )
             handleError(
                 "Package tarball exceeds the RUniverse maximum size requirement.",
                 messages = msgs
             )
         }
+    } else {
+        if (pkgSize > maxSize) {
+            msgs <- c(
+                paste0(
+                    "Package Size: ",
+                    as.character(round(pkgSize / mb, 2L)),
+                    " MB"
+                ),
+                paste0(
+                    "Size Requirement: ",
+                    sprintf("%.2f", round(maxSize / mb, 2L)),
+                    " MB"
+                )
+            )
+            handleNote(
+                "Package tarball exceeds the recommended Bioconductor size requirement.",
+                messages = c(
+                    paste0("Not strictly enforced for pkgType ",pkgType),
+                    msgs
+                )
+            )
+        }
+        if (pkgSize > gb){
+            handleError(
+                "Package tarball exceeds the RUniverse maximum size requirement 1GB."
+            )
+        } else {
+            if (pkgSize > hardLimit){
+                msgs = c(
+                    paste0(
+                    "RUniverse Recommended Size Requirement: ",
+                    sprintf("%.2f", round(hardLimit / mb, 2L)),
+                    " MB"
+                    ),
+                    paste0(
+                        "RUniverse Maximum Size Requirement: 1 GB"
+                    )
+                )
+                handleNote(
+                    "Package tarball exceeds recommended RUniverse size requirement.",
+                    messages = msgs
+                )
+            }
+        }
     }
 }
+
 
 .MAX_FILE_SIZE <- 5L * 1024L * 1024L  ## 5MB in bytes 5e+6L
 .DATA_DIRS <- c("data", file.path("inst", "extdata"), "data-raw")
