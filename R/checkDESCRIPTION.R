@@ -310,9 +310,11 @@ checkBiocDepsDESC <- function(dcf, which = c("Depends", "Imports")) {
 
     if (!any(bioc_deps)) {
         views <- .BiocPackage$getBiocViews()
-        handleFUN <-
-            if ("Infrastructure" %in% views) handleNote else handleWarning
-        msg <- "No Bioconductor dependencies detected. Note that some
+        handleFUN <- if (any(c("Infrastructure", "Workflow") %in% views))
+                handleNote
+            else
+                handleWarning
+        msg <- "No hard Bioconductor dependencies detected. Note that some
             infrastructure packages may not have Bioconductor dependencies.
             For more information, reach out to the Bioconductor community
             and/or consider a CRAN submission."
