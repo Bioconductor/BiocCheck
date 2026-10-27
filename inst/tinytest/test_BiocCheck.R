@@ -1218,7 +1218,7 @@ if (connect) {
         "lori.shepherd@rosWellpark.org", "bioCfiLecache"
     )
     expect_true(stillZero())
-
+    .BiocCheck$zero()
 }
 
 # checkForVersionNumberMismatch -------------------------------------------
