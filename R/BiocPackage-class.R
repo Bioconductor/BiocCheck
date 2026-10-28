@@ -291,8 +291,10 @@
             .self[["isInfrastructure"]] <- "Infrastructure" %in% views
         },
         findRoxygen = function() {
-            .self[["usesRoxygen"]] <-
-                "RoxygenNote" %in% colnames(.self[["DESCRIPTION"]])
+            .self[["usesRoxygen"]] <- any(
+                c("RoxygenNote", "Config/roxygen2/version") %in%
+                    colnames(.self[["DESCRIPTION"]])
+            )
         },
         getPackageVersion = function() {
             .self[["packageVersion"]]
