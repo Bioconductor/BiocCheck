@@ -415,13 +415,15 @@ checkVigChunkEval <- function(vigdircontents)
             percent
         )
         handleMessage(msg, indent = 8)
-        handleMessage(
-            sprintf(
-                "%s non-exec code chunk(s) (e.g., '```r')",
-                combined$noneval
-            ),
-            indent = 8
-        )
+        if (combined$non_eval > 0L) {
+            handleMessage(
+                sprintf(
+                    "%s non-exec code chunk(s) (e.g., '```r')",
+                    combined$non_eval
+                ),
+                indent = 8
+            )
+        }
     }
 }
 
