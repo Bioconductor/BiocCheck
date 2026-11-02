@@ -34,6 +34,8 @@ BUG FIXES AND MINOR IMPROVEMENTS
     o Man pages with the `internal` keyword are no longer counted by the
     runnable examples check (`checkExportsAreDocumented`); only user-facing
     pages documenting exported objects count toward the 80% requirement.
+    o Honor the DESCRIPTION Encoding field when parsing Rd files, preventing
+    failures for UTF-8 man pages under non-UTF-8 locales (@sifakise, #264).
     o Missing `fnd` role in `Authors@R` or `Author` fields does not produce a
     `NOTE` but rather an informative message (@lshep, #251).
     o Missing `CITATION` files produce a message rather than a `NOTE`

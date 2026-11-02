@@ -60,7 +60,15 @@ checkForPromptComments <- function(.BiocPackage) {
     nzchar(trimws(value)) && length(values)
 }
 
-.parse_Rd_pack <- function(manpage, usesRdpack) {
+.rd_encoding <- function(.BiocPackage) {
+    dcf <- .BiocPackage$DESCRIPTION
+    if ("Encoding" %in% colnames(dcf))
+        dcf[, "Encoding"]
+    else
+        "unknown"
+}
+
+.parse_Rd_pack <- function(manpage, usesRdpack, encoding = "unknown") {
     sysfile_rdpack <- system.file(package = "Rdpack")
     rdpack_avail <- nzchar(sysfile_rdpack)
     if (usesRdpack && rdpack_avail)
@@ -70,16 +78,17 @@ checkForPromptComments <- function(.BiocPackage) {
     else
         rdmacros <- file.path(R.home("share"), "Rd", "macros", "system.Rd")
 
-    tools::parse_Rd(manpage, macros = rdmacros)
+    tools::parse_Rd(manpage, encoding = encoding, macros = rdmacros)
 }
 
-.read_all_rds <- function(manpages, usesRdpack) {
+.read_all_rds <- function(manpages, usesRdpack, encoding = "unknown") {
     lapply(
         manpages,
-        function(manpage, usesRdpack) {
-            .parse_Rd_pack(manpage, usesRdpack)
+        function(manpage, usesRdpack, encoding) {
+            .parse_Rd_pack(manpage, usesRdpack, encoding = encoding)
         },
-        usesRdpack = usesRdpack
+        usesRdpack = usesRdpack,
+        encoding = encoding
     )
 }
 
@@ -104,7 +113,10 @@ checkForPromptComments <- function(.BiocPackage) {
 }
 
 checkForValueSection <- function(.BiocPackage) {
-    all_rds <- .read_all_rds(.BiocPackage$manSources, .BiocPackage$usesRdpack)
+    all_rds <- .read_all_rds(
+        .BiocPackage$manSources, .BiocPackage$usesRdpack,
+        encoding = .rd_encoding(.BiocPackage)
+    )
     all_tags <- lapply(all_rds, .RdTags)
     docTypes <- mapply(docType, rd = all_rds, tags = all_tags, SIMPLIFY = FALSE)
     hasUsage <- vapply(
@@ -153,6 +165,7 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc) {
     pkgdir <- .BiocPackage$sourceDir
     pkgname <- .BiocPackage$packageName
     uses_rd_pack <- .BiocPackage$usesRdpack
+    encoding <- .rd_encoding(.BiocPackage)
     manpages <- .BiocPackage$manSources
 
     already_loaded <- isNamespaceLoaded(pkgname)
@@ -166,7 +179,9 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc) {
     noExamplesCount <- 0L
 
     for (manpage in manpages) {
-        rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
+        rd <- .parse_Rd_pack(
+            manpage, usesRdpack = uses_rd_pack, encoding = encoding
+        )
         tags <- .RdTags(rd)
         ## internal pages are not user-facing; exclude from the ratio
         if (.isInternalRd(rd, tags))
@@ -212,9 +227,12 @@ checkUsageOfDont <- function(.BiocPackage) {
     hasBad <- rep(FALSE, length(manpages))
     hasdontrun <- rep(FALSE, length(manpages))
     uses_rd_pack <- .BiocPackage$usesRdpack
+    encoding <- .rd_encoding(.BiocPackage)
     for (dx in seq_along(manpages)) {
         manpage <- manpages[dx]
-        rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
+        rd <- .parse_Rd_pack(
+            manpage, usesRdpack = uses_rd_pack, encoding = encoding
+        )
         hasExamples <- "\\examples" %in% .RdTags(rd)
         if (hasExamples) {
             rdCode <- as.character(rd)
