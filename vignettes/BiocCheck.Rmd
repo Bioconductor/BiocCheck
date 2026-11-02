@@ -584,6 +584,11 @@ Can be disabled with `--no-check-man-doc`.
 
 **Checking man page documentation...**
 
+`BiocCheck` uses the `Encoding` field in a package's `DESCRIPTION` when
+parsing Rd man pages, including when extracting example code.
+If `Encoding` is absent, the parser retains its default encoding behavior;
+a per-file `\encoding{}` declaration takes precedence over the package encoding.
+
 * Checking for canned comments in man pages
 
 It can be handy to generate man page skeletons with `prompt()` and/or
