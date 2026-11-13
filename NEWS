@@ -22,6 +22,8 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Honor the DESCRIPTION Encoding field when parsing Rd files, preventing
+    failures for UTF-8 man pages under non-UTF-8 locales (#264).
     o Missing `fnd` role in `Authors@R` or `Author` fields does not produce a
     `NOTE` but rather an informative message (@lshep, #251).
     o Missing `CITATION` files produce a message rather than a `NOTE`
