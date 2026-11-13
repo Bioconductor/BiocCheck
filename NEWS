@@ -11,6 +11,11 @@ NEW FEATURES
     `VignetteEngine` in the DESCRIPTION file (@LiNk-NY, #246).
     o Add new check `checkValidDESCfields` to validate and flag unknown or
     non-standard fields in the `DESCRIPTION` file.
+    o Add new check `checkBiocType` to validate the `BiocType` field in the
+    `DESCRIPTION` file against the allowed values: `Software`,
+    `ExperimentData`, `Annotation`, `Workflow`, `Book`, and `Docker`.
+    Invalid values no longer override the package type inferred from
+    `biocViews`, e.g., when checking the package size.
     o Add check for S4 classes to verify they provide a non-derived default
     `show()` method.
     o Write a machine-readable `00BiocCheck.json` report next to
