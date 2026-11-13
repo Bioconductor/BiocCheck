@@ -1082,6 +1082,32 @@ expect_identical("AnnotationData", .bioctest$packageType)
     description = list(biocViews = "Cancer, HapMap")
 )
 expect_identical(.bioctest$packageType, NA_character_)
+
+# a valid BiocType overrides the biocViews-derived type
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    description = list(
+        biocViews = "DifferentialExpression, CellBiology",
+        BiocType = "Workflow"
+    )
+)
+expect_identical("Workflow", .bioctest$packageType)
+
+# an invalid BiocType is ignored in favor of the biocViews-derived type
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    description = list(
+        biocViews = "GeneCardsCustomSchema, ChipManufacturer",
+        BiocType = "software"
+    )
+)
+expect_identical("AnnotationData", .bioctest$packageType)
+
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    description = list(biocViews = "Cancer, HapMap", BiocType = "Sofware")
+)
+expect_identical(.bioctest$packageType, NA_character_)
 unlink(temp_dir, recursive = TRUE)
 
 # checkForBiocDevelSubscription -------------------------------------------

@@ -71,6 +71,7 @@ checkDESCRIPTIONFile <- function(.BiocPackage) {
     checkBiocDepsDESC(dcf)
     checkPinnedDeps(dcf)
     checkFndPerson(dcf)
+    checkBiocType(dcf)
 }
 
 checkRemotesUsage <- function(.BiocPackage)
@@ -347,6 +348,30 @@ checkFndPerson <- function(dcf) {
     )
     if (!any(grepl("fnd", people, fixed = TRUE)))
         handleMessage(msg)
+}
+
+.BIOC_TYPES <- c(
+    "Software", "ExperimentData", "Annotation", "Workflow", "Book", "Docker"
+)
+
+checkBiocType <- function(dcf) {
+    if (!"BiocType" %in% colnames(dcf))
+        return(invisible())
+    handleCheck("Checking for valid BiocType field...")
+    biocType <- trimws(dcf[, "BiocType"])
+    if (biocType %in% .BIOC_TYPES)
+        return(invisible())
+    caseMatch <- .BIOC_TYPES[tolower(.BIOC_TYPES) == tolower(biocType)]
+    hint <- if (length(caseMatch))
+        paste0(" Did you mean '", caseMatch, "'?")
+    else
+        ""
+    handleError(
+        "Invalid 'BiocType' field in DESCRIPTION: '", biocType, "'. ",
+        "Use one of: ", paste(.BIOC_TYPES, collapse = ", "), ".", hint,
+        " See https://contributions.bioconductor.org/description.html",
+        "#description-bioctype"
+    )
 }
 
 checkValidDESCfields <- function(dcf) {

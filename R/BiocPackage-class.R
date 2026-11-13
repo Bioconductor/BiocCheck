@@ -42,7 +42,8 @@
 #'
 #' @field packageType `character` indicating the type of package based on the
 #'   `biocViews` field; can be `NA_character_` there are invalid `biocViews`
-#'   terms
+#'   terms. A valid `BiocType` field in the `DESCRIPTION` takes precedence;
+#'   invalid `BiocType` values are ignored
 #'
 #' @field sourceDir `character` path to the source directory
 #'
@@ -77,7 +78,8 @@
 #' * `getManSources`: Get the Rd source files
 #' * `getBiocCheckDir`: Get the directory where the BiocCheck logs are written
 #' * `getBiocViews`: Get the `biocViews` field from the `DESCRIPTION` file
-#' * `getPackageType`: Get the package type based on the `biocViews` field
+#' * `getPackageType`: Get the package type from a valid `BiocType` field or,
+#'   otherwise, the `biocViews` field
 #' * `readDESCRIPTION`: Read the `DESCRIPTION` file
 #' * `getVigBuilder`: Get the vignette builder
 #' * `getAllDependencies`: Get all dependencies from the `DESCRIPTION` file
@@ -247,8 +249,12 @@
             u <- unique(parents)
             type <- if (identical(length(u), 1L)) u else NA_character_
             dcf <- .self[["DESCRIPTION"]]
-            if ("BiocType" %in% colnames(dcf))
-                type <- dcf[, "BiocType"]
+            if ("BiocType" %in% colnames(dcf)) {
+                ## invalid values are reported by checkBiocType()
+                biocType <- unname(trimws(dcf[, "BiocType"]))
+                if (biocType %in% .BIOC_TYPES)
+                    type <- biocType
+            }
             .self[["packageType"]] <- type
         },
         readDESCRIPTION = function() {

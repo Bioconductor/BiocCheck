@@ -50,7 +50,8 @@ not be read}
 
 \item{\code{packageType}}{\code{character} indicating the type of package based on the
 \code{biocViews} field; can be \code{NA_character_} there are invalid \code{biocViews}
-terms}
+terms. A valid \code{BiocType} field in the \code{DESCRIPTION} takes precedence;
+invalid \code{BiocType} values are ignored}
 
 \item{\code{sourceDir}}{\code{character} path to the source directory}
 
@@ -83,7 +84,8 @@ BiocCheck logs are written}
 \item \code{getManSources}: Get the Rd source files
 \item \code{getBiocCheckDir}: Get the directory where the BiocCheck logs are written
 \item \code{getBiocViews}: Get the \code{biocViews} field from the \code{DESCRIPTION} file
-\item \code{getPackageType}: Get the package type based on the \code{biocViews} field
+\item \code{getPackageType}: Get the package type from a valid \code{BiocType} field or,
+otherwise, the \code{biocViews} field
 \item \code{readDESCRIPTION}: Read the \code{DESCRIPTION} file
 \item \code{getVigBuilder}: Get the vignette builder
 \item \code{getAllDependencies}: Get all dependencies from the \code{DESCRIPTION} file
