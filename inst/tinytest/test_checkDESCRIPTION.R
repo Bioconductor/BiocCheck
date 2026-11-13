@@ -90,4 +90,33 @@ expect_true(stillZero())
 BiocCheck:::checkValidDESCfields(.bioctest)
 checkCounter("Unknown or non-standard DESCRIPTION field(s)", "warning")
 
+# test checkBiocType ------------------------------------------------------
+dcf <- cbind(Package = "foo", BiocType = "Software")
+BiocCheck:::checkBiocType(dcf)
+expect_true(stillZero())
+
+dcf <- cbind(Package = "foo")
+BiocCheck:::checkBiocType(dcf)
+expect_true(stillZero())
+
+for (type in c("ExperimentData", "Annotation", "Workflow", "Book", "Docker")) {
+    BiocCheck:::checkBiocType(cbind(Package = "foo", BiocType = type))
+    expect_true(stillZero())
+}
+
+dcf <- cbind(Package = "foo", BiocType = "Package")
+BiocCheck:::checkBiocType(dcf)
+checkCounter("Invalid 'BiocType' field", "error")
+
+dcf <- cbind(Package = "foo", BiocType = "workflow")
+BiocCheck:::checkBiocType(dcf)
+expect_true(
+    any(grepl(
+        "Did you mean 'Workflow'",
+        unlist(.BiocCheck$get("error"), use.names = FALSE),
+        fixed = TRUE
+    ))
+)
+checkCounter("BiocType with incorrect case", "error")
+
 unlink(temp_dir, recursive = TRUE)

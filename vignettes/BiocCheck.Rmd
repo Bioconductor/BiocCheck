@@ -354,7 +354,12 @@ field as an argument in the person function, e.g., `comment = c(ORCID = ...)`
 * **Checking for 'fnd' role in Authors@R...** Checks to see if the `Authors@R`
     or `Author` field has a person or organization with the `fnd` (funder) role
     (`message`).
+* **Checking for valid BiocType field...** When a `BiocType` field is
+    present, checks that its value is one of `Software`, `ExperimentData`,
+    `Annotation`, `Workflow`, `Book`, or `Docker` (`ERROR`). See the
+    [BiocType][] section of the contributions guide.
 
+[BiocType]: https://contributions.bioconductor.org/description.html#description-bioctype
 [choosealicense]: https://choosealicense.com/appendix
 [SPDX License List]: https://spdx.org/licenses/
 
