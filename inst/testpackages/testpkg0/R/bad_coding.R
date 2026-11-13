@@ -31,7 +31,7 @@ bad_dl <- function() {
     dataurl <- "https://raw.githubusercontent.com/file.csv"
     githurl <- "https://github.com/user/package/"
     githurl <- "https://dropbox.com/data?dl=1"
-    laburl <- "https://gitlab.com/raw/master/data.Rda"
+    laburl <- "https://gitlab.com/raw/main/data.Rda"
     bucketurl <- "https://bitbucket.org/test/raw/file.sav"
     download.file(dataurl, destfile = tempfile())
 

@@ -1,0 +1,26 @@
+# R CMD check and BiocCheck in the Bioconductor container, from
+# https://github.com/Bioconductor/workflows (ci.yml template), with Codecov
+# turned on. Use its workflow generator to add pkgdown or other options:
+# https://bioconductor.github.io/workflows/
+name: Bioconductor CI
+
+on:
+  push:
+    branches: [ devel, main, RELEASE_* ]
+  pull_request:
+    branches: [ devel, main, RELEASE_* ]
+
+jobs:
+  bioccheck:
+    # Required only if you set enable_pkgdown: true
+    # permissions:
+    #   pages: write
+    #   id-token: write
+    uses: bioconductor/workflows/.github/workflows/bioccheck.yml@main
+    with:
+      rcmdcheck_error_on: 'warning'
+      enable_pkgdown: false
+    # Test coverage via Codecov, using the repository's CODECOV_TOKEN secret.
+    # Delete these two lines to turn coverage off.
+    secrets:
+      CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
