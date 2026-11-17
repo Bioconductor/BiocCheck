@@ -354,6 +354,11 @@ checkFndPerson <- function(dcf) {
     "Software", "ExperimentData", "Annotation", "Workflow", "Book", "Docker"
 )
 
+## common misspellings of valid BiocType values, e.g., biocViews terms
+.BIOC_TYPE_ALIASES <- c(
+    AnnotationData = "Annotation", ExperimentalData = "ExperimentData"
+)
+
 checkBiocType <- function(dcf) {
     if (!"BiocType" %in% colnames(dcf))
         return(invisible())
@@ -361,9 +366,13 @@ checkBiocType <- function(dcf) {
     biocType <- trimws(dcf[, "BiocType"])
     if (biocType %in% .BIOC_TYPES)
         return(invisible())
-    caseMatch <- .BIOC_TYPES[tolower(.BIOC_TYPES) == tolower(biocType)]
-    hint <- if (length(caseMatch))
-        paste0(" Did you mean '", caseMatch, "'?")
+    suggestion <- .BIOC_TYPES[tolower(.BIOC_TYPES) == tolower(biocType)]
+    if (!length(suggestion))
+        suggestion <- unname(.BIOC_TYPE_ALIASES[
+            tolower(names(.BIOC_TYPE_ALIASES)) == tolower(biocType)
+        ])
+    hint <- if (length(suggestion))
+        paste0(" Did you mean '", suggestion, "'?")
     else
         ""
     handleError(

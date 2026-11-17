@@ -119,4 +119,32 @@ expect_true(
 )
 checkCounter("BiocType with incorrect case", "error")
 
+hints <- c(
+    AnnotationData = "Annotation", annotationdata = "Annotation",
+    ExperimentalData = "ExperimentData"
+)
+for (type in names(hints)) {
+    BiocCheck:::checkBiocType(cbind(Package = "foo", BiocType = type))
+    expect_true(
+        any(grepl(
+            paste0("Did you mean '", hints[[type]], "'"),
+            unlist(.BiocCheck$get("error"), use.names = FALSE),
+            fixed = TRUE
+        )),
+        info = type
+    )
+    checkCounter(paste("BiocType alias", type), "error")
+}
+
+## no hint for values without a close match
+BiocCheck:::checkBiocType(cbind(Package = "foo", BiocType = "Package"))
+expect_false(
+    any(grepl(
+        "Did you mean",
+        unlist(.BiocCheck$get("error"), use.names = FALSE),
+        fixed = TRUE
+    ))
+)
+checkCounter("BiocType without a hint", "error")
+
 unlink(temp_dir, recursive = TRUE)
