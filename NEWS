@@ -15,7 +15,9 @@ NEW FEATURES
     `DESCRIPTION` file against the allowed values: `Software`,
     `ExperimentData`, `Annotation`, `Workflow`, `Book`, and `Docker`.
     Invalid values no longer override the package type inferred from
-    `biocViews`, e.g., when checking the package size.
+    `biocViews`, e.g., when checking the package size. Common misspellings,
+    such as `AnnotationData`, and incorrect capitalization prompt a
+    suggestion of the valid value.
     o Add check for S4 classes to verify they provide a non-derived default
     `show()` method.
     o Write a machine-readable `00BiocCheck.json` report next to
@@ -27,6 +29,10 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Retry Support Site API requests that fail with HTTP 429 (Too Many
+    Requests) or 503, and request the API URLs with a trailing slash to avoid
+    a redirect. This avoids spurious warnings from the registration and
+    watched tags checks when the site limits requests.
     o Missing `fnd` role in `Authors@R` or `Author` fields does not produce a
     `NOTE` but rather an informative message (@lshep, #251).
     o Missing `CITATION` files produce a message rather than a `NOTE`
