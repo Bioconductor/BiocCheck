@@ -831,15 +831,18 @@ checkForSupportSiteRegistration <- function(.BiocPackage)
 }
 
 #' @importFrom httr2 req_perform request resp_body_json req_timeout req_error
+#' @importFrom httr2 req_retry
 #' @importFrom httr2 resp_status
 #' @importFrom utils URLencode
 checkSupportReg <- function(email) {
     response <- paste0(
         "https://support.bioconductor.org/api/email/",
-        URLencode(email, reserved = TRUE)
+        URLencode(email, reserved = TRUE),
+        "/"
     ) |>
         request() |>
         req_timeout(15L) |>
+        req_retry(max_tries = 3L) |>
         req_error(is_error = function(resp) FALSE) |>
         req_perform() |>
         try(silent = TRUE)
@@ -878,10 +881,12 @@ checkWatchedTag <- function(email, pkgname) {
 
     response <- paste0(
         "https://support.bioconductor.org/api/watched/tags/",
-        URLencode(email, reserved = TRUE)
+        URLencode(email, reserved = TRUE),
+        "/"
     ) |>
         request() |>
         req_timeout(15L) |>
+        req_retry(max_tries = 3L) |>
         req_error(is_error = function(resp) FALSE) |>
         req_perform() |>
         try(silent = TRUE)

@@ -1177,7 +1177,7 @@ if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
 # checkForSupportSiteRegistration ----------------------------------------
 cli::cli_h3("checkForSupportSiteRegistration")
 
-connect <- support_site_reachable()
+connect <- support_api_ok()
 
 if (connect) {
 

@@ -68,15 +68,20 @@ stillZero <- function()
     )
 }
 
-support_site_reachable <-
-    function(url = "https://support.bioconductor.org")
-{
+## TRUE only when the Support Site API answers normally, i.e., it is
+## reachable and not rate limiting (HTTP 429) or otherwise failing
+support_api_ok <- function(
+    url = paste0(
+        "https://support.bioconductor.org/api/email/",
+        "maintainer%40bioconductor.org/"
+    )
+) {
   out <- try(
     curl::curl_fetch_memory(
       url,
-      handle = curl::new_handle(timeout_ms = 3000L)
+      handle = curl::new_handle(timeout_ms = 5000L)
     ),
     silent = TRUE
   )
-  !inherits(out, "try-error")
+  !inherits(out, "try-error") && out[["status_code"]] %in% c(200L, 404L)
 }
