@@ -96,10 +96,10 @@ additional analysis
 \item \code{new-package}:  enable checks specific to new packages
 \item \code{no-check-bbs}: disable BBS-specific checks (for non-BioC packages).
 Valid DESCRIPTION
-\item \code{no-check-bioc-help}: disable check for registration on Bioconductor
+\item \code{no-check-bioc-help}: disable check for subscription to the Bioc-devel
+mailing list
 \item \code{no-check-bioc-views}: disable biocViews-specific checks (for non-BioC
 packages)
-mailing list and support site
 \item \code{no-check-coding-practices}: disable check for some common best coding
 practices
 \item \code{no-check-CRAN}:  disable check for if package exists in CRAN
