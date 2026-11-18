@@ -180,6 +180,12 @@ Bioconductor only allows dependencies that are hosted on CRAN or
 Bioconductor. The use of `Remotes:` in the DESCRIPTION to specify a unique
 remote location is not allowed.
 
+For packages that depend on `basilisk`, the R code is also checked for calls
+to `setBasiliskCheckVersions()`, which disable version pinning, and for Python
+package specifications that point to a VCS or URL (e.g.,
+`git+https://github.com/...` or `pkg @ https://...`). Python dependencies
+must be version-pinned and installed from PyPI or conda (`ERROR`).
+
 ## LazyData Usage Check
 
 **Checking for 'LazyData: true' usage...**
@@ -835,7 +841,9 @@ DESCRIPTION file is therefore checked in its raw original form.
 
 * **Checking for remote package usage...**
     The `Remotes` field is not allowed in Bioconductor packages as dependencies
-    must be from CRAN or Bioconductor. (`ERROR`)
+    must be from CRAN or Bioconductor. (`ERROR`) For packages using
+    `basilisk`, `setBasiliskCheckVersions()` calls and VCS / URL Python
+    package specifications are also flagged. (`ERROR`)
 
 *  **Checking for valid use of maintainer fields**
     Using the `Authors@R` field over the `Author` and `Maintainer` fields is

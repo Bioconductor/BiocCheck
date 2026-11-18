@@ -924,6 +924,55 @@ BiocCheck:::checkRemotesUsage(.bioctest)
 expect_equivalent(0, BiocCheck:::.BiocCheck$getNum("error"))
 .BiocCheck$zero()
 
+.basiliskCode <- c(
+    "basilisk::setBasiliskCheckVersions(FALSE)",
+    "ghEnv <- basilisk::BasiliskEnvironment(",
+    "    envname = 'ghEnv', pkgname = 'foo',",
+    "    packages = c('python=3.12.10'),",
+    "    pip = c('git+https://github.com/pypa/sampleproject.git',",
+    "        'pandas @ https://example.org/pandas.whl')",
+    ")"
+)
+.writeBasilisk <- function(pkgdir) {
+    dir.create(file.path(pkgdir, "R"), showWarnings = FALSE)
+    writeLines(.basiliskCode, file.path(pkgdir, "R", "basilisk.R"))
+}
+temp_dir <- tempfile()
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    description = list(Imports = "basilisk"),
+    extraActions = .writeBasilisk
+)
+BiocCheck:::checkRemotesUsage(.bioctest)
+expect_equivalent(2, BiocCheck:::.BiocCheck$getNum("error"))
+.errs <- unlist(BiocCheck:::.BiocCheck$get("error"))
+expect_true(any(grepl("setBasiliskCheckVersions", .errs)))
+expect_true(any(grepl("version-pinned", .errs)))
+.BiocCheck$zero()
+
+## no basilisk dependency, no basilisk checks
+.bioctest <- create_test_package(
+    test_dir = temp_dir, extraActions = .writeBasilisk
+)
+BiocCheck:::checkRemotesUsage(.bioctest)
+expect_true(stillZero())
+
+## pinned PyPI packages are fine
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    description = list(Imports = "basilisk"),
+    extraActions = function(pkgdir) {
+        dir.create(file.path(pkgdir, "R"), showWarnings = FALSE)
+        writeLines(c(
+            "env <- basilisk::BasiliskEnvironment('env', 'foo',",
+            "    packages = c('python=3.12.10', 'pandas==2.2.3'))"
+        ), file.path(pkgdir, "R", "basilisk.R"))
+    }
+)
+BiocCheck:::checkRemotesUsage(.bioctest)
+expect_true(stillZero())
+unlink(temp_dir, recursive = TRUE)
+
 # LazyDataUsage -----------------------------------------------------------
 cli::cli_h3("LazyDataUsage")
 

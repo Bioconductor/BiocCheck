@@ -84,6 +84,32 @@ checkRemotesUsage <- function(.BiocPackage)
             " Remove 'Remotes:' and/or 'Additional_repositories:' fields",
             " from DESCRIPTION"
         )
+    if ("basilisk" %in% .BiocPackage$dependencies)
+        checkBasiliskRemotes(.BiocPackage)
+}
+
+checkBasiliskRemotes <- function(.BiocPackage)
+{
+    msg_ver <- findSymbolsInRFiles(
+        .BiocPackage, "setBasiliskCheckVersions", "SYMBOL_FUNCTION_CALL"
+    )
+    if (length(msg_ver))
+        handleErrorFiles(
+            "Avoid disabling basilisk version checks with",
+            " setBasiliskCheckVersions()",
+            messages = msg_ver
+        )
+    ## pip direct references, e.g., 'git+https://...' or 'pkg @ https://...'
+    msg_url <- findSymbolsInRFiles(
+        .BiocPackage, "git\\+|@\\s*(https?|file)://", "STR_CONST",
+        fun = FALSE, FUN = .grepTokenTextCode
+    )
+    if (length(msg_url))
+        handleErrorFiles(
+            "Python dependencies must be version-pinned and installed from",
+            " PyPI or conda; remove VCS / URL package specifications",
+            messages = msg_url
+        )
 }
 
 checkNewPackageVersionNumber <- function(.BiocPackage)

@@ -24,6 +24,10 @@ NEW FEATURES
     overall `status`, one structured `entries` record per condition raised
     (with the originating check function and file locations where reported),
     and the plain text report. See the vignette for the schema.
+    o Extend `checkRemotesUsage` to flag `basilisk` packages that disable
+    version checks with `setBasiliskCheckVersions()` or that install Python
+    packages from VCS / URL specifications, e.g., `git+https://...`
+    (@Artur-man, #263).
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
