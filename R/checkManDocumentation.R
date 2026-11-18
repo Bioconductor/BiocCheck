@@ -122,15 +122,14 @@ checkForValueSection <- function(.BiocPackage) {
     isData <- docTypes == "data"
     docTypes[!lengths(docTypes) | (hasUsage & !isInternal & !isData)] <- "fun"
     funs <- lapply(docTypes, .whichRdCheck)
-    ok <- mapply(
+    ok <- unlist(Map(
         function(afun, rds, atags) {
             afun(rds, atags)
         },
         afun = funs,
         rds = all_rds,
-        atags = all_tags,
-        SIMPLIFY = TRUE
-    )
+        atags = all_tags
+    ))
     dataOK <- ok[isData]
     elseOK <- ok[!isData]
     if (!all(dataOK)) {
