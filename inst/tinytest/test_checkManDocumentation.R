@@ -334,6 +334,66 @@ expect_true(stillZero())
 .bioctest$installDir |> dirname() |> unlink(recursive = TRUE)
 unlink(temp_dir, recursive = TRUE)
 
+# Case 4: internal pages are excluded from the runnable examples ratio
+# (1 user-facing page with examples, 2 internal pages without) -> Zero
+.BiocCheck$zero()
+temp_dir <- tempfile()
+.bioctest <- create_test_package(
+    test_dir = temp_dir,
+    extraActions = function(path) {
+        cat(
+            "export(fun1)\nexport(fun2)\nexport(fun3)\n",
+            file = file.path(path, "NAMESPACE")
+        )
+        rdir <- file.path(path, "R")
+        cat(
+            "fun1 <- function() { 1 }\n",
+            "fun2 <- function() { 2 }\n",
+            "fun3 <- function() { 3 }\n",
+            file = file.path(rdir, "funs.R")
+        )
+        mandir <- file.path(path, "man")
+        dir.create(mandir, recursive = TRUE)
+        cat(
+            "\\name{fun1}
+            \\alias{fun1}
+            \\title{fun1}
+            \\description{fun1}
+            \\usage{fun1()}
+            \\value{1}
+            \\examples{
+            fun1()
+            }
+            ",
+            file = file.path(mandir, "fun1.Rd")
+        )
+        for (fun in c("fun2", "fun3"))
+            cat(
+                sprintf(
+                    "\\name{%1$s}
+                    \\alias{%1$s}
+                    \\title{%1$s}
+                    \\description{%1$s}
+                    \\usage{%1$s()}
+                    \\value{1}
+                    \\keyword{internal}
+                    ",
+                    fun
+                ),
+                file = file.path(mandir, paste0(fun, ".Rd"))
+            )
+    }
+)
+.bioctest$inst_setup()
+res <- BiocCheck:::checkExportsAreDocumented(
+    .bioctest, lib.loc = .bioctest$installDir
+)
+expect_identical(res, character(0L))
+expect_true(stillZero())
+# Cleanup installation
+.bioctest$installDir |> dirname() |> unlink(recursive = TRUE)
+unlink(temp_dir, recursive = TRUE)
+
 
 # checkUsageOfDont --------------------------------------------------------
 cli::cli_h3("checkUsageOfDont")

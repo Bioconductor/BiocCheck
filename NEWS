@@ -29,6 +29,9 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o Man pages with the `internal` keyword are no longer counted by the
+    runnable examples check (`checkExportsAreDocumented`); only user-facing
+    pages documenting exported objects count toward the 80% requirement.
     o Retry Support Site API requests that fail with HTTP 429 (Too Many
     Requests) or 503, and request the API URLs with a trailing slash to avoid
     a redirect. This avoids spurious warnings from the registration and

@@ -46,6 +46,13 @@ checkForPromptComments <- function(.BiocPackage) {
     as.character(tagList)
 }
 
+.isInternalRd <- function(rd, tags) {
+    if (missing(tags))
+        tags <- .RdTags(rd)
+    keywords <- trimws(.tagsExtract(rd, tags = tags, Tag = "\\keyword"))
+    "internal" %in% keywords
+}
+
 .valueInParsedRd <- function(rd, tags) {
     tagList <- .tagListExtract(rd, tags, "\\value")
     values <- Filter(function(x) attr(x, "Rd_tag") != "COMMENT", tagList)
@@ -107,18 +114,10 @@ checkForValueSection <- function(.BiocPackage) {
         },
         logical(1L)
     )
-    isInternal <- mapply(
-        function(rd, tags, keyword) {
-            if ("\\keyword" %in% tags)
-                "internal" %in% unlist(.tagListExtract(rd, tags, "\\keyword"))
-            else
-                FALSE
-        },
-        rd = all_rds,
-        tags = all_tags,
-        SIMPLIFY = TRUE
-    ) |>
-        as.logical()
+    isInternal <- unlist(
+        Map(.isInternalRd, rd = all_rds, tags = all_tags),
+        use.names = FALSE
+    )
     docTypes[isInternal] <- "internal"
     isData <- docTypes == "data"
     docTypes[!lengths(docTypes) | (hasUsage & !isInternal & !isData)] <- "fun"
@@ -170,6 +169,9 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc) {
     for (manpage in manpages) {
         rd <- .parse_Rd_pack(manpage, usesRdpack = uses_rd_pack)
         tags <- .RdTags(rd)
+        ## internal pages are not user-facing; exclude from the ratio
+        if (.isInternalRd(rd, tags))
+            next
         name <- .tagsExtract(rd, tags = tags, Tag = "\\name")
         aliases <- .tagsExtract(rd, tags = tags, Tag = "\\alias")
         namesAndAliases <- c(name, aliases)
@@ -220,21 +222,12 @@ checkUsageOfDont <- function(.BiocPackage) {
             exampleCode <- rdCode[which(rdCode == "\\examples"):length(rdCode)]
             donttest <- "\\donttest" %in% exampleCode
             dontrun <- "\\dontrun" %in% exampleCode
-            ## check for the 'internal' keyword - this will be a false positive
-            keyword <- .RdTags(rd) == "\\keyword"
-            internalVec <- FALSE
-            if (any(keyword))
-                internalVec <- vapply(
-                    as.character(rd[keyword]),
-                    grepl,
-                    logical(1L),
-                    pattern = "internal",
-                    USE.NAMES = FALSE
-                )
-            if ((donttest || dontrun) && !any(internalVec))
+            ## skip pages with the 'internal' keyword
+            isInternal <- .isInternalRd(rd)
+            if ((donttest || dontrun) && !isInternal)
                 hasBad[dx] <- TRUE
 
-            if (dontrun && !any(internalVec))
+            if (dontrun && !isInternal)
                 hasdontrun[dx] <- TRUE
         }
     }
