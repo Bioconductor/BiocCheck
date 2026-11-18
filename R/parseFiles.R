@@ -18,7 +18,7 @@ parseFile <- function(.BiocPackage, infile) {
     } else if (grepl("\\.Rd$", infile, TRUE)) {
         rd <- .parse_Rd_pack(
             infile, usesRdpack = .BiocPackage$usesRdpack,
-            encoding = .rd_encoding(.BiocPackage)
+            encoding = .BiocPackage$encoding
         )
         code <- capture.output(tools::Rd2ex(rd))
         writeLines(code, con=outfile, sep="\n")

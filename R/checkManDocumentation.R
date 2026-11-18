@@ -60,14 +60,6 @@ checkForPromptComments <- function(.BiocPackage) {
     nzchar(trimws(value)) && length(values)
 }
 
-.rd_encoding <- function(.BiocPackage) {
-    dcf <- .BiocPackage$DESCRIPTION
-    if ("Encoding" %in% colnames(dcf))
-        dcf[, "Encoding"]
-    else
-        "unknown"
-}
-
 .parse_Rd_pack <- function(manpage, usesRdpack, encoding = "unknown") {
     sysfile_rdpack <- system.file(package = "Rdpack")
     rdpack_avail <- nzchar(sysfile_rdpack)
@@ -85,7 +77,7 @@ checkForPromptComments <- function(.BiocPackage) {
     lapply(
         manpages,
         function(manpage, usesRdpack, encoding) {
-            .parse_Rd_pack(manpage, usesRdpack, encoding = encoding)
+            .parse_Rd_pack(manpage, usesRdpack, encoding)
         },
         usesRdpack = usesRdpack,
         encoding = encoding
@@ -114,8 +106,9 @@ checkForPromptComments <- function(.BiocPackage) {
 
 checkForValueSection <- function(.BiocPackage) {
     all_rds <- .read_all_rds(
-        .BiocPackage$manSources, .BiocPackage$usesRdpack,
-        encoding = .rd_encoding(.BiocPackage)
+        manpages = .BiocPackage$manSources,
+        usesRdpack = .BiocPackage$usesRdpack,
+        encoding = .BiocPackage$encoding
     )
     all_tags <- lapply(all_rds, .RdTags)
     docTypes <- mapply(docType, rd = all_rds, tags = all_tags, SIMPLIFY = FALSE)
@@ -165,7 +158,7 @@ checkExportsAreDocumented <- function(.BiocPackage, lib.loc) {
     pkgdir <- .BiocPackage$sourceDir
     pkgname <- .BiocPackage$packageName
     uses_rd_pack <- .BiocPackage$usesRdpack
-    encoding <- .rd_encoding(.BiocPackage)
+    encoding <- .BiocPackage$encoding
     manpages <- .BiocPackage$manSources
 
     already_loaded <- isNamespaceLoaded(pkgname)
@@ -227,7 +220,7 @@ checkUsageOfDont <- function(.BiocPackage) {
     hasBad <- rep(FALSE, length(manpages))
     hasdontrun <- rep(FALSE, length(manpages))
     uses_rd_pack <- .BiocPackage$usesRdpack
-    encoding <- .rd_encoding(.BiocPackage)
+    encoding <- .BiocPackage$encoding
     for (dx in seq_along(manpages)) {
         manpage <- manpages[dx]
         rd <- .parse_Rd_pack(

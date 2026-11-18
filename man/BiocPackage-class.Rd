@@ -41,6 +41,10 @@ package}
 \item{\code{DESCRIPTION}}{\code{matrix} containing the DCF contents of the \code{DESCRIPTION}
 file}
 
+\item{\code{encoding}}{\code{character} encoding declared in the \code{DESCRIPTION}
+\code{Encoding} field, used when parsing Rd files; \code{"unknown"} when the field
+is absent or empty}
+
 \item{\code{dependencies}}{\code{character} vector of package dependencies}
 
 \item{\code{readError}}{\code{character} error message if the \code{DESCRIPTION} file could

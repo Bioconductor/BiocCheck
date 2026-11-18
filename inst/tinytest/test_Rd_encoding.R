@@ -16,7 +16,7 @@ test_rd_encoding <- function() {
         if (!is.null(encoding))
             fields <- c(fields, Encoding = encoding)
         write.dcf(as.data.frame(as.list(fields)), description)
-        read.dcf(description)
+        pkg$readDESCRIPTION()
     }
     write_rd <- function(title, encoding = "UTF-8", rd_encoding = NULL,
                          value = TRUE, dontrun = FALSE) {
@@ -38,10 +38,10 @@ test_rd_encoding <- function() {
         text <- paste0(paste(lines, collapse = "\n"), "\n")
         writeBin(charToRaw(iconv(text, from = "UTF-8", to = encoding)), manpage)
     }
-    pkg <- list(
-        sourceDir = test_dir, packageName = "stats", usesRdpack = FALSE,
-        manSources = setNames(manpage, "man/median.Rd")
-    )
+    pkg <- methods::new("BiocPackage")
+    pkg$sourceDir <- test_dir
+    pkg$usesRdpack <- FALSE
+    pkg$manSources <- setNames(manpage, "man/median.Rd")
     title <- "caf\u00e9 \u2013 \u03b2"
 
     for (locale in unique(c(old_locale, "C"))) {
@@ -50,7 +50,8 @@ test_rd_encoding <- function() {
             message("Skipping unavailable LC_CTYPE locale: ", locale)
             next
         }
-        pkg$DESCRIPTION <- write_description("UTF-8")
+        write_description("UTF-8")
+        expect_identical(pkg$encoding, "UTF-8")
         write_rd(title)
 
         # Each production caller must pass DESCRIPTION Encoding to the parser.
@@ -71,7 +72,7 @@ test_rd_encoding <- function() {
 
         rds <- BiocCheck:::.read_all_rds(
             pkg$manSources, pkg$usesRdpack,
-            encoding = BiocCheck:::.rd_encoding(pkg)
+            encoding = pkg$encoding
         )
         expect_identical(names(rds), names(pkg$manSources))
         expect_identical(
@@ -103,8 +104,8 @@ test_rd_encoding <- function() {
         expect_equivalent(BiocCheck::.BiocCheck$getNum("error"), 1L)
 
         # An omitted field retains parse_Rd's native-encoding default.
-        pkg$DESCRIPTION <- write_description()
-        expect_identical(BiocCheck:::.rd_encoding(pkg), "unknown")
+        write_description()
+        expect_identical(pkg$encoding, "unknown")
         write_rd("ASCII title")
         rd <- BiocCheck:::.parse_Rd_pack(manpage, FALSE)
         expect_identical(
@@ -129,19 +130,20 @@ test_rd_encoding <- function() {
 
         # Respect other declared encodings and per-file overrides.
         latin_title <- "caf\u00e9"
-        pkg$DESCRIPTION <- write_description("latin1")
+        write_description("latin1")
+        expect_identical(pkg$encoding, "latin1")
         write_rd(latin_title, encoding = "latin1")
         rd <- BiocCheck:::.parse_Rd_pack(
-            manpage, FALSE, encoding = BiocCheck:::.rd_encoding(pkg)
+            manpage, FALSE, encoding = pkg$encoding
         )
         expect_identical(
             enc2utf8(BiocCheck:::.tagsExtract(rd, Tag = "\\title")),
             latin_title
         )
-        pkg$DESCRIPTION <- write_description("UTF-8")
+        write_description("UTF-8")
         write_rd(latin_title, encoding = "latin1", rd_encoding = "latin1")
         rd <- BiocCheck:::.parse_Rd_pack(
-            manpage, FALSE, encoding = BiocCheck:::.rd_encoding(pkg)
+            manpage, FALSE, encoding = pkg$encoding
         )
         expect_identical(
             enc2utf8(BiocCheck:::.tagsExtract(rd, Tag = "\\title")),
@@ -151,3 +153,13 @@ test_rd_encoding <- function() {
 }
 
 test_rd_encoding()
+
+# A blank Encoding field falls back to parse_Rd's native-encoding default.
+expect_identical(
+    BiocCheck:::.descEncoding(cbind(Package = "pkg", Encoding = " ")),
+    "unknown"
+)
+expect_identical(
+    BiocCheck:::.descEncoding(cbind(Package = "pkg", Encoding = "UTF-8")),
+    "UTF-8"
+)

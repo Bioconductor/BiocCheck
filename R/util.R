@@ -461,6 +461,12 @@ doesManPageHaveRunnableExample <- function(rd)
         dir.exists(file.path(sourceDir, ".git"))
 }
 
+.descEncoding <- function(dcf) {
+    encoding <- if ("Encoding" %in% colnames(dcf))
+        trimws(unname(dcf[1L, "Encoding"]))
+    if (isScalarCharacter(encoding)) encoding else "unknown"
+}
+
 #' @noRd
 #' @keywords internal
 .isSourceDir <- function(sourceDir) {

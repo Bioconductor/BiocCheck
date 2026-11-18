@@ -33,6 +33,10 @@
 #' @field DESCRIPTION `matrix` containing the DCF contents of the `DESCRIPTION`
 #'   file
 #'
+#' @field encoding `character` encoding declared in the `DESCRIPTION`
+#'   `Encoding` field, used when parsing Rd files; `"unknown"` when the field
+#'   is absent or empty
+#'
 #' @field dependencies `character` vector of package dependencies
 #'
 #' @field readError `character` error message if the `DESCRIPTION` file could
@@ -115,6 +119,7 @@
         usesRoxygen = "logical",
         usesRdpack = "logical",
         DESCRIPTION = "matrix",
+        encoding = "character",
         dependencies = "character",
         readError = "character",
         packageVersion = "character",
@@ -265,6 +270,7 @@
                 .self[["DESCRIPTION"]] <- dcf
                 .self[["packageName"]] <- as.character(dcf[, "Package"])
                 .self[["packageVersion"]] <- as.character(dcf[, "Version"])
+                .self[["encoding"]] <- .descEncoding(dcf)
             } else {
                 .self[["readError"]] <- conditionMessage(attr(dcf, "condition"))
             }
