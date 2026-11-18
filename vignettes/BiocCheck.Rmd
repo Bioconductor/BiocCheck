@@ -484,8 +484,9 @@ directory.
     type is then a `list()` rather than a vector or array. (`NOTE`)
 
 * We recommend that `seq_len()` or `seq_along()` be used instead of
-    `1:...`. This is because the case `1:0` creates the sequence `c(1, 0)`
-    which may be an unexpected or unwanted result (`NOTE`).
+    `1:n`. This is because the case `1:0` creates the sequence `c(1, 0)`
+    which may be an unexpected or unwanted result. Sequences with a numeric
+    literal upper bound, e.g., `1:10`, are not flagged (`NOTE`).
 
 * Single colon typos are checked for when a user inputs 'package:function'
     instead of using double colons ('::') to import a function (`ERROR`).

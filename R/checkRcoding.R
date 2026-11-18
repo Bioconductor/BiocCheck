@@ -19,7 +19,7 @@ checkCodingPractice <- function(.BiocPackage, parsedCode)
     msg_seq <- check1toN(.BiocPackage)
     if (length(msg_seq)) {
         handleNoteFiles(
-            " Avoid 1:...; use seq_len() or seq_along()",
+            " Avoid 1:n; use seq_len() or seq_along() as 1:0 is c(1, 0)",
             messages = msg_seq
         )
     }
@@ -217,7 +217,11 @@ check1toN <- function(.BiocPackage) {
         tokens <- getParseData(parse(rfile, keep.source=TRUE))
         tokens <- tokens[tokens[,"token"] != "expr", ,drop=FALSE]
         colons <- which(tokens[,"text"] == ":") - 1
-        colons <- colons[tokens[colons, "text"] == "1"]
+        ## numeric literal upper bounds (e.g., 1:10) cannot be zero-length
+        colons <- colons[
+            tokens[colons, "text"] == "1" &
+                tokens[colons + 2L, "token"] != "NUM_CONST"
+        ]
         tokens <- tokens[colons, , drop=FALSE]
         tokens <- tokens[ tokens[,"text"] == "1", , drop=FALSE]
         sprintf(

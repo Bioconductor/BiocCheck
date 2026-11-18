@@ -559,6 +559,8 @@ expect_equivalent(length(msg_sapply), 1)
 
 msg_seq <- BiocCheck:::check1toN(.bioctest)
 expect_equivalent(length(msg_seq), 1)
+## 1:10 is not flagged; only 1:n
+expect_true(grepl("bad_coding.R (line 139,", msg_seq, fixed = TRUE))
 
 msg_eda <- BiocCheck:::checkExternalData(.bioctest)
 expect_equivalent(length(msg_eda), 4)

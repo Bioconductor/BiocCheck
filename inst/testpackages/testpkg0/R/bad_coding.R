@@ -135,3 +135,8 @@ really_long_function <- function() {
   
   return(TRUE)
 }
+badSeq <- function(n) {
+    for (i in 1:n) {
+        message(i)
+    }
+}

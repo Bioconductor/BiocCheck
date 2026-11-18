@@ -31,6 +31,9 @@ NEW FEATURES
 
 BUG FIXES AND MINOR IMPROVEMENTS
 
+    o `check1toN` no longer flags sequences with a numeric literal upper
+    bound, e.g., `1:10`; only `1:n`-style sequences, which can be
+    unexpectedly decreasing when `n` is 0, are reported (@Bisaloo, #256).
     o Remove the Support Site registration and 'Watched Tags' checks as
     Bioconductor transitions away from the Support Site. The
     `no-check-bioc-help` option now only disables the Bioc-devel mailing list
