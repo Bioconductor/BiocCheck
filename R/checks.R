@@ -754,7 +754,8 @@ checkIsPackageNameAlreadyInUse <- function(
         handleError(msg)
 }
 
-#' @importFrom httr2 req_body_form resp_status resp_body_html
+#' @importFrom httr2 request req_body_form req_perform resp_status
+#' @importFrom httr2 resp_body_html
 checkForBiocDevelSubscription <- function(.BiocPackage)
 {
     email <- getMaintainerEmail(.BiocPackage) |> tolower()
@@ -805,123 +806,5 @@ checkForBiocDevelSubscription <- function(.BiocPackage)
             "https://stat.ethz.ch/mailman/listinfo/bioc-devel",
             nframe = 3L
         )
-    }
-}
-
-checkForSupportSiteRegistration <- function(.BiocPackage)
-{
-    email <- getMaintainerEmail(.BiocPackage) |> tolower()
-    if (is.null(email)) {
-        handleError(
-            "Unable to determine maintainer email from DESCRIPTION file.",
-            nframe = 3L
-        )
-        return()
-    }
-    if (identical(tolower(email), "maintainer@bioconductor.org")) {
-        handleMessage("Maintainer email is ok.")
-        return()
-    }
-    accountExists <- checkSupportReg(email)
-
-    if (accountExists) {
-        pkgname <- tolower(.BiocPackage$packageName)
-        checkWatchedTag(email, pkgname)
-    }
-}
-
-#' @importFrom httr2 req_perform request resp_body_json req_timeout req_error
-#' @importFrom httr2 req_retry
-#' @importFrom httr2 resp_status
-#' @importFrom utils URLencode
-checkSupportReg <- function(email) {
-    response <- paste0(
-        "https://support.bioconductor.org/api/email/",
-        URLencode(email, reserved = TRUE),
-        "/"
-    ) |>
-        request() |>
-        req_timeout(15L) |>
-        req_retry(max_tries = 3L) |>
-        req_error(is_error = function(resp) FALSE) |>
-        req_perform() |>
-        try(silent = TRUE)
-
-    response_error <- inherits(response, "try-error")
-    if (!response_error) {
-        status <- resp_status(response)
-        if (status != 200L && status != 404L) {
-            response_error <- TRUE
-            attr(response, "condition") <-
-                simpleError(paste("HTTP status", status))
-            class(response) <- "try-error"
-        }
-    }
-
-    result <- !response_error && (resp_status(response) == 200L)
-    if (response_error) {
-        handleWarning(
-            "Unable to retrieve email info from the Support Site:",
-            "\n  ", conditionMessage(attr(response, "condition"))
-        )
-    } else if (result) {
-        handleMessage("Maintainer is registered at support site.")
-    } else {
-        handleError(
-            "Register your email account on the Support Site at ",
-            "https://support.bioconductor.org/accounts/signup/"
-        )
-    }
-    result
-}
-
-checkWatchedTag <- function(email, pkgname) {
-    if (identical(email, "maintainer@bioconductor.org"))
-        return()
-
-    response <- paste0(
-        "https://support.bioconductor.org/api/watched/tags/",
-        URLencode(email, reserved = TRUE),
-        "/"
-    ) |>
-        request() |>
-        req_timeout(15L) |>
-        req_retry(max_tries = 3L) |>
-        req_error(is_error = function(resp) FALSE) |>
-        req_perform() |>
-        try(silent = TRUE)
-
-    response_error <- inherits(response, "try-error")
-    if (!response_error) {
-        status <- resp_status(response)
-        if (status != 200L) {
-            response_error <- TRUE
-            attr(response, "condition") <-
-                simpleError(paste("HTTP status", status))
-            class(response) <- "try-error"
-        }
-    }
-
-    if (response_error) {
-        handleMessage(
-            "Unable to retrieve 'Watched Tags' profile from the Support Site:",
-            "\n  ", conditionMessage(attr(response, "condition"))
-        )
-    } else {
-        alltags <- resp_body_json(response)[["watched_tags"]]
-        taglist <- unlist(strsplit(alltags, split = ","))
-        tags <- tolower(taglist)
-        if (tolower(pkgname) %in% tags)
-            handleMessage(
-                sQuote(pkgname, FALSE),
-                " is already in your 'Watched Tags' on the Support Site."
-            )
-        else
-            handleError(
-                "The ", sQuote(pkgname, FALSE), " tag must be added to your ",
-                "'Watched Tags' in your Support Site profile ",
-                "to receive email notifications for tagged questions: ",
-                "https://support.bioconductor.org/accounts/edit/profile"
-            )
     }
 }

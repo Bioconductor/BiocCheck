@@ -1200,53 +1200,6 @@ if (nchar(Sys.getenv("BIOC_DEVEL_PASSWORD"))) {
 
 }
 
-# checkForSupportSiteRegistration ----------------------------------------
-cli::cli_h3("checkForSupportSiteRegistration")
-
-connect <- support_api_ok()
-
-if (connect) {
-
-    # Email registration
-    .BiocCheck$zero()
-    BiocCheck:::checkSupportReg("lori.shepherd@roswellpark.org")
-    expect_true(stillZero())
-    BiocCheck:::checkSupportReg("foo@bar.com")
-    expect_equivalent(.BiocCheck$getNum("error"), 1)
-    .BiocCheck$zero()
-    ## api is not case sensitive
-    BiocCheck:::checkSupportReg("lori.shePhErd@roswellpark.org")
-    expect_true(stillZero())
-
-    .BiocCheck$zero()
-    ## tag check for existing package
-    BiocCheck:::checkWatchedTag(
-        "lori.shepherd@roswellpark.org", "biocfilecache"
-    )
-    expect_true(stillZero())
-
-    .BiocCheck$zero()
-    ## tag check for non-existing package
-    BiocCheck:::checkWatchedTag(
-        "lori.shepherd@roswellpark.org", "unwatchedpackage"
-    )
-    expect_equivalent(.BiocCheck$getNum("error"), 1)
-    .BiocCheck$zero()
-    ## email is case insensitive
-    BiocCheck:::checkWatchedTag(
-        "lori.shePherd@rosWellpark.org", "biocfilecache"
-    )
-    expect_true(stillZero())
-
-    .BiocCheck$zero()
-    ## check tag is not case senstive
-    BiocCheck:::checkWatchedTag(
-        "lori.shepherd@rosWellpark.org", "bioCfiLecache"
-    )
-    expect_true(stillZero())
-    .BiocCheck$zero()
-}
-
 # checkForVersionNumberMismatch -------------------------------------------
 cli::cli_h3("checkForVersionNumberMismatch")
 

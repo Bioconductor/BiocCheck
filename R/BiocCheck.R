@@ -454,9 +454,6 @@ BiocCheckSource <- function(.BiocPackage, debug, dots) {
                 "https://stat.ethz.ch/mailman/listinfo/bioc-devel"
             )
         }
-
-        handleCheck("Checking for support site registration...")
-        checkForSupportSiteRegistration(.BiocPackage)
     }
 
     .BiocCheck$report(debug, onBBS)
