@@ -281,10 +281,19 @@ checkS4ClassShowMethod <- function(.BiocPackage) {
 
     Filter(
         function(x) {
-            is(selectMethod("show", x), "derivedDefaultMethod")
+            !.inheritsS3Class(x) &&
+                is(selectMethod("show", x), "derivedDefaultMethod")
         },
         eligClass
     )
+}
+
+## S4 classes with a data part (e.g., contains = "array" or "data.frame")
+## are displayed reasonably by methods::showDefault(), which print()s the
+## underlying object; classes extending a setOldClass() class without a
+## data part already dispatch to the non-derived show,oldClass method
+.inheritsS3Class <- function(cl) {
+    ".Data" %in% names(getClass(cl)@slots)
 }
 
 .filtTokens <-

@@ -1,4 +1,4 @@
 import(tools)
 export(baddep)
 
-exportClasses("classB")
+exportClasses("classB", "classC", "classD", "classE")
